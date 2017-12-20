@@ -53,15 +53,15 @@ TSO
 TSO concentration
 ------------------
 
- - 80 uM (  +100 nL of 400 uM A1-A7 source wells) in A1-A7, A8-A14, A15-A21, K1-K7, N1-N7 
- - 40 uM ( +50 nL of 400 uM A1-A7 source wells) in B1-B7, B8-B14, B15-B21, L1-L7, O1-O7
- - 20 uM ( +25 nL of 400 uM A1-A7 source wells) in C1-C7, C8-C14, C15-C21, M1-M7, P1-P7
- - 10 uM ( +100 nL of 50 uM source wells) in D1-D7, D8-D14, D15-D21, K8-K14, N8-N14 + J1-J7, J8-J14, J15-J21, K22-K24, L22-L24, M23, N22-N24, O22-O24, P23
- - 5 uM ( +50 nL of 50 uM source wells) in E1-E7, E8-E14, E15-E21, L8-L14, O8-O14
- - 2,5 uM (+25 nL of 50 uM source wells) in F1-F7, F8-F14, F15-F21, M8-M14, P8-P14
- - 1,25 uM (+100 nL of 6,25 uM source wells) in G1-G7, G8-G14, G15-G21, K15-K21, N15-N21
- - 0,625 uM (+50 nL of 6,25 uM source wells) in H1-H7, H8-H14, H15-H21, L15-L21, O15-O21
- - 0,3125 uM (+25 nL of 6,25 uM source wells) in I1-I7, I8-I14, I15-I21, M15-M21, P15-P21
+ - 80 μM (  +100 nL of 400 μM A1-A7 source wells) in A1-A7, A8-A14, A15-A21, K1-K7, N1-N7 
+ - 40 μM ( +50 nL of 400 μM A1-A7 source wells) in B1-B7, B8-B14, B15-B21, L1-L7, O1-O7
+ - 20 μM ( +25 nL of 400 μM A1-A7 source wells) in C1-C7, C8-C14, C15-C21, M1-M7, P1-P7
+ - 10 μM ( +100 nL of 50 μM source wells) in D1-D7, D8-D14, D15-D21, K8-K14, N8-N14 + J1-J7, J8-J14, J15-J21, K22-K24, L22-L24, M23, N22-N24, O22-O24, P23
+ - 5 μM ( +50 nL of 50 μM source wells) in E1-E7, E8-E14, E15-E21, L8-L14, O8-O14
+ - 2,5 μM (+25 nL of 50 μM source wells) in F1-F7, F8-F14, F15-F21, M8-M14, P8-P14
+ - 1,25 μM (+100 nL of 6,25 μM source wells) in G1-G7, G8-G14, G15-G21, K15-K21, N15-N21
+ - 0,625 μM (+50 nL of 6,25 μM source wells) in H1-H7, H8-H14, H15-H21, L15-L21, O15-O21
+ - 0,3125 μM (+25 nL of 6,25 μM source wells) in I1-I7, I8-I14, I15-I21, M15-M21, P15-P21
  
 
 ```{r TSO_concentration}
@@ -149,13 +149,13 @@ RT_PRIMERS
 RT primers concentration
 -------------------------
 
- - 0 uM (controls, + 0 nL) in Col 1, 8 and 15 + M23 + P23
- - 0.125 uM (+ 25 nL from source well K1 2.5 uM) in Col 2, 9 and 16 + K22 + N22
- - 0.25 uM (+ 25 nL from source well K2 5 uM) in Col 3, 10 and 17 + K23 + N23
- - 0.5 uM (+ 25 nL from source well K3 10 uM) in Col 4, 11 and 18 + K24 + N24
- - 1 uM (+ 25 nL from source well K4 20 uM) in Col 5, 12 and 19 + L22 + O22
- - 2 uM (+ 25 nL from source well K5 40 uM) in Col 6, 13 and 20 + L23 + O23
- - 4 uM (+ 25 nL from source well K6 80 uM) in Col 7, 14 and 21 + L24 + O24
+ - 0 μM (controls, + 0 nL) in Col 1, 8 and 15 + M23 + P23
+ - 0.125 μM (+ 25 nL from source well K1 2.5 μM) in Col 2, 9 and 16 + K22 + N22
+ - 0.25 μM (+ 25 nL from source well K2 5 μM) in Col 3, 10 and 17 + K23 + N23
+ - 0.5 μM (+ 25 nL from source well K3 10 μM) in Col 4, 11 and 18 + K24 + N24
+ - 1 μM (+ 25 nL from source well K4 20 μM) in Col 5, 12 and 19 + L22 + O22
+ - 2 μM (+ 25 nL from source well K5 40 μM) in Col 6, 13 and 20 + L23 + O23
+ - 4 μM (+ 25 nL from source well K6 80 μM) in Col 7, 14 and 21 + L24 + O24
 
 ```{r RT_PRIMERS}
 plate %<>%
