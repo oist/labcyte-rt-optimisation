@@ -1,0 +1,409 @@
+---
+title: "RT optimisation with the Labcyte Echo 525 (December 2017)"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r set-options, echo=FALSE, cache=FALSE}
+options(width = 120)
+```
+
+Load scripts and libraries.
+
+```{r}
+# We use the R library called "magrittr", to build the data frame describing the
+#384-well plate.
+library(magrittr)
+
+# The "setBlock" function to update values in the data frame is shared by multiple
+# Rmarkdown files, so it is stored in a separate source file.
+source('setBlock.R')
+```
+
+Create a data frame representing the contents of each well.
+
+```{r}
+plate <- data.frame(
+    Row = rep(LETTERS[1:16], 24)
+  , Col = unlist(lapply(01:24, rep, 16))
+)
+rownames(plate) <- paste0(plate$Row, plate$Col)
+```
+
+MASTER_MIX
+==========
+
+Master mix volume 
+------------------
+
+- 350 nL of mastermix added to each well
+
+```{r MASTER_MIX_vol}
+plate %<>%
+  setBlock("A01~P21", "MASTER_MIX_vol", 350) %>%
+  setBlock("K22~L24", "MASTER_MIX_vol", 350) %>%
+  setBlock("M23", "MASTER_MIX_vol", 350) %>%
+  setBlock("N22~O24", "MASTER_MIX_vol", 350) %>%
+  setBlock("P23", "MASTER_MIX_vol", 350)
+```
+
+TSO
+===
+
+TSO concentration
+------------------
+
+ - 80 uM (  +100 nL of 400 uM A1-A7 source wells) in A1-A7, A8-A14, A15-A21, K1-K7, N1-N7 
+ - 40 uM ( +50 nL of 400 uM A1-A7 source wells) in B1-B7, B8-B14, B15-B21, L1-L7, O1-O7
+ - 20 uM ( +25 nL of 400 uM A1-A7 source wells) in C1-C7, C8-C14, C15-C21, M1-M7, P1-P7
+ - 10 uM ( +100 nL of 50 uM source wells) in D1-D7, D8-D14, D15-D21, K8-K14, N8-N14 + J1-J7, J8-J14, J15-J21, K22-K24, L22-L24, M23, N22-N24, O22-O24, P23
+ - 5 uM ( +50 nL of 50 uM source wells) in E1-E7, E8-E14, E15-E21, L8-L14, O8-O14
+ - 2,5 uM (+25 nL of 50 uM source wells) in F1-F7, F8-F14, F15-F21, M8-M14, P8-P14
+ - 1,25 uM (+100 nL of 6,25 uM source wells) in G1-G7, G8-G14, G15-G21, K15-K21, N15-N21
+ - 0,625 uM (+50 nL of 6,25 uM source wells) in H1-H7, H8-H14, H15-H21, L15-L21, O15-O21
+ - 0,3125 uM (+25 nL of 6,25 uM source wells) in I1-I7, I8-I14, I15-I21, M15-M21, P15-P21
+ 
+
+```{r TSO_concentration}
+plate %<>%
+  setBlock("A01~A21", "TSO", 80) %>%
+  setBlock("K01~K07", "TSO", 80) %>%
+  setBlock("N01~N07", "TSO", 80) %>%
+  setBlock("B01~B21", "TSO", 40) %>%
+  setBlock("L01~L07", "TSO", 40) %>%
+  setBlock("O01~O07", "TSO", 40) %>%
+  setBlock("C01~C21", "TSO", 20) %>%
+  setBlock("M01~M07", "TSO", 20) %>%
+  setBlock("P01~P07", "TSO", 20) %>%
+  setBlock("D01~D21", "TSO", 10) %>%
+  setBlock("K08~K14", "TSO", 10) %>%
+  setBlock("N08~N14", "TSO", 10) %>%
+  setBlock("J01~J21", "TSO", 10) %>%
+  setBlock("K22~K24", "TSO", 10) %>%
+  setBlock("L22~L24", "TSO", 10) %>%
+  setBlock("M23", "TSO", 10) %>%
+  setBlock("N22~N24", "TSO", 10) %>%
+  setBlock("O22~O24", "TSO", 10) %>%
+  setBlock("P23", "TSO", 10) %>% 
+  setBlock("E01~E21", "TSO", 5) %>%
+  setBlock("L08~L14", "TSO", 5) %>%
+  setBlock("O08~O14", "TSO", 5) %>%
+  setBlock("F01~F21", "TSO", 2.5) %>%
+  setBlock("M08~M14", "TSO", 2.5) %>%
+  setBlock("P08~P14", "TSO", 2.5) %>%
+  setBlock("G01~G21", "TSO", 1.25) %>%
+  setBlock("K15~K21", "TSO", 1.25) %>%
+  setBlock("N15~N21", "TSO", 1.25) %>%
+  setBlock("H01~H21", "TSO", 0.625) %>%
+  setBlock("L15~L21", "TSO", 0.625) %>%
+  setBlock("O15~O21", "TSO", 0.625) %>%
+  setBlock("I01~I21", "TSO", 0.3125) %>%
+  setBlock("M15~M21", "TSO", 0.3125) %>%
+  setBlock("P15~P21", "TSO", 0.3125)
+```
+
+TSO volume
+-----------
+
+```{r TSO_volume}
+plate %<>%
+  setBlock("A01~A21", "TSO_vol", 100) %>%
+  setBlock("K01~K07", "TSO_vol", 100) %>%
+  setBlock("N01~N07", "TSO_vol", 100) %>%
+  setBlock("B01~B21", "TSO_vol", 50) %>%
+  setBlock("L01~L07", "TSO_vol", 50) %>%
+  setBlock("O01~O07", "TSO_vol", 50) %>%
+  setBlock("C01~C21", "TSO_vol", 25) %>%
+  setBlock("M01~M07", "TSO_vol", 25) %>%
+  setBlock("P01~P07", "TSO_vol", 25) %>%
+  setBlock("D01~D21", "TSO_vol", 100) %>%
+  setBlock("K08~K14", "TSO_vol", 100) %>%
+  setBlock("N08~N14", "TSO_vol", 100) %>%
+  setBlock("J01~J21", "TSO_vol", 100) %>%
+  setBlock("K22~K24", "TSO_vol", 100) %>%
+  setBlock("L22~L24", "TSO_vol", 100) %>%
+  setBlock("M23", "TSO_vol", 100) %>%
+  setBlock("N22~N24", "TSO_vol", 100) %>%
+  setBlock("O22~O24", "TSO_vol", 100) %>%
+  setBlock("P23", "TSO_vol", 100) %>% 
+  setBlock("E01~E21", "TSO_vol", 50) %>%
+  setBlock("L08~L14", "TSO_vol", 50) %>%
+  setBlock("O08~O14", "TSO_vol", 50) %>%
+  setBlock("F01~F21", "TSO_vol", 25) %>%
+  setBlock("M08~M14", "TSO_vol", 25) %>%
+  setBlock("P08~P14", "TSO_vol", 25) %>%
+  setBlock("G01~G21", "TSO_vol", 100) %>%
+  setBlock("K15~K21", "TSO_vol", 100) %>%
+  setBlock("N15~N21", "TSO_vol", 100) %>%
+  setBlock("H01~H21", "TSO_vol", 50) %>%
+  setBlock("L15~L21", "TSO_vol", 50) %>%
+  setBlock("O15~O21", "TSO_vol", 50) %>%
+  setBlock("I01~I21", "TSO_vol", 25) %>%
+  setBlock("M15~M21", "TSO_vol", 25) %>%
+  setBlock("P15~P21", "TSO_vol", 25) 
+```
+
+RT_PRIMERS
+===========
+
+RT primers concentration
+-------------------------
+
+ - 0 uM (controls, + 0 nL) in Col 1, 8 and 15 + M23 + P23
+ - 0.125 uM (+ 25 nL from source well K1 2.5 uM) in Col 2, 9 and 16 + K22 + N22
+ - 0.25 uM (+ 25 nL from source well K2 5 uM) in Col 3, 10 and 17 + K23 + N23
+ - 0.5 uM (+ 25 nL from source well K3 10 uM) in Col 4, 11 and 18 + K24 + N24
+ - 1 uM (+ 25 nL from source well K4 20 uM) in Col 5, 12 and 19 + L22 + O22
+ - 2 uM (+ 25 nL from source well K5 40 uM) in Col 6, 13 and 20 + L23 + O23
+ - 4 uM (+ 25 nL from source well K6 80 uM) in Col 7, 14 and 21 + L24 + O24
+
+```{r RT_PRIMERS}
+plate %<>%
+  setBlock("A01~P01",   "RT_PRIMERS", 0) %>%
+  setBlock("A08~P08",   "RT_PRIMERS", 0) %>%
+  setBlock("A15~P15",   "RT_PRIMERS", 0) %>%
+  setBlock("M23",   "RT_PRIMERS", 0) %>%
+  setBlock("P23",   "RT_PRIMERS", 0) %>%
+  setBlock("A02~P02",   "RT_PRIMERS", 0.125) %>%
+  setBlock("A09~P09",   "RT_PRIMERS", 0.125) %>%
+  setBlock("A16~P16",   "RT_PRIMERS", 0.125) %>%
+  setBlock("K22",   "RT_PRIMERS", 0.125) %>%
+  setBlock("N22",   "RT_PRIMERS", 0.125) %>%
+  setBlock("A03~P03",   "RT_PRIMERS", 0.25) %>%
+  setBlock("A10~P10",   "RT_PRIMERS", 0.25) %>%
+  setBlock("A17~P17",   "RT_PRIMERS", 0.25) %>%
+  setBlock("K23",   "RT_PRIMERS", 0.25) %>%
+  setBlock("N23",   "RT_PRIMERS", 0.25) %>%
+  setBlock("A04~P04",   "RT_PRIMERS", 0.5) %>%
+  setBlock("A11~P11",   "RT_PRIMERS", 0.5) %>%
+  setBlock("A18~P18",   "RT_PRIMERS", 0.5) %>%
+  setBlock("K24",   "RT_PRIMERS", 0.5) %>%
+  setBlock("N24",   "RT_PRIMERS", 0.5) %>%
+  setBlock("A05~P05",   "RT_PRIMERS", 1) %>%
+  setBlock("A12~P12",   "RT_PRIMERS", 1) %>%
+  setBlock("A19~P19",   "RT_PRIMERS", 1) %>%
+  setBlock("L22",   "RT_PRIMERS", 1) %>%
+  setBlock("O22",   "RT_PRIMERS", 1) %>%
+  setBlock("A06~P06",   "RT_PRIMERS", 2) %>%
+  setBlock("A13~P13",   "RT_PRIMERS", 2) %>%
+  setBlock("A20~P20",   "RT_PRIMERS", 2) %>%
+  setBlock("L23",   "RT_PRIMERS", 2) %>%
+  setBlock("O23",   "RT_PRIMERS", 2) %>%
+  setBlock("A07~P07",   "RT_PRIMERS", 4) %>%
+  setBlock("A14~P14",   "RT_PRIMERS", 4) %>%
+  setBlock("A21~P21",   "RT_PRIMERS", 4) %>%
+  setBlock("L24",   "RT_PRIMERS", 4) %>%
+  setBlock("O24",   "RT_PRIMERS", 4) 
+```
+
+RT primer volume 
+------------------
+
+```{r RT_PRIMERS_vol}
+plate %<>%
+  setBlock("A01~P01",   "RT_PRIMERS_vol", 0) %>%
+  setBlock("A08~P08",   "RT_PRIMERS_vol", 0) %>%
+  setBlock("A15~P15",   "RT_PRIMERS_vol", 0) %>%
+  setBlock("M23",   "RT_PRIMERS_vol", 0) %>%
+  setBlock("P23",   "RT_PRIMERS_vol", 0) %>%
+  setBlock("A02~P02",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("A09~P09",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("A16~P16",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("K22",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("N22",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("A03~P03",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("A10~P10",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("A17~P17",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("K23",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("N23",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("A04~P04",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("A11~P11",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("A18~P18",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("K24",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("N24",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("A05~P05",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("A12~P12",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("A19~P19",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("L22",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("O22",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("A06~P06",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("A13~P13",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("A20~P20",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("L23",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("O23",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("A07~P07",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("A14~P14",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("A21~P21",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("L24",   "RT_PRIMERS_vol", 25) %>%
+  setBlock("O24",   "RT_PRIMERS_vol", 25) 
+```
+
+RNA
+====
+
+RNA concentration
+------------------
+
+ - 0 (controls, + 0 nL) in J01-J21 + K22-K24 + L22-L24 + M23 + N22-N24 + O22-O24 + P23
+ - 100 ng (+ 25 nL from source well L1 4 ug/uL) in A01-I07
+ - 10 ng (+ 25 nL from source well L2 400 ng/uL) in A08-I14
+ - 1 ng (+ 25 nL from source well L3 40 ng/uL) in A15-I21
+ - 100 pg (+ 25 nL from source well L4 4 ng/uL) in K01-M21
+ - 10 pg (+ 25 nL from source well L5 0.4 ng/uL) in N01-P21
+
+```{r RNA}
+plate %<>%
+  setBlock("J01~J21", "RNA", 0) %>%
+  setBlock("K22~L24", "RNA", 0) %>%
+  setBlock("M23", "RNA", 0) %>%
+  setBlock("N22~O24", "RNA", 0) %>%
+  setBlock("P23", "RNA", 0) %>%
+  setBlock("A01~I07", "RNA", 100) %>%
+  setBlock("A08~I14", "RNA", 10) %>%
+  setBlock("A15~I21", "RNA", 1) %>%
+  setBlock("K01~M21", "RNA", 0.1) %>%
+  setBlock("N01~P21", "RNA", 0.01)
+```
+
+RNA volume
+-----------
+
+```{r RNA_vol}
+plate %<>%
+  setBlock("J01~J21", "RNA_vol", 0) %>%
+  setBlock("K22~L24", "RNA_vol", 0) %>%
+  setBlock("M23", "RNA_vol", 0) %>%
+  setBlock("N22~O24", "RNA_vol", 0) %>%
+  setBlock("P23", "RNA_vol", 0) %>%
+  setBlock("A01~I07", "RNA_vol", 25) %>%
+  setBlock("A08~I14", "RNA_vol", 25) %>%
+  setBlock("A15~I21", "RNA_vol", 25) %>%
+  setBlock("K01~M21", "RNA_vol", 25) %>%
+  setBlock("N01~P21", "RNA_vol", 25)
+```
+
+H2O
+====
+
+H2O volume
+-----------
+
+H2O added to complete RT reaction volume up to 500 nL
+
+```{r H2O_vol}
+plate %<>%
+  setBlock("A02~A07", "H2O_vol", 0) %>%
+  setBlock("A09~A14", "H2O_vol", 0) %>%
+  setBlock("A16~A21", "H2O_vol", 0) %>%
+  setBlock("D02~D07", "H2O_vol", 0) %>%
+  setBlock("D09~D14", "H2O_vol", 0) %>%
+  setBlock("D16~D21", "H2O_vol", 0) %>%
+  setBlock("G02~G07", "H2O_vol", 0) %>%
+  setBlock("G09~G14", "H2O_vol", 0) %>%
+  setBlock("G16~G21", "H2O_vol", 0) %>%
+  setBlock("K02~K07", "H2O_vol", 0) %>%
+  setBlock("K09~K14", "H2O_vol", 0) %>%
+  setBlock("K16~K21", "H2O_vol", 0) %>%
+  setBlock("N02~N07", "H2O_vol", 0) %>%
+  setBlock("N09~N14", "H2O_vol", 0) %>%
+  setBlock("N16~N21", "H2O_vol", 0) %>%
+  setBlock("J02~J07", "H2O_vol", 25) %>%
+  setBlock("J09~J14", "H2O_vol", 25) %>%
+  setBlock("J16~J21", "H2O_vol", 25) %>%
+  setBlock("J02~J07", "H2O_vol", 25) %>%
+  setBlock("K22~K24", "H2O_vol", 25) %>%
+  setBlock("L22~L24", "H2O_vol", 25) %>%
+  setBlock("N22~N24", "H2O_vol", 25) %>%
+  setBlock("O22~O24", "H2O_vol", 25) %>%
+  setBlock("K22~K24", "H2O_vol", 25) %>%
+  setBlock("A01", "H2O_vol", 25) %>%
+  setBlock("A08", "H2O_vol", 25) %>%
+  setBlock("A15", "H2O_vol", 25) %>%
+  setBlock("D01", "H2O_vol", 25) %>%
+  setBlock("D08", "H2O_vol", 25) %>%
+  setBlock("D15", "H2O_vol", 25) %>%
+  setBlock("G01", "H2O_vol", 25) %>%
+  setBlock("G08", "H2O_vol", 25) %>%
+  setBlock("G15", "H2O_vol", 25) %>%
+  setBlock("K01", "H2O_vol", 25) %>%
+  setBlock("K08", "H2O_vol", 25) %>%
+  setBlock("K15", "H2O_vol", 25) %>%
+  setBlock("N01", "H2O_vol", 25) %>%
+  setBlock("N08", "H2O_vol", 25) %>%
+  setBlock("N15", "H2O_vol", 25) %>%
+  setBlock("B02~B07", "H2O_vol", 50) %>%
+  setBlock("B09~B14", "H2O_vol", 50) %>%
+  setBlock("B16~B21", "H2O_vol", 50) %>%
+  setBlock("E02~E07", "H2O_vol", 50) %>%
+  setBlock("E09~E14", "H2O_vol", 50) %>%
+  setBlock("E16~E21", "H2O_vol", 50) %>%
+  setBlock("H02~H07", "H2O_vol", 50) %>%
+  setBlock("H09~H14", "H2O_vol", 50) %>%
+  setBlock("H16~H21", "H2O_vol", 50) %>%
+  setBlock("L02~L07", "H2O_vol", 50) %>%
+  setBlock("L09~L14", "H2O_vol", 50) %>%
+  setBlock("L16~L21", "H2O_vol", 50) %>%
+  setBlock("O02~O07", "H2O_vol", 50) %>%
+  setBlock("O09~O14", "H2O_vol", 50) %>%
+  setBlock("O16~O21", "H2O_vol", 50) %>%
+  setBlock("M23", "H2O_vol", 50) %>%
+  setBlock("P23", "H2O_vol", 50) %>%
+  setBlock("J01", "H2O_vol", 50) %>%
+  setBlock("J08", "H2O_vol", 50) %>%
+  setBlock("J15", "H2O_vol", 50) %>%
+  setBlock("C02~C07", "H2O_vol", 75) %>%
+  setBlock("C09~C14", "H2O_vol", 75) %>%
+  setBlock("C16~C21", "H2O_vol", 75) %>%
+  setBlock("F02~F07", "H2O_vol", 75) %>%
+  setBlock("F09~F14", "H2O_vol", 75) %>%
+  setBlock("F16~F21", "H2O_vol", 75) %>%
+  setBlock("I02~I07", "H2O_vol", 75) %>%
+  setBlock("I09~I14", "H2O_vol", 75) %>%
+  setBlock("I16~I21", "H2O_vol", 75) %>%
+  setBlock("M02~M07", "H2O_vol", 75) %>%
+  setBlock("M09~M14", "H2O_vol", 75) %>%
+  setBlock("M16~M21", "H2O_vol", 75) %>%
+  setBlock("P02~P07", "H2O_vol", 75) %>%
+  setBlock("P09~P14", "H2O_vol", 75) %>%
+  setBlock("P16~P21", "H2O_vol", 75) %>%
+  setBlock("B01", "H2O_vol", 75) %>%
+  setBlock("B08", "H2O_vol", 75) %>%
+  setBlock("B15", "H2O_vol", 75) %>%
+  setBlock("E01", "H2O_vol", 75) %>%
+  setBlock("E08", "H2O_vol", 75) %>%
+  setBlock("E15", "H2O_vol", 75) %>%
+  setBlock("H01", "H2O_vol", 75) %>%
+  setBlock("H08", "H2O_vol", 75) %>%
+  setBlock("H15", "H2O_vol", 75) %>%
+  setBlock("L01", "H2O_vol", 75) %>%
+  setBlock("L08", "H2O_vol", 75) %>%
+  setBlock("L15", "H2O_vol", 75) %>%
+  setBlock("O01", "H2O_vol", 75) %>%
+  setBlock("O08", "H2O_vol", 75) %>%
+  setBlock("O15", "H2O_vol", 75) %>%
+  setBlock("C01", "H2O_vol", 100) %>%
+  setBlock("C08", "H2O_vol", 100) %>%
+  setBlock("C15", "H2O_vol", 100) %>%
+  setBlock("F01", "H2O_vol", 100) %>%
+  setBlock("F08", "H2O_vol", 100) %>%
+  setBlock("F15", "H2O_vol", 100) %>%
+  setBlock("I01", "H2O_vol", 100) %>%
+  setBlock("I08", "H2O_vol", 100) %>%
+  setBlock("I15", "H2O_vol", 100) %>%
+  setBlock("M01", "H2O_vol", 100) %>%
+  setBlock("M08", "H2O_vol", 100) %>%
+  setBlock("M15", "H2O_vol", 100) %>%
+  setBlock("P01", "H2O_vol", 100) %>%
+  setBlock("P08", "H2O_vol", 100) %>%
+  setBlock("P15", "H2O_vol", 100)
+```
+
+```{r}
+plate$total_volume <- ""
+plate$total_volume <- rowSums(plate[, c(3, 5,7,9,10)])
+plate 
+plate$total_volume
+length(which(plate$total_volume != "NA")) 
+sum(is.na(plate$total_volume))
+```
