@@ -429,54 +429,72 @@ TSO
 ---
 
 ```{r plot_TSO_concentration}
-platetools::raw_map(plate$TSO, well=plate$Well, plate="384") +
+(plot_TSO <- platetools::raw_map(plate$TSO, well=plate$Well, plate="384") +
   ggtitle("TSO concentration") +
-  viridis::scale_fill_viridis(trans = "log", breaks = unique(plate$TSO))
+  viridis::scale_fill_viridis(trans = "log", breaks = unique(plate$TSO)))
 ```
 
 ```{r plot_TSO_volume}
-platetools::raw_map(plate$TSO_vol, well=plate$Well, plate="384") +
+(plot_TSO_vol <- platetools::raw_map(plate$TSO_vol, well=plate$Well, plate="384") +
   ggtitle("TSO volume") +
-  viridis::scale_fill_viridis(breaks = unique(plate$TSO_vol))
+  viridis::scale_fill_viridis(breaks = unique(plate$TSO_vol)))
 ```
 
 H2O
 ---
 
-```{r plot_H20_vol}
-platetools::raw_map(plate$H2O_vol, well=plate$Well, plate="384") +
+```{r plot_H2O_vol}
+(plot_H2O_vol <- platetools::raw_map(plate$H2O_vol, well=plate$Well, plate="384") +
   ggtitle("H20 volume") +
-  viridis::scale_fill_viridis(breaks = unique(plate$H2O_vol))
+  viridis::scale_fill_viridis(breaks = unique(plate$H2O_vol)))
 ```
 
 RT primers
 ----------
 
 ```{r plot_RT_concentration}
-platetools::raw_map(plate$RT_PRIMERS, well=plate$Well, plate="384") +
+(plot_RT <- platetools::raw_map(plate$RT_PRIMERS, well=plate$Well, plate="384") +
   ggtitle("RT primer concentration") +
-  viridis::scale_fill_viridis(breaks = unique(plate$RT_PRIMERS), trans = "log")
+  viridis::scale_fill_viridis(breaks = unique(plate$RT_PRIMERS), trans = "log"))
 ```
 
 ```{r plot_RT_volume}
-platetools::raw_map(plate$RT_PRIMERS_vol, well=plate$Well, plate="384") +
+(plot_RT_vol <- platetools::raw_map(plate$RT_PRIMERS_vol, well=plate$Well, plate="384") +
   ggtitle("RT primer volume") +
-  viridis::scale_fill_viridis(breaks = unique(plate$RT_PRIMERS_vol))
+  viridis::scale_fill_viridis(breaks = unique(plate$RT_PRIMERS_vol)))
 ```
 
 RNA mass
 --------
 
 ```{r plot_RNA_mass}
-platetools::raw_map(plate$RNA, well=plate$Well, plate="384") +
+(plot_RNA <- platetools::raw_map(plate$RNA, well=plate$Well, plate="384") +
   ggtitle("RNA mass (ng)") +
-  viridis::scale_fill_viridis(breaks = unique(plate$RNA), trans = "log")
+  viridis::scale_fill_viridis(breaks = unique(plate$RNA), trans = "log"))
 ```
 
 ```{r plot_RNA_vol}
-platetools::raw_map(plate$RNA_vol, well=plate$Well, plate="384") +
+(plot_RNA_vol <- platetools::raw_map(plate$RNA_vol, well=plate$Well, plate="384") +
   ggtitle("RNA volume") +
-  viridis::scale_fill_viridis(breaks = unique(plate$RNA_vol))
+  viridis::scale_fill_viridis(breaks = unique(plate$RNA_vol)))
+```
+
+Grand summary plots
+-------------------
+
+Concentrations
+--------------
+
+```{r plate_all_concentrations, fig.height=10, fig.width=10}
+ggpubr::ggarrange(ncol = 2, nrow = 2, plot_TSO, plot_RT, plot_RNA, plot_H2O_vol)
+```
+
+Volumes
+-------
+
+```{r plate_all_volumes, fig.height=10, fig.width=10}
+ggpubr::ggarrange( ncol = 2, nrow = 2
+                 , plot_TSO_vol, plot_RT_vol, plot_RNA_vol, plot_H2O_vol)
 ```
 
 Session information
