@@ -18,7 +18,7 @@ library(magrittr)
 
 # The "setBlock" function to update values in the data frame is shared by multiple
 # Rmarkdown files, so it is stored in a separate source file.
-source('setBlock.R')
+setBlock <- smallCAGEqc:::setBlock
 ```
 
 Create a data frame representing the contents of each well.
