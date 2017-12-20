@@ -20,11 +20,18 @@ Load scripts and libraries.
 library(magrittr)
 
 library(ggplot2)
+library(plyr)
 
 # The "setBlock" function to update values in the data frame is shared by multiple
 # Rmarkdown files, so it is stored in a separate source file.
 setBlock <- smallCAGEqc:::setBlock
+
+# The "makePlate384" function outputs a data frame representing a 384-well plate
+# (one well per row).
+source('makePlate384.R')
 ```
+
+## Plate layout
 
 Create a data frame representing the contents of each well.
 
@@ -41,7 +48,7 @@ MASTER_MIX
 Master mix volume 
 ------------------
 
-- 350 nL of mastermix added to each well
+350 nL of mastermix added to each well
 
 ```{r MASTER_MIX_vol}
 plate %<>%
@@ -110,6 +117,8 @@ plate %<>%
 TSO volume
 -----------
 
+25 (1-drop), 50 (2-drops) or 100 nL (4-drops) of TSO added, depending on the final concentration
+
 ```{r TSO_volume}
 plate %<>%
   setBlock("A01~A21", "TSO_vol", 100) %>%
@@ -146,6 +155,365 @@ plate %<>%
   setBlock("I01~I21", "TSO_vol", 25) %>%
   setBlock("M15~M21", "TSO_vol", 25) %>%
   setBlock("P15~P21", "TSO_vol", 25) 
+```
+
+Barcode ID
+-----------
+
+70 barcodes used for each RNA concentration tested
+
+```{r BARCODE_ID}
+plate %<>%
+  setBlock("A01", "BARCODE_ID", 01) %>%
+  setBlock("A02", "BARCODE_ID", 02) %>%
+  setBlock("A03", "BARCODE_ID", 03) %>%
+  setBlock("A04", "BARCODE_ID", 04) %>%
+  setBlock("A05", "BARCODE_ID", 05) %>%
+  setBlock("A06", "BARCODE_ID", 06) %>%
+  setBlock("A07", "BARCODE_ID", 07) %>%  
+  setBlock("A08", "BARCODE_ID", 01) %>%
+  setBlock("A09", "BARCODE_ID", 02) %>%
+  setBlock("A10", "BARCODE_ID", 03) %>%
+  setBlock("A11", "BARCODE_ID", 04) %>%
+  setBlock("A12", "BARCODE_ID", 05) %>%
+  setBlock("A13", "BARCODE_ID", 06) %>%
+  setBlock("A14", "BARCODE_ID", 07) %>%  
+  setBlock("A15", "BARCODE_ID", 01) %>%
+  setBlock("A16", "BARCODE_ID", 02) %>%
+  setBlock("A17", "BARCODE_ID", 03) %>%
+  setBlock("A18", "BARCODE_ID", 04) %>%
+  setBlock("A19", "BARCODE_ID", 05) %>%
+  setBlock("A20", "BARCODE_ID", 06) %>%
+  setBlock("A21", "BARCODE_ID", 07) %>%  
+  setBlock("K01", "BARCODE_ID", 01) %>%
+  setBlock("K02", "BARCODE_ID", 02) %>%
+  setBlock("K03", "BARCODE_ID", 03) %>%
+  setBlock("K04", "BARCODE_ID", 04) %>%
+  setBlock("K05", "BARCODE_ID", 05) %>%
+  setBlock("K06", "BARCODE_ID", 06) %>%
+  setBlock("K07", "BARCODE_ID", 07) %>%    
+  setBlock("N01", "BARCODE_ID", 01) %>%
+  setBlock("N02", "BARCODE_ID", 02) %>%
+  setBlock("N03", "BARCODE_ID", 03) %>%
+  setBlock("N04", "BARCODE_ID", 04) %>%
+  setBlock("N05", "BARCODE_ID", 05) %>%
+  setBlock("N06", "BARCODE_ID", 06) %>%
+  setBlock("N07", "BARCODE_ID", 07) %>%  
+  setBlock("B01", "BARCODE_ID", 08) %>%
+  setBlock("B02", "BARCODE_ID", 09) %>%
+  setBlock("B03", "BARCODE_ID", 10) %>%
+  setBlock("B04", "BARCODE_ID", 11) %>%
+  setBlock("B05", "BARCODE_ID", 12) %>%
+  setBlock("B06", "BARCODE_ID", 13) %>%
+  setBlock("B07", "BARCODE_ID", 14) %>%  
+  setBlock("B08", "BARCODE_ID", 08) %>%
+  setBlock("B09", "BARCODE_ID", 09) %>%
+  setBlock("B10", "BARCODE_ID", 10) %>%
+  setBlock("B11", "BARCODE_ID", 11) %>%
+  setBlock("B12", "BARCODE_ID", 12) %>%
+  setBlock("B13", "BARCODE_ID", 13) %>%
+  setBlock("B14", "BARCODE_ID", 14) %>%  
+  setBlock("B15", "BARCODE_ID", 08) %>%
+  setBlock("B16", "BARCODE_ID", 09) %>%
+  setBlock("B17", "BARCODE_ID", 10) %>%
+  setBlock("B18", "BARCODE_ID", 11) %>%
+  setBlock("B19", "BARCODE_ID", 12) %>%
+  setBlock("B20", "BARCODE_ID", 13) %>%
+  setBlock("B21", "BARCODE_ID", 14) %>% 
+  setBlock("L01", "BARCODE_ID", 08) %>%
+  setBlock("L02", "BARCODE_ID", 09) %>%
+  setBlock("L03", "BARCODE_ID", 10) %>%
+  setBlock("L04", "BARCODE_ID", 11) %>%
+  setBlock("L05", "BARCODE_ID", 12) %>%
+  setBlock("L06", "BARCODE_ID", 13) %>%
+  setBlock("L07", "BARCODE_ID", 14) %>% 
+  setBlock("O01", "BARCODE_ID", 08) %>%
+  setBlock("O02", "BARCODE_ID", 09) %>%
+  setBlock("O03", "BARCODE_ID", 10) %>%
+  setBlock("O04", "BARCODE_ID", 11) %>%
+  setBlock("O05", "BARCODE_ID", 12) %>%
+  setBlock("O06", "BARCODE_ID", 13) %>%
+  setBlock("O07", "BARCODE_ID", 14) %>% 
+  setBlock("C01", "BARCODE_ID", 15) %>%
+  setBlock("C02", "BARCODE_ID", 16) %>%
+  setBlock("C03", "BARCODE_ID", 17) %>%
+  setBlock("C04", "BARCODE_ID", 18) %>%
+  setBlock("C05", "BARCODE_ID", 19) %>%
+  setBlock("C06", "BARCODE_ID", 20) %>%
+  setBlock("C07", "BARCODE_ID", 21) %>%   
+  setBlock("C08", "BARCODE_ID", 15) %>%
+  setBlock("C09", "BARCODE_ID", 16) %>%
+  setBlock("C10", "BARCODE_ID", 17) %>%
+  setBlock("C11", "BARCODE_ID", 18) %>%
+  setBlock("C12", "BARCODE_ID", 19) %>%
+  setBlock("C13", "BARCODE_ID", 20) %>%
+  setBlock("C14", "BARCODE_ID", 21) %>%  
+  setBlock("C15", "BARCODE_ID", 15) %>%
+  setBlock("C16", "BARCODE_ID", 16) %>%
+  setBlock("C17", "BARCODE_ID", 17) %>%
+  setBlock("C18", "BARCODE_ID", 18) %>%
+  setBlock("C19", "BARCODE_ID", 19) %>%
+  setBlock("C20", "BARCODE_ID", 20) %>%
+  setBlock("C21", "BARCODE_ID", 21) %>%
+  setBlock("M01", "BARCODE_ID", 15) %>%
+  setBlock("M02", "BARCODE_ID", 16) %>%
+  setBlock("M03", "BARCODE_ID", 17) %>%
+  setBlock("M04", "BARCODE_ID", 18) %>%
+  setBlock("M05", "BARCODE_ID", 19) %>%
+  setBlock("M06", "BARCODE_ID", 20) %>%
+  setBlock("M07", "BARCODE_ID", 21) %>%
+  setBlock("P01", "BARCODE_ID", 15) %>%
+  setBlock("P02", "BARCODE_ID", 16) %>%
+  setBlock("P03", "BARCODE_ID", 17) %>%
+  setBlock("P04", "BARCODE_ID", 18) %>%
+  setBlock("P05", "BARCODE_ID", 19) %>%
+  setBlock("P06", "BARCODE_ID", 20) %>%
+  setBlock("P07", "BARCODE_ID", 21) %>%
+  setBlock("D01", "BARCODE_ID", 22) %>%
+  setBlock("D02", "BARCODE_ID", 23) %>%
+  setBlock("D03", "BARCODE_ID", 24) %>%
+  setBlock("D04", "BARCODE_ID", 25) %>%
+  setBlock("D05", "BARCODE_ID", 26) %>%
+  setBlock("D06", "BARCODE_ID", 27) %>%
+  setBlock("D07", "BARCODE_ID", 28) %>%   
+  setBlock("D08", "BARCODE_ID", 22) %>%
+  setBlock("D09", "BARCODE_ID", 23) %>%
+  setBlock("D10", "BARCODE_ID", 24) %>%
+  setBlock("D11", "BARCODE_ID", 25) %>%
+  setBlock("D12", "BARCODE_ID", 26) %>%
+  setBlock("D13", "BARCODE_ID", 27) %>%
+  setBlock("D14", "BARCODE_ID", 28) %>% 
+  setBlock("D15", "BARCODE_ID", 22) %>%
+  setBlock("D16", "BARCODE_ID", 23) %>%
+  setBlock("D17", "BARCODE_ID", 24) %>%
+  setBlock("D18", "BARCODE_ID", 25) %>%
+  setBlock("D19", "BARCODE_ID", 26) %>%
+  setBlock("D20", "BARCODE_ID", 27) %>%
+  setBlock("D21", "BARCODE_ID", 28) %>%
+  setBlock("K08", "BARCODE_ID", 22) %>%
+  setBlock("K09", "BARCODE_ID", 23) %>%
+  setBlock("K10", "BARCODE_ID", 24) %>%
+  setBlock("K11", "BARCODE_ID", 25) %>%
+  setBlock("K12", "BARCODE_ID", 26) %>%
+  setBlock("K13", "BARCODE_ID", 27) %>%
+  setBlock("K14", "BARCODE_ID", 28) %>%  
+  setBlock("N08", "BARCODE_ID", 22) %>%
+  setBlock("N09", "BARCODE_ID", 23) %>%
+  setBlock("N10", "BARCODE_ID", 24) %>%
+  setBlock("N11", "BARCODE_ID", 25) %>%
+  setBlock("N12", "BARCODE_ID", 26) %>%
+  setBlock("N13", "BARCODE_ID", 27) %>%
+  setBlock("N14", "BARCODE_ID", 28) %>% 
+  setBlock("E01", "BARCODE_ID", 29) %>%
+  setBlock("E02", "BARCODE_ID", 30) %>%
+  setBlock("E03", "BARCODE_ID", 31) %>%
+  setBlock("E04", "BARCODE_ID", 32) %>%
+  setBlock("E05", "BARCODE_ID", 33) %>%
+  setBlock("E06", "BARCODE_ID", 34) %>%
+  setBlock("E07", "BARCODE_ID", 35) %>%
+  setBlock("E08", "BARCODE_ID", 29) %>%
+  setBlock("E09", "BARCODE_ID", 30) %>%
+  setBlock("E10", "BARCODE_ID", 31) %>%
+  setBlock("E11", "BARCODE_ID", 32) %>%
+  setBlock("E12", "BARCODE_ID", 33) %>%
+  setBlock("E13", "BARCODE_ID", 34) %>%
+  setBlock("E14", "BARCODE_ID", 35) %>%  
+  setBlock("E15", "BARCODE_ID", 29) %>%
+  setBlock("E16", "BARCODE_ID", 30) %>%
+  setBlock("E17", "BARCODE_ID", 31) %>%
+  setBlock("E18", "BARCODE_ID", 32) %>%
+  setBlock("E19", "BARCODE_ID", 33) %>%
+  setBlock("E20", "BARCODE_ID", 34) %>%
+  setBlock("E21", "BARCODE_ID", 35) %>%  
+  setBlock("L08", "BARCODE_ID", 29) %>%
+  setBlock("L09", "BARCODE_ID", 30) %>%
+  setBlock("L10", "BARCODE_ID", 31) %>%
+  setBlock("L11", "BARCODE_ID", 32) %>%
+  setBlock("L12", "BARCODE_ID", 33) %>%
+  setBlock("L13", "BARCODE_ID", 34) %>%
+  setBlock("L14", "BARCODE_ID", 35) %>%  
+  setBlock("O08", "BARCODE_ID", 29) %>%
+  setBlock("O09", "BARCODE_ID", 30) %>%
+  setBlock("O10", "BARCODE_ID", 31) %>%
+  setBlock("O11", "BARCODE_ID", 32) %>%
+  setBlock("O12", "BARCODE_ID", 33) %>%
+  setBlock("O13", "BARCODE_ID", 34) %>%
+  setBlock("O14", "BARCODE_ID", 35) %>%    
+  setBlock("F01", "BARCODE_ID", 36) %>%
+  setBlock("F02", "BARCODE_ID", 37) %>%
+  setBlock("F03", "BARCODE_ID", 38) %>%
+  setBlock("F04", "BARCODE_ID", 39) %>%
+  setBlock("F05", "BARCODE_ID", 40) %>%
+  setBlock("F06", "BARCODE_ID", 41) %>%
+  setBlock("F07", "BARCODE_ID", 42) %>% 
+  setBlock("F08", "BARCODE_ID", 36) %>%
+  setBlock("F09", "BARCODE_ID", 37) %>%
+  setBlock("F10", "BARCODE_ID", 38) %>%
+  setBlock("F11", "BARCODE_ID", 39) %>%
+  setBlock("F12", "BARCODE_ID", 40) %>%
+  setBlock("F13", "BARCODE_ID", 41) %>%
+  setBlock("F14", "BARCODE_ID", 42) %>%  
+  setBlock("F15", "BARCODE_ID", 36) %>%
+  setBlock("F16", "BARCODE_ID", 37) %>%
+  setBlock("F17", "BARCODE_ID", 38) %>%
+  setBlock("F18", "BARCODE_ID", 39) %>%
+  setBlock("F19", "BARCODE_ID", 40) %>%
+  setBlock("F20", "BARCODE_ID", 41) %>%
+  setBlock("F21", "BARCODE_ID", 42) %>%
+  setBlock("M08", "BARCODE_ID", 36) %>%
+  setBlock("M09", "BARCODE_ID", 37) %>%
+  setBlock("M10", "BARCODE_ID", 38) %>%
+  setBlock("M11", "BARCODE_ID", 39) %>%
+  setBlock("M12", "BARCODE_ID", 40) %>%
+  setBlock("M13", "BARCODE_ID", 41) %>%
+  setBlock("M14", "BARCODE_ID", 42) %>%   
+  setBlock("P08", "BARCODE_ID", 36) %>%
+  setBlock("P09", "BARCODE_ID", 37) %>%
+  setBlock("P10", "BARCODE_ID", 38) %>%
+  setBlock("P11", "BARCODE_ID", 39) %>%
+  setBlock("P12", "BARCODE_ID", 40) %>%
+  setBlock("P13", "BARCODE_ID", 41) %>%
+  setBlock("P14", "BARCODE_ID", 42) %>%  
+  setBlock("G01", "BARCODE_ID", 43) %>%
+  setBlock("G02", "BARCODE_ID", 44) %>%
+  setBlock("G03", "BARCODE_ID", 45) %>%
+  setBlock("G04", "BARCODE_ID", 46) %>%
+  setBlock("G05", "BARCODE_ID", 47) %>%
+  setBlock("G06", "BARCODE_ID", 48) %>%
+  setBlock("G07", "BARCODE_ID", 49) %>% 
+  setBlock("G08", "BARCODE_ID", 43) %>%
+  setBlock("G09", "BARCODE_ID", 44) %>%
+  setBlock("G10", "BARCODE_ID", 45) %>%
+  setBlock("G11", "BARCODE_ID", 46) %>%
+  setBlock("G12", "BARCODE_ID", 47) %>%
+  setBlock("G13", "BARCODE_ID", 48) %>%
+  setBlock("G14", "BARCODE_ID", 49) %>%   
+  setBlock("G15", "BARCODE_ID", 43) %>%
+  setBlock("G16", "BARCODE_ID", 44) %>%
+  setBlock("G17", "BARCODE_ID", 45) %>%
+  setBlock("G18", "BARCODE_ID", 46) %>%
+  setBlock("G19", "BARCODE_ID", 47) %>%
+  setBlock("G20", "BARCODE_ID", 48) %>%
+  setBlock("G21", "BARCODE_ID", 49) %>% 
+  setBlock("K15", "BARCODE_ID", 43) %>%
+  setBlock("K16", "BARCODE_ID", 44) %>%
+  setBlock("K17", "BARCODE_ID", 45) %>%
+  setBlock("K18", "BARCODE_ID", 46) %>%
+  setBlock("K19", "BARCODE_ID", 47) %>%
+  setBlock("K20", "BARCODE_ID", 48) %>%
+  setBlock("K21", "BARCODE_ID", 49) %>%   
+  setBlock("N15", "BARCODE_ID", 43) %>%
+  setBlock("N16", "BARCODE_ID", 44) %>%
+  setBlock("N17", "BARCODE_ID", 45) %>%
+  setBlock("N18", "BARCODE_ID", 46) %>%
+  setBlock("N19", "BARCODE_ID", 47) %>%
+  setBlock("N20", "BARCODE_ID", 48) %>%
+  setBlock("N21", "BARCODE_ID", 49) %>%  
+  setBlock("H01", "BARCODE_ID", 50) %>%
+  setBlock("H02", "BARCODE_ID", 51) %>%
+  setBlock("H03", "BARCODE_ID", 52) %>%
+  setBlock("H04", "BARCODE_ID", 53) %>%
+  setBlock("H05", "BARCODE_ID", 54) %>%
+  setBlock("H06", "BARCODE_ID", 55) %>%
+  setBlock("H07", "BARCODE_ID", 56) %>%
+  setBlock("H08", "BARCODE_ID", 50) %>%
+  setBlock("H09", "BARCODE_ID", 51) %>%
+  setBlock("H10", "BARCODE_ID", 52) %>%
+  setBlock("H11", "BARCODE_ID", 53) %>%
+  setBlock("H12", "BARCODE_ID", 54) %>%
+  setBlock("H13", "BARCODE_ID", 55) %>%
+  setBlock("H14", "BARCODE_ID", 56) %>%
+  setBlock("H15", "BARCODE_ID", 50) %>%
+  setBlock("H16", "BARCODE_ID", 51) %>%
+  setBlock("H17", "BARCODE_ID", 52) %>%
+  setBlock("H18", "BARCODE_ID", 53) %>%
+  setBlock("H19", "BARCODE_ID", 54) %>%
+  setBlock("H20", "BARCODE_ID", 55) %>%
+  setBlock("H21", "BARCODE_ID", 56) %>%
+  setBlock("L15", "BARCODE_ID", 50) %>%
+  setBlock("L16", "BARCODE_ID", 51) %>%
+  setBlock("L17", "BARCODE_ID", 52) %>%
+  setBlock("L18", "BARCODE_ID", 53) %>%
+  setBlock("L19", "BARCODE_ID", 54) %>%
+  setBlock("L20", "BARCODE_ID", 55) %>%
+  setBlock("L21", "BARCODE_ID", 56) %>%  
+  setBlock("O15", "BARCODE_ID", 50) %>%
+  setBlock("O16", "BARCODE_ID", 51) %>%
+  setBlock("O17", "BARCODE_ID", 52) %>%
+  setBlock("O18", "BARCODE_ID", 53) %>%
+  setBlock("O19", "BARCODE_ID", 54) %>%
+  setBlock("O20", "BARCODE_ID", 55) %>%
+  setBlock("O21", "BARCODE_ID", 56) %>% 
+  setBlock("I01", "BARCODE_ID", 57) %>%
+  setBlock("I02", "BARCODE_ID", 58) %>%
+  setBlock("I03", "BARCODE_ID", 59) %>%
+  setBlock("I04", "BARCODE_ID", 60) %>%
+  setBlock("I05", "BARCODE_ID", 61) %>%
+  setBlock("I06", "BARCODE_ID", 62) %>%
+  setBlock("I07", "BARCODE_ID", 63) %>%  
+  setBlock("I08", "BARCODE_ID", 57) %>%
+  setBlock("I09", "BARCODE_ID", 58) %>%
+  setBlock("I10", "BARCODE_ID", 59) %>%
+  setBlock("I11", "BARCODE_ID", 60) %>%
+  setBlock("I12", "BARCODE_ID", 61) %>%
+  setBlock("I13", "BARCODE_ID", 62) %>%
+  setBlock("I14", "BARCODE_ID", 63) %>%    
+  setBlock("I15", "BARCODE_ID", 57) %>%
+  setBlock("I16", "BARCODE_ID", 58) %>%
+  setBlock("I17", "BARCODE_ID", 59) %>%
+  setBlock("I18", "BARCODE_ID", 60) %>%
+  setBlock("I19", "BARCODE_ID", 61) %>%
+  setBlock("I20", "BARCODE_ID", 62) %>%
+  setBlock("I21", "BARCODE_ID", 63) %>%   
+  setBlock("M15", "BARCODE_ID", 57) %>%
+  setBlock("M16", "BARCODE_ID", 58) %>%
+  setBlock("M17", "BARCODE_ID", 59) %>%
+  setBlock("M18", "BARCODE_ID", 60) %>%
+  setBlock("M19", "BARCODE_ID", 61) %>%
+  setBlock("M20", "BARCODE_ID", 62) %>%
+  setBlock("M21", "BARCODE_ID", 63) %>%  
+  setBlock("P15", "BARCODE_ID", 57) %>%
+  setBlock("P16", "BARCODE_ID", 58) %>%
+  setBlock("P17", "BARCODE_ID", 59) %>%
+  setBlock("P18", "BARCODE_ID", 60) %>%
+  setBlock("P19", "BARCODE_ID", 61) %>%
+  setBlock("P20", "BARCODE_ID", 62) %>%
+  setBlock("P21", "BARCODE_ID", 63) %>%   
+  setBlock("J01", "BARCODE_ID", 64) %>%
+  setBlock("J02", "BARCODE_ID", 65) %>%
+  setBlock("J03", "BARCODE_ID", 66) %>%
+  setBlock("J04", "BARCODE_ID", 67) %>%
+  setBlock("J05", "BARCODE_ID", 68) %>%
+  setBlock("J06", "BARCODE_ID", 69) %>%
+  setBlock("J07", "BARCODE_ID", 70) %>%   
+  setBlock("J08", "BARCODE_ID", 64) %>%
+  setBlock("J09", "BARCODE_ID", 65) %>%
+  setBlock("J10", "BARCODE_ID", 66) %>%
+  setBlock("J11", "BARCODE_ID", 67) %>%
+  setBlock("J12", "BARCODE_ID", 68) %>%
+  setBlock("J13", "BARCODE_ID", 69) %>%
+  setBlock("J14", "BARCODE_ID", 70) %>%   
+  setBlock("J15", "BARCODE_ID", 64) %>%
+  setBlock("J16", "BARCODE_ID", 65) %>%
+  setBlock("J17", "BARCODE_ID", 66) %>%
+  setBlock("J18", "BARCODE_ID", 67) %>%
+  setBlock("J19", "BARCODE_ID", 68) %>%
+  setBlock("J20", "BARCODE_ID", 69) %>%
+  setBlock("J21", "BARCODE_ID", 70) %>%  
+  setBlock("M23", "BARCODE_ID", 64) %>%
+  setBlock("K22", "BARCODE_ID", 65) %>%
+  setBlock("K23", "BARCODE_ID", 66) %>%
+  setBlock("K24", "BARCODE_ID", 67) %>%
+  setBlock("L22", "BARCODE_ID", 68) %>%
+  setBlock("L23", "BARCODE_ID", 69) %>%
+  setBlock("L24", "BARCODE_ID", 70) %>%  
+  setBlock("P23", "BARCODE_ID", 64) %>%
+  setBlock("N22", "BARCODE_ID", 65) %>%
+  setBlock("N23", "BARCODE_ID", 66) %>%
+  setBlock("N24", "BARCODE_ID", 67) %>%
+  setBlock("O22", "BARCODE_ID", 68) %>%
+  setBlock("O23", "BARCODE_ID", 69) %>%
+  setBlock("O24", "BARCODE_ID", 70)   
 ```
 
 RT_PRIMERS
@@ -203,6 +571,8 @@ plate %<>%
 
 RT primer volume 
 ------------------
+
+25 nl of RT_PRIMERS added in each well, except the negative controls 
 
 ```{r RT_PRIMERS_vol}
 plate %<>%
@@ -273,6 +643,8 @@ plate %<>%
 RNA volume
 -----------
 
+25 nL of RNA added to each well, except the negative controls
+
 ```{r RNA_vol}
 plate %<>%
   setBlock("J01~J21", "RNA_vol", 0) %>%
@@ -293,7 +665,7 @@ H2O
 H2O volume
 -----------
 
-H2O added to complete RT reaction volume up to 500 nL
+0, 25, 50, 75 or 100 nL H2O added to complete RT reaction volume up to 500 nL
 
 ```{r H2O_vol}
 plate %<>%
@@ -409,9 +781,17 @@ Total volume
 ```{r total_volume}
 plate$total_volume <- ""
 plate$total_volume <- rowSums(plate[, c("MASTER_MIX_vol", "TSO_vol", "RT_PRIMERS_vol", "RNA_vol", "H2O_vol")])
-plate$total_volume
-length(which(plate$total_volume != "NA")) 
-sum(is.na(plate$total_volume))
+```
+
+RATIO TSO/RT_PRIMERS
+=====================
+
+Different ratio of TSO/RT_PRIMERS tested
+
+```{r ratio_TSO_RT_PRIMERS}
+plate$PRIMERS_RATIO <- ""
+plate$PRIMERS_RATIO <- c(plate$TSO/plate$RT_PRIMERS)
+plate$PRIMERS_RATIO <- sub("Inf", "no_RT_PRIMERS", plate$PRIMERS_RATIO)
 ```
 
 Summary
@@ -420,6 +800,11 @@ Summary
 ```{r plate_summary}
 plate 
 summary(plate)
+plate$BARCODE_ID
+length(which(plate$total_volume != "NA")) 
+sum(is.na(plate$total_volume))
+count(plate$BARCODE_ID)
+plate$PRIMERS_RATIO
 ```
 
 Plate maps
