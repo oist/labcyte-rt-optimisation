@@ -23,12 +23,11 @@ setBlock <- smallCAGEqc:::setBlock
 
 Create a data frame representing the contents of each well.
 
-```{r}
-plate <- data.frame(
-    Row = rep(LETTERS[1:16], 24)
-  , Col = unlist(lapply(01:24, rep, 16))
-)
-rownames(plate) <- paste0(plate$Row, plate$Col)
+```{r make_plate_df}
+plate           <- data.frame(Well = platetools::num_to_well(1:384, plate = "384"))
+rownames(plate) <- plate$Well
+plate$Row       <- sub("..$", "", plate$Well) %>% factor
+plate$Col       <- sub("^.",  "", plate$Well) %>% as.numeric %>% factor
 ```
 
 MASTER_MIX
