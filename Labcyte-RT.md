@@ -1819,6 +1819,8 @@ TSO
 
 ![](Labcyte-RT_files/figure-html/plot_TSO_volume-1.png)<!-- -->
 
+![](images/destination_TSO_2.JPG)
+
 H2O
 ---
 
@@ -1854,6 +1856,8 @@ RT primers
 
 ![](Labcyte-RT_files/figure-html/plot_RT_volume-1.png)<!-- -->
 
+![](images/destination_RT_PRIMERS_2.JPG)
+
 Ratio TSO / RT
 --------------
 
@@ -1886,6 +1890,8 @@ RNA mass
 ```
 
 ![](Labcyte-RT_files/figure-html/plot_RNA_vol-1.png)<!-- -->
+
+![](images/destination_RNA_2.JPG)
 
 Grand summary plots
 -------------------

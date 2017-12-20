@@ -835,6 +835,8 @@ TSO
 (plot_TSO_vol <- plateMap("TSO_vol", "TSO volume"))
 ```
 
+![](images/destination_TSO_2.JPG)
+
 H2O
 ---
 
@@ -852,6 +854,8 @@ RT primers
 ```{r plot_RT_volume}
 (plot_RT_vol <- plateMap("RT_PRIMERS_vol", "RT primer volume"))
 ```
+
+![](images/destination_RT_PRIMERS_2.JPG)
 
 Ratio TSO / RT
 --------------
@@ -872,6 +876,8 @@ RNA mass
 ```{r plot_RNA_vol}
 (plot_RNA_vol <- plateMap("RNA_vol", "RNA volume"))
 ```
+
+![](images/destination_RNA_2.JPG)
 
 Grand summary plots
 -------------------
