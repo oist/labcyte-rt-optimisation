@@ -5,6 +5,7 @@ output:
     fig_height: 5.25
     fig_width: 5.25
     keep_md: yes
+    toc: yes
 ---
 
 ```{r set-options, echo=FALSE, cache=FALSE}
@@ -403,7 +404,7 @@ plate %<>%
 ```
 
 Total volume
-------------
+============
 
 ```{r total_volume}
 plate$total_volume <- ""
@@ -414,7 +415,7 @@ sum(is.na(plate$total_volume))
 ```
 
 Summary
--------
+=======
 
 ```{r plate_summary}
 plate 
@@ -422,9 +423,10 @@ summary(plate)
 ```
 
 Plate maps
-----------
+==========
 
-### TSO
+TSO
+---
 
 ```{r plot_TSO_concentration}
 platetools::raw_map(plate$TSO, well=plate$Well, plate="384") +
@@ -438,7 +440,8 @@ platetools::raw_map(plate$TSO_vol, well=plate$Well, plate="384") +
   viridis::scale_fill_viridis(breaks = unique(plate$TSO_vol))
 ```
 
-### H2O
+H2O
+---
 
 ```{r plot_H20_vol}
 platetools::raw_map(plate$H2O_vol, well=plate$Well, plate="384") +
@@ -446,7 +449,8 @@ platetools::raw_map(plate$H2O_vol, well=plate$Well, plate="384") +
   viridis::scale_fill_viridis(breaks = unique(plate$H2O_vol))
 ```
 
-### RT primers
+RT primers
+----------
 
 ```{r plot_RT_concentration}
 platetools::raw_map(plate$RT_PRIMERS, well=plate$Well, plate="384") +
@@ -460,7 +464,8 @@ platetools::raw_map(plate$RT_PRIMERS_vol, well=plate$Well, plate="384") +
   viridis::scale_fill_viridis(breaks = unique(plate$RT_PRIMERS_vol))
 ```
 
-### RNA mass
+RNA mass
+--------
 
 ```{r plot_RNA_mass}
 platetools::raw_map(plate$RNA, well=plate$Well, plate="384") +
@@ -472,4 +477,11 @@ platetools::raw_map(plate$RNA, well=plate$Well, plate="384") +
 platetools::raw_map(plate$RNA_vol, well=plate$Well, plate="384") +
   ggtitle("RNA volume") +
   viridis::scale_fill_viridis(breaks = unique(plate$RNA_vol))
+```
+
+Session information
+===================
+
+```{r sesion_info}
+sessionInfo()
 ```
