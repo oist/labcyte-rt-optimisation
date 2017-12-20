@@ -402,13 +402,23 @@ plate %<>%
   setBlock("P15", "H2O_vol", 100)
 ```
 
-```{r}
+Total volume
+------------
+
+```{r total_volume}
 plate$total_volume <- ""
 plate$total_volume <- rowSums(plate[, c("MASTER_MIX_vol", "TSO_vol", "RT_PRIMERS_vol", "RNA_vol", "H2O_vol")])
-plate 
 plate$total_volume
 length(which(plate$total_volume != "NA")) 
 sum(is.na(plate$total_volume))
+```
+
+Summary
+-------
+
+```{r plate_summary}
+plate 
+summary(plate)
 ```
 
 Plate maps
