@@ -400,7 +400,7 @@ plate %<>%
 
 ```{r}
 plate$total_volume <- ""
-plate$total_volume <- rowSums(plate[, c(3, 5,7,9,10)])
+plate$total_volume <- rowSums(plate[, c("MASTER_MIX_vol", "TSO_vol", "RT_PRIMERS_vol", "RNA_vol", "H2O_vol")])
 plate 
 plate$total_volume
 length(which(plate$total_volume != "NA")) 
