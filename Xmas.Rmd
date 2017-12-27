@@ -1,0 +1,140 @@
+---
+title: "Xmas"
+author: "Charles Plessy"
+date: "26 December 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load scripts and libraries.
+
+```{r}
+library("magrittr")   # For its diamond pipe operators
+library("ggplot2")    # For plotting
+library("platetools") # For defining and manipulating 384-well plates
+library("plyr")
+library("tibble")     # For comfortable command-line operations
+
+# The set_block function that will become part of platetools
+source("https://raw.githubusercontent.com/charles-plessy/platetools/76213accb1704d11a2d96fb1f6284d0b46117778/R/set_block.R")
+```
+
+## Plate layout
+
+Create a data frame representing the contents of each well.
+
+```{r make_plate}
+plate <- tibble(well = platetools::num_to_well(1:384, plate = "384"))
+plate
+```
+
+```{r add_stem}
+plate %<>% set_block("H21~I24", "stem", 1)
+```
+
+```{r add_leaves}
+plate %<>%
+  set_block("B19~O20", "leaves", 1) %>%
+  set_block("C17~N18", "leaves", 1) %>%
+  set_block("D15~M16", "leaves", 1) %>%
+  set_block("E13~L14", "leaves", 1) %>%
+  set_block("F09~K12", "leaves", 1) %>%
+  set_block("G05~J08", "leaves", 1) %>%
+  set_block("H02~I04", "leaves", 1)
+```
+
+```{r add_Xmas_balls}
+plate %<>%
+  set_block("G05", "balls", 1) %>%
+  set_block("J08", "balls", 1) %>%
+  set_block("F13", "balls", 1) %>%
+  set_block("J12", "balls", 1) %>%
+  set_block("I17", "balls", 1) %>%
+  set_block("E18", "balls", 1) %>%
+  set_block("M16", "balls", 1)
+```
+
+```{r plot_plate}
+plateMap <- function(plate, x, title) {
+  platetools::raw_map(plate[[x]], well=plate$well, plate="384") +
+  ggtitle(title) +
+  viridis::scale_fill_viridis(breaks = unique(plate[[x]]))
+}
+
+(plot_stem   <- plateMap(plate, "stem",   "stem"))
+(plot_leaves <- plateMap(plate, "leaves", "leaves"))
+(plot_balls  <- plateMap(plate, "balls",  "balls"))
+
+
+x <- data.frame(lapply(colnames(plate[,-1]), function(x) ifelse(is.na(plate[,x]), "", x)))
+x <- apply( x, 1
+          , function(x)
+              if(all(x=="")) {
+                NA
+              } else {
+                paste(unique(x[x!=""]), collapse=",")
+              })
+plate$contents <- x
+
+raw_map(plate$contents, well=plate$well, plate="384")
+```
+
+## Source plate
+
+```{r}
+colSums(plate[,-1], na.rm = TRUE)
+
+source <- tibble(well = platetools::num_to_well(1:384, plate = "384"))
+source %<>%
+  set_block("A01", "stem", 20) %>%
+  set_block("A02~A04", "leaves", 60) %>%
+  set_block("A05", "balls", 20)
+
+x <- data.frame(lapply(colnames(source[,-1]), function(x) ifelse(is.na(source[,x]), "", x)))
+x <- apply( x, 1
+          , function(x)
+              if(all(x=="")) {
+                NA
+              } else {
+                paste(unique(x[x!=""]), collapse=",")
+              })
+source$contents <- x
+
+raw_map(source$contents, well=source$well, plate="384")
+```
+
+## Transfer system
+
+Let `l` be a list comprising
+
+ - `source` (a source plate)
+ - `plan` (a plate representing the final goal)
+ - `target` (a target plate)
+ - `transfers` (a list of transfer commands)
+ 
+The function `transfer` will take `l` as input and return a list where
+
+ - `source` is the source plate, with volumes removed
+ - `plan` is unchanged
+ - `target` is the target plates with volumes added
+ - `transfers` is the list of transfer commands, with new transfers appended.
+ 
+(Later, a vectorised version may be written with a list of source plates as input)
+ 
+
+```{r}
+
+
+transfer <- function(l) {
+  source <- l$source
+  
+  
+  ...
+  
+  return(l)
+}
+
+```
