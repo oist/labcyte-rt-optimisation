@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Load scripts and libraries.
+## Load scripts and libraries.
 
 ```{r}
 library("magrittr")   # For its diamond pipe operators
@@ -22,7 +22,7 @@ library("tibble")     # For comfortable command-line operations
 source("https://raw.githubusercontent.com/charles-plessy/platetools/76213accb1704d11a2d96fb1f6284d0b46117778/R/set_block.R")
 ```
 
-## Plate layout
+## Target plate layout
 
 Create a data frame representing the contents of each well.
 
@@ -82,7 +82,7 @@ plate$contents <- x
 raw_map(plate$contents, well=plate$well, plate="384")
 ```
 
-## Source plate
+## Source plate layout
 
 ```{r}
 colSums(plate[,-1], na.rm = TRUE)
@@ -125,7 +125,22 @@ The function `transfer` will take `l` as input and return a list where
 (Later, a vectorised version may be written with a list of source plates as input)
  
 
+
 ```{r}
+
+transducer <- list()
+
+shoot <- function()
+
+l <- list()
+l$source      <- source
+l$plan        <- plate
+l$destination <- tibble(well = platetools::num_to_well(1:384, plate = "384"))
+l$transfers   <- list()
+
+transferTo <- function(l, pos, what) {
+  
+}
 
 
 transfer <- function(l) {
