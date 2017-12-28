@@ -208,9 +208,11 @@ setMethod( "moveTransducer"
 
 setGeneric("showLogs", function(echo) standardGeneric("showLogs"))
 
-setMethod("showLogs", "Echo", function(echo)
-  do.call(rbind, echo@log)
-)
+setMethod("showLogs", "Echo", function(echo) {
+  df <- as.data.frame(t(as.data.frame(lapply(echo@log, unlist))))
+  rownames(df) <- NULL
+  df
+})
 
 
 #' Transfer volume from a source to a destination plate
@@ -232,9 +234,9 @@ setMethod("showLogs", "Echo", function(echo)
 #' 
 #' sourcePlate <- Plate(plate = tibble::tibble(well = platetools::num_to_well(1:384, plate = "384")))
 #' sourcePlate %<>%
-#'   setWell(Well(well = "A01", plateFormat = "384"), "dNTP", 100) %>%
-#'   setWell(Well(well = "A02", plateFormat = "384"), "dNTP", 100) %>%
-#'   setWell(Well(well = "A03", plateFormat = "384"), "buffer", 100)
+#'   setWell(Well(well = "A01", plateFormat = "384"), "dNTP", 100000) %>%
+#'   setWell(Well(well = "A02", plateFormat = "384"), "dNTP", 100000) %>%
+#'   setWell(Well(well = "A03", plateFormat = "384"), "buffer", 100000)
 #' sourcePlate@plate
 #' 
 #' destinationPlate <- Plate(plate = tibble::tibble(well = platetools::num_to_well(1:384, plate = "384")))
@@ -292,11 +294,6 @@ setMethod( "transfer"
   if (validObject(echo)) echo
 })
 
-setGeneric("enoughVolume", function(echo, volume) standardGeneric("enoughVolume"))
-setMethod ("enoughVolume", c("Echo", "numeric"), function(echo, volume) {
-    availableVolume <- plateWellVolume(echo@source, echo@transducer@source)
-    availableVolume - volume > echo@source@deadVolume
-})
 
 #' Plan Echo transfers
 #' 
@@ -320,9 +317,9 @@ setMethod ("enoughVolume", c("Echo", "numeric"), function(echo, volume) {
 #' @examples 
 #' sourcePlate <- Plate(plate = tibble::tibble(well = platetools::num_to_well(1:384, plate = "384")))
 #' sourcePlate %<>%
-#'   setWell(Well(well = "A01", plateFormat = "384"), "dNTP", 100) %>%
-#'   setWell(Well(well = "A02", plateFormat = "384"), "dNTP", 100) %>%
-#'   setWell(Well(well = "A03", plateFormat = "384"), "buffer", 100)
+#'   setWell(Well(well = "A01", plateFormat = "384"), "dNTP", 200000) %>%
+#'   setWell(Well(well = "A02", plateFormat = "384"), "dNTP", 200000) %>%
+#'   setWell(Well(well = "A03", plateFormat = "384"), "buffer", 200000)
 #' sourcePlate@plate
 #' 
 #' planPlate <- Plate(plate = tibble::tibble(well = platetools::num_to_well(1:384, plate = "384")))
@@ -334,12 +331,15 @@ setMethod ("enoughVolume", c("Echo", "numeric"), function(echo, volume) {
 #' 
 #' destinationPlate <- Plate(plate = tibble::tibble(well = platetools::num_to_well(1:384, plate = "384")))
 #' 
+#' echo <- planTransfers(sourcePlate, destinationPlate, planPlate)
+#' echo
+#' echo %>% showLogs
 #' 
 #' @export
 
 planTransfers <- function(source, destination, plan, model = "525") {
-  echo <- Echo( source      = sourcePlate
-              , destination = destinationPlate
+  echo <- Echo( source      = source
+              , destination = destination
               , transducer  = Transducer( source = Well(well = "A01",      plateFormat = "384")
                                         , destination = Well(well = "A01", plateFormat = "384"))
               , model       = model)
@@ -349,14 +349,52 @@ planTransfers <- function(source, destination, plan, model = "525") {
 # To do: reform the sourceReagent function (the name is misleading, since now
 # it can also be run on destination plates)
   
+# To do: accept plan plates that contain non-numerical variables.
+  
+  transferLoop <- function (echo, plan, reagent) {
+    # Where is the next transfer ?
+    nextTrans <- seekReagent(plan, reagent, echo@transducer@destination)
+    # If no next transfer, end the loop
+    if(suppressWarnings(is.na(nextTrans))) return(echo)
+    # Otherwise, move the tranducer
+    echo %<>% moveTransducer(destination = nextTrans)
+    # Read the volume to be transferred
+    volume <- plateWellVolume(plate = plan, nextTrans, reagent)
+    # Check if there is enough reagent
+    while (! enoughVolume(echo, volume))
+      # If not, move the transducer to the next source well
+      echo %<>% seekReagent(reagent, nextWell(echo@transducer@source))
+    # Transfer
+    echo %<>% transfer(volume)
+    # Register the transfer in the plan plate
+    plan %<>% setWell(nextTrans, reagent, NA)
+    # Recursively call the loop
+    transferLoop(echo, plan, reagent)
+  }
+  
   for (reagent in sourceReagent(plan)) {
     # Move transducer in upper-left corner
-    echo %<>% moveTransducer(source = Well(well = "A01", plateFormat = echo@transducer@source@plateFormat))
+    echo %<>% moveTransducer( source      = Well(well = "A01", plateFormat = echo@transducer@source@plateFormat)
+                              
+                            , destination = Well(well = "A01", plateFormat = echo@transducer@destination@plateFormat))
     # Find reagent in source plate
     echo %<>% seekReagent(reagent)
+    # Enter transfer loop
+    echo %<>% transferLoop(plan, reagent)
   }
+  echo
 }
 
-setMethod("seekReagent", c("Echo", "character", "missing"), function(object, reagent, start) {
-  echo %>% moveTransducer(source = seekReagent(echo@source, reagent, echo@transducer@source))
+setMethod("seekReagent", c("Echo", "character", "Well"), function(object, reagent, start) {
+  newPos <- seekReagent(object@source, reagent, start)
+  if (suppressWarnings(is.na(newPos))) stop("Reagent not found !")
+  object %>% moveTransducer(source = newPos)
 })
+
+setMethod("seekReagent", c("Echo", "character", "missing"), function(object, reagent, start) {
+  object %>% seekReagent(reagent, object@transducer@source)
+})
+
+enoughVolume <- function(echo, volume) {
+  plateWellVolume(echo@source, echo@transducer@source) > volume + echo@source@deadVolume
+}

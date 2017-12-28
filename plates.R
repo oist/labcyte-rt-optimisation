@@ -85,8 +85,8 @@ setMethod ("nextWell", "Well", function(well) {
 #' @examples 
 #' 
 #' plate <- Plate( plate      = tibble::tibble(well = num_to_well(1:384, plate = "384"))
-#'               , deadVolume = 10
-#'               , maxVolume  = 100)
+#'               , deadVolume = 10000
+#'               , maxVolume  = 100000)
 #' plate
 #' 
 #' @importFrom platetools num_to_well
@@ -97,8 +97,8 @@ Plate <- setClass( "Plate",
                   , deadVolume = "numeric"
                   , maxVolume  = "numeric"),
   prototype = list( plate = list()
-                  , deadVolume = 10
-                  , maxVolume  = 100)
+                  , deadVolume = 10000
+                  , maxVolume  = 100000)
 )
 
 setMethod("as.character", "Plate", function(x)
@@ -122,9 +122,9 @@ setMethod("colnames", "Plate", function(x) colnames(x@plate))
 #' 
 #' sourcePlate <- Plate(plate = tibble::tibble(well = platetools::num_to_well(1:384, plate = "384")))
 #' sourcePlate %<>%
-#'   setWell(Well(well = "A01", plateFormat = "384"), "dNTP", 100) %>%
-#'   setWell(Well(well = "A02", plateFormat = "384"), "dNTP", 100) %>%
-#'   setWell(Well(well = "A03", plateFormat = "384"), "buffer", 100)
+#'   setWell(Well(well = "A01", plateFormat = "384"), "dNTP", 100000) %>%
+#'   setWell(Well(well = "A02", plateFormat = "384"), "dNTP", 100000) %>%
+#'   setWell(Well(well = "A03", plateFormat = "384"), "buffer", 100000)
 #' 
 #' sourcePlate %>% sourceReagent(Well(well = "A01"))
 #' sourcePlate %>% sourceReagent(Well(well = "A03"))
@@ -170,7 +170,12 @@ setMethod("sourceReagent", c("Plate", "missing"), function(plate, well) {
 #'   setWell(Well(well = "A01", plateFormat = "384"), "buffer", 50)
 #' 
 #' destPlate %>% plateWellVolume(Well(well = "A01"))
+#' destPlate %>% plateWellVolume(Well(well = "A01"), "dNTP")
 #' destPlate %>% plateWellVolume(Well(well = "A01"), "buffer")
+#' 
+#' destPlate %>% plateWellVolume(Well(well = "A02"))
+#' destPlate %>% plateWellVolume(Well(well = "A02"), "dNTP")
+#' destPlate %>% plateWellVolume(Well(well = "A02"), "buffer")
 #' 
 #' @export
 
@@ -191,7 +196,10 @@ setMethod("plateWellVolume", c("Plate", "Well", "character"), function(plate, we
   plateTable <- plate@plate
   plateRow   <- plateTable[plateTable$well == wellName, ]
   plateRow   <- plateRow[, -1] # Removing the "well" column.
-  plateRow[[what]]
+  vol <- plateRow[[what]]
+  if(is.null(vol)) return(0)
+  if(is.na(vol)) return(0)
+  vol
 })
 
 
@@ -200,7 +208,7 @@ setMethod("plateWellVolume", c("Plate", "Well", "character"), function(plate, we
 #' Given a \code{\link{Plate}} object, check if the reagent is available, and
 #' if yes, in which well.
 #' 
-#' @param plate A \code{\link{Plate}} object.
+#' @param object A \code{\link{Plate}} object.
 #' @param reagent A reagent name.
 #' @param start A \code{\link{Well}} object (to avoid backtracking).
 #' 
@@ -209,9 +217,9 @@ setMethod("plateWellVolume", c("Plate", "Well", "character"), function(plate, we
 #' @examples 
 #' sourcePlate <- Plate(plate = tibble::tibble(well = platetools::num_to_well(1:384, plate = "384")))
 #' sourcePlate %<>%
-#'   setWell(Well(well = "A01", plateFormat = "384"), "dNTP", 100) %>%
-#'   setWell(Well(well = "A02", plateFormat = "384"), "dNTP", 100) %>%
-#'   setWell(Well(well = "A03", plateFormat = "384"), "buffer", 100)
+#'   setWell(Well(well = "A01", plateFormat = "384"), "dNTP", 100000) %>%
+#'   setWell(Well(well = "A02", plateFormat = "384"), "dNTP", 100000) %>%
+#'   setWell(Well(well = "A03", plateFormat = "384"), "buffer", 100000)
 #' 
 #' seekReagent(sourcePlate, "buffer")
 #' 
@@ -226,7 +234,7 @@ setMethod ("seekReagent", c("Plate", "character", "Well"), function(object, reag
   # Remove empty wells
   plateTable <- plateTable[!as.vector(is.na(plateTable[,reagent])),]
   well <- plateTable$well[1]
-  if (is.na(well)) stop("Reagent not found")
+  if (is.na(well)) return(NA)
   Well(well=well)
 })
 
@@ -248,20 +256,26 @@ setMethod ("seekReagent", c("Plate", "character", "missing"), function(object, r
 #' 
 #' sourcePlate <- Plate(plate = tibble::tibble(well = platetools::num_to_well(1:384, plate = "384")))
 #' sourcePlate@plate
-#' sourcePlate <- setWell(sourcePlate, Well(well = "A01", plateFormat = "384"), "dNTP", 100)
-#' sourcePlate <- setWell(sourcePlate, Well(well = "A02", plateFormat = "384"), "dNTP", 100)
-#' sourcePlate <- setWell(sourcePlate, Well(well = "A03", plateFormat = "384"), "buffer", 100)
+#' sourcePlate <- setWell(sourcePlate, Well(well = "A01", plateFormat = "384"), "dNTP", 100000)
+#' sourcePlate <- setWell(sourcePlate, Well(well = "A02", plateFormat = "384"), "dNTP", 100000)
+#' sourcePlate <- setWell(sourcePlate, Well(well = "A03", plateFormat = "384"), "buffer", 100000)
 #' sourcePlate@plate
 #' 
 #' @export
 
 setGeneric("setWell", function(plate, well, what, volume) standardGeneric("setWell"))
 
-setMethod( "setWell"
-         , c("Plate", "Well", "character", "numeric")
-         , function(plate, well, what, volume) {
+.setWell <- function(plate, well, what, volume) {
   tbl <- plate@plate
   tbl[tbl$well == well@well, what] <- volume
   plate@plate <- tbl
   if (validObject(plate)) plate
+}
+
+setMethod( "setWell", c("Plate", "Well", "character", "numeric"), .setWell)
+setMethod( "setWell", c("Plate", "Well", "character", "logical")
+         , function (plate, well, what, volume) {
+  if(! is.na(volume)) stop("NA expected")
+  .setWell (plate, well, what, volume)
 })
+
