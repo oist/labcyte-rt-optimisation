@@ -2,7 +2,12 @@
 title: "Xmas"
 author: "Charles Plessy"
 date: "26 December 2017"
-output: html_document
+output: 
+  html_document: 
+    fig_height: 3
+    fig_width: 5
+    keep_md: yes
+    toc: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -32,29 +37,29 @@ plate
 ```
 
 ```{r add_stem}
-plate %<>% set_block("H21~I24", "stem", 1)
+plate %<>% set_block("H21~I24", "stem", 1000)
 ```
 
 ```{r add_leaves}
 plate %<>%
-  set_block("B19~O20", "leaves", 1) %>%
-  set_block("C17~N18", "leaves", 1) %>%
-  set_block("D15~M16", "leaves", 1) %>%
-  set_block("E13~L14", "leaves", 1) %>%
-  set_block("F09~K12", "leaves", 1) %>%
-  set_block("G05~J08", "leaves", 1) %>%
-  set_block("H02~I04", "leaves", 1)
+  set_block("B19~O20", "leaves", 1000) %>%
+  set_block("C17~N18", "leaves", 1000) %>%
+  set_block("D15~M16", "leaves", 1000) %>%
+  set_block("E13~L14", "leaves", 1000) %>%
+  set_block("F09~K12", "leaves", 1000) %>%
+  set_block("G05~J08", "leaves", 1000) %>%
+  set_block("H02~I04", "leaves", 1000)
 ```
 
 ```{r add_Xmas_balls}
 plate %<>%
-  set_block("G05", "balls", 1) %>%
-  set_block("J08", "balls", 1) %>%
-  set_block("F13", "balls", 1) %>%
-  set_block("J12", "balls", 1) %>%
-  set_block("I17", "balls", 1) %>%
-  set_block("E18", "balls", 1) %>%
-  set_block("M16", "balls", 1)
+  set_block("G05", "balls", 1000) %>%
+  set_block("J08", "balls", 1000) %>%
+  set_block("F13", "balls", 1000) %>%
+  set_block("J12", "balls", 1000) %>%
+  set_block("I17", "balls", 1000) %>%
+  set_block("E18", "balls", 1000) %>%
+  set_block("M16", "balls", 1000)
 ```
 
 ```{r plot_plate}
@@ -84,14 +89,14 @@ raw_map(plate$contents, well=plate$well, plate="384")
 
 ## Source plate layout
 
-```{r}
-colSums(plate[,-1], na.rm = TRUE)
+```{r sourcePlate}
+colSums(plate[,c("stem", "leaves", "balls")], na.rm = TRUE)
 
 source <- tibble(well = platetools::num_to_well(1:384, plate = "384"))
 source %<>%
-  set_block("A01", "stem", 20) %>%
-  set_block("A02~A04", "leaves", 60) %>%
-  set_block("A05", "balls", 20)
+  set_block("A01", "stem", 20000) %>%
+  set_block("A02~A04", "leaves", 60000) %>%
+  set_block("A05", "balls", 20000)
 
 x <- data.frame(lapply(colnames(source[,-1]), function(x) ifelse(is.na(source[,x]), "", x)))
 x <- apply( x, 1
@@ -106,50 +111,25 @@ source$contents <- x
 raw_map(source$contents, well=source$well, plate="384")
 ```
 
-## Transfer system
+## Plan transfer
 
-Let `l` be a list comprising
+```{r transfers}
+source("plates.R")
+source("echo.R")
+planPlate   <- Plate(plate = plate[, c("well", "stem", "leaves", "balls")])
+sourcePlate <- Plate(plate = source[, c("well", "stem", "leaves", "balls")])
+destPlate   <- Plate(plate = tibble::tibble(well = num_to_well(1:384, plate = "384")))
 
- - `source` (a source plate)
- - `plan` (a plate representing the final goal)
- - `target` (a target plate)
- - `transfers` (a list of transfer commands)
- 
-The function `transfer` will take `l` as input and return a list where
+echo <- planTransfers(sourcePlate, destPlate, planPlate)
+echo
 
- - `source` is the source plate, with volumes removed
- - `plan` is unchanged
- - `target` is the target plates with volumes added
- - `transfers` is the list of transfer commands, with new transfers appended.
- 
-(Later, a vectorised version may be written with a list of source plates as input)
- 
+transfers <- as.data.frame(echo %>% showLogs)
+transfers
+write.csv(transfers[,1:3], file = "Xmas.csv")
+```
 
+## Session information
 
-```{r}
-
-transducer <- list()
-
-shoot <- function()
-
-l <- list()
-l$source      <- source
-l$plan        <- plate
-l$destination <- tibble(well = platetools::num_to_well(1:384, plate = "384"))
-l$transfers   <- list()
-
-transferTo <- function(l, pos, what) {
-  
-}
-
-
-transfer <- function(l) {
-  source <- l$source
-  
-  
-  ...
-  
-  return(l)
-}
-
+```{r sessionInfo}
+sessionInfo()
 ```
