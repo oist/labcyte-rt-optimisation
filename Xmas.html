@@ -401,7 +401,8 @@ transfers</code></pre>
 ## 147  A05 J08 1000  balls
 ## 148  A05 J12 1000  balls
 ## 149  A05 M16 1000  balls</code></pre>
-<pre class="r"><code>write.csv(transfers[,1:3], file = &quot;Xmas.csv&quot;)</code></pre>
+<pre class="r"><code>write.table( transfers[,1:3], file = &quot;Xmas.csv&quot;
+           , quote = FALSE, row.names = FALSE, col.names = FALSE, sep = &quot;,&quot;)</code></pre>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>

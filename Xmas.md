@@ -347,7 +347,8 @@ transfers
 ```
 
 ```r
-write.csv(transfers[,1:3], file = "Xmas.csv")
+write.table( transfers[,1:3], file = "Xmas.csv"
+           , quote = FALSE, row.names = FALSE, col.names = FALSE, sep = ",")
 ```
 
 ## Session information
