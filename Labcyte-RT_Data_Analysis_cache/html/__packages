@@ -25,3 +25,4 @@ reshape
 permute
 lattice
 vegan
+bindrcpp
