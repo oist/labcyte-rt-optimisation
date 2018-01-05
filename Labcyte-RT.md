@@ -1,12 +1,4 @@
----
-title: "RT optimisation with the Labcyte Echo 525 (December 2017)"
-output: 
-  html_document: 
-    fig_height: 5.25
-    fig_width: 5.25
-    keep_md: yes
-    toc: yes
----
+# RT optimisation with the Labcyte Echo 525 (December 2017)
 
 
 
@@ -1784,6 +1776,10 @@ plate$PRIMERS_RATIO
 ## [379] "0.3125"        "0.15625"       "0.078125"      NA              "no_RT_PRIMERS" NA
 ```
 
+```r
+write.table(plate, "plate.txt", sep = "\t", quote = FALSE, row.names = FALSE)
+```
+
 Plate maps
 ==========
 
@@ -1936,7 +1932,7 @@ sessionInfo()
 ```
 
 ```
-## R version 3.4.3 (2017-11-30)
+## R version 3.4.0 (2017-04-21)
 ## Platform: x86_64-pc-linux-gnu (64-bit)
 ## Running under: Debian GNU/Linux 9 (stretch)
 ## 
@@ -1945,9 +1941,9 @@ sessionInfo()
 ## LAPACK: /usr/lib/lapack/liblapack.so.3.7.0
 ## 
 ## locale:
-##  [1] LC_CTYPE=en_GB.UTF-8       LC_NUMERIC=C               LC_TIME=en_GB.UTF-8        LC_COLLATE=en_GB.UTF-8    
-##  [5] LC_MONETARY=en_GB.UTF-8    LC_MESSAGES=en_GB.UTF-8    LC_PAPER=en_GB.UTF-8       LC_NAME=C                 
-##  [9] LC_ADDRESS=C               LC_TELEPHONE=C             LC_MEASUREMENT=en_GB.UTF-8 LC_IDENTIFICATION=C       
+##  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8        LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8   
+##  [6] LC_MESSAGES=C.UTF-8    LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C           LC_TELEPHONE=C        
+## [11] LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   
 ## 
 ## attached base packages:
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
@@ -1956,20 +1952,20 @@ sessionInfo()
 ## [1] bindrcpp_0.2  plyr_1.8.4    ggplot2_2.2.1 magrittr_1.5 
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] gtools_3.5.0             purrr_0.2.4              lattice_0.20-35          colorspace_1.3-2        
-##  [5] htmltools_0.3.6          stats4_3.4.3             viridisLite_0.2.0        yaml_2.1.15             
-##  [9] mgcv_1.8-22              rlang_0.1.4              ggpubr_0.1.6             glue_1.2.0              
-## [13] BiocGenerics_0.24.0      RColorBrewer_1.1-2       lambda.r_1.2             platetools_0.0.2        
-## [17] GenomeInfoDbData_0.99.1  bindr_0.1                stringr_1.2.0            zlibbioc_1.24.0         
+##  [1] gtools_3.5.0             purrr_0.2.3              lattice_0.20-35          colorspace_1.3-2        
+##  [5] htmltools_0.3.6          stats4_3.4.0             viridisLite_0.2.0        yaml_2.1.14             
+##  [9] mgcv_1.8-17              rlang_0.1.2              ggpubr_0.1.5             glue_1.1.1              
+## [13] BiocGenerics_0.22.1      RColorBrewer_1.1-2       lambda.r_1.2             platetools_0.0.2        
+## [17] GenomeInfoDbData_0.99.0  bindr_0.1                stringr_1.2.0            zlibbioc_1.22.0         
 ## [21] smallCAGEqc_0.12.2.99999 munsell_0.4.3            gtable_0.2.0             futile.logger_1.4.3     
 ## [25] evaluate_0.10.1          labeling_0.3             knitr_1.17               permute_0.9-4           
-## [29] IRanges_2.13.4           GenomeInfoDb_1.14.0      parallel_3.4.3           Rcpp_0.12.14            
+## [29] IRanges_2.10.3           GenomeInfoDb_1.12.3      parallel_3.4.0           Rcpp_0.12.12            
 ## [33] scales_0.5.0             backports_1.1.1          gdata_2.18.0             vegan_2.4-4             
-## [37] S4Vectors_0.17.12        XVector_0.19.1           gridExtra_2.3            digest_0.6.12           
-## [41] stringi_1.1.6            dplyr_0.7.4              cowplot_0.9.2            GenomicRanges_1.31.1    
-## [45] grid_3.4.3               rprojroot_1.2            tools_3.4.3              bitops_1.0-6            
-## [49] lazyeval_0.2.1           RCurl_1.95-4.8           tibble_1.3.4             cluster_2.0.6           
-## [53] futile.options_1.0.0     pkgconfig_2.0.1          MASS_7.3-47              Matrix_1.2-12           
-## [57] assertthat_0.2.0         rmarkdown_1.8            reshape_0.8.7            viridis_0.4.0           
-## [61] R6_2.2.2                 VennDiagram_1.6.18       nlme_3.1-131             compiler_3.4.3
+## [37] S4Vectors_0.14.5         XVector_0.16.0           gridExtra_2.3            digest_0.6.12           
+## [41] stringi_1.1.5            dplyr_0.7.4              cowplot_0.8.0            GenomicRanges_1.28.4    
+## [45] grid_3.4.0               rprojroot_1.2            tools_3.4.0              bitops_1.0-6            
+## [49] lazyeval_0.2.0           RCurl_1.95-4.8           tibble_1.3.4             cluster_2.0.6           
+## [53] futile.options_1.0.0     pkgconfig_2.0.1          MASS_7.3-47              Matrix_1.2-10           
+## [57] assertthat_0.2.0         rmarkdown_1.6.0.9001     reshape_0.8.7            viridis_0.4.0           
+## [61] R6_2.2.2                 VennDiagram_1.6.17       nlme_3.1-131             compiler_3.4.0
 ```

@@ -1,0 +1,183 @@
+---
+title: "Labcyte-RT Data Analysis (MOIRAI BED FILES)"
+output:
+  html_document:
+    keep_md: yes
+    number_sections: yes
+    toc: yes
+  pdf_document:
+    toc: yes
+---
+
+```{r echo=FALSE}
+knitr::opts_chunk$set(cache  = TRUE)
+knitr::opts_knit$set(verbose = TRUE)
+ggplot2::theme_set(ggplot2::theme_bw())
+```
+
+Data load and QC in R
+=====================
+
+```{r load_R_libraries}
+BS_GENOME    <- "BSgenome.Mmusculus.UCSC.mm9" 
+library(BS_GENOME, character.only = T)
+library(CAGEr)
+library(data.table)
+library(ggplot2)
+library(gplots)
+library('RColorBrewer')
+library(magrittr)
+library(plyr)
+library(MultiAssayExperiment)
+library(SummarizedExperiment)
+library(reshape)
+library(vegan)
+```
+
+MOIRAI shortcuts
+
+```{r moirai_shortcuts}
+WORKFLOW       <- "OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1"
+MOIRAI_PROJ    <- "project/Labcyte" 
+MOIRAI_USER    <- "nanoCAGE2" 
+ASSEMBLY       <- "mm9"
+BASEDIR        <- "/osc-fs_home/scratch/moirai"
+MOIRAI_BASE    <- file.path(BASEDIR, MOIRAI_USER)
+MOIRAI_RESULTS <- file.path(MOIRAI_BASE, MOIRAI_PROJ)
+```
+
+Load CAGE libraries
+===================
+
+Load summary statistics from MOIRAI and polish the names
+--------------------------------------------------------
+
+```{r MOIRAI}
+libs <- smallCAGEqc::loadMoiraiStats(
+  pipeline  = "OP-WORKFLOW-CAGEscan-short-reads-v2.0",
+  multiplex = file.path( MOIRAI_BASE, "input/171227_M00528_0321_000000000-B4GLP.multiplex.txt"),
+  summary   = file.path( MOIRAI_RESULTS,"171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/text/summary.txt"))
+libs$barcode_ID <- c(1:70)
+libs$inputFiles <- list.files(path = "/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments")
+libs$inputFiles <- paste0("/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments/", libs$inputFiles)
+libs$inputFilesType <- c("bed")
+libs$sampleLabels <- as.character(libs$samplename)
+libs
+```
+
+
+```{r PLATE}
+plate <- read.table("plate.txt", sep = "\t", header = TRUE)
+plate_10ng <- subset(plate, plate$RNA == 10)
+plate_10ng_no_RNA <- plate[224:230,]
+plate_10ng_all <- rbind(plate_10ng, plate_10ng_no_RNA)
+plate_10ng_all
+```
+
+```{r LIBS}
+libs <- cbind(libs, plate_10ng_all)
+libs[,24] <- NULL
+#rownames(libs) <- NULL
+libs$PRIMERS_RATIO <- sub("no_RT_PRIMERS", "NA", libs$PRIMERS_RATIO)
+libs$PRIMERS_RATIO <- as.numeric(libs$PRIMERS_RATIO)
+libs$RNA <- as.numeric(libs$RNA)
+libs <- libs[order(-libs$PRIMERS_RATIO),]
+libs <- libs[order(-libs$RNA),]
+libs$PRIMERS_RATIO[is.na(libs$PRIMERS_RATIO)] <- "no_RT_PRIMERS"
+libs
+```
+
+Create a CAGEexp object and load expression data
+------------------------------------------------
+
+```{r new_CAGEexp, message = F, echo = TRUE}
+myCAGEexp <- CAGEexp(colData = DataFrame(libs)
+                     , metadata = list( genomeName = BS_GENOME
+                                        , inputFilesType = "bed"))
+
+getCTSS(myCAGEexp)
+normalizeTagCount(myCAGEexp, method = "simpleTpm")
+```
+
+Number of sequencing reads extracted per sample
+-----------------------------------------------
+
+```{r sample stats}
+data.frame(colData(myCAGEexp)[,"extracted",drop=F])
+```
+
+CTSS ANALYSIS
+=============
+
+Number of nanoCAGE tags mapping at CTSS positions in each group of samples
+--------------------------------------------------------------------------
+  
+```{r CTSS_counts_distribution, dev=c('png'), fig.show='hide', results='hide', message = FALSE, warning=FALSE}
+## Figures not displayed on the html/pdf output
+plotReverseCumulatives(myCAGEexp[,1:7], onePlot = TRUE)
+plotReverseCumulatives(myCAGEexp[,8:14], onePlot = TRUE)
+plotReverseCumulatives(myCAGEexp[,15:21], onePlot = TRUE)
+plotReverseCumulatives(myCAGEexp[,22:28], onePlot = TRUE)
+plotReverseCumulatives(myCAGEexp[,29:35], onePlot = TRUE)
+plotReverseCumulatives(myCAGEexp[,36:42], onePlot = TRUE)
+#plotReverseCumulatives(myCAGEexp$RNA == "10", onePlot = TRUE)
+plotReverseCumulatives(myCAGEexp[,50:56], onePlot = TRUE)
+#plotReverseCumulatives(myCAGEexp[,57:63], onePlot = TRUE)
+#plotReverseCumulatives(myCAGEexp[,64:70], onePlot = TRUE)
+```
+
+Number of nanoCAGE tags mapping at CTSS positions in each sample
+----------------------------------------------------------------
+  
+```{r ctss-analysis}
+(myCAGEexp$l1 <- colSums(CTSStagCountDf(myCAGEexp) > 0))
+```
+
+Save myCAGEexp file (temp).
+
+```{r save myCAGEexp object}
+saveRDS(myCAGEexp, "myCAGEexp.Rds")
+```
+
+Create CTSS clusters
+--------------------
+
+```{r create_CTSS_clusters, message = FALSE, warning=FALSE}
+clusterCTSS(myCAGEexp, thresholdIsTpm = FALSE, useMulticore = TRUE, nrPassThreshold = 2, removeSingletons = TRUE)
+cumulativeCTSSdistribution(myCAGEexp, clusters = "tagClusters")
+#, use multicore = TRUE)
+quantilePositions(myCAGEexp, clusters = "tagClusters", qLow = 0.1, qUp = 0.9, useMulticore = TRUE)
+```
+
+
+Annotation with GENCODE
+-----------------------
+  
+Collect Gencode annotations and gene symbols via AnnotationHub.
+
+```{r expression-per-gene, message = F}
+ah <- AnnotationHub::AnnotationHub()
+ah["AH49556"]
+```
+
+Annotate the genomic ranges of the `tagCountMatrix` SummarizedExperiment.
+
+```{r annotate-CAGEexp, message = FALSE, warning = FALSE}
+annotateCTSS(myCAGEexp, ah[["AH49556"]])
+annotateConsensusClusters(myCAGEexp, ah[["AH49556"]])
+#consensusClustersSE(myCAGEexp)
+#consensusClustersGR(myCAGEexp)
+```
+
+Make a gene expression table (not really required now).
+
+```{r CTSStoGenes-CAGEexp}
+CTSStoGenes(myCAGEexp)
+#CTSScoordinatesGR(myCAGEexp)
+```
+
+Save myCAGEexp file.
+
+```{r save myCAGEexp object}
+saveRDS(myCAGEexp, "myCAGEexp.Rds")
+```
