@@ -1,11 +1,11 @@
 ---
 title: "Labcyte-RT Data Analysis (MOIRAI BED FILES)"
 output:
+  pdf_document:
+    toc: yes
   html_document:
     keep_md: yes
     number_sections: yes
-    toc: yes
-  pdf_document:
     toc: yes
 ---
 
@@ -509,14 +509,14 @@ Grand summary plots
 Extracted. artefacts, rDNA
 --------------------------
 
-```{r plate_reads, fig.height=8, fig.width=20}
+```{r plate_reads, fig.height=7, fig.width=20}
 ggpubr::ggarrange(ncol = 3, nrow = 2, plot_RT, plot_TSO, plot_TSO_RT_ratio, plot_extracted, plot_artefacts, plot_rDNA)
 ```
 
 Molecules, genes and promoters
 -------------------------------
 
-```{r plate_counts, fig.height=8, fig.width=20}
+```{r plate_counts, fig.height=7, fig.width=20}
 ggpubr::ggarrange(ncol = 3, nrow = 2, plot_RT, plot_TSO, plot_TSO_RT_ratio, plot_counts, plot_genes, plot_promoters)
 ```
 
