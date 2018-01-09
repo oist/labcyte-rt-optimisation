@@ -121,9 +121,10 @@ plotReverseCumulatives(myCAGEexp[,22:28], onePlot = TRUE)
 plotReverseCumulatives(myCAGEexp[,29:35], onePlot = TRUE)
 plotReverseCumulatives(myCAGEexp[,36:42], onePlot = TRUE)
 #plotReverseCumulatives(myCAGEexp$RNA == "10", onePlot = TRUE)
-#plotReverseCumulatives(myCAGEexp[,50:56], onePlot = TRUE)
-#plotReverseCumulatives(myCAGEexp[,57:63], onePlot = TRUE)
-#plotReverseCumulatives(myCAGEexp[,64:70], onePlot = TRUE)
+plotReverseCumulatives(myCAGEexp[,43:49], onePlot = TRUE)
+plotReverseCumulatives(myCAGEexp[,50:56], onePlot = TRUE)
+plotReverseCumulatives(myCAGEexp[,57:63], onePlot = TRUE)
+plotReverseCumulatives(myCAGEexp[,64:70], onePlot = TRUE)
 ```
 
 Number of nanoCAGE tags mapping at CTSS positions in each sample
@@ -137,10 +138,50 @@ Create CTSS clusters
 --------------------
 
 ```{r create_CTSS_clusters, message = FALSE, warning=FALSE}
-#clusterCTSS(myCAGEexp, thresholdIsTpm = FALSE, useMulticore = TRUE, nrPassThreshold = 2, removeSingletons = TRUE)
-#cumulativeCTSSdistribution(myCAGEexp, clusters = "tagClusters")
-##, use multicore = TRUE)
-#quantilePositions(myCAGEexp, clusters = "tagClusters", qLow = 0.1, qUp = 0.9, useMulticore = TRUE)
+clusterCTSS(myCAGEexp, thresholdIsTpm = FALSE, useMulticore = TRUE, nrPassThreshold = 2, removeSingletons = TRUE)
+cumulativeCTSSdistribution(myCAGEexp, clusters = "tagClusters", useMulticore = TRUE)
+quantilePositions(myCAGEexp, clusters = "tagClusters", qLow = 0.1, qUp = 0.9, useMulticore = TRUE)
+```
+
+
+Plot interquantile width of CTSS clusters 
+-----------------------------------------
+
+```{r CTSS_clusters_interquantile_width, dev = c('png'), fig.show='hide', results='hide', message = FALSE, warning=FALSE}
+## Figures not displayed on the html/pdf output
+#par(mfrow=c(4,6))
+plotInterquantileWidth(myCAGEexp, clusters= "tagClusters", tpmTreshold = 3, qLow = 0.1, qUp = 0.9)
+```
+
+Save myCAGEexp file (temp)
+
+```{r save myCAGEexp object}
+saveRDS(myCAGEexp, "myCAGEexp.Rds")
+```
+
+Create consensus promoters across samples
+-----------------------------------------
+  
+```{r aggregate_CTSS_tag_clusters}
+aggregateTagClusters(myCAGEexp, tpmThreshold = 5, qLow = 0.1, qUp = 0.9, maxDist = 100)
+#myCAGEexp$outOfClusters / myCAGEexp$librarySizes *100
+#myCAGEexp
+```
+
+Analyse consensus promoters distribution across samples  
+-------------------------------------------------------
+
+Not ready yet.
+
+```{r analyse_consensus_CTSS_clusters_distribution, echo = FALSE}
+#not functionnal yet...
+#cumulativeCTSSdistribution(myCAGEexp, clusters = "consensusClusters", useMulticore = TRUE)
+#quantilePositions(myCAGEexp, clusters = "consensusClusters", qLow = 0.1, qUp = 0.9, useMulticore = TRUE)
+```
+
+```{r plot_interquantile_width, dev = c('png'), echo = FALSE}
+#not functionnal yet...
+#plotInterquantileWidth(myCAGEexp, clusters= "consensusClusters", tpmTreshold = 3, qLow = 0.1, qUp = 0.9)
 ```
 
 Annotation with GENCODE
