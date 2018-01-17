@@ -1,11 +1,11 @@
 ---
 title: "Labcyte-RT Data Analysis (MOIRAI BED FILES)"
 output:
-  pdf_document:
-    toc: yes
   html_document:
     keep_md: yes
     number_sections: yes
+    toc: yes
+  pdf_document:
     toc: yes
 ---
 
@@ -121,10 +121,10 @@ plotReverseCumulatives(myCAGEexp[,22:28], onePlot = TRUE)
 plotReverseCumulatives(myCAGEexp[,29:35], onePlot = TRUE)
 plotReverseCumulatives(myCAGEexp[,36:42], onePlot = TRUE)
 #plotReverseCumulatives(myCAGEexp$RNA == "10", onePlot = TRUE)
-plotReverseCumulatives(myCAGEexp[,43:49], onePlot = TRUE)
-plotReverseCumulatives(myCAGEexp[,50:56], onePlot = TRUE)
-plotReverseCumulatives(myCAGEexp[,57:63], onePlot = TRUE)
-plotReverseCumulatives(myCAGEexp[,64:70], onePlot = TRUE)
+#plotReverseCumulatives(myCAGEexp[,43:49], onePlot = TRUE)
+#plotReverseCumulatives(myCAGEexp[,50:56], onePlot = TRUE)
+#plotReverseCumulatives(myCAGEexp[,57:63], onePlot = TRUE)
+#plotReverseCumulatives(myCAGEexp[,64:70], onePlot = TRUE)
 ```
 
 Number of nanoCAGE tags mapping at CTSS positions in each sample
@@ -153,28 +153,19 @@ Plot interquantile width of CTSS clusters
 plotInterquantileWidth(myCAGEexp, clusters= "tagClusters", tpmTreshold = 3, qLow = 0.1, qUp = 0.9)
 ```
 
-Save myCAGEexp file (temp)
-
-```{r save myCAGEexp object}
-saveRDS(myCAGEexp, "myCAGEexp.Rds")
-```
-
 Create consensus promoters across samples
 -----------------------------------------
   
 ```{r aggregate_CTSS_tag_clusters}
 aggregateTagClusters(myCAGEexp, tpmThreshold = 5, qLow = 0.1, qUp = 0.9, maxDist = 100)
-#myCAGEexp$outOfClusters / myCAGEexp$librarySizes *100
+#myCAGEexp$promoter / myCAGEexp$librarySizes *100
 #myCAGEexp
 ```
 
 Analyse consensus promoters distribution across samples  
 -------------------------------------------------------
 
-Not ready yet.
-
 ```{r analyse_consensus_CTSS_clusters_distribution, echo = FALSE}
-#not functionnal yet...
 #cumulativeCTSSdistribution(myCAGEexp, clusters = "consensusClusters", useMulticore = TRUE)
 #quantilePositions(myCAGEexp, clusters = "consensusClusters", qLow = 0.1, qUp = 0.9, useMulticore = TRUE)
 ```
@@ -208,6 +199,26 @@ Make a gene expression table (not really required now).
 ```{r CTSStoGenes-CAGEexp}
 CTSStoGenes(myCAGEexp)
 #CTSScoordinatesGR(myCAGEexp)
+```
+
+Promoter rate
+```{r promoter rate}
+myCAGEexp$promoter_rate <- myCAGEexp$promoter / myCAGEexp$librarySizes *100
+myCAGEexp$promoter_rate
+```
+
+Promoter rate
+```{r plot promoter rate, dev=c('png'), fig.height=8, fig.width=10}
+#plot(myCAGEexp$promoter_rate ~ myCAGEexp$barcode_ID)
+dotsize <- 0.08
+ggplot(colData(myCAGEexp) %>% data.frame, aes(x=barcode_ID, y=promoter_rate)) +
+  stat_summary(fun.y=mean, fun.ymin=mean, fun.ymax=mean, geom="crossbar", color="gray") +
+  geom_dotplot(aes(fill=group), binaxis='y', binwidth=1.5, dotsize=dotsize, stackdir='center') + theme_bw() +
+  xlab("Barocde_ID") +
+  ylab("Promoter rate") +
+  scale_x_continuous(breaks = c(1:70)) +
+  labs(title = "Promoter rate per barcoded TSO") +
+  coord_flip()
 ```
 
 Save myCAGEexp file.
@@ -414,21 +425,22 @@ Create the correlation matrix
 -----------------------------
 
 ```{r cor_data, message = FALSE}
-#c <- assay(consensusClustersSE(myCAGEexp)) %>% as.data.frame
-#cor_clusters <- cor(log1p(c))
-#cor_clusters[cor_clusters == 1] <- NA
+c <- assay(consensusClustersSE(myCAGEexp)) %>% as.data.frame
+cor_clusters <- cor(log1p(c))
+cor_clusters[cor_clusters == 1] <- NA
 ```
 
 Heatmap
 -------
 
-```{r pheatmap_cor_clusters, dev=c('png'), fig.height= 8, fig.width = 10}
+```{r pheatmap_cor_clusters, dev=c('png'), fig.height= 14, fig.width = 14}
 #col <- colorRampPalette( rev(brewer.pal(9, "RdBu")) )(255)
-#ann_col <- data.frame(row.names = rownames(colData(myCAGEexp)), protocol = myCAGEexp$protocol)
+ann_col <- data.frame(row.names = rownames(colData(myCAGEexp)), TSO_conc. = myCAGEexp$TSO)
 #ann_col$protocol <- sub("CONTROL", "CTL", ann_col$protocol)
-#ann_row <- data.frame(row.names = rownames(colData(myCAGEexp)), step = myCAGEexp$step)
+ann_row <- data.frame(row.names = rownames(colData(myCAGEexp)), RT_PRIMERS_conc. = myCAGEexp$RT_PRIMERS)
 #ann_row$step <- sub("0", "CTL", ann_row$step)
-#pheatmap::pheatmap(cor_clusters, show_colnames = F, annotation_row = ann_row, annotation_col = ann_col, color = col, main = "Correlation of consensus clusters expression across samples\n", display_numbers = TRUE, fontsize_number = 8)
+#colnames(cor_clusters) <- myCAGEexp$barcode_ID
+pheatmap::pheatmap(cor_clusters, show_colnames = F, annotation_col = ann_col, annotation_row = ann_row, labels_row = myCAGEexp$barcode_ID, main = "Correlation of consensus clusters expression across samples\n", display_numbers = TRUE, fontsize_number = 4)
 ```
 
 Principal Component Analysis (PCA)
@@ -438,22 +450,22 @@ Define PCA axis based on correlation matrix
 --------------------------------------------
 
 ```{r PCA_data}
-#cor_clusters <- cor(log1p(c))
-#PCA <- prcomp(cor_clusters, scale. = TRUE)
-#dfdf <- stats:::summary.prcomp(PCA)$importance[2, ]
+cor_clusters <- cor(log1p(c))
+PCA <- prcomp(cor_clusters, scale. = TRUE)
+dfdf <- stats:::summary.prcomp(PCA)$importance[2, ]
 ```
 
 List of principal components identified ranked by % of explained variability: 
 
 ```{r, echo = FALSE}
-#dfdf
+dfdf
 ```
 
 PCA Plot 1: PC1 vs. PC2 annotated by `PRIMERS_RATIO`
 ----------------------------------------------------
 
 ```{r PCA_1, dev=c('png'), message = FALSE, warning = FALSE}
-#ggbiplot::ggbiplot(PCA, choices=c(1,2), obs.scale = 1, var.scale = 1, groups = colData(myCAGEexp)$results, var.axes = FALSE, labels = #colData(myCAGEexp)$sampleLabels, ellipse = TRUE, margins = c(9,9))
+ggbiplot::ggbiplot(PCA, choices=c(1,2), obs.scale = 1, var.scale = 1, groups = as.character(colData(myCAGEexp)$TSO), var.axes = FALSE, labels = colData(myCAGEexp)$genes, ellipse = T, margins = c(9,9))
 ```
 
 Plate maps

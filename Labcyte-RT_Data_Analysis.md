@@ -645,6 +645,7 @@ plotReverseCumulatives(myCAGEexp[,36:42], onePlot = TRUE)
 
 ```r
 #plotReverseCumulatives(myCAGEexp$RNA == "10", onePlot = TRUE)
+#plotReverseCumulatives(myCAGEexp[,43:49], onePlot = TRUE)
 #plotReverseCumulatives(myCAGEexp[,50:56], onePlot = TRUE)
 #plotReverseCumulatives(myCAGEexp[,57:63], onePlot = TRUE)
 #plotReverseCumulatives(myCAGEexp[,64:70], onePlot = TRUE)
@@ -680,11 +681,38 @@ Create CTSS clusters
 
 
 ```r
-#clusterCTSS(myCAGEexp, thresholdIsTpm = FALSE, useMulticore = TRUE, nrPassThreshold = 2, removeSingletons = TRUE)
-#cumulativeCTSSdistribution(myCAGEexp, clusters = "tagClusters")
-##, use multicore = TRUE)
-#quantilePositions(myCAGEexp, clusters = "tagClusters", qLow = 0.1, qUp = 0.9, useMulticore = TRUE)
+clusterCTSS(myCAGEexp, thresholdIsTpm = FALSE, useMulticore = TRUE, nrPassThreshold = 2, removeSingletons = TRUE)
+cumulativeCTSSdistribution(myCAGEexp, clusters = "tagClusters", useMulticore = TRUE)
+quantilePositions(myCAGEexp, clusters = "tagClusters", qLow = 0.1, qUp = 0.9, useMulticore = TRUE)
 ```
+
+
+Plot interquantile width of CTSS clusters 
+-----------------------------------------
+
+
+```r
+## Figures not displayed on the html/pdf output
+#par(mfrow=c(4,6))
+plotInterquantileWidth(myCAGEexp, clusters= "tagClusters", tpmTreshold = 3, qLow = 0.1, qUp = 0.9)
+```
+
+Create consensus promoters across samples
+-----------------------------------------
+  
+
+```r
+aggregateTagClusters(myCAGEexp, tpmThreshold = 5, qLow = 0.1, qUp = 0.9, maxDist = 100)
+#myCAGEexp$promoter / myCAGEexp$librarySizes *100
+#myCAGEexp
+```
+
+Analyse consensus promoters distribution across samples  
+-------------------------------------------------------
+
+
+
+
 
 Annotation with GENCODE
 -----------------------
@@ -733,6 +761,51 @@ Make a gene expression table (not really required now).
 CTSStoGenes(myCAGEexp)
 #CTSScoordinatesGR(myCAGEexp)
 ```
+
+Promoter rate
+
+```r
+myCAGEexp$promoter_rate <- myCAGEexp$promoter / myCAGEexp$librarySizes *100
+myCAGEexp$promoter_rate
+```
+
+```
+##   ACACGT   ACACTC   ACATGA   ACAGAT   AGTACG   AGTGAT   ACAGCA   AGTAGC 
+## 4.215547 4.714214 3.745481 5.145124 5.367793 3.396037 6.020180 5.650040 
+##   AGTGCA   ATCGCA   ACAGTG   AGTATA   AGTGTG   ATCGTG   CACATA   ACATAC 
+## 3.967233 4.959034 6.804414 6.377358 5.627858 5.334847 4.437213 6.869826 
+##   AGTCAG   ATCACG   ATCTAC   CACGAT   CGACAG   AGTCGT   ATCAGC   ATCTCT 
+## 7.137224 5.691489 4.799716 4.487917 3.257329 6.888610 5.544477 5.555556 
+##   CACGCA   CGACGT   CGATCT   ATCATA   ATCTGA   CACGTG   CGACTC   CGATGA 
+## 5.003192 4.392284 5.161067 6.367041 5.646600 4.708904 4.617083 2.717391 
+##   CTGCTC   CACACG   CACTAC   CGAGAT   CTGACG   CTGTAC   GAGCAG   CACTCT 
+## 4.915730 5.413731 4.791224 4.541883 3.122831 5.222734 3.924775 5.055645 
+##   CGAGCA   CTGAGC   CTGTCT   GAGCGT   CGAGTG   CTGATA   CTGTGA   GAGCTC 
+## 4.214039 4.961985 4.086631 6.435644 4.703770 3.799944 4.050179 4.778325 
+##   CTGCAG   GAGACG   GAGTAC   GAGAGC   GAGTCT   GAGTGA   ACACAG   ACATCT 
+## 3.711340 4.906334 5.660377 4.279523 1.731602 5.039466 4.388658 3.577089 
+##   AGTCTC   ATCGAT   CACAGC   CACTGA   CGATAC   CTGCGT   GAGATA   GCTAGC 
+## 5.158730 3.351955 6.240713 4.160584 5.421687 4.705882 5.555556 7.048458 
+##   GCTATA   GCTCAG   GCTCGT   GCTCTC   GCTGAT   GCTACG 
+## 4.854369 6.156716 5.677656 3.896104 5.939630 4.982206
+```
+
+Promoter rate
+
+```r
+#plot(myCAGEexp$promoter_rate ~ myCAGEexp$barcode_ID)
+dotsize <- 0.08
+ggplot(colData(myCAGEexp) %>% data.frame, aes(x=barcode_ID, y=promoter_rate)) +
+  stat_summary(fun.y=mean, fun.ymin=mean, fun.ymax=mean, geom="crossbar", color="gray") +
+  geom_dotplot(aes(fill=group), binaxis='y', binwidth=1.5, dotsize=dotsize, stackdir='center') + theme_bw() +
+  xlab("Barocde_ID") +
+  ylab("Promoter rate") +
+  scale_x_continuous(breaks = c(1:70)) +
+  labs(title = "Promoter rate per barcoded TSO") +
+  coord_flip()
+```
+
+![](Labcyte-RT_Data_Analysis_files/figure-html/plot promoter rate-1.png)<!-- -->
 
 Save myCAGEexp file.
 
@@ -1014,9 +1087,9 @@ Create the correlation matrix
 
 
 ```r
-#c <- assay(consensusClustersSE(myCAGEexp)) %>% as.data.frame
-#cor_clusters <- cor(log1p(c))
-#cor_clusters[cor_clusters == 1] <- NA
+c <- assay(consensusClustersSE(myCAGEexp)) %>% as.data.frame
+cor_clusters <- cor(log1p(c))
+cor_clusters[cor_clusters == 1] <- NA
 ```
 
 Heatmap
@@ -1025,12 +1098,15 @@ Heatmap
 
 ```r
 #col <- colorRampPalette( rev(brewer.pal(9, "RdBu")) )(255)
-#ann_col <- data.frame(row.names = rownames(colData(myCAGEexp)), protocol = myCAGEexp$protocol)
+ann_col <- data.frame(row.names = rownames(colData(myCAGEexp)), TSO_conc. = myCAGEexp$TSO)
 #ann_col$protocol <- sub("CONTROL", "CTL", ann_col$protocol)
-#ann_row <- data.frame(row.names = rownames(colData(myCAGEexp)), step = myCAGEexp$step)
+ann_row <- data.frame(row.names = rownames(colData(myCAGEexp)), RT_PRIMERS_conc. = myCAGEexp$RT_PRIMERS)
 #ann_row$step <- sub("0", "CTL", ann_row$step)
-#pheatmap::pheatmap(cor_clusters, show_colnames = F, annotation_row = ann_row, annotation_col = ann_col, color = col, main = "Correlation of consensus clusters expression across samples\n", display_numbers = TRUE, fontsize_number = 8)
+#colnames(cor_clusters) <- myCAGEexp$barcode_ID
+pheatmap::pheatmap(cor_clusters, show_colnames = F, annotation_col = ann_col, annotation_row = ann_row, labels_row = myCAGEexp$barcode_ID, main = "Correlation of consensus clusters expression across samples\n", display_numbers = TRUE, fontsize_number = 4)
 ```
+
+![](Labcyte-RT_Data_Analysis_files/figure-html/pheatmap_cor_clusters-1.png)<!-- -->
 
 Principal Component Analysis (PCA)
 ==================================
@@ -1040,22 +1116,42 @@ Define PCA axis based on correlation matrix
 
 
 ```r
-#cor_clusters <- cor(log1p(c))
-#PCA <- prcomp(cor_clusters, scale. = TRUE)
-#dfdf <- stats:::summary.prcomp(PCA)$importance[2, ]
+cor_clusters <- cor(log1p(c))
+PCA <- prcomp(cor_clusters, scale. = TRUE)
+dfdf <- stats:::summary.prcomp(PCA)$importance[2, ]
 ```
 
 List of principal components identified ranked by % of explained variability: 
 
 
+```
+##     PC1     PC2     PC3     PC4     PC5     PC6     PC7     PC8     PC9 
+## 0.53148 0.14751 0.08617 0.02581 0.01441 0.01172 0.01027 0.00996 0.00899 
+##    PC10    PC11    PC12    PC13    PC14    PC15    PC16    PC17    PC18 
+## 0.00860 0.00773 0.00700 0.00656 0.00641 0.00588 0.00553 0.00527 0.00494 
+##    PC19    PC20    PC21    PC22    PC23    PC24    PC25    PC26    PC27 
+## 0.00473 0.00456 0.00453 0.00436 0.00410 0.00388 0.00379 0.00365 0.00357 
+##    PC28    PC29    PC30    PC31    PC32    PC33    PC34    PC35    PC36 
+## 0.00348 0.00325 0.00300 0.00288 0.00285 0.00274 0.00260 0.00247 0.00239 
+##    PC37    PC38    PC39    PC40    PC41    PC42    PC43    PC44    PC45 
+## 0.00236 0.00227 0.00219 0.00199 0.00191 0.00178 0.00175 0.00152 0.00138 
+##    PC46    PC47    PC48    PC49    PC50    PC51    PC52    PC53    PC54 
+## 0.00135 0.00130 0.00123 0.00113 0.00102 0.00101 0.00093 0.00082 0.00077 
+##    PC55    PC56    PC57    PC58    PC59    PC60    PC61    PC62    PC63 
+## 0.00076 0.00072 0.00066 0.00063 0.00057 0.00047 0.00040 0.00034 0.00031 
+##    PC64    PC65    PC66    PC67    PC68    PC69    PC70 
+## 0.00029 0.00028 0.00024 0.00023 0.00018 0.00016 0.00000
+```
 
 PCA Plot 1: PC1 vs. PC2 annotated by `PRIMERS_RATIO`
 ----------------------------------------------------
 
 
 ```r
-#ggbiplot::ggbiplot(PCA, choices=c(1,2), obs.scale = 1, var.scale = 1, groups = colData(myCAGEexp)$results, var.axes = FALSE, labels = #colData(myCAGEexp)$sampleLabels, ellipse = TRUE, margins = c(9,9))
+ggbiplot::ggbiplot(PCA, choices=c(1,2), obs.scale = 1, var.scale = 1, groups = as.character(colData(myCAGEexp)$TSO), var.axes = FALSE, labels = colData(myCAGEexp)$genes, ellipse = T, margins = c(9,9))
 ```
+
+![](Labcyte-RT_Data_Analysis_files/figure-html/PCA_1-1.png)<!-- -->
 
 Plate maps
 ==========
@@ -1320,38 +1416,38 @@ sessionInfo()
 ## [10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   
 ## 
 ## attached base packages:
-## [1] stats4    parallel  stats     graphics  grDevices utils     datasets 
-## [8] methods   base     
+##  [1] grid      stats4    parallel  stats     graphics  grDevices utils    
+##  [8] datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] bindrcpp_0.2                      vegan_2.4-4                      
-##  [3] lattice_0.20-35                   permute_0.9-4                    
-##  [5] reshape_0.8.7                     SummarizedExperiment_1.6.5       
-##  [7] DelayedArray_0.2.7                matrixStats_0.52.2               
-##  [9] Biobase_2.36.2                    MultiAssayExperiment_1.2.1       
-## [11] plyr_1.8.4                        magrittr_1.5                     
-## [13] RColorBrewer_1.1-2                gplots_3.0.1                     
-## [15] ggplot2_2.2.1                     data.table_1.10.4-1              
-## [17] CAGEr_1.21.0                      BSgenome.Mmusculus.UCSC.mm9_1.4.0
-## [19] BSgenome_1.44.2                   rtracklayer_1.36.4               
-## [21] Biostrings_2.44.2                 XVector_0.16.0                   
-## [23] GenomicRanges_1.28.4              GenomeInfoDb_1.12.3              
-## [25] IRanges_2.10.3                    S4Vectors_0.14.5                 
-## [27] BiocGenerics_0.22.1              
+##  [1] bindrcpp_0.2                      scales_0.5.0                     
+##  [3] vegan_2.4-4                       lattice_0.20-35                  
+##  [5] permute_0.9-4                     reshape_0.8.7                    
+##  [7] SummarizedExperiment_1.6.5        DelayedArray_0.2.7               
+##  [9] matrixStats_0.52.2                Biobase_2.36.2                   
+## [11] MultiAssayExperiment_1.2.1        plyr_1.8.4                       
+## [13] magrittr_1.5                      RColorBrewer_1.1-2               
+## [15] gplots_3.0.1                      ggplot2_2.2.1                    
+## [17] data.table_1.10.4-1               CAGEr_1.21.4.2                   
+## [19] BSgenome.Mmusculus.UCSC.mm9_1.4.0 BSgenome_1.44.2                  
+## [21] rtracklayer_1.36.4                Biostrings_2.44.2                
+## [23] XVector_0.16.0                    GenomicRanges_1.28.4             
+## [25] GenomeInfoDb_1.12.3               IRanges_2.10.3                   
+## [27] S4Vectors_0.14.5                  BiocGenerics_0.22.1              
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] nlme_3.1-131                  bitops_1.0-6                 
 ##  [3] bit64_0.9-7                   httr_1.3.1                   
 ##  [5] rprojroot_1.3-2               UpSetR_1.3.3                 
-##  [7] tools_3.4.0                   backports_1.1.2              
-##  [9] platetools_0.0.2              R6_2.2.2                     
-## [11] KernSmooth_2.23-15            DBI_0.7                      
-## [13] lazyeval_0.2.1                mgcv_1.8-17                  
-## [15] colorspace_1.3-2              gridExtra_2.3                
-## [17] curl_3.1                      bit_1.1-12                   
-## [19] compiler_3.4.0                VennDiagram_1.6.18           
-## [21] labeling_0.3                  caTools_1.17.1               
-## [23] scales_0.5.0                  stringr_1.2.0                
+##  [7] ggbiplot_0.55                 tools_3.4.0                  
+##  [9] backports_1.1.2               platetools_0.0.2             
+## [11] R6_2.2.2                      KernSmooth_2.23-15           
+## [13] DBI_0.7                       lazyeval_0.2.1               
+## [15] mgcv_1.8-17                   colorspace_1.3-2             
+## [17] gridExtra_2.3                 curl_3.1                     
+## [19] bit_1.1-12                    compiler_3.4.0               
+## [21] VennDiagram_1.6.18            labeling_0.3                 
+## [23] caTools_1.17.1                stringr_1.2.0                
 ## [25] digest_0.6.13                 Rsamtools_1.28.0             
 ## [27] rmarkdown_1.8                 pkgconfig_2.0.1              
 ## [29] htmltools_0.3.6               rlang_0.1.2                  
@@ -1366,18 +1462,18 @@ sessionInfo()
 ## [47] stringi_1.1.6                 yaml_2.1.16                  
 ## [49] MASS_7.3-47                   zlibbioc_1.22.0              
 ## [51] AnnotationHub_2.8.3           blob_1.1.0                   
-## [53] grid_3.4.0                    gdata_2.18.0                 
-## [55] shinydashboard_0.6.1          cowplot_0.9.2                
-## [57] splines_3.4.0                 knitr_1.18                   
-## [59] beanplot_1.2                  ggpubr_0.1.6                 
-## [61] reshape2_1.4.3                codetools_0.2-15             
-## [63] futile.options_1.0.0          XML_3.98-1.9                 
-## [65] glue_1.2.0                    evaluate_0.10.1              
-## [67] lambda.r_1.2                  httpuv_1.3.5                 
-## [69] gtable_0.2.0                  purrr_0.2.4                  
-## [71] tidyr_0.7.1                   assertthat_0.2.0             
-## [73] mime_0.5                      xtable_1.8-2                 
-## [75] viridisLite_0.2.0             tibble_1.3.4                 
+## [53] gdata_2.18.0                  shinydashboard_0.6.1         
+## [55] cowplot_0.9.2                 splines_3.4.0                
+## [57] knitr_1.18                    beanplot_1.2                 
+## [59] ggpubr_0.1.6                  reshape2_1.4.3               
+## [61] codetools_0.2-15              futile.options_1.0.0         
+## [63] XML_3.98-1.9                  glue_1.2.0                   
+## [65] evaluate_0.10.1               lambda.r_1.2                 
+## [67] httpuv_1.3.5                  gtable_0.2.0                 
+## [69] purrr_0.2.4                   tidyr_0.7.1                  
+## [71] assertthat_0.2.0              mime_0.5                     
+## [73] xtable_1.8-2                  viridisLite_0.2.0            
+## [75] pheatmap_1.0.8                tibble_1.3.4                 
 ## [77] som_0.3-5.1                   AnnotationDbi_1.38.2         
 ## [79] memoise_1.1.0                 GenomicAlignments_1.12.2     
 ## [81] cluster_2.0.6                 interactiveDisplayBase_1.14.0
