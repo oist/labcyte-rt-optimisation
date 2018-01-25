@@ -1,0 +1,35 @@
+[Header]
+IEMFileVersion,4
+Investigator Name,Sachi KATO
+Experiment Name,Labcyte_180111
+Date,1/23/2018
+Workflow,GenerateFASTQ
+Application,FASTQ Only
+Assay,TruSeq LT
+Description,
+Chemistry,Default
+
+[Reads]
+46
+21
+
+[Settings]
+ReverseComplement,0
+
+[Data]
+Sample_ID,Sample_Name,Sample_Plate,Sample_Well,I7_Index_ID,index,Sample_Project,Description
+1,,,,N712,GTAGAGGA,,100ng_1
+2,,,,N714,GCTCATGA,,10ng_1
+3,,,,N715,ATCTCAGG,,1ng_1
+4,,,,N716,ACTCGCTA,,100pg_1
+5,,,,N718,GGAGCTAC,,10pg_1
+6,,,,N707,CTCTCTAC,,100ng_2
+7,,,,N720,CGGAGCCT,,10ng_2
+8,,,,N721,TACGCTGC,,1ng_2
+9,,,,N722,ATGCGCAG,,100pg_2
+10,,,,N723,TAGCGCTC,,10pg_2
+11,,,,N724,ACTGAGCG,,100ng_3
+12,,,,N726,CCTAAGAC,,10ng_3
+13,,,,N727,CGATCAGT,,1ng_3
+14,,,,N728,TGCAGCTA,,100pg_3
+15,,,,N729,TCGACGTC,,10pg_3
