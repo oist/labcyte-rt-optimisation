@@ -1,4 +1,12 @@
-# RT optimisation with the Labcyte Echo 525 (December 2017)
+---
+title: "RT optimisation with the Labcyte Echo 525 (December 2017)"
+output: 
+  html_document: 
+    fig_height: 5.25
+    fig_width: 5.25
+    keep_md: yes
+    toc: yes
+---
 
 
 
@@ -8,18 +16,19 @@ Load scripts and libraries.
 ```r
 # We use the R library called "magrittr", to build the data frame describing the
 #384-well plate.
-library(magrittr)
+library("magrittr")
 
-library(ggplot2)
-library(plyr)
+library("ggplot2")
+library("plyr")
 
-# The "setBlock" function to update values in the data frame is shared by multiple
-# Rmarkdown files, so it is stored in a separate source file.
-setBlock <- smallCAGEqc:::setBlock
+library("platetools")
+# The "set_block" function to update values in the data frame will be distributed
+# in the platetools package.
+# See https://github.com/Swarchal/platetools/pull/1
+source("https://raw.githubusercontent.com/charles-plessy/platetools/setBlock/R/set_block.R")
 
-# The "makePlate384" function outputs a data frame representing a 384-well plate
-# (one well per row).
-source('makePlate384.R')
+# Do not load the whole smallCAGEqc package, just get the barcode data.
+data("nanoCAGE2017barcodes", package = "smallCAGEqc")
 ```
 
 ## Plate layout
@@ -28,10 +37,10 @@ Create a data frame representing the contents of each well.
 
 
 ```r
-plate           <- data.frame(Well = platetools::num_to_well(1:384, plate = "384"))
-rownames(plate) <- plate$Well
-plate$Row       <- sub("..$", "", plate$Well) %>% factor
-plate$Col       <- sub("^.",  "", plate$Well) %>% as.numeric %>% factor
+plate           <- data.frame(well = platetools::num_to_well(1:384, plate = "384"))
+rownames(plate) <- plate$well
+plate$row       <- sub("..$", "", plate$well) %>% factor
+plate$col       <- sub("^.",  "", plate$well) %>% as.numeric %>% factor
 ```
 
 MASTER_MIX
@@ -45,11 +54,11 @@ Master mix volume
 
 ```r
 plate %<>%
-  setBlock("A01~P21", "MASTER_MIX_vol", 350) %>%
-  setBlock("K22~L24", "MASTER_MIX_vol", 350) %>%
-  setBlock("M23", "MASTER_MIX_vol", 350) %>%
-  setBlock("N22~O24", "MASTER_MIX_vol", 350) %>%
-  setBlock("P23", "MASTER_MIX_vol", 350)
+  set_block("A01~P21", "MASTER_MIX_vol", 350) %>%
+  set_block("K22~L24", "MASTER_MIX_vol", 350) %>%
+  set_block("M23",     "MASTER_MIX_vol", 350) %>%
+  set_block("N22~O24", "MASTER_MIX_vol", 350) %>%
+  set_block("P23",     "MASTER_MIX_vol", 350)
 ```
 
 TSO
@@ -72,40 +81,40 @@ TSO concentration
 
 ```r
 plate %<>%
-  setBlock("A01~A21", "TSO", 80) %>%
-  setBlock("K01~K07", "TSO", 80) %>%
-  setBlock("N01~N07", "TSO", 80) %>%
-  setBlock("B01~B21", "TSO", 40) %>%
-  setBlock("L01~L07", "TSO", 40) %>%
-  setBlock("O01~O07", "TSO", 40) %>%
-  setBlock("C01~C21", "TSO", 20) %>%
-  setBlock("M01~M07", "TSO", 20) %>%
-  setBlock("P01~P07", "TSO", 20) %>%
-  setBlock("D01~D21", "TSO", 10) %>%
-  setBlock("K08~K14", "TSO", 10) %>%
-  setBlock("N08~N14", "TSO", 10) %>%
-  setBlock("J01~J21", "TSO", 10) %>%
-  setBlock("K22~K24", "TSO", 10) %>%
-  setBlock("L22~L24", "TSO", 10) %>%
-  setBlock("M23", "TSO", 10) %>%
-  setBlock("N22~N24", "TSO", 10) %>%
-  setBlock("O22~O24", "TSO", 10) %>%
-  setBlock("P23", "TSO", 10) %>% 
-  setBlock("E01~E21", "TSO", 5) %>%
-  setBlock("L08~L14", "TSO", 5) %>%
-  setBlock("O08~O14", "TSO", 5) %>%
-  setBlock("F01~F21", "TSO", 2.5) %>%
-  setBlock("M08~M14", "TSO", 2.5) %>%
-  setBlock("P08~P14", "TSO", 2.5) %>%
-  setBlock("G01~G21", "TSO", 1.25) %>%
-  setBlock("K15~K21", "TSO", 1.25) %>%
-  setBlock("N15~N21", "TSO", 1.25) %>%
-  setBlock("H01~H21", "TSO", 0.625) %>%
-  setBlock("L15~L21", "TSO", 0.625) %>%
-  setBlock("O15~O21", "TSO", 0.625) %>%
-  setBlock("I01~I21", "TSO", 0.3125) %>%
-  setBlock("M15~M21", "TSO", 0.3125) %>%
-  setBlock("P15~P21", "TSO", 0.3125)
+  set_block("A01~A21", "TSO", 80) %>%
+  set_block("K01~K07", "TSO", 80) %>%
+  set_block("N01~N07", "TSO", 80) %>%
+  set_block("B01~B21", "TSO", 40) %>%
+  set_block("L01~L07", "TSO", 40) %>%
+  set_block("O01~O07", "TSO", 40) %>%
+  set_block("C01~C21", "TSO", 20) %>%
+  set_block("M01~M07", "TSO", 20) %>%
+  set_block("P01~P07", "TSO", 20) %>%
+  set_block("D01~D21", "TSO", 10) %>%
+  set_block("K08~K14", "TSO", 10) %>%
+  set_block("N08~N14", "TSO", 10) %>%
+  set_block("J01~J21", "TSO", 10) %>%
+  set_block("K22~K24", "TSO", 10) %>%
+  set_block("L22~L24", "TSO", 10) %>%
+  set_block("M23",     "TSO", 10) %>%
+  set_block("N22~N24", "TSO", 10) %>%
+  set_block("O22~O24", "TSO", 10) %>%
+  set_block("P23",     "TSO", 10) %>% 
+  set_block("E01~E21", "TSO", 5)  %>%
+  set_block("L08~L14", "TSO", 5)  %>%
+  set_block("O08~O14", "TSO", 5)  %>%
+  set_block("F01~F21", "TSO", 2.5) %>%
+  set_block("M08~M14", "TSO", 2.5) %>%
+  set_block("P08~P14", "TSO", 2.5) %>%
+  set_block("G01~G21", "TSO", 1.25) %>%
+  set_block("K15~K21", "TSO", 1.25) %>%
+  set_block("N15~N21", "TSO", 1.25) %>%
+  set_block("H01~H21", "TSO", 0.625) %>%
+  set_block("L15~L21", "TSO", 0.625) %>%
+  set_block("O15~O21", "TSO", 0.625) %>%
+  set_block("I01~I21", "TSO", 0.3125) %>%
+  set_block("M15~M21", "TSO", 0.3125) %>%
+  set_block("P15~P21", "TSO", 0.3125)
 ```
 
 TSO volume
@@ -116,40 +125,40 @@ TSO volume
 
 ```r
 plate %<>%
-  setBlock("A01~A21", "TSO_vol", 100) %>%
-  setBlock("K01~K07", "TSO_vol", 100) %>%
-  setBlock("N01~N07", "TSO_vol", 100) %>%
-  setBlock("B01~B21", "TSO_vol", 50) %>%
-  setBlock("L01~L07", "TSO_vol", 50) %>%
-  setBlock("O01~O07", "TSO_vol", 50) %>%
-  setBlock("C01~C21", "TSO_vol", 25) %>%
-  setBlock("M01~M07", "TSO_vol", 25) %>%
-  setBlock("P01~P07", "TSO_vol", 25) %>%
-  setBlock("D01~D21", "TSO_vol", 100) %>%
-  setBlock("K08~K14", "TSO_vol", 100) %>%
-  setBlock("N08~N14", "TSO_vol", 100) %>%
-  setBlock("J01~J21", "TSO_vol", 100) %>%
-  setBlock("K22~K24", "TSO_vol", 100) %>%
-  setBlock("L22~L24", "TSO_vol", 100) %>%
-  setBlock("M23", "TSO_vol", 100) %>%
-  setBlock("N22~N24", "TSO_vol", 100) %>%
-  setBlock("O22~O24", "TSO_vol", 100) %>%
-  setBlock("P23", "TSO_vol", 100) %>% 
-  setBlock("E01~E21", "TSO_vol", 50) %>%
-  setBlock("L08~L14", "TSO_vol", 50) %>%
-  setBlock("O08~O14", "TSO_vol", 50) %>%
-  setBlock("F01~F21", "TSO_vol", 25) %>%
-  setBlock("M08~M14", "TSO_vol", 25) %>%
-  setBlock("P08~P14", "TSO_vol", 25) %>%
-  setBlock("G01~G21", "TSO_vol", 100) %>%
-  setBlock("K15~K21", "TSO_vol", 100) %>%
-  setBlock("N15~N21", "TSO_vol", 100) %>%
-  setBlock("H01~H21", "TSO_vol", 50) %>%
-  setBlock("L15~L21", "TSO_vol", 50) %>%
-  setBlock("O15~O21", "TSO_vol", 50) %>%
-  setBlock("I01~I21", "TSO_vol", 25) %>%
-  setBlock("M15~M21", "TSO_vol", 25) %>%
-  setBlock("P15~P21", "TSO_vol", 25) 
+  set_block("A01~A21", "TSO_vol", 100) %>%
+  set_block("K01~K07", "TSO_vol", 100) %>%
+  set_block("N01~N07", "TSO_vol", 100) %>%
+  set_block("B01~B21", "TSO_vol", 50)  %>%
+  set_block("L01~L07", "TSO_vol", 50)  %>%
+  set_block("O01~O07", "TSO_vol", 50)  %>%
+  set_block("C01~C21", "TSO_vol", 25)  %>%
+  set_block("M01~M07", "TSO_vol", 25)  %>%
+  set_block("P01~P07", "TSO_vol", 25)  %>%
+  set_block("D01~D21", "TSO_vol", 100) %>%
+  set_block("K08~K14", "TSO_vol", 100) %>%
+  set_block("N08~N14", "TSO_vol", 100) %>%
+  set_block("J01~J21", "TSO_vol", 100) %>%
+  set_block("K22~K24", "TSO_vol", 100) %>%
+  set_block("L22~L24", "TSO_vol", 100) %>%
+  set_block("M23",     "TSO_vol", 100) %>%
+  set_block("N22~N24", "TSO_vol", 100) %>%
+  set_block("O22~O24", "TSO_vol", 100) %>%
+  set_block("P23",     "TSO_vol", 100) %>% 
+  set_block("E01~E21", "TSO_vol", 50)  %>%
+  set_block("L08~L14", "TSO_vol", 50)  %>%
+  set_block("O08~O14", "TSO_vol", 50)  %>%
+  set_block("F01~F21", "TSO_vol", 25)  %>%
+  set_block("M08~M14", "TSO_vol", 25)  %>%
+  set_block("P08~P14", "TSO_vol", 25)  %>%
+  set_block("G01~G21", "TSO_vol", 100) %>%
+  set_block("K15~K21", "TSO_vol", 100) %>%
+  set_block("N15~N21", "TSO_vol", 100) %>%
+  set_block("H01~H21", "TSO_vol", 50)  %>%
+  set_block("L15~L21", "TSO_vol", 50)  %>%
+  set_block("O15~O21", "TSO_vol", 50)  %>%
+  set_block("I01~I21", "TSO_vol", 25)  %>%
+  set_block("M15~M21", "TSO_vol", 25)  %>%
+  set_block("P15~P21", "TSO_vol", 25) 
 ```
 
 Barcode ID
@@ -160,356 +169,358 @@ Barcode ID
 
 ```r
 plate %<>%
-  setBlock("A01", "BARCODE_ID", 01) %>%
-  setBlock("A02", "BARCODE_ID", 02) %>%
-  setBlock("A03", "BARCODE_ID", 03) %>%
-  setBlock("A04", "BARCODE_ID", 04) %>%
-  setBlock("A05", "BARCODE_ID", 05) %>%
-  setBlock("A06", "BARCODE_ID", 06) %>%
-  setBlock("A07", "BARCODE_ID", 07) %>%  
-  setBlock("A08", "BARCODE_ID", 01) %>%
-  setBlock("A09", "BARCODE_ID", 02) %>%
-  setBlock("A10", "BARCODE_ID", 03) %>%
-  setBlock("A11", "BARCODE_ID", 04) %>%
-  setBlock("A12", "BARCODE_ID", 05) %>%
-  setBlock("A13", "BARCODE_ID", 06) %>%
-  setBlock("A14", "BARCODE_ID", 07) %>%  
-  setBlock("A15", "BARCODE_ID", 01) %>%
-  setBlock("A16", "BARCODE_ID", 02) %>%
-  setBlock("A17", "BARCODE_ID", 03) %>%
-  setBlock("A18", "BARCODE_ID", 04) %>%
-  setBlock("A19", "BARCODE_ID", 05) %>%
-  setBlock("A20", "BARCODE_ID", 06) %>%
-  setBlock("A21", "BARCODE_ID", 07) %>%  
-  setBlock("K01", "BARCODE_ID", 01) %>%
-  setBlock("K02", "BARCODE_ID", 02) %>%
-  setBlock("K03", "BARCODE_ID", 03) %>%
-  setBlock("K04", "BARCODE_ID", 04) %>%
-  setBlock("K05", "BARCODE_ID", 05) %>%
-  setBlock("K06", "BARCODE_ID", 06) %>%
-  setBlock("K07", "BARCODE_ID", 07) %>%    
-  setBlock("N01", "BARCODE_ID", 01) %>%
-  setBlock("N02", "BARCODE_ID", 02) %>%
-  setBlock("N03", "BARCODE_ID", 03) %>%
-  setBlock("N04", "BARCODE_ID", 04) %>%
-  setBlock("N05", "BARCODE_ID", 05) %>%
-  setBlock("N06", "BARCODE_ID", 06) %>%
-  setBlock("N07", "BARCODE_ID", 07) %>%  
-  setBlock("B01", "BARCODE_ID", 08) %>%
-  setBlock("B02", "BARCODE_ID", 09) %>%
-  setBlock("B03", "BARCODE_ID", 10) %>%
-  setBlock("B04", "BARCODE_ID", 11) %>%
-  setBlock("B05", "BARCODE_ID", 12) %>%
-  setBlock("B06", "BARCODE_ID", 13) %>%
-  setBlock("B07", "BARCODE_ID", 14) %>%  
-  setBlock("B08", "BARCODE_ID", 08) %>%
-  setBlock("B09", "BARCODE_ID", 09) %>%
-  setBlock("B10", "BARCODE_ID", 10) %>%
-  setBlock("B11", "BARCODE_ID", 11) %>%
-  setBlock("B12", "BARCODE_ID", 12) %>%
-  setBlock("B13", "BARCODE_ID", 13) %>%
-  setBlock("B14", "BARCODE_ID", 14) %>%  
-  setBlock("B15", "BARCODE_ID", 08) %>%
-  setBlock("B16", "BARCODE_ID", 09) %>%
-  setBlock("B17", "BARCODE_ID", 10) %>%
-  setBlock("B18", "BARCODE_ID", 11) %>%
-  setBlock("B19", "BARCODE_ID", 12) %>%
-  setBlock("B20", "BARCODE_ID", 13) %>%
-  setBlock("B21", "BARCODE_ID", 14) %>% 
-  setBlock("L01", "BARCODE_ID", 08) %>%
-  setBlock("L02", "BARCODE_ID", 09) %>%
-  setBlock("L03", "BARCODE_ID", 10) %>%
-  setBlock("L04", "BARCODE_ID", 11) %>%
-  setBlock("L05", "BARCODE_ID", 12) %>%
-  setBlock("L06", "BARCODE_ID", 13) %>%
-  setBlock("L07", "BARCODE_ID", 14) %>% 
-  setBlock("O01", "BARCODE_ID", 08) %>%
-  setBlock("O02", "BARCODE_ID", 09) %>%
-  setBlock("O03", "BARCODE_ID", 10) %>%
-  setBlock("O04", "BARCODE_ID", 11) %>%
-  setBlock("O05", "BARCODE_ID", 12) %>%
-  setBlock("O06", "BARCODE_ID", 13) %>%
-  setBlock("O07", "BARCODE_ID", 14) %>% 
-  setBlock("C01", "BARCODE_ID", 15) %>%
-  setBlock("C02", "BARCODE_ID", 16) %>%
-  setBlock("C03", "BARCODE_ID", 17) %>%
-  setBlock("C04", "BARCODE_ID", 18) %>%
-  setBlock("C05", "BARCODE_ID", 19) %>%
-  setBlock("C06", "BARCODE_ID", 20) %>%
-  setBlock("C07", "BARCODE_ID", 21) %>%   
-  setBlock("C08", "BARCODE_ID", 15) %>%
-  setBlock("C09", "BARCODE_ID", 16) %>%
-  setBlock("C10", "BARCODE_ID", 17) %>%
-  setBlock("C11", "BARCODE_ID", 18) %>%
-  setBlock("C12", "BARCODE_ID", 19) %>%
-  setBlock("C13", "BARCODE_ID", 20) %>%
-  setBlock("C14", "BARCODE_ID", 21) %>%  
-  setBlock("C15", "BARCODE_ID", 15) %>%
-  setBlock("C16", "BARCODE_ID", 16) %>%
-  setBlock("C17", "BARCODE_ID", 17) %>%
-  setBlock("C18", "BARCODE_ID", 18) %>%
-  setBlock("C19", "BARCODE_ID", 19) %>%
-  setBlock("C20", "BARCODE_ID", 20) %>%
-  setBlock("C21", "BARCODE_ID", 21) %>%
-  setBlock("M01", "BARCODE_ID", 15) %>%
-  setBlock("M02", "BARCODE_ID", 16) %>%
-  setBlock("M03", "BARCODE_ID", 17) %>%
-  setBlock("M04", "BARCODE_ID", 18) %>%
-  setBlock("M05", "BARCODE_ID", 19) %>%
-  setBlock("M06", "BARCODE_ID", 20) %>%
-  setBlock("M07", "BARCODE_ID", 21) %>%
-  setBlock("P01", "BARCODE_ID", 15) %>%
-  setBlock("P02", "BARCODE_ID", 16) %>%
-  setBlock("P03", "BARCODE_ID", 17) %>%
-  setBlock("P04", "BARCODE_ID", 18) %>%
-  setBlock("P05", "BARCODE_ID", 19) %>%
-  setBlock("P06", "BARCODE_ID", 20) %>%
-  setBlock("P07", "BARCODE_ID", 21) %>%
-  setBlock("D01", "BARCODE_ID", 22) %>%
-  setBlock("D02", "BARCODE_ID", 23) %>%
-  setBlock("D03", "BARCODE_ID", 24) %>%
-  setBlock("D04", "BARCODE_ID", 25) %>%
-  setBlock("D05", "BARCODE_ID", 26) %>%
-  setBlock("D06", "BARCODE_ID", 27) %>%
-  setBlock("D07", "BARCODE_ID", 28) %>%   
-  setBlock("D08", "BARCODE_ID", 22) %>%
-  setBlock("D09", "BARCODE_ID", 23) %>%
-  setBlock("D10", "BARCODE_ID", 24) %>%
-  setBlock("D11", "BARCODE_ID", 25) %>%
-  setBlock("D12", "BARCODE_ID", 26) %>%
-  setBlock("D13", "BARCODE_ID", 27) %>%
-  setBlock("D14", "BARCODE_ID", 28) %>% 
-  setBlock("D15", "BARCODE_ID", 22) %>%
-  setBlock("D16", "BARCODE_ID", 23) %>%
-  setBlock("D17", "BARCODE_ID", 24) %>%
-  setBlock("D18", "BARCODE_ID", 25) %>%
-  setBlock("D19", "BARCODE_ID", 26) %>%
-  setBlock("D20", "BARCODE_ID", 27) %>%
-  setBlock("D21", "BARCODE_ID", 28) %>%
-  setBlock("K08", "BARCODE_ID", 22) %>%
-  setBlock("K09", "BARCODE_ID", 23) %>%
-  setBlock("K10", "BARCODE_ID", 24) %>%
-  setBlock("K11", "BARCODE_ID", 25) %>%
-  setBlock("K12", "BARCODE_ID", 26) %>%
-  setBlock("K13", "BARCODE_ID", 27) %>%
-  setBlock("K14", "BARCODE_ID", 28) %>%  
-  setBlock("N08", "BARCODE_ID", 22) %>%
-  setBlock("N09", "BARCODE_ID", 23) %>%
-  setBlock("N10", "BARCODE_ID", 24) %>%
-  setBlock("N11", "BARCODE_ID", 25) %>%
-  setBlock("N12", "BARCODE_ID", 26) %>%
-  setBlock("N13", "BARCODE_ID", 27) %>%
-  setBlock("N14", "BARCODE_ID", 28) %>% 
-  setBlock("E01", "BARCODE_ID", 29) %>%
-  setBlock("E02", "BARCODE_ID", 30) %>%
-  setBlock("E03", "BARCODE_ID", 31) %>%
-  setBlock("E04", "BARCODE_ID", 32) %>%
-  setBlock("E05", "BARCODE_ID", 33) %>%
-  setBlock("E06", "BARCODE_ID", 34) %>%
-  setBlock("E07", "BARCODE_ID", 35) %>%
-  setBlock("E08", "BARCODE_ID", 29) %>%
-  setBlock("E09", "BARCODE_ID", 30) %>%
-  setBlock("E10", "BARCODE_ID", 31) %>%
-  setBlock("E11", "BARCODE_ID", 32) %>%
-  setBlock("E12", "BARCODE_ID", 33) %>%
-  setBlock("E13", "BARCODE_ID", 34) %>%
-  setBlock("E14", "BARCODE_ID", 35) %>%  
-  setBlock("E15", "BARCODE_ID", 29) %>%
-  setBlock("E16", "BARCODE_ID", 30) %>%
-  setBlock("E17", "BARCODE_ID", 31) %>%
-  setBlock("E18", "BARCODE_ID", 32) %>%
-  setBlock("E19", "BARCODE_ID", 33) %>%
-  setBlock("E20", "BARCODE_ID", 34) %>%
-  setBlock("E21", "BARCODE_ID", 35) %>%  
-  setBlock("L08", "BARCODE_ID", 29) %>%
-  setBlock("L09", "BARCODE_ID", 30) %>%
-  setBlock("L10", "BARCODE_ID", 31) %>%
-  setBlock("L11", "BARCODE_ID", 32) %>%
-  setBlock("L12", "BARCODE_ID", 33) %>%
-  setBlock("L13", "BARCODE_ID", 34) %>%
-  setBlock("L14", "BARCODE_ID", 35) %>%  
-  setBlock("O08", "BARCODE_ID", 29) %>%
-  setBlock("O09", "BARCODE_ID", 30) %>%
-  setBlock("O10", "BARCODE_ID", 31) %>%
-  setBlock("O11", "BARCODE_ID", 32) %>%
-  setBlock("O12", "BARCODE_ID", 33) %>%
-  setBlock("O13", "BARCODE_ID", 34) %>%
-  setBlock("O14", "BARCODE_ID", 35) %>%    
-  setBlock("F01", "BARCODE_ID", 36) %>%
-  setBlock("F02", "BARCODE_ID", 37) %>%
-  setBlock("F03", "BARCODE_ID", 38) %>%
-  setBlock("F04", "BARCODE_ID", 39) %>%
-  setBlock("F05", "BARCODE_ID", 40) %>%
-  setBlock("F06", "BARCODE_ID", 41) %>%
-  setBlock("F07", "BARCODE_ID", 42) %>% 
-  setBlock("F08", "BARCODE_ID", 36) %>%
-  setBlock("F09", "BARCODE_ID", 37) %>%
-  setBlock("F10", "BARCODE_ID", 38) %>%
-  setBlock("F11", "BARCODE_ID", 39) %>%
-  setBlock("F12", "BARCODE_ID", 40) %>%
-  setBlock("F13", "BARCODE_ID", 41) %>%
-  setBlock("F14", "BARCODE_ID", 42) %>%  
-  setBlock("F15", "BARCODE_ID", 36) %>%
-  setBlock("F16", "BARCODE_ID", 37) %>%
-  setBlock("F17", "BARCODE_ID", 38) %>%
-  setBlock("F18", "BARCODE_ID", 39) %>%
-  setBlock("F19", "BARCODE_ID", 40) %>%
-  setBlock("F20", "BARCODE_ID", 41) %>%
-  setBlock("F21", "BARCODE_ID", 42) %>%
-  setBlock("M08", "BARCODE_ID", 36) %>%
-  setBlock("M09", "BARCODE_ID", 37) %>%
-  setBlock("M10", "BARCODE_ID", 38) %>%
-  setBlock("M11", "BARCODE_ID", 39) %>%
-  setBlock("M12", "BARCODE_ID", 40) %>%
-  setBlock("M13", "BARCODE_ID", 41) %>%
-  setBlock("M14", "BARCODE_ID", 42) %>%   
-  setBlock("P08", "BARCODE_ID", 36) %>%
-  setBlock("P09", "BARCODE_ID", 37) %>%
-  setBlock("P10", "BARCODE_ID", 38) %>%
-  setBlock("P11", "BARCODE_ID", 39) %>%
-  setBlock("P12", "BARCODE_ID", 40) %>%
-  setBlock("P13", "BARCODE_ID", 41) %>%
-  setBlock("P14", "BARCODE_ID", 42) %>%  
-  setBlock("G01", "BARCODE_ID", 43) %>%
-  setBlock("G02", "BARCODE_ID", 44) %>%
-  setBlock("G03", "BARCODE_ID", 45) %>%
-  setBlock("G04", "BARCODE_ID", 46) %>%
-  setBlock("G05", "BARCODE_ID", 47) %>%
-  setBlock("G06", "BARCODE_ID", 48) %>%
-  setBlock("G07", "BARCODE_ID", 49) %>% 
-  setBlock("G08", "BARCODE_ID", 43) %>%
-  setBlock("G09", "BARCODE_ID", 44) %>%
-  setBlock("G10", "BARCODE_ID", 45) %>%
-  setBlock("G11", "BARCODE_ID", 46) %>%
-  setBlock("G12", "BARCODE_ID", 47) %>%
-  setBlock("G13", "BARCODE_ID", 48) %>%
-  setBlock("G14", "BARCODE_ID", 49) %>%   
-  setBlock("G15", "BARCODE_ID", 43) %>%
-  setBlock("G16", "BARCODE_ID", 44) %>%
-  setBlock("G17", "BARCODE_ID", 45) %>%
-  setBlock("G18", "BARCODE_ID", 46) %>%
-  setBlock("G19", "BARCODE_ID", 47) %>%
-  setBlock("G20", "BARCODE_ID", 48) %>%
-  setBlock("G21", "BARCODE_ID", 49) %>% 
-  setBlock("K15", "BARCODE_ID", 43) %>%
-  setBlock("K16", "BARCODE_ID", 44) %>%
-  setBlock("K17", "BARCODE_ID", 45) %>%
-  setBlock("K18", "BARCODE_ID", 46) %>%
-  setBlock("K19", "BARCODE_ID", 47) %>%
-  setBlock("K20", "BARCODE_ID", 48) %>%
-  setBlock("K21", "BARCODE_ID", 49) %>%   
-  setBlock("N15", "BARCODE_ID", 43) %>%
-  setBlock("N16", "BARCODE_ID", 44) %>%
-  setBlock("N17", "BARCODE_ID", 45) %>%
-  setBlock("N18", "BARCODE_ID", 46) %>%
-  setBlock("N19", "BARCODE_ID", 47) %>%
-  setBlock("N20", "BARCODE_ID", 48) %>%
-  setBlock("N21", "BARCODE_ID", 49) %>%  
-  setBlock("H01", "BARCODE_ID", 50) %>%
-  setBlock("H02", "BARCODE_ID", 51) %>%
-  setBlock("H03", "BARCODE_ID", 52) %>%
-  setBlock("H04", "BARCODE_ID", 53) %>%
-  setBlock("H05", "BARCODE_ID", 54) %>%
-  setBlock("H06", "BARCODE_ID", 55) %>%
-  setBlock("H07", "BARCODE_ID", 56) %>%
-  setBlock("H08", "BARCODE_ID", 50) %>%
-  setBlock("H09", "BARCODE_ID", 51) %>%
-  setBlock("H10", "BARCODE_ID", 52) %>%
-  setBlock("H11", "BARCODE_ID", 53) %>%
-  setBlock("H12", "BARCODE_ID", 54) %>%
-  setBlock("H13", "BARCODE_ID", 55) %>%
-  setBlock("H14", "BARCODE_ID", 56) %>%
-  setBlock("H15", "BARCODE_ID", 50) %>%
-  setBlock("H16", "BARCODE_ID", 51) %>%
-  setBlock("H17", "BARCODE_ID", 52) %>%
-  setBlock("H18", "BARCODE_ID", 53) %>%
-  setBlock("H19", "BARCODE_ID", 54) %>%
-  setBlock("H20", "BARCODE_ID", 55) %>%
-  setBlock("H21", "BARCODE_ID", 56) %>%
-  setBlock("L15", "BARCODE_ID", 50) %>%
-  setBlock("L16", "BARCODE_ID", 51) %>%
-  setBlock("L17", "BARCODE_ID", 52) %>%
-  setBlock("L18", "BARCODE_ID", 53) %>%
-  setBlock("L19", "BARCODE_ID", 54) %>%
-  setBlock("L20", "BARCODE_ID", 55) %>%
-  setBlock("L21", "BARCODE_ID", 56) %>%  
-  setBlock("O15", "BARCODE_ID", 50) %>%
-  setBlock("O16", "BARCODE_ID", 51) %>%
-  setBlock("O17", "BARCODE_ID", 52) %>%
-  setBlock("O18", "BARCODE_ID", 53) %>%
-  setBlock("O19", "BARCODE_ID", 54) %>%
-  setBlock("O20", "BARCODE_ID", 55) %>%
-  setBlock("O21", "BARCODE_ID", 56) %>% 
-  setBlock("I01", "BARCODE_ID", 57) %>%
-  setBlock("I02", "BARCODE_ID", 58) %>%
-  setBlock("I03", "BARCODE_ID", 59) %>%
-  setBlock("I04", "BARCODE_ID", 60) %>%
-  setBlock("I05", "BARCODE_ID", 61) %>%
-  setBlock("I06", "BARCODE_ID", 62) %>%
-  setBlock("I07", "BARCODE_ID", 63) %>%  
-  setBlock("I08", "BARCODE_ID", 57) %>%
-  setBlock("I09", "BARCODE_ID", 58) %>%
-  setBlock("I10", "BARCODE_ID", 59) %>%
-  setBlock("I11", "BARCODE_ID", 60) %>%
-  setBlock("I12", "BARCODE_ID", 61) %>%
-  setBlock("I13", "BARCODE_ID", 62) %>%
-  setBlock("I14", "BARCODE_ID", 63) %>%    
-  setBlock("I15", "BARCODE_ID", 57) %>%
-  setBlock("I16", "BARCODE_ID", 58) %>%
-  setBlock("I17", "BARCODE_ID", 59) %>%
-  setBlock("I18", "BARCODE_ID", 60) %>%
-  setBlock("I19", "BARCODE_ID", 61) %>%
-  setBlock("I20", "BARCODE_ID", 62) %>%
-  setBlock("I21", "BARCODE_ID", 63) %>%   
-  setBlock("M15", "BARCODE_ID", 57) %>%
-  setBlock("M16", "BARCODE_ID", 58) %>%
-  setBlock("M17", "BARCODE_ID", 59) %>%
-  setBlock("M18", "BARCODE_ID", 60) %>%
-  setBlock("M19", "BARCODE_ID", 61) %>%
-  setBlock("M20", "BARCODE_ID", 62) %>%
-  setBlock("M21", "BARCODE_ID", 63) %>%  
-  setBlock("P15", "BARCODE_ID", 57) %>%
-  setBlock("P16", "BARCODE_ID", 58) %>%
-  setBlock("P17", "BARCODE_ID", 59) %>%
-  setBlock("P18", "BARCODE_ID", 60) %>%
-  setBlock("P19", "BARCODE_ID", 61) %>%
-  setBlock("P20", "BARCODE_ID", 62) %>%
-  setBlock("P21", "BARCODE_ID", 63) %>%   
-  setBlock("J01", "BARCODE_ID", 64) %>%
-  setBlock("J02", "BARCODE_ID", 65) %>%
-  setBlock("J03", "BARCODE_ID", 66) %>%
-  setBlock("J04", "BARCODE_ID", 67) %>%
-  setBlock("J05", "BARCODE_ID", 68) %>%
-  setBlock("J06", "BARCODE_ID", 69) %>%
-  setBlock("J07", "BARCODE_ID", 70) %>%   
-  setBlock("J08", "BARCODE_ID", 64) %>%
-  setBlock("J09", "BARCODE_ID", 65) %>%
-  setBlock("J10", "BARCODE_ID", 66) %>%
-  setBlock("J11", "BARCODE_ID", 67) %>%
-  setBlock("J12", "BARCODE_ID", 68) %>%
-  setBlock("J13", "BARCODE_ID", 69) %>%
-  setBlock("J14", "BARCODE_ID", 70) %>%   
-  setBlock("J15", "BARCODE_ID", 64) %>%
-  setBlock("J16", "BARCODE_ID", 65) %>%
-  setBlock("J17", "BARCODE_ID", 66) %>%
-  setBlock("J18", "BARCODE_ID", 67) %>%
-  setBlock("J19", "BARCODE_ID", 68) %>%
-  setBlock("J20", "BARCODE_ID", 69) %>%
-  setBlock("J21", "BARCODE_ID", 70) %>%  
-  setBlock("M23", "BARCODE_ID", 64) %>%
-  setBlock("K22", "BARCODE_ID", 65) %>%
-  setBlock("K23", "BARCODE_ID", 66) %>%
-  setBlock("K24", "BARCODE_ID", 67) %>%
-  setBlock("L22", "BARCODE_ID", 68) %>%
-  setBlock("L23", "BARCODE_ID", 69) %>%
-  setBlock("L24", "BARCODE_ID", 70) %>%  
-  setBlock("P23", "BARCODE_ID", 64) %>%
-  setBlock("N22", "BARCODE_ID", 65) %>%
-  setBlock("N23", "BARCODE_ID", 66) %>%
-  setBlock("N24", "BARCODE_ID", 67) %>%
-  setBlock("O22", "BARCODE_ID", 68) %>%
-  setBlock("O23", "BARCODE_ID", 69) %>%
-  setBlock("O24", "BARCODE_ID", 70)   
+  set_block("A01", "BARCODE_ID", 01) %>%
+  set_block("A02", "BARCODE_ID", 02) %>%
+  set_block("A03", "BARCODE_ID", 03) %>%
+  set_block("A04", "BARCODE_ID", 04) %>%
+  set_block("A05", "BARCODE_ID", 05) %>%
+  set_block("A06", "BARCODE_ID", 06) %>%
+  set_block("A07", "BARCODE_ID", 07) %>%  
+  set_block("A08", "BARCODE_ID", 01) %>%
+  set_block("A09", "BARCODE_ID", 02) %>%
+  set_block("A10", "BARCODE_ID", 03) %>%
+  set_block("A11", "BARCODE_ID", 04) %>%
+  set_block("A12", "BARCODE_ID", 05) %>%
+  set_block("A13", "BARCODE_ID", 06) %>%
+  set_block("A14", "BARCODE_ID", 07) %>%  
+  set_block("A15", "BARCODE_ID", 01) %>%
+  set_block("A16", "BARCODE_ID", 02) %>%
+  set_block("A17", "BARCODE_ID", 03) %>%
+  set_block("A18", "BARCODE_ID", 04) %>%
+  set_block("A19", "BARCODE_ID", 05) %>%
+  set_block("A20", "BARCODE_ID", 06) %>%
+  set_block("A21", "BARCODE_ID", 07) %>%  
+  set_block("K01", "BARCODE_ID", 01) %>%
+  set_block("K02", "BARCODE_ID", 02) %>%
+  set_block("K03", "BARCODE_ID", 03) %>%
+  set_block("K04", "BARCODE_ID", 04) %>%
+  set_block("K05", "BARCODE_ID", 05) %>%
+  set_block("K06", "BARCODE_ID", 06) %>%
+  set_block("K07", "BARCODE_ID", 07) %>%    
+  set_block("N01", "BARCODE_ID", 01) %>%
+  set_block("N02", "BARCODE_ID", 02) %>%
+  set_block("N03", "BARCODE_ID", 03) %>%
+  set_block("N04", "BARCODE_ID", 04) %>%
+  set_block("N05", "BARCODE_ID", 05) %>%
+  set_block("N06", "BARCODE_ID", 06) %>%
+  set_block("N07", "BARCODE_ID", 07) %>%  
+  set_block("B01", "BARCODE_ID", 08) %>%
+  set_block("B02", "BARCODE_ID", 09) %>%
+  set_block("B03", "BARCODE_ID", 10) %>%
+  set_block("B04", "BARCODE_ID", 11) %>%
+  set_block("B05", "BARCODE_ID", 12) %>%
+  set_block("B06", "BARCODE_ID", 13) %>%
+  set_block("B07", "BARCODE_ID", 14) %>%  
+  set_block("B08", "BARCODE_ID", 08) %>%
+  set_block("B09", "BARCODE_ID", 09) %>%
+  set_block("B10", "BARCODE_ID", 10) %>%
+  set_block("B11", "BARCODE_ID", 11) %>%
+  set_block("B12", "BARCODE_ID", 12) %>%
+  set_block("B13", "BARCODE_ID", 13) %>%
+  set_block("B14", "BARCODE_ID", 14) %>%  
+  set_block("B15", "BARCODE_ID", 08) %>%
+  set_block("B16", "BARCODE_ID", 09) %>%
+  set_block("B17", "BARCODE_ID", 10) %>%
+  set_block("B18", "BARCODE_ID", 11) %>%
+  set_block("B19", "BARCODE_ID", 12) %>%
+  set_block("B20", "BARCODE_ID", 13) %>%
+  set_block("B21", "BARCODE_ID", 14) %>% 
+  set_block("L01", "BARCODE_ID", 08) %>%
+  set_block("L02", "BARCODE_ID", 09) %>%
+  set_block("L03", "BARCODE_ID", 10) %>%
+  set_block("L04", "BARCODE_ID", 11) %>%
+  set_block("L05", "BARCODE_ID", 12) %>%
+  set_block("L06", "BARCODE_ID", 13) %>%
+  set_block("L07", "BARCODE_ID", 14) %>% 
+  set_block("O01", "BARCODE_ID", 08) %>%
+  set_block("O02", "BARCODE_ID", 09) %>%
+  set_block("O03", "BARCODE_ID", 10) %>%
+  set_block("O04", "BARCODE_ID", 11) %>%
+  set_block("O05", "BARCODE_ID", 12) %>%
+  set_block("O06", "BARCODE_ID", 13) %>%
+  set_block("O07", "BARCODE_ID", 14) %>% 
+  set_block("C01", "BARCODE_ID", 15) %>%
+  set_block("C02", "BARCODE_ID", 16) %>%
+  set_block("C03", "BARCODE_ID", 17) %>%
+  set_block("C04", "BARCODE_ID", 18) %>%
+  set_block("C05", "BARCODE_ID", 19) %>%
+  set_block("C06", "BARCODE_ID", 20) %>%
+  set_block("C07", "BARCODE_ID", 21) %>%   
+  set_block("C08", "BARCODE_ID", 15) %>%
+  set_block("C09", "BARCODE_ID", 16) %>%
+  set_block("C10", "BARCODE_ID", 17) %>%
+  set_block("C11", "BARCODE_ID", 18) %>%
+  set_block("C12", "BARCODE_ID", 19) %>%
+  set_block("C13", "BARCODE_ID", 20) %>%
+  set_block("C14", "BARCODE_ID", 21) %>%  
+  set_block("C15", "BARCODE_ID", 15) %>%
+  set_block("C16", "BARCODE_ID", 16) %>%
+  set_block("C17", "BARCODE_ID", 17) %>%
+  set_block("C18", "BARCODE_ID", 18) %>%
+  set_block("C19", "BARCODE_ID", 19) %>%
+  set_block("C20", "BARCODE_ID", 20) %>%
+  set_block("C21", "BARCODE_ID", 21) %>%
+  set_block("M01", "BARCODE_ID", 15) %>%
+  set_block("M02", "BARCODE_ID", 16) %>%
+  set_block("M03", "BARCODE_ID", 17) %>%
+  set_block("M04", "BARCODE_ID", 18) %>%
+  set_block("M05", "BARCODE_ID", 19) %>%
+  set_block("M06", "BARCODE_ID", 20) %>%
+  set_block("M07", "BARCODE_ID", 21) %>%
+  set_block("P01", "BARCODE_ID", 15) %>%
+  set_block("P02", "BARCODE_ID", 16) %>%
+  set_block("P03", "BARCODE_ID", 17) %>%
+  set_block("P04", "BARCODE_ID", 18) %>%
+  set_block("P05", "BARCODE_ID", 19) %>%
+  set_block("P06", "BARCODE_ID", 20) %>%
+  set_block("P07", "BARCODE_ID", 21) %>%
+  set_block("D01", "BARCODE_ID", 22) %>%
+  set_block("D02", "BARCODE_ID", 23) %>%
+  set_block("D03", "BARCODE_ID", 24) %>%
+  set_block("D04", "BARCODE_ID", 25) %>%
+  set_block("D05", "BARCODE_ID", 26) %>%
+  set_block("D06", "BARCODE_ID", 27) %>%
+  set_block("D07", "BARCODE_ID", 28) %>%   
+  set_block("D08", "BARCODE_ID", 22) %>%
+  set_block("D09", "BARCODE_ID", 23) %>%
+  set_block("D10", "BARCODE_ID", 24) %>%
+  set_block("D11", "BARCODE_ID", 25) %>%
+  set_block("D12", "BARCODE_ID", 26) %>%
+  set_block("D13", "BARCODE_ID", 27) %>%
+  set_block("D14", "BARCODE_ID", 28) %>% 
+  set_block("D15", "BARCODE_ID", 22) %>%
+  set_block("D16", "BARCODE_ID", 23) %>%
+  set_block("D17", "BARCODE_ID", 24) %>%
+  set_block("D18", "BARCODE_ID", 25) %>%
+  set_block("D19", "BARCODE_ID", 26) %>%
+  set_block("D20", "BARCODE_ID", 27) %>%
+  set_block("D21", "BARCODE_ID", 28) %>%
+  set_block("K08", "BARCODE_ID", 22) %>%
+  set_block("K09", "BARCODE_ID", 23) %>%
+  set_block("K10", "BARCODE_ID", 24) %>%
+  set_block("K11", "BARCODE_ID", 25) %>%
+  set_block("K12", "BARCODE_ID", 26) %>%
+  set_block("K13", "BARCODE_ID", 27) %>%
+  set_block("K14", "BARCODE_ID", 28) %>%  
+  set_block("N08", "BARCODE_ID", 22) %>%
+  set_block("N09", "BARCODE_ID", 23) %>%
+  set_block("N10", "BARCODE_ID", 24) %>%
+  set_block("N11", "BARCODE_ID", 25) %>%
+  set_block("N12", "BARCODE_ID", 26) %>%
+  set_block("N13", "BARCODE_ID", 27) %>%
+  set_block("N14", "BARCODE_ID", 28) %>% 
+  set_block("E01", "BARCODE_ID", 29) %>%
+  set_block("E02", "BARCODE_ID", 30) %>%
+  set_block("E03", "BARCODE_ID", 31) %>%
+  set_block("E04", "BARCODE_ID", 32) %>%
+  set_block("E05", "BARCODE_ID", 33) %>%
+  set_block("E06", "BARCODE_ID", 34) %>%
+  set_block("E07", "BARCODE_ID", 35) %>%
+  set_block("E08", "BARCODE_ID", 29) %>%
+  set_block("E09", "BARCODE_ID", 30) %>%
+  set_block("E10", "BARCODE_ID", 31) %>%
+  set_block("E11", "BARCODE_ID", 32) %>%
+  set_block("E12", "BARCODE_ID", 33) %>%
+  set_block("E13", "BARCODE_ID", 34) %>%
+  set_block("E14", "BARCODE_ID", 35) %>%  
+  set_block("E15", "BARCODE_ID", 29) %>%
+  set_block("E16", "BARCODE_ID", 30) %>%
+  set_block("E17", "BARCODE_ID", 31) %>%
+  set_block("E18", "BARCODE_ID", 32) %>%
+  set_block("E19", "BARCODE_ID", 33) %>%
+  set_block("E20", "BARCODE_ID", 34) %>%
+  set_block("E21", "BARCODE_ID", 35) %>%  
+  set_block("L08", "BARCODE_ID", 29) %>%
+  set_block("L09", "BARCODE_ID", 30) %>%
+  set_block("L10", "BARCODE_ID", 31) %>%
+  set_block("L11", "BARCODE_ID", 32) %>%
+  set_block("L12", "BARCODE_ID", 33) %>%
+  set_block("L13", "BARCODE_ID", 34) %>%
+  set_block("L14", "BARCODE_ID", 35) %>%  
+  set_block("O08", "BARCODE_ID", 29) %>%
+  set_block("O09", "BARCODE_ID", 30) %>%
+  set_block("O10", "BARCODE_ID", 31) %>%
+  set_block("O11", "BARCODE_ID", 32) %>%
+  set_block("O12", "BARCODE_ID", 33) %>%
+  set_block("O13", "BARCODE_ID", 34) %>%
+  set_block("O14", "BARCODE_ID", 35) %>%    
+  set_block("F01", "BARCODE_ID", 36) %>%
+  set_block("F02", "BARCODE_ID", 37) %>%
+  set_block("F03", "BARCODE_ID", 38) %>%
+  set_block("F04", "BARCODE_ID", 39) %>%
+  set_block("F05", "BARCODE_ID", 40) %>%
+  set_block("F06", "BARCODE_ID", 41) %>%
+  set_block("F07", "BARCODE_ID", 42) %>% 
+  set_block("F08", "BARCODE_ID", 36) %>%
+  set_block("F09", "BARCODE_ID", 37) %>%
+  set_block("F10", "BARCODE_ID", 38) %>%
+  set_block("F11", "BARCODE_ID", 39) %>%
+  set_block("F12", "BARCODE_ID", 40) %>%
+  set_block("F13", "BARCODE_ID", 41) %>%
+  set_block("F14", "BARCODE_ID", 42) %>%  
+  set_block("F15", "BARCODE_ID", 36) %>%
+  set_block("F16", "BARCODE_ID", 37) %>%
+  set_block("F17", "BARCODE_ID", 38) %>%
+  set_block("F18", "BARCODE_ID", 39) %>%
+  set_block("F19", "BARCODE_ID", 40) %>%
+  set_block("F20", "BARCODE_ID", 41) %>%
+  set_block("F21", "BARCODE_ID", 42) %>%
+  set_block("M08", "BARCODE_ID", 36) %>%
+  set_block("M09", "BARCODE_ID", 37) %>%
+  set_block("M10", "BARCODE_ID", 38) %>%
+  set_block("M11", "BARCODE_ID", 39) %>%
+  set_block("M12", "BARCODE_ID", 40) %>%
+  set_block("M13", "BARCODE_ID", 41) %>%
+  set_block("M14", "BARCODE_ID", 42) %>%   
+  set_block("P08", "BARCODE_ID", 36) %>%
+  set_block("P09", "BARCODE_ID", 37) %>%
+  set_block("P10", "BARCODE_ID", 38) %>%
+  set_block("P11", "BARCODE_ID", 39) %>%
+  set_block("P12", "BARCODE_ID", 40) %>%
+  set_block("P13", "BARCODE_ID", 41) %>%
+  set_block("P14", "BARCODE_ID", 42) %>%  
+  set_block("G01", "BARCODE_ID", 43) %>%
+  set_block("G02", "BARCODE_ID", 44) %>%
+  set_block("G03", "BARCODE_ID", 45) %>%
+  set_block("G04", "BARCODE_ID", 46) %>%
+  set_block("G05", "BARCODE_ID", 47) %>%
+  set_block("G06", "BARCODE_ID", 48) %>%
+  set_block("G07", "BARCODE_ID", 49) %>% 
+  set_block("G08", "BARCODE_ID", 43) %>%
+  set_block("G09", "BARCODE_ID", 44) %>%
+  set_block("G10", "BARCODE_ID", 45) %>%
+  set_block("G11", "BARCODE_ID", 46) %>%
+  set_block("G12", "BARCODE_ID", 47) %>%
+  set_block("G13", "BARCODE_ID", 48) %>%
+  set_block("G14", "BARCODE_ID", 49) %>%   
+  set_block("G15", "BARCODE_ID", 43) %>%
+  set_block("G16", "BARCODE_ID", 44) %>%
+  set_block("G17", "BARCODE_ID", 45) %>%
+  set_block("G18", "BARCODE_ID", 46) %>%
+  set_block("G19", "BARCODE_ID", 47) %>%
+  set_block("G20", "BARCODE_ID", 48) %>%
+  set_block("G21", "BARCODE_ID", 49) %>% 
+  set_block("K15", "BARCODE_ID", 43) %>%
+  set_block("K16", "BARCODE_ID", 44) %>%
+  set_block("K17", "BARCODE_ID", 45) %>%
+  set_block("K18", "BARCODE_ID", 46) %>%
+  set_block("K19", "BARCODE_ID", 47) %>%
+  set_block("K20", "BARCODE_ID", 48) %>%
+  set_block("K21", "BARCODE_ID", 49) %>%   
+  set_block("N15", "BARCODE_ID", 43) %>%
+  set_block("N16", "BARCODE_ID", 44) %>%
+  set_block("N17", "BARCODE_ID", 45) %>%
+  set_block("N18", "BARCODE_ID", 46) %>%
+  set_block("N19", "BARCODE_ID", 47) %>%
+  set_block("N20", "BARCODE_ID", 48) %>%
+  set_block("N21", "BARCODE_ID", 49) %>%  
+  set_block("H01", "BARCODE_ID", 50) %>%
+  set_block("H02", "BARCODE_ID", 51) %>%
+  set_block("H03", "BARCODE_ID", 52) %>%
+  set_block("H04", "BARCODE_ID", 53) %>%
+  set_block("H05", "BARCODE_ID", 54) %>%
+  set_block("H06", "BARCODE_ID", 55) %>%
+  set_block("H07", "BARCODE_ID", 56) %>%
+  set_block("H08", "BARCODE_ID", 50) %>%
+  set_block("H09", "BARCODE_ID", 51) %>%
+  set_block("H10", "BARCODE_ID", 52) %>%
+  set_block("H11", "BARCODE_ID", 53) %>%
+  set_block("H12", "BARCODE_ID", 54) %>%
+  set_block("H13", "BARCODE_ID", 55) %>%
+  set_block("H14", "BARCODE_ID", 56) %>%
+  set_block("H15", "BARCODE_ID", 50) %>%
+  set_block("H16", "BARCODE_ID", 51) %>%
+  set_block("H17", "BARCODE_ID", 52) %>%
+  set_block("H18", "BARCODE_ID", 53) %>%
+  set_block("H19", "BARCODE_ID", 54) %>%
+  set_block("H20", "BARCODE_ID", 55) %>%
+  set_block("H21", "BARCODE_ID", 56) %>%
+  set_block("L15", "BARCODE_ID", 50) %>%
+  set_block("L16", "BARCODE_ID", 51) %>%
+  set_block("L17", "BARCODE_ID", 52) %>%
+  set_block("L18", "BARCODE_ID", 53) %>%
+  set_block("L19", "BARCODE_ID", 54) %>%
+  set_block("L20", "BARCODE_ID", 55) %>%
+  set_block("L21", "BARCODE_ID", 56) %>%  
+  set_block("O15", "BARCODE_ID", 50) %>%
+  set_block("O16", "BARCODE_ID", 51) %>%
+  set_block("O17", "BARCODE_ID", 52) %>%
+  set_block("O18", "BARCODE_ID", 53) %>%
+  set_block("O19", "BARCODE_ID", 54) %>%
+  set_block("O20", "BARCODE_ID", 55) %>%
+  set_block("O21", "BARCODE_ID", 56) %>% 
+  set_block("I01", "BARCODE_ID", 57) %>%
+  set_block("I02", "BARCODE_ID", 58) %>%
+  set_block("I03", "BARCODE_ID", 59) %>%
+  set_block("I04", "BARCODE_ID", 60) %>%
+  set_block("I05", "BARCODE_ID", 61) %>%
+  set_block("I06", "BARCODE_ID", 62) %>%
+  set_block("I07", "BARCODE_ID", 63) %>%  
+  set_block("I08", "BARCODE_ID", 57) %>%
+  set_block("I09", "BARCODE_ID", 58) %>%
+  set_block("I10", "BARCODE_ID", 59) %>%
+  set_block("I11", "BARCODE_ID", 60) %>%
+  set_block("I12", "BARCODE_ID", 61) %>%
+  set_block("I13", "BARCODE_ID", 62) %>%
+  set_block("I14", "BARCODE_ID", 63) %>%    
+  set_block("I15", "BARCODE_ID", 57) %>%
+  set_block("I16", "BARCODE_ID", 58) %>%
+  set_block("I17", "BARCODE_ID", 59) %>%
+  set_block("I18", "BARCODE_ID", 60) %>%
+  set_block("I19", "BARCODE_ID", 61) %>%
+  set_block("I20", "BARCODE_ID", 62) %>%
+  set_block("I21", "BARCODE_ID", 63) %>%   
+  set_block("M15", "BARCODE_ID", 57) %>%
+  set_block("M16", "BARCODE_ID", 58) %>%
+  set_block("M17", "BARCODE_ID", 59) %>%
+  set_block("M18", "BARCODE_ID", 60) %>%
+  set_block("M19", "BARCODE_ID", 61) %>%
+  set_block("M20", "BARCODE_ID", 62) %>%
+  set_block("M21", "BARCODE_ID", 63) %>%  
+  set_block("P15", "BARCODE_ID", 57) %>%
+  set_block("P16", "BARCODE_ID", 58) %>%
+  set_block("P17", "BARCODE_ID", 59) %>%
+  set_block("P18", "BARCODE_ID", 60) %>%
+  set_block("P19", "BARCODE_ID", 61) %>%
+  set_block("P20", "BARCODE_ID", 62) %>%
+  set_block("P21", "BARCODE_ID", 63) %>%   
+  set_block("J01", "BARCODE_ID", 64) %>%
+  set_block("J02", "BARCODE_ID", 65) %>%
+  set_block("J03", "BARCODE_ID", 66) %>%
+  set_block("J04", "BARCODE_ID", 67) %>%
+  set_block("J05", "BARCODE_ID", 68) %>%
+  set_block("J06", "BARCODE_ID", 69) %>%
+  set_block("J07", "BARCODE_ID", 70) %>%   
+  set_block("J08", "BARCODE_ID", 64) %>%
+  set_block("J09", "BARCODE_ID", 65) %>%
+  set_block("J10", "BARCODE_ID", 66) %>%
+  set_block("J11", "BARCODE_ID", 67) %>%
+  set_block("J12", "BARCODE_ID", 68) %>%
+  set_block("J13", "BARCODE_ID", 69) %>%
+  set_block("J14", "BARCODE_ID", 70) %>%   
+  set_block("J15", "BARCODE_ID", 64) %>%
+  set_block("J16", "BARCODE_ID", 65) %>%
+  set_block("J17", "BARCODE_ID", 66) %>%
+  set_block("J18", "BARCODE_ID", 67) %>%
+  set_block("J19", "BARCODE_ID", 68) %>%
+  set_block("J20", "BARCODE_ID", 69) %>%
+  set_block("J21", "BARCODE_ID", 70) %>%  
+  set_block("M23", "BARCODE_ID", 64) %>%
+  set_block("K22", "BARCODE_ID", 65) %>%
+  set_block("K23", "BARCODE_ID", 66) %>%
+  set_block("K24", "BARCODE_ID", 67) %>%
+  set_block("L22", "BARCODE_ID", 68) %>%
+  set_block("L23", "BARCODE_ID", 69) %>%
+  set_block("L24", "BARCODE_ID", 70) %>%  
+  set_block("P23", "BARCODE_ID", 64) %>%
+  set_block("N22", "BARCODE_ID", 65) %>%
+  set_block("N23", "BARCODE_ID", 66) %>%
+  set_block("N24", "BARCODE_ID", 67) %>%
+  set_block("O22", "BARCODE_ID", 68) %>%
+  set_block("O23", "BARCODE_ID", 69) %>%
+  set_block("O24", "BARCODE_ID", 70)
+
+plate$BARCODE_SEQ <- nanoCAGE2017barcodes[plate$BARCODE_ID,1]
 ```
 
 RT_PRIMERS
@@ -529,41 +540,41 @@ RT primers concentration
 
 ```r
 plate %<>%
-  setBlock("A01~P01",   "RT_PRIMERS", 0) %>%
-  setBlock("A08~P08",   "RT_PRIMERS", 0) %>%
-  setBlock("A15~P15",   "RT_PRIMERS", 0) %>%
-  setBlock("M23",   "RT_PRIMERS", 0) %>%
-  setBlock("P23",   "RT_PRIMERS", 0) %>%
-  setBlock("A02~P02",   "RT_PRIMERS", 0.125) %>%
-  setBlock("A09~P09",   "RT_PRIMERS", 0.125) %>%
-  setBlock("A16~P16",   "RT_PRIMERS", 0.125) %>%
-  setBlock("K22",   "RT_PRIMERS", 0.125) %>%
-  setBlock("N22",   "RT_PRIMERS", 0.125) %>%
-  setBlock("A03~P03",   "RT_PRIMERS", 0.25) %>%
-  setBlock("A10~P10",   "RT_PRIMERS", 0.25) %>%
-  setBlock("A17~P17",   "RT_PRIMERS", 0.25) %>%
-  setBlock("K23",   "RT_PRIMERS", 0.25) %>%
-  setBlock("N23",   "RT_PRIMERS", 0.25) %>%
-  setBlock("A04~P04",   "RT_PRIMERS", 0.5) %>%
-  setBlock("A11~P11",   "RT_PRIMERS", 0.5) %>%
-  setBlock("A18~P18",   "RT_PRIMERS", 0.5) %>%
-  setBlock("K24",   "RT_PRIMERS", 0.5) %>%
-  setBlock("N24",   "RT_PRIMERS", 0.5) %>%
-  setBlock("A05~P05",   "RT_PRIMERS", 1) %>%
-  setBlock("A12~P12",   "RT_PRIMERS", 1) %>%
-  setBlock("A19~P19",   "RT_PRIMERS", 1) %>%
-  setBlock("L22",   "RT_PRIMERS", 1) %>%
-  setBlock("O22",   "RT_PRIMERS", 1) %>%
-  setBlock("A06~P06",   "RT_PRIMERS", 2) %>%
-  setBlock("A13~P13",   "RT_PRIMERS", 2) %>%
-  setBlock("A20~P20",   "RT_PRIMERS", 2) %>%
-  setBlock("L23",   "RT_PRIMERS", 2) %>%
-  setBlock("O23",   "RT_PRIMERS", 2) %>%
-  setBlock("A07~P07",   "RT_PRIMERS", 4) %>%
-  setBlock("A14~P14",   "RT_PRIMERS", 4) %>%
-  setBlock("A21~P21",   "RT_PRIMERS", 4) %>%
-  setBlock("L24",   "RT_PRIMERS", 4) %>%
-  setBlock("O24",   "RT_PRIMERS", 4) 
+  set_block("A01~P01",   "RT_PRIMERS", 0) %>%
+  set_block("A08~P08",   "RT_PRIMERS", 0) %>%
+  set_block("A15~P15",   "RT_PRIMERS", 0) %>%
+  set_block("M23",       "RT_PRIMERS", 0) %>%
+  set_block("P23",       "RT_PRIMERS", 0) %>%
+  set_block("A02~P02",   "RT_PRIMERS", 0.125) %>%
+  set_block("A09~P09",   "RT_PRIMERS", 0.125) %>%
+  set_block("A16~P16",   "RT_PRIMERS", 0.125) %>%
+  set_block("K22",       "RT_PRIMERS", 0.125) %>%
+  set_block("N22",       "RT_PRIMERS", 0.125) %>%
+  set_block("A03~P03",   "RT_PRIMERS", 0.25) %>%
+  set_block("A10~P10",   "RT_PRIMERS", 0.25) %>%
+  set_block("A17~P17",   "RT_PRIMERS", 0.25) %>%
+  set_block("K23",       "RT_PRIMERS", 0.25) %>%
+  set_block("N23",       "RT_PRIMERS", 0.25) %>%
+  set_block("A04~P04",   "RT_PRIMERS", 0.5) %>%
+  set_block("A11~P11",   "RT_PRIMERS", 0.5) %>%
+  set_block("A18~P18",   "RT_PRIMERS", 0.5) %>%
+  set_block("K24",       "RT_PRIMERS", 0.5) %>%
+  set_block("N24",       "RT_PRIMERS", 0.5) %>%
+  set_block("A05~P05",   "RT_PRIMERS", 1) %>%
+  set_block("A12~P12",   "RT_PRIMERS", 1) %>%
+  set_block("A19~P19",   "RT_PRIMERS", 1) %>%
+  set_block("L22",       "RT_PRIMERS", 1) %>%
+  set_block("O22",       "RT_PRIMERS", 1) %>%
+  set_block("A06~P06",   "RT_PRIMERS", 2) %>%
+  set_block("A13~P13",   "RT_PRIMERS", 2) %>%
+  set_block("A20~P20",   "RT_PRIMERS", 2) %>%
+  set_block("L23",       "RT_PRIMERS", 2) %>%
+  set_block("O23",       "RT_PRIMERS", 2) %>%
+  set_block("A07~P07",   "RT_PRIMERS", 4) %>%
+  set_block("A14~P14",   "RT_PRIMERS", 4) %>%
+  set_block("A21~P21",   "RT_PRIMERS", 4) %>%
+  set_block("L24",       "RT_PRIMERS", 4) %>%
+  set_block("O24",       "RT_PRIMERS", 4) 
 ```
 
 RT primer volume 
@@ -574,41 +585,41 @@ RT primer volume
 
 ```r
 plate %<>%
-  setBlock("A01~P01",   "RT_PRIMERS_vol", 0) %>%
-  setBlock("A08~P08",   "RT_PRIMERS_vol", 0) %>%
-  setBlock("A15~P15",   "RT_PRIMERS_vol", 0) %>%
-  setBlock("M23",   "RT_PRIMERS_vol", 0) %>%
-  setBlock("P23",   "RT_PRIMERS_vol", 0) %>%
-  setBlock("A02~P02",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("A09~P09",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("A16~P16",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("K22",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("N22",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("A03~P03",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("A10~P10",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("A17~P17",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("K23",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("N23",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("A04~P04",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("A11~P11",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("A18~P18",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("K24",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("N24",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("A05~P05",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("A12~P12",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("A19~P19",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("L22",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("O22",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("A06~P06",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("A13~P13",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("A20~P20",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("L23",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("O23",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("A07~P07",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("A14~P14",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("A21~P21",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("L24",   "RT_PRIMERS_vol", 25) %>%
-  setBlock("O24",   "RT_PRIMERS_vol", 25) 
+  set_block("A01~P01",   "RT_PRIMERS_vol", 0) %>%
+  set_block("A08~P08",   "RT_PRIMERS_vol", 0) %>%
+  set_block("A15~P15",   "RT_PRIMERS_vol", 0) %>%
+  set_block("M23",       "RT_PRIMERS_vol", 0) %>%
+  set_block("P23",       "RT_PRIMERS_vol", 0) %>%
+  set_block("A02~P02",   "RT_PRIMERS_vol", 25) %>%
+  set_block("A09~P09",   "RT_PRIMERS_vol", 25) %>%
+  set_block("A16~P16",   "RT_PRIMERS_vol", 25) %>%
+  set_block("K22",       "RT_PRIMERS_vol", 25) %>%
+  set_block("N22",       "RT_PRIMERS_vol", 25) %>%
+  set_block("A03~P03",   "RT_PRIMERS_vol", 25) %>%
+  set_block("A10~P10",   "RT_PRIMERS_vol", 25) %>%
+  set_block("A17~P17",   "RT_PRIMERS_vol", 25) %>%
+  set_block("K23",       "RT_PRIMERS_vol", 25) %>%
+  set_block("N23",       "RT_PRIMERS_vol", 25) %>%
+  set_block("A04~P04",   "RT_PRIMERS_vol", 25) %>%
+  set_block("A11~P11",   "RT_PRIMERS_vol", 25) %>%
+  set_block("A18~P18",   "RT_PRIMERS_vol", 25) %>%
+  set_block("K24",       "RT_PRIMERS_vol", 25) %>%
+  set_block("N24",       "RT_PRIMERS_vol", 25) %>%
+  set_block("A05~P05",   "RT_PRIMERS_vol", 25) %>%
+  set_block("A12~P12",   "RT_PRIMERS_vol", 25) %>%
+  set_block("A19~P19",   "RT_PRIMERS_vol", 25) %>%
+  set_block("L22",       "RT_PRIMERS_vol", 25) %>%
+  set_block("O22",       "RT_PRIMERS_vol", 25) %>%
+  set_block("A06~P06",   "RT_PRIMERS_vol", 25) %>%
+  set_block("A13~P13",   "RT_PRIMERS_vol", 25) %>%
+  set_block("A20~P20",   "RT_PRIMERS_vol", 25) %>%
+  set_block("L23",       "RT_PRIMERS_vol", 25) %>%
+  set_block("O23",       "RT_PRIMERS_vol", 25) %>%
+  set_block("A07~P07",   "RT_PRIMERS_vol", 25) %>%
+  set_block("A14~P14",   "RT_PRIMERS_vol", 25) %>%
+  set_block("A21~P21",   "RT_PRIMERS_vol", 25) %>%
+  set_block("L24",       "RT_PRIMERS_vol", 25) %>%
+  set_block("O24",       "RT_PRIMERS_vol", 25) 
 ```
 
 RNA
@@ -627,16 +638,16 @@ RNA concentration
 
 ```r
 plate %<>%
-  setBlock("J01~J21", "RNA", 0) %>%
-  setBlock("K22~L24", "RNA", 0) %>%
-  setBlock("M23", "RNA", 0) %>%
-  setBlock("N22~O24", "RNA", 0) %>%
-  setBlock("P23", "RNA", 0) %>%
-  setBlock("A01~I07", "RNA", 100) %>%
-  setBlock("A08~I14", "RNA", 10) %>%
-  setBlock("A15~I21", "RNA", 1) %>%
-  setBlock("K01~M21", "RNA", 0.1) %>%
-  setBlock("N01~P21", "RNA", 0.01)
+  set_block("J01~J21", "RNA", 0)   %>%
+  set_block("K22~L24", "RNA", 0)   %>%
+  set_block("M23",     "RNA", 0)   %>%
+  set_block("N22~O24", "RNA", 0)   %>%
+  set_block("P23",     "RNA", 0)   %>%
+  set_block("A01~I07", "RNA", 100) %>%
+  set_block("A08~I14", "RNA", 10)  %>%
+  set_block("A15~I21", "RNA", 1)   %>%
+  set_block("K01~M21", "RNA", 0.1) %>%
+  set_block("N01~P21", "RNA", 0.01)
 ```
 
 RNA volume
@@ -647,16 +658,16 @@ RNA volume
 
 ```r
 plate %<>%
-  setBlock("J01~J21", "RNA_vol", 0) %>%
-  setBlock("K22~L24", "RNA_vol", 0) %>%
-  setBlock("M23", "RNA_vol", 0) %>%
-  setBlock("N22~O24", "RNA_vol", 0) %>%
-  setBlock("P23", "RNA_vol", 0) %>%
-  setBlock("A01~I07", "RNA_vol", 25) %>%
-  setBlock("A08~I14", "RNA_vol", 25) %>%
-  setBlock("A15~I21", "RNA_vol", 25) %>%
-  setBlock("K01~M21", "RNA_vol", 25) %>%
-  setBlock("N01~P21", "RNA_vol", 25)
+  set_block("J01~J21", "RNA_vol", 0)  %>%
+  set_block("K22~L24", "RNA_vol", 0)  %>%
+  set_block("M23",     "RNA_vol", 0)  %>%
+  set_block("N22~O24", "RNA_vol", 0)  %>%
+  set_block("P23",     "RNA_vol", 0)  %>%
+  set_block("A01~I07", "RNA_vol", 25) %>%
+  set_block("A08~I14", "RNA_vol", 25) %>%
+  set_block("A15~I21", "RNA_vol", 25) %>%
+  set_block("K01~M21", "RNA_vol", 25) %>%
+  set_block("N01~P21", "RNA_vol", 25)
 ```
 
 H2O
@@ -670,110 +681,110 @@ H2O volume
 
 ```r
 plate %<>%
-  setBlock("A02~A07", "H2O_vol", 0) %>%
-  setBlock("A09~A14", "H2O_vol", 0) %>%
-  setBlock("A16~A21", "H2O_vol", 0) %>%
-  setBlock("D02~D07", "H2O_vol", 0) %>%
-  setBlock("D09~D14", "H2O_vol", 0) %>%
-  setBlock("D16~D21", "H2O_vol", 0) %>%
-  setBlock("G02~G07", "H2O_vol", 0) %>%
-  setBlock("G09~G14", "H2O_vol", 0) %>%
-  setBlock("G16~G21", "H2O_vol", 0) %>%
-  setBlock("K02~K07", "H2O_vol", 0) %>%
-  setBlock("K09~K14", "H2O_vol", 0) %>%
-  setBlock("K16~K21", "H2O_vol", 0) %>%
-  setBlock("N02~N07", "H2O_vol", 0) %>%
-  setBlock("N09~N14", "H2O_vol", 0) %>%
-  setBlock("N16~N21", "H2O_vol", 0) %>%
-  setBlock("J02~J07", "H2O_vol", 25) %>%
-  setBlock("J09~J14", "H2O_vol", 25) %>%
-  setBlock("J16~J21", "H2O_vol", 25) %>%
-  setBlock("J02~J07", "H2O_vol", 25) %>%
-  setBlock("K22~K24", "H2O_vol", 25) %>%
-  setBlock("L22~L24", "H2O_vol", 25) %>%
-  setBlock("N22~N24", "H2O_vol", 25) %>%
-  setBlock("O22~O24", "H2O_vol", 25) %>%
-  setBlock("K22~K24", "H2O_vol", 25) %>%
-  setBlock("A01", "H2O_vol", 25) %>%
-  setBlock("A08", "H2O_vol", 25) %>%
-  setBlock("A15", "H2O_vol", 25) %>%
-  setBlock("D01", "H2O_vol", 25) %>%
-  setBlock("D08", "H2O_vol", 25) %>%
-  setBlock("D15", "H2O_vol", 25) %>%
-  setBlock("G01", "H2O_vol", 25) %>%
-  setBlock("G08", "H2O_vol", 25) %>%
-  setBlock("G15", "H2O_vol", 25) %>%
-  setBlock("K01", "H2O_vol", 25) %>%
-  setBlock("K08", "H2O_vol", 25) %>%
-  setBlock("K15", "H2O_vol", 25) %>%
-  setBlock("N01", "H2O_vol", 25) %>%
-  setBlock("N08", "H2O_vol", 25) %>%
-  setBlock("N15", "H2O_vol", 25) %>%
-  setBlock("B02~B07", "H2O_vol", 50) %>%
-  setBlock("B09~B14", "H2O_vol", 50) %>%
-  setBlock("B16~B21", "H2O_vol", 50) %>%
-  setBlock("E02~E07", "H2O_vol", 50) %>%
-  setBlock("E09~E14", "H2O_vol", 50) %>%
-  setBlock("E16~E21", "H2O_vol", 50) %>%
-  setBlock("H02~H07", "H2O_vol", 50) %>%
-  setBlock("H09~H14", "H2O_vol", 50) %>%
-  setBlock("H16~H21", "H2O_vol", 50) %>%
-  setBlock("L02~L07", "H2O_vol", 50) %>%
-  setBlock("L09~L14", "H2O_vol", 50) %>%
-  setBlock("L16~L21", "H2O_vol", 50) %>%
-  setBlock("O02~O07", "H2O_vol", 50) %>%
-  setBlock("O09~O14", "H2O_vol", 50) %>%
-  setBlock("O16~O21", "H2O_vol", 50) %>%
-  setBlock("M23", "H2O_vol", 50) %>%
-  setBlock("P23", "H2O_vol", 50) %>%
-  setBlock("J01", "H2O_vol", 50) %>%
-  setBlock("J08", "H2O_vol", 50) %>%
-  setBlock("J15", "H2O_vol", 50) %>%
-  setBlock("C02~C07", "H2O_vol", 75) %>%
-  setBlock("C09~C14", "H2O_vol", 75) %>%
-  setBlock("C16~C21", "H2O_vol", 75) %>%
-  setBlock("F02~F07", "H2O_vol", 75) %>%
-  setBlock("F09~F14", "H2O_vol", 75) %>%
-  setBlock("F16~F21", "H2O_vol", 75) %>%
-  setBlock("I02~I07", "H2O_vol", 75) %>%
-  setBlock("I09~I14", "H2O_vol", 75) %>%
-  setBlock("I16~I21", "H2O_vol", 75) %>%
-  setBlock("M02~M07", "H2O_vol", 75) %>%
-  setBlock("M09~M14", "H2O_vol", 75) %>%
-  setBlock("M16~M21", "H2O_vol", 75) %>%
-  setBlock("P02~P07", "H2O_vol", 75) %>%
-  setBlock("P09~P14", "H2O_vol", 75) %>%
-  setBlock("P16~P21", "H2O_vol", 75) %>%
-  setBlock("B01", "H2O_vol", 75) %>%
-  setBlock("B08", "H2O_vol", 75) %>%
-  setBlock("B15", "H2O_vol", 75) %>%
-  setBlock("E01", "H2O_vol", 75) %>%
-  setBlock("E08", "H2O_vol", 75) %>%
-  setBlock("E15", "H2O_vol", 75) %>%
-  setBlock("H01", "H2O_vol", 75) %>%
-  setBlock("H08", "H2O_vol", 75) %>%
-  setBlock("H15", "H2O_vol", 75) %>%
-  setBlock("L01", "H2O_vol", 75) %>%
-  setBlock("L08", "H2O_vol", 75) %>%
-  setBlock("L15", "H2O_vol", 75) %>%
-  setBlock("O01", "H2O_vol", 75) %>%
-  setBlock("O08", "H2O_vol", 75) %>%
-  setBlock("O15", "H2O_vol", 75) %>%
-  setBlock("C01", "H2O_vol", 100) %>%
-  setBlock("C08", "H2O_vol", 100) %>%
-  setBlock("C15", "H2O_vol", 100) %>%
-  setBlock("F01", "H2O_vol", 100) %>%
-  setBlock("F08", "H2O_vol", 100) %>%
-  setBlock("F15", "H2O_vol", 100) %>%
-  setBlock("I01", "H2O_vol", 100) %>%
-  setBlock("I08", "H2O_vol", 100) %>%
-  setBlock("I15", "H2O_vol", 100) %>%
-  setBlock("M01", "H2O_vol", 100) %>%
-  setBlock("M08", "H2O_vol", 100) %>%
-  setBlock("M15", "H2O_vol", 100) %>%
-  setBlock("P01", "H2O_vol", 100) %>%
-  setBlock("P08", "H2O_vol", 100) %>%
-  setBlock("P15", "H2O_vol", 100)
+  set_block("A02~A07", "H2O_vol", 0) %>%
+  set_block("A09~A14", "H2O_vol", 0) %>%
+  set_block("A16~A21", "H2O_vol", 0) %>%
+  set_block("D02~D07", "H2O_vol", 0) %>%
+  set_block("D09~D14", "H2O_vol", 0) %>%
+  set_block("D16~D21", "H2O_vol", 0) %>%
+  set_block("G02~G07", "H2O_vol", 0) %>%
+  set_block("G09~G14", "H2O_vol", 0) %>%
+  set_block("G16~G21", "H2O_vol", 0) %>%
+  set_block("K02~K07", "H2O_vol", 0) %>%
+  set_block("K09~K14", "H2O_vol", 0) %>%
+  set_block("K16~K21", "H2O_vol", 0) %>%
+  set_block("N02~N07", "H2O_vol", 0) %>%
+  set_block("N09~N14", "H2O_vol", 0) %>%
+  set_block("N16~N21", "H2O_vol", 0) %>%
+  set_block("J02~J07", "H2O_vol", 25) %>%
+  set_block("J09~J14", "H2O_vol", 25) %>%
+  set_block("J16~J21", "H2O_vol", 25) %>%
+  set_block("J02~J07", "H2O_vol", 25) %>%
+  set_block("K22~K24", "H2O_vol", 25) %>%
+  set_block("L22~L24", "H2O_vol", 25) %>%
+  set_block("N22~N24", "H2O_vol", 25) %>%
+  set_block("O22~O24", "H2O_vol", 25) %>%
+  set_block("K22~K24", "H2O_vol", 25) %>%
+  set_block("A01",     "H2O_vol", 25) %>%
+  set_block("A08",     "H2O_vol", 25) %>%
+  set_block("A15",     "H2O_vol", 25) %>%
+  set_block("D01",     "H2O_vol", 25) %>%
+  set_block("D08",     "H2O_vol", 25) %>%
+  set_block("D15",     "H2O_vol", 25) %>%
+  set_block("G01",     "H2O_vol", 25) %>%
+  set_block("G08",     "H2O_vol", 25) %>%
+  set_block("G15",     "H2O_vol", 25) %>%
+  set_block("K01",     "H2O_vol", 25) %>%
+  set_block("K08",     "H2O_vol", 25) %>%
+  set_block("K15",     "H2O_vol", 25) %>%
+  set_block("N01",     "H2O_vol", 25) %>%
+  set_block("N08",     "H2O_vol", 25) %>%
+  set_block("N15",     "H2O_vol", 25) %>%
+  set_block("B02~B07", "H2O_vol", 50) %>%
+  set_block("B09~B14", "H2O_vol", 50) %>%
+  set_block("B16~B21", "H2O_vol", 50) %>%
+  set_block("E02~E07", "H2O_vol", 50) %>%
+  set_block("E09~E14", "H2O_vol", 50) %>%
+  set_block("E16~E21", "H2O_vol", 50) %>%
+  set_block("H02~H07", "H2O_vol", 50) %>%
+  set_block("H09~H14", "H2O_vol", 50) %>%
+  set_block("H16~H21", "H2O_vol", 50) %>%
+  set_block("L02~L07", "H2O_vol", 50) %>%
+  set_block("L09~L14", "H2O_vol", 50) %>%
+  set_block("L16~L21", "H2O_vol", 50) %>%
+  set_block("O02~O07", "H2O_vol", 50) %>%
+  set_block("O09~O14", "H2O_vol", 50) %>%
+  set_block("O16~O21", "H2O_vol", 50) %>%
+  set_block("M23",     "H2O_vol", 50) %>%
+  set_block("P23",     "H2O_vol", 50) %>%
+  set_block("J01",     "H2O_vol", 50) %>%
+  set_block("J08",     "H2O_vol", 50) %>%
+  set_block("J15",     "H2O_vol", 50) %>%
+  set_block("C02~C07", "H2O_vol", 75) %>%
+  set_block("C09~C14", "H2O_vol", 75) %>%
+  set_block("C16~C21", "H2O_vol", 75) %>%
+  set_block("F02~F07", "H2O_vol", 75) %>%
+  set_block("F09~F14", "H2O_vol", 75) %>%
+  set_block("F16~F21", "H2O_vol", 75) %>%
+  set_block("I02~I07", "H2O_vol", 75) %>%
+  set_block("I09~I14", "H2O_vol", 75) %>%
+  set_block("I16~I21", "H2O_vol", 75) %>%
+  set_block("M02~M07", "H2O_vol", 75) %>%
+  set_block("M09~M14", "H2O_vol", 75) %>%
+  set_block("M16~M21", "H2O_vol", 75) %>%
+  set_block("P02~P07", "H2O_vol", 75) %>%
+  set_block("P09~P14", "H2O_vol", 75) %>%
+  set_block("P16~P21", "H2O_vol", 75) %>%
+  set_block("B01",     "H2O_vol", 75) %>%
+  set_block("B08",     "H2O_vol", 75) %>%
+  set_block("B15",     "H2O_vol", 75) %>%
+  set_block("E01",     "H2O_vol", 75) %>%
+  set_block("E08",     "H2O_vol", 75) %>%
+  set_block("E15",     "H2O_vol", 75) %>%
+  set_block("H01",     "H2O_vol", 75) %>%
+  set_block("H08",     "H2O_vol", 75) %>%
+  set_block("H15",     "H2O_vol", 75) %>%
+  set_block("L01",     "H2O_vol", 75) %>%
+  set_block("L08",     "H2O_vol", 75) %>%
+  set_block("L15",     "H2O_vol", 75) %>%
+  set_block("O01",     "H2O_vol", 75) %>%
+  set_block("O08",     "H2O_vol", 75) %>%
+  set_block("O15",     "H2O_vol", 75) %>%
+  set_block("C01",     "H2O_vol", 100) %>%
+  set_block("C08",     "H2O_vol", 100) %>%
+  set_block("C15",     "H2O_vol", 100) %>%
+  set_block("F01",     "H2O_vol", 100) %>%
+  set_block("F08",     "H2O_vol", 100) %>%
+  set_block("F15",     "H2O_vol", 100) %>%
+  set_block("I01",     "H2O_vol", 100) %>%
+  set_block("I08",     "H2O_vol", 100) %>%
+  set_block("I15",     "H2O_vol", 100) %>%
+  set_block("M01",     "H2O_vol", 100) %>%
+  set_block("M08",     "H2O_vol", 100) %>%
+  set_block("M15",     "H2O_vol", 100) %>%
+  set_block("P01",     "H2O_vol", 100) %>%
+  set_block("P08",     "H2O_vol", 100) %>%
+  set_block("P15",     "H2O_vol", 100)
 ```
 
 Total volume
@@ -806,776 +817,776 @@ plate
 ```
 
 ```
-##     Well Row Col MASTER_MIX_vol     TSO TSO_vol BARCODE_ID RT_PRIMERS RT_PRIMERS_vol   RNA RNA_vol H2O_vol total_volume
-## A01  A01   A   1            350 80.0000     100          1      0.000              0 1e+02      25      25          500
-## A02  A02   A   2            350 80.0000     100          2      0.125             25 1e+02      25       0          500
-## A03  A03   A   3            350 80.0000     100          3      0.250             25 1e+02      25       0          500
-## A04  A04   A   4            350 80.0000     100          4      0.500             25 1e+02      25       0          500
-## A05  A05   A   5            350 80.0000     100          5      1.000             25 1e+02      25       0          500
-## A06  A06   A   6            350 80.0000     100          6      2.000             25 1e+02      25       0          500
-## A07  A07   A   7            350 80.0000     100          7      4.000             25 1e+02      25       0          500
-## A08  A08   A   8            350 80.0000     100          1      0.000              0 1e+01      25      25          500
-## A09  A09   A   9            350 80.0000     100          2      0.125             25 1e+01      25       0          500
-## A10  A10   A  10            350 80.0000     100          3      0.250             25 1e+01      25       0          500
-## A11  A11   A  11            350 80.0000     100          4      0.500             25 1e+01      25       0          500
-## A12  A12   A  12            350 80.0000     100          5      1.000             25 1e+01      25       0          500
-## A13  A13   A  13            350 80.0000     100          6      2.000             25 1e+01      25       0          500
-## A14  A14   A  14            350 80.0000     100          7      4.000             25 1e+01      25       0          500
-## A15  A15   A  15            350 80.0000     100          1      0.000              0 1e+00      25      25          500
-## A16  A16   A  16            350 80.0000     100          2      0.125             25 1e+00      25       0          500
-## A17  A17   A  17            350 80.0000     100          3      0.250             25 1e+00      25       0          500
-## A18  A18   A  18            350 80.0000     100          4      0.500             25 1e+00      25       0          500
-## A19  A19   A  19            350 80.0000     100          5      1.000             25 1e+00      25       0          500
-## A20  A20   A  20            350 80.0000     100          6      2.000             25 1e+00      25       0          500
-## A21  A21   A  21            350 80.0000     100          7      4.000             25 1e+00      25       0          500
-## A22  A22   A  22             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## A23  A23   A  23             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## A24  A24   A  24             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## B01  B01   B   1            350 40.0000      50          8      0.000              0 1e+02      25      75          500
-## B02  B02   B   2            350 40.0000      50          9      0.125             25 1e+02      25      50          500
-## B03  B03   B   3            350 40.0000      50         10      0.250             25 1e+02      25      50          500
-## B04  B04   B   4            350 40.0000      50         11      0.500             25 1e+02      25      50          500
-## B05  B05   B   5            350 40.0000      50         12      1.000             25 1e+02      25      50          500
-## B06  B06   B   6            350 40.0000      50         13      2.000             25 1e+02      25      50          500
-## B07  B07   B   7            350 40.0000      50         14      4.000             25 1e+02      25      50          500
-## B08  B08   B   8            350 40.0000      50          8      0.000              0 1e+01      25      75          500
-## B09  B09   B   9            350 40.0000      50          9      0.125             25 1e+01      25      50          500
-## B10  B10   B  10            350 40.0000      50         10      0.250             25 1e+01      25      50          500
-## B11  B11   B  11            350 40.0000      50         11      0.500             25 1e+01      25      50          500
-## B12  B12   B  12            350 40.0000      50         12      1.000             25 1e+01      25      50          500
-## B13  B13   B  13            350 40.0000      50         13      2.000             25 1e+01      25      50          500
-## B14  B14   B  14            350 40.0000      50         14      4.000             25 1e+01      25      50          500
-## B15  B15   B  15            350 40.0000      50          8      0.000              0 1e+00      25      75          500
-## B16  B16   B  16            350 40.0000      50          9      0.125             25 1e+00      25      50          500
-## B17  B17   B  17            350 40.0000      50         10      0.250             25 1e+00      25      50          500
-## B18  B18   B  18            350 40.0000      50         11      0.500             25 1e+00      25      50          500
-## B19  B19   B  19            350 40.0000      50         12      1.000             25 1e+00      25      50          500
-## B20  B20   B  20            350 40.0000      50         13      2.000             25 1e+00      25      50          500
-## B21  B21   B  21            350 40.0000      50         14      4.000             25 1e+00      25      50          500
-## B22  B22   B  22             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## B23  B23   B  23             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## B24  B24   B  24             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## C01  C01   C   1            350 20.0000      25         15      0.000              0 1e+02      25     100          500
-## C02  C02   C   2            350 20.0000      25         16      0.125             25 1e+02      25      75          500
-## C03  C03   C   3            350 20.0000      25         17      0.250             25 1e+02      25      75          500
-## C04  C04   C   4            350 20.0000      25         18      0.500             25 1e+02      25      75          500
-## C05  C05   C   5            350 20.0000      25         19      1.000             25 1e+02      25      75          500
-## C06  C06   C   6            350 20.0000      25         20      2.000             25 1e+02      25      75          500
-## C07  C07   C   7            350 20.0000      25         21      4.000             25 1e+02      25      75          500
-## C08  C08   C   8            350 20.0000      25         15      0.000              0 1e+01      25     100          500
-## C09  C09   C   9            350 20.0000      25         16      0.125             25 1e+01      25      75          500
-## C10  C10   C  10            350 20.0000      25         17      0.250             25 1e+01      25      75          500
-## C11  C11   C  11            350 20.0000      25         18      0.500             25 1e+01      25      75          500
-## C12  C12   C  12            350 20.0000      25         19      1.000             25 1e+01      25      75          500
-## C13  C13   C  13            350 20.0000      25         20      2.000             25 1e+01      25      75          500
-## C14  C14   C  14            350 20.0000      25         21      4.000             25 1e+01      25      75          500
-## C15  C15   C  15            350 20.0000      25         15      0.000              0 1e+00      25     100          500
-## C16  C16   C  16            350 20.0000      25         16      0.125             25 1e+00      25      75          500
-## C17  C17   C  17            350 20.0000      25         17      0.250             25 1e+00      25      75          500
-## C18  C18   C  18            350 20.0000      25         18      0.500             25 1e+00      25      75          500
-## C19  C19   C  19            350 20.0000      25         19      1.000             25 1e+00      25      75          500
-## C20  C20   C  20            350 20.0000      25         20      2.000             25 1e+00      25      75          500
-## C21  C21   C  21            350 20.0000      25         21      4.000             25 1e+00      25      75          500
-## C22  C22   C  22             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## C23  C23   C  23             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## C24  C24   C  24             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## D01  D01   D   1            350 10.0000     100         22      0.000              0 1e+02      25      25          500
-## D02  D02   D   2            350 10.0000     100         23      0.125             25 1e+02      25       0          500
-## D03  D03   D   3            350 10.0000     100         24      0.250             25 1e+02      25       0          500
-## D04  D04   D   4            350 10.0000     100         25      0.500             25 1e+02      25       0          500
-## D05  D05   D   5            350 10.0000     100         26      1.000             25 1e+02      25       0          500
-## D06  D06   D   6            350 10.0000     100         27      2.000             25 1e+02      25       0          500
-## D07  D07   D   7            350 10.0000     100         28      4.000             25 1e+02      25       0          500
-## D08  D08   D   8            350 10.0000     100         22      0.000              0 1e+01      25      25          500
-## D09  D09   D   9            350 10.0000     100         23      0.125             25 1e+01      25       0          500
-## D10  D10   D  10            350 10.0000     100         24      0.250             25 1e+01      25       0          500
-## D11  D11   D  11            350 10.0000     100         25      0.500             25 1e+01      25       0          500
-## D12  D12   D  12            350 10.0000     100         26      1.000             25 1e+01      25       0          500
-## D13  D13   D  13            350 10.0000     100         27      2.000             25 1e+01      25       0          500
-## D14  D14   D  14            350 10.0000     100         28      4.000             25 1e+01      25       0          500
-## D15  D15   D  15            350 10.0000     100         22      0.000              0 1e+00      25      25          500
-## D16  D16   D  16            350 10.0000     100         23      0.125             25 1e+00      25       0          500
-## D17  D17   D  17            350 10.0000     100         24      0.250             25 1e+00      25       0          500
-## D18  D18   D  18            350 10.0000     100         25      0.500             25 1e+00      25       0          500
-## D19  D19   D  19            350 10.0000     100         26      1.000             25 1e+00      25       0          500
-## D20  D20   D  20            350 10.0000     100         27      2.000             25 1e+00      25       0          500
-## D21  D21   D  21            350 10.0000     100         28      4.000             25 1e+00      25       0          500
-## D22  D22   D  22             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## D23  D23   D  23             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## D24  D24   D  24             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## E01  E01   E   1            350  5.0000      50         29      0.000              0 1e+02      25      75          500
-## E02  E02   E   2            350  5.0000      50         30      0.125             25 1e+02      25      50          500
-## E03  E03   E   3            350  5.0000      50         31      0.250             25 1e+02      25      50          500
-## E04  E04   E   4            350  5.0000      50         32      0.500             25 1e+02      25      50          500
-## E05  E05   E   5            350  5.0000      50         33      1.000             25 1e+02      25      50          500
-## E06  E06   E   6            350  5.0000      50         34      2.000             25 1e+02      25      50          500
-## E07  E07   E   7            350  5.0000      50         35      4.000             25 1e+02      25      50          500
-## E08  E08   E   8            350  5.0000      50         29      0.000              0 1e+01      25      75          500
-## E09  E09   E   9            350  5.0000      50         30      0.125             25 1e+01      25      50          500
-## E10  E10   E  10            350  5.0000      50         31      0.250             25 1e+01      25      50          500
-## E11  E11   E  11            350  5.0000      50         32      0.500             25 1e+01      25      50          500
-## E12  E12   E  12            350  5.0000      50         33      1.000             25 1e+01      25      50          500
-## E13  E13   E  13            350  5.0000      50         34      2.000             25 1e+01      25      50          500
-## E14  E14   E  14            350  5.0000      50         35      4.000             25 1e+01      25      50          500
-## E15  E15   E  15            350  5.0000      50         29      0.000              0 1e+00      25      75          500
-## E16  E16   E  16            350  5.0000      50         30      0.125             25 1e+00      25      50          500
-## E17  E17   E  17            350  5.0000      50         31      0.250             25 1e+00      25      50          500
-## E18  E18   E  18            350  5.0000      50         32      0.500             25 1e+00      25      50          500
-## E19  E19   E  19            350  5.0000      50         33      1.000             25 1e+00      25      50          500
-## E20  E20   E  20            350  5.0000      50         34      2.000             25 1e+00      25      50          500
-## E21  E21   E  21            350  5.0000      50         35      4.000             25 1e+00      25      50          500
-## E22  E22   E  22             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## E23  E23   E  23             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## E24  E24   E  24             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## F01  F01   F   1            350  2.5000      25         36      0.000              0 1e+02      25     100          500
-## F02  F02   F   2            350  2.5000      25         37      0.125             25 1e+02      25      75          500
-## F03  F03   F   3            350  2.5000      25         38      0.250             25 1e+02      25      75          500
-## F04  F04   F   4            350  2.5000      25         39      0.500             25 1e+02      25      75          500
-## F05  F05   F   5            350  2.5000      25         40      1.000             25 1e+02      25      75          500
-## F06  F06   F   6            350  2.5000      25         41      2.000             25 1e+02      25      75          500
-## F07  F07   F   7            350  2.5000      25         42      4.000             25 1e+02      25      75          500
-## F08  F08   F   8            350  2.5000      25         36      0.000              0 1e+01      25     100          500
-## F09  F09   F   9            350  2.5000      25         37      0.125             25 1e+01      25      75          500
-## F10  F10   F  10            350  2.5000      25         38      0.250             25 1e+01      25      75          500
-## F11  F11   F  11            350  2.5000      25         39      0.500             25 1e+01      25      75          500
-## F12  F12   F  12            350  2.5000      25         40      1.000             25 1e+01      25      75          500
-## F13  F13   F  13            350  2.5000      25         41      2.000             25 1e+01      25      75          500
-## F14  F14   F  14            350  2.5000      25         42      4.000             25 1e+01      25      75          500
-## F15  F15   F  15            350  2.5000      25         36      0.000              0 1e+00      25     100          500
-## F16  F16   F  16            350  2.5000      25         37      0.125             25 1e+00      25      75          500
-## F17  F17   F  17            350  2.5000      25         38      0.250             25 1e+00      25      75          500
-## F18  F18   F  18            350  2.5000      25         39      0.500             25 1e+00      25      75          500
-## F19  F19   F  19            350  2.5000      25         40      1.000             25 1e+00      25      75          500
-## F20  F20   F  20            350  2.5000      25         41      2.000             25 1e+00      25      75          500
-## F21  F21   F  21            350  2.5000      25         42      4.000             25 1e+00      25      75          500
-## F22  F22   F  22             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## F23  F23   F  23             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## F24  F24   F  24             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## G01  G01   G   1            350  1.2500     100         43      0.000              0 1e+02      25      25          500
-## G02  G02   G   2            350  1.2500     100         44      0.125             25 1e+02      25       0          500
-## G03  G03   G   3            350  1.2500     100         45      0.250             25 1e+02      25       0          500
-## G04  G04   G   4            350  1.2500     100         46      0.500             25 1e+02      25       0          500
-## G05  G05   G   5            350  1.2500     100         47      1.000             25 1e+02      25       0          500
-## G06  G06   G   6            350  1.2500     100         48      2.000             25 1e+02      25       0          500
-## G07  G07   G   7            350  1.2500     100         49      4.000             25 1e+02      25       0          500
-## G08  G08   G   8            350  1.2500     100         43      0.000              0 1e+01      25      25          500
-## G09  G09   G   9            350  1.2500     100         44      0.125             25 1e+01      25       0          500
-## G10  G10   G  10            350  1.2500     100         45      0.250             25 1e+01      25       0          500
-## G11  G11   G  11            350  1.2500     100         46      0.500             25 1e+01      25       0          500
-## G12  G12   G  12            350  1.2500     100         47      1.000             25 1e+01      25       0          500
-## G13  G13   G  13            350  1.2500     100         48      2.000             25 1e+01      25       0          500
-## G14  G14   G  14            350  1.2500     100         49      4.000             25 1e+01      25       0          500
-## G15  G15   G  15            350  1.2500     100         43      0.000              0 1e+00      25      25          500
-## G16  G16   G  16            350  1.2500     100         44      0.125             25 1e+00      25       0          500
-## G17  G17   G  17            350  1.2500     100         45      0.250             25 1e+00      25       0          500
-## G18  G18   G  18            350  1.2500     100         46      0.500             25 1e+00      25       0          500
-## G19  G19   G  19            350  1.2500     100         47      1.000             25 1e+00      25       0          500
-## G20  G20   G  20            350  1.2500     100         48      2.000             25 1e+00      25       0          500
-## G21  G21   G  21            350  1.2500     100         49      4.000             25 1e+00      25       0          500
-## G22  G22   G  22             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## G23  G23   G  23             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## G24  G24   G  24             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## H01  H01   H   1            350  0.6250      50         50      0.000              0 1e+02      25      75          500
-## H02  H02   H   2            350  0.6250      50         51      0.125             25 1e+02      25      50          500
-## H03  H03   H   3            350  0.6250      50         52      0.250             25 1e+02      25      50          500
-## H04  H04   H   4            350  0.6250      50         53      0.500             25 1e+02      25      50          500
-## H05  H05   H   5            350  0.6250      50         54      1.000             25 1e+02      25      50          500
-## H06  H06   H   6            350  0.6250      50         55      2.000             25 1e+02      25      50          500
-## H07  H07   H   7            350  0.6250      50         56      4.000             25 1e+02      25      50          500
-## H08  H08   H   8            350  0.6250      50         50      0.000              0 1e+01      25      75          500
-## H09  H09   H   9            350  0.6250      50         51      0.125             25 1e+01      25      50          500
-## H10  H10   H  10            350  0.6250      50         52      0.250             25 1e+01      25      50          500
-## H11  H11   H  11            350  0.6250      50         53      0.500             25 1e+01      25      50          500
-## H12  H12   H  12            350  0.6250      50         54      1.000             25 1e+01      25      50          500
-## H13  H13   H  13            350  0.6250      50         55      2.000             25 1e+01      25      50          500
-## H14  H14   H  14            350  0.6250      50         56      4.000             25 1e+01      25      50          500
-## H15  H15   H  15            350  0.6250      50         50      0.000              0 1e+00      25      75          500
-## H16  H16   H  16            350  0.6250      50         51      0.125             25 1e+00      25      50          500
-## H17  H17   H  17            350  0.6250      50         52      0.250             25 1e+00      25      50          500
-## H18  H18   H  18            350  0.6250      50         53      0.500             25 1e+00      25      50          500
-## H19  H19   H  19            350  0.6250      50         54      1.000             25 1e+00      25      50          500
-## H20  H20   H  20            350  0.6250      50         55      2.000             25 1e+00      25      50          500
-## H21  H21   H  21            350  0.6250      50         56      4.000             25 1e+00      25      50          500
-## H22  H22   H  22             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## H23  H23   H  23             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## H24  H24   H  24             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## I01  I01   I   1            350  0.3125      25         57      0.000              0 1e+02      25     100          500
-## I02  I02   I   2            350  0.3125      25         58      0.125             25 1e+02      25      75          500
-## I03  I03   I   3            350  0.3125      25         59      0.250             25 1e+02      25      75          500
-## I04  I04   I   4            350  0.3125      25         60      0.500             25 1e+02      25      75          500
-## I05  I05   I   5            350  0.3125      25         61      1.000             25 1e+02      25      75          500
-## I06  I06   I   6            350  0.3125      25         62      2.000             25 1e+02      25      75          500
-## I07  I07   I   7            350  0.3125      25         63      4.000             25 1e+02      25      75          500
-## I08  I08   I   8            350  0.3125      25         57      0.000              0 1e+01      25     100          500
-## I09  I09   I   9            350  0.3125      25         58      0.125             25 1e+01      25      75          500
-## I10  I10   I  10            350  0.3125      25         59      0.250             25 1e+01      25      75          500
-## I11  I11   I  11            350  0.3125      25         60      0.500             25 1e+01      25      75          500
-## I12  I12   I  12            350  0.3125      25         61      1.000             25 1e+01      25      75          500
-## I13  I13   I  13            350  0.3125      25         62      2.000             25 1e+01      25      75          500
-## I14  I14   I  14            350  0.3125      25         63      4.000             25 1e+01      25      75          500
-## I15  I15   I  15            350  0.3125      25         57      0.000              0 1e+00      25     100          500
-## I16  I16   I  16            350  0.3125      25         58      0.125             25 1e+00      25      75          500
-## I17  I17   I  17            350  0.3125      25         59      0.250             25 1e+00      25      75          500
-## I18  I18   I  18            350  0.3125      25         60      0.500             25 1e+00      25      75          500
-## I19  I19   I  19            350  0.3125      25         61      1.000             25 1e+00      25      75          500
-## I20  I20   I  20            350  0.3125      25         62      2.000             25 1e+00      25      75          500
-## I21  I21   I  21            350  0.3125      25         63      4.000             25 1e+00      25      75          500
-## I22  I22   I  22             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## I23  I23   I  23             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## I24  I24   I  24             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## J01  J01   J   1            350 10.0000     100         64      0.000              0 0e+00       0      50          500
-## J02  J02   J   2            350 10.0000     100         65      0.125             25 0e+00       0      25          500
-## J03  J03   J   3            350 10.0000     100         66      0.250             25 0e+00       0      25          500
-## J04  J04   J   4            350 10.0000     100         67      0.500             25 0e+00       0      25          500
-## J05  J05   J   5            350 10.0000     100         68      1.000             25 0e+00       0      25          500
-## J06  J06   J   6            350 10.0000     100         69      2.000             25 0e+00       0      25          500
-## J07  J07   J   7            350 10.0000     100         70      4.000             25 0e+00       0      25          500
-## J08  J08   J   8            350 10.0000     100         64      0.000              0 0e+00       0      50          500
-## J09  J09   J   9            350 10.0000     100         65      0.125             25 0e+00       0      25          500
-## J10  J10   J  10            350 10.0000     100         66      0.250             25 0e+00       0      25          500
-## J11  J11   J  11            350 10.0000     100         67      0.500             25 0e+00       0      25          500
-## J12  J12   J  12            350 10.0000     100         68      1.000             25 0e+00       0      25          500
-## J13  J13   J  13            350 10.0000     100         69      2.000             25 0e+00       0      25          500
-## J14  J14   J  14            350 10.0000     100         70      4.000             25 0e+00       0      25          500
-## J15  J15   J  15            350 10.0000     100         64      0.000              0 0e+00       0      50          500
-## J16  J16   J  16            350 10.0000     100         65      0.125             25 0e+00       0      25          500
-## J17  J17   J  17            350 10.0000     100         66      0.250             25 0e+00       0      25          500
-## J18  J18   J  18            350 10.0000     100         67      0.500             25 0e+00       0      25          500
-## J19  J19   J  19            350 10.0000     100         68      1.000             25 0e+00       0      25          500
-## J20  J20   J  20            350 10.0000     100         69      2.000             25 0e+00       0      25          500
-## J21  J21   J  21            350 10.0000     100         70      4.000             25 0e+00       0      25          500
-## J22  J22   J  22             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## J23  J23   J  23             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## J24  J24   J  24             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## K01  K01   K   1            350 80.0000     100          1      0.000              0 1e-01      25      25          500
-## K02  K02   K   2            350 80.0000     100          2      0.125             25 1e-01      25       0          500
-## K03  K03   K   3            350 80.0000     100          3      0.250             25 1e-01      25       0          500
-## K04  K04   K   4            350 80.0000     100          4      0.500             25 1e-01      25       0          500
-## K05  K05   K   5            350 80.0000     100          5      1.000             25 1e-01      25       0          500
-## K06  K06   K   6            350 80.0000     100          6      2.000             25 1e-01      25       0          500
-## K07  K07   K   7            350 80.0000     100          7      4.000             25 1e-01      25       0          500
-## K08  K08   K   8            350 10.0000     100         22      0.000              0 1e-01      25      25          500
-## K09  K09   K   9            350 10.0000     100         23      0.125             25 1e-01      25       0          500
-## K10  K10   K  10            350 10.0000     100         24      0.250             25 1e-01      25       0          500
-## K11  K11   K  11            350 10.0000     100         25      0.500             25 1e-01      25       0          500
-## K12  K12   K  12            350 10.0000     100         26      1.000             25 1e-01      25       0          500
-## K13  K13   K  13            350 10.0000     100         27      2.000             25 1e-01      25       0          500
-## K14  K14   K  14            350 10.0000     100         28      4.000             25 1e-01      25       0          500
-## K15  K15   K  15            350  1.2500     100         43      0.000              0 1e-01      25      25          500
-## K16  K16   K  16            350  1.2500     100         44      0.125             25 1e-01      25       0          500
-## K17  K17   K  17            350  1.2500     100         45      0.250             25 1e-01      25       0          500
-## K18  K18   K  18            350  1.2500     100         46      0.500             25 1e-01      25       0          500
-## K19  K19   K  19            350  1.2500     100         47      1.000             25 1e-01      25       0          500
-## K20  K20   K  20            350  1.2500     100         48      2.000             25 1e-01      25       0          500
-## K21  K21   K  21            350  1.2500     100         49      4.000             25 1e-01      25       0          500
-## K22  K22   K  22            350 10.0000     100         65      0.125             25 0e+00       0      25          500
-## K23  K23   K  23            350 10.0000     100         66      0.250             25 0e+00       0      25          500
-## K24  K24   K  24            350 10.0000     100         67      0.500             25 0e+00       0      25          500
-## L01  L01   L   1            350 40.0000      50          8      0.000              0 1e-01      25      75          500
-## L02  L02   L   2            350 40.0000      50          9      0.125             25 1e-01      25      50          500
-## L03  L03   L   3            350 40.0000      50         10      0.250             25 1e-01      25      50          500
-## L04  L04   L   4            350 40.0000      50         11      0.500             25 1e-01      25      50          500
-## L05  L05   L   5            350 40.0000      50         12      1.000             25 1e-01      25      50          500
-## L06  L06   L   6            350 40.0000      50         13      2.000             25 1e-01      25      50          500
-## L07  L07   L   7            350 40.0000      50         14      4.000             25 1e-01      25      50          500
-## L08  L08   L   8            350  5.0000      50         29      0.000              0 1e-01      25      75          500
-## L09  L09   L   9            350  5.0000      50         30      0.125             25 1e-01      25      50          500
-## L10  L10   L  10            350  5.0000      50         31      0.250             25 1e-01      25      50          500
-## L11  L11   L  11            350  5.0000      50         32      0.500             25 1e-01      25      50          500
-## L12  L12   L  12            350  5.0000      50         33      1.000             25 1e-01      25      50          500
-## L13  L13   L  13            350  5.0000      50         34      2.000             25 1e-01      25      50          500
-## L14  L14   L  14            350  5.0000      50         35      4.000             25 1e-01      25      50          500
-## L15  L15   L  15            350  0.6250      50         50      0.000              0 1e-01      25      75          500
-## L16  L16   L  16            350  0.6250      50         51      0.125             25 1e-01      25      50          500
-## L17  L17   L  17            350  0.6250      50         52      0.250             25 1e-01      25      50          500
-## L18  L18   L  18            350  0.6250      50         53      0.500             25 1e-01      25      50          500
-## L19  L19   L  19            350  0.6250      50         54      1.000             25 1e-01      25      50          500
-## L20  L20   L  20            350  0.6250      50         55      2.000             25 1e-01      25      50          500
-## L21  L21   L  21            350  0.6250      50         56      4.000             25 1e-01      25      50          500
-## L22  L22   L  22            350 10.0000     100         68      1.000             25 0e+00       0      25          500
-## L23  L23   L  23            350 10.0000     100         69      2.000             25 0e+00       0      25          500
-## L24  L24   L  24            350 10.0000     100         70      4.000             25 0e+00       0      25          500
-## M01  M01   M   1            350 20.0000      25         15      0.000              0 1e-01      25     100          500
-## M02  M02   M   2            350 20.0000      25         16      0.125             25 1e-01      25      75          500
-## M03  M03   M   3            350 20.0000      25         17      0.250             25 1e-01      25      75          500
-## M04  M04   M   4            350 20.0000      25         18      0.500             25 1e-01      25      75          500
-## M05  M05   M   5            350 20.0000      25         19      1.000             25 1e-01      25      75          500
-## M06  M06   M   6            350 20.0000      25         20      2.000             25 1e-01      25      75          500
-## M07  M07   M   7            350 20.0000      25         21      4.000             25 1e-01      25      75          500
-## M08  M08   M   8            350  2.5000      25         36      0.000              0 1e-01      25     100          500
-## M09  M09   M   9            350  2.5000      25         37      0.125             25 1e-01      25      75          500
-## M10  M10   M  10            350  2.5000      25         38      0.250             25 1e-01      25      75          500
-## M11  M11   M  11            350  2.5000      25         39      0.500             25 1e-01      25      75          500
-## M12  M12   M  12            350  2.5000      25         40      1.000             25 1e-01      25      75          500
-## M13  M13   M  13            350  2.5000      25         41      2.000             25 1e-01      25      75          500
-## M14  M14   M  14            350  2.5000      25         42      4.000             25 1e-01      25      75          500
-## M15  M15   M  15            350  0.3125      25         57      0.000              0 1e-01      25     100          500
-## M16  M16   M  16            350  0.3125      25         58      0.125             25 1e-01      25      75          500
-## M17  M17   M  17            350  0.3125      25         59      0.250             25 1e-01      25      75          500
-## M18  M18   M  18            350  0.3125      25         60      0.500             25 1e-01      25      75          500
-## M19  M19   M  19            350  0.3125      25         61      1.000             25 1e-01      25      75          500
-## M20  M20   M  20            350  0.3125      25         62      2.000             25 1e-01      25      75          500
-## M21  M21   M  21            350  0.3125      25         63      4.000             25 1e-01      25      75          500
-## M22  M22   M  22             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## M23  M23   M  23            350 10.0000     100         64      0.000              0 0e+00       0      50          500
-## M24  M24   M  24             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## N01  N01   N   1            350 80.0000     100          1      0.000              0 1e-02      25      25          500
-## N02  N02   N   2            350 80.0000     100          2      0.125             25 1e-02      25       0          500
-## N03  N03   N   3            350 80.0000     100          3      0.250             25 1e-02      25       0          500
-## N04  N04   N   4            350 80.0000     100          4      0.500             25 1e-02      25       0          500
-## N05  N05   N   5            350 80.0000     100          5      1.000             25 1e-02      25       0          500
-## N06  N06   N   6            350 80.0000     100          6      2.000             25 1e-02      25       0          500
-## N07  N07   N   7            350 80.0000     100          7      4.000             25 1e-02      25       0          500
-## N08  N08   N   8            350 10.0000     100         22      0.000              0 1e-02      25      25          500
-## N09  N09   N   9            350 10.0000     100         23      0.125             25 1e-02      25       0          500
-## N10  N10   N  10            350 10.0000     100         24      0.250             25 1e-02      25       0          500
-## N11  N11   N  11            350 10.0000     100         25      0.500             25 1e-02      25       0          500
-## N12  N12   N  12            350 10.0000     100         26      1.000             25 1e-02      25       0          500
-## N13  N13   N  13            350 10.0000     100         27      2.000             25 1e-02      25       0          500
-## N14  N14   N  14            350 10.0000     100         28      4.000             25 1e-02      25       0          500
-## N15  N15   N  15            350  1.2500     100         43      0.000              0 1e-02      25      25          500
-## N16  N16   N  16            350  1.2500     100         44      0.125             25 1e-02      25       0          500
-## N17  N17   N  17            350  1.2500     100         45      0.250             25 1e-02      25       0          500
-## N18  N18   N  18            350  1.2500     100         46      0.500             25 1e-02      25       0          500
-## N19  N19   N  19            350  1.2500     100         47      1.000             25 1e-02      25       0          500
-## N20  N20   N  20            350  1.2500     100         48      2.000             25 1e-02      25       0          500
-## N21  N21   N  21            350  1.2500     100         49      4.000             25 1e-02      25       0          500
-## N22  N22   N  22            350 10.0000     100         65      0.125             25 0e+00       0      25          500
-## N23  N23   N  23            350 10.0000     100         66      0.250             25 0e+00       0      25          500
-## N24  N24   N  24            350 10.0000     100         67      0.500             25 0e+00       0      25          500
-## O01  O01   O   1            350 40.0000      50          8      0.000              0 1e-02      25      75          500
-## O02  O02   O   2            350 40.0000      50          9      0.125             25 1e-02      25      50          500
-## O03  O03   O   3            350 40.0000      50         10      0.250             25 1e-02      25      50          500
-## O04  O04   O   4            350 40.0000      50         11      0.500             25 1e-02      25      50          500
-## O05  O05   O   5            350 40.0000      50         12      1.000             25 1e-02      25      50          500
-## O06  O06   O   6            350 40.0000      50         13      2.000             25 1e-02      25      50          500
-## O07  O07   O   7            350 40.0000      50         14      4.000             25 1e-02      25      50          500
-## O08  O08   O   8            350  5.0000      50         29      0.000              0 1e-02      25      75          500
-## O09  O09   O   9            350  5.0000      50         30      0.125             25 1e-02      25      50          500
-## O10  O10   O  10            350  5.0000      50         31      0.250             25 1e-02      25      50          500
-## O11  O11   O  11            350  5.0000      50         32      0.500             25 1e-02      25      50          500
-## O12  O12   O  12            350  5.0000      50         33      1.000             25 1e-02      25      50          500
-## O13  O13   O  13            350  5.0000      50         34      2.000             25 1e-02      25      50          500
-## O14  O14   O  14            350  5.0000      50         35      4.000             25 1e-02      25      50          500
-## O15  O15   O  15            350  0.6250      50         50      0.000              0 1e-02      25      75          500
-## O16  O16   O  16            350  0.6250      50         51      0.125             25 1e-02      25      50          500
-## O17  O17   O  17            350  0.6250      50         52      0.250             25 1e-02      25      50          500
-## O18  O18   O  18            350  0.6250      50         53      0.500             25 1e-02      25      50          500
-## O19  O19   O  19            350  0.6250      50         54      1.000             25 1e-02      25      50          500
-## O20  O20   O  20            350  0.6250      50         55      2.000             25 1e-02      25      50          500
-## O21  O21   O  21            350  0.6250      50         56      4.000             25 1e-02      25      50          500
-## O22  O22   O  22            350 10.0000     100         68      1.000             25 0e+00       0      25          500
-## O23  O23   O  23            350 10.0000     100         69      2.000             25 0e+00       0      25          500
-## O24  O24   O  24            350 10.0000     100         70      4.000             25 0e+00       0      25          500
-## P01  P01   P   1            350 20.0000      25         15      0.000              0 1e-02      25     100          500
-## P02  P02   P   2            350 20.0000      25         16      0.125             25 1e-02      25      75          500
-## P03  P03   P   3            350 20.0000      25         17      0.250             25 1e-02      25      75          500
-## P04  P04   P   4            350 20.0000      25         18      0.500             25 1e-02      25      75          500
-## P05  P05   P   5            350 20.0000      25         19      1.000             25 1e-02      25      75          500
-## P06  P06   P   6            350 20.0000      25         20      2.000             25 1e-02      25      75          500
-## P07  P07   P   7            350 20.0000      25         21      4.000             25 1e-02      25      75          500
-## P08  P08   P   8            350  2.5000      25         36      0.000              0 1e-02      25     100          500
-## P09  P09   P   9            350  2.5000      25         37      0.125             25 1e-02      25      75          500
-## P10  P10   P  10            350  2.5000      25         38      0.250             25 1e-02      25      75          500
-## P11  P11   P  11            350  2.5000      25         39      0.500             25 1e-02      25      75          500
-## P12  P12   P  12            350  2.5000      25         40      1.000             25 1e-02      25      75          500
-## P13  P13   P  13            350  2.5000      25         41      2.000             25 1e-02      25      75          500
-## P14  P14   P  14            350  2.5000      25         42      4.000             25 1e-02      25      75          500
-## P15  P15   P  15            350  0.3125      25         57      0.000              0 1e-02      25     100          500
-## P16  P16   P  16            350  0.3125      25         58      0.125             25 1e-02      25      75          500
-## P17  P17   P  17            350  0.3125      25         59      0.250             25 1e-02      25      75          500
-## P18  P18   P  18            350  0.3125      25         60      0.500             25 1e-02      25      75          500
-## P19  P19   P  19            350  0.3125      25         61      1.000             25 1e-02      25      75          500
-## P20  P20   P  20            350  0.3125      25         62      2.000             25 1e-02      25      75          500
-## P21  P21   P  21            350  0.3125      25         63      4.000             25 1e-02      25      75          500
-## P22  P22   P  22             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-## P23  P23   P  23            350 10.0000     100         64      0.000              0 0e+00       0      50          500
-## P24  P24   P  24             NA      NA      NA         NA         NA             NA    NA      NA      NA           NA
-##     PRIMERS_RATIO
-## A01 no_RT_PRIMERS
-## A02           640
-## A03           320
-## A04           160
-## A05            80
-## A06            40
-## A07            20
-## A08 no_RT_PRIMERS
-## A09           640
-## A10           320
-## A11           160
-## A12            80
-## A13            40
-## A14            20
-## A15 no_RT_PRIMERS
-## A16           640
-## A17           320
-## A18           160
-## A19            80
-## A20            40
-## A21            20
-## A22          <NA>
-## A23          <NA>
-## A24          <NA>
-## B01 no_RT_PRIMERS
-## B02           320
-## B03           160
-## B04            80
-## B05            40
-## B06            20
-## B07            10
-## B08 no_RT_PRIMERS
-## B09           320
-## B10           160
-## B11            80
-## B12            40
-## B13            20
-## B14            10
-## B15 no_RT_PRIMERS
-## B16           320
-## B17           160
-## B18            80
-## B19            40
-## B20            20
-## B21            10
-## B22          <NA>
-## B23          <NA>
-## B24          <NA>
-## C01 no_RT_PRIMERS
-## C02           160
-## C03            80
-## C04            40
-## C05            20
-## C06            10
-## C07             5
-## C08 no_RT_PRIMERS
-## C09           160
-## C10            80
-## C11            40
-## C12            20
-## C13            10
-## C14             5
-## C15 no_RT_PRIMERS
-## C16           160
-## C17            80
-## C18            40
-## C19            20
-## C20            10
-## C21             5
-## C22          <NA>
-## C23          <NA>
-## C24          <NA>
-## D01 no_RT_PRIMERS
-## D02            80
-## D03            40
-## D04            20
-## D05            10
-## D06             5
-## D07           2.5
-## D08 no_RT_PRIMERS
-## D09            80
-## D10            40
-## D11            20
-## D12            10
-## D13             5
-## D14           2.5
-## D15 no_RT_PRIMERS
-## D16            80
-## D17            40
-## D18            20
-## D19            10
-## D20             5
-## D21           2.5
-## D22          <NA>
-## D23          <NA>
-## D24          <NA>
-## E01 no_RT_PRIMERS
-## E02            40
-## E03            20
-## E04            10
-## E05             5
-## E06           2.5
-## E07          1.25
-## E08 no_RT_PRIMERS
-## E09            40
-## E10            20
-## E11            10
-## E12             5
-## E13           2.5
-## E14          1.25
-## E15 no_RT_PRIMERS
-## E16            40
-## E17            20
-## E18            10
-## E19             5
-## E20           2.5
-## E21          1.25
-## E22          <NA>
-## E23          <NA>
-## E24          <NA>
-## F01 no_RT_PRIMERS
-## F02            20
-## F03            10
-## F04             5
-## F05           2.5
-## F06          1.25
-## F07         0.625
-## F08 no_RT_PRIMERS
-## F09            20
-## F10            10
-## F11             5
-## F12           2.5
-## F13          1.25
-## F14         0.625
-## F15 no_RT_PRIMERS
-## F16            20
-## F17            10
-## F18             5
-## F19           2.5
-## F20          1.25
-## F21         0.625
-## F22          <NA>
-## F23          <NA>
-## F24          <NA>
-## G01 no_RT_PRIMERS
-## G02            10
-## G03             5
-## G04           2.5
-## G05          1.25
-## G06         0.625
-## G07        0.3125
-## G08 no_RT_PRIMERS
-## G09            10
-## G10             5
-## G11           2.5
-## G12          1.25
-## G13         0.625
-## G14        0.3125
-## G15 no_RT_PRIMERS
-## G16            10
-## G17             5
-## G18           2.5
-## G19          1.25
-## G20         0.625
-## G21        0.3125
-## G22          <NA>
-## G23          <NA>
-## G24          <NA>
-## H01 no_RT_PRIMERS
-## H02             5
-## H03           2.5
-## H04          1.25
-## H05         0.625
-## H06        0.3125
-## H07       0.15625
-## H08 no_RT_PRIMERS
-## H09             5
-## H10           2.5
-## H11          1.25
-## H12         0.625
-## H13        0.3125
-## H14       0.15625
-## H15 no_RT_PRIMERS
-## H16             5
-## H17           2.5
-## H18          1.25
-## H19         0.625
-## H20        0.3125
-## H21       0.15625
-## H22          <NA>
-## H23          <NA>
-## H24          <NA>
-## I01 no_RT_PRIMERS
-## I02           2.5
-## I03          1.25
-## I04         0.625
-## I05        0.3125
-## I06       0.15625
-## I07      0.078125
-## I08 no_RT_PRIMERS
-## I09           2.5
-## I10          1.25
-## I11         0.625
-## I12        0.3125
-## I13       0.15625
-## I14      0.078125
-## I15 no_RT_PRIMERS
-## I16           2.5
-## I17          1.25
-## I18         0.625
-## I19        0.3125
-## I20       0.15625
-## I21      0.078125
-## I22          <NA>
-## I23          <NA>
-## I24          <NA>
-## J01 no_RT_PRIMERS
-## J02            80
-## J03            40
-## J04            20
-## J05            10
-## J06             5
-## J07           2.5
-## J08 no_RT_PRIMERS
-## J09            80
-## J10            40
-## J11            20
-## J12            10
-## J13             5
-## J14           2.5
-## J15 no_RT_PRIMERS
-## J16            80
-## J17            40
-## J18            20
-## J19            10
-## J20             5
-## J21           2.5
-## J22          <NA>
-## J23          <NA>
-## J24          <NA>
-## K01 no_RT_PRIMERS
-## K02           640
-## K03           320
-## K04           160
-## K05            80
-## K06            40
-## K07            20
-## K08 no_RT_PRIMERS
-## K09            80
-## K10            40
-## K11            20
-## K12            10
-## K13             5
-## K14           2.5
-## K15 no_RT_PRIMERS
-## K16            10
-## K17             5
-## K18           2.5
-## K19          1.25
-## K20         0.625
-## K21        0.3125
-## K22            80
-## K23            40
-## K24            20
-## L01 no_RT_PRIMERS
-## L02           320
-## L03           160
-## L04            80
-## L05            40
-## L06            20
-## L07            10
-## L08 no_RT_PRIMERS
-## L09            40
-## L10            20
-## L11            10
-## L12             5
-## L13           2.5
-## L14          1.25
-## L15 no_RT_PRIMERS
-## L16             5
-## L17           2.5
-## L18          1.25
-## L19         0.625
-## L20        0.3125
-## L21       0.15625
-## L22            10
-## L23             5
-## L24           2.5
-## M01 no_RT_PRIMERS
-## M02           160
-## M03            80
-## M04            40
-## M05            20
-## M06            10
-## M07             5
-## M08 no_RT_PRIMERS
-## M09            20
-## M10            10
-## M11             5
-## M12           2.5
-## M13          1.25
-## M14         0.625
-## M15 no_RT_PRIMERS
-## M16           2.5
-## M17          1.25
-## M18         0.625
-## M19        0.3125
-## M20       0.15625
-## M21      0.078125
-## M22          <NA>
-## M23 no_RT_PRIMERS
-## M24          <NA>
-## N01 no_RT_PRIMERS
-## N02           640
-## N03           320
-## N04           160
-## N05            80
-## N06            40
-## N07            20
-## N08 no_RT_PRIMERS
-## N09            80
-## N10            40
-## N11            20
-## N12            10
-## N13             5
-## N14           2.5
-## N15 no_RT_PRIMERS
-## N16            10
-## N17             5
-## N18           2.5
-## N19          1.25
-## N20         0.625
-## N21        0.3125
-## N22            80
-## N23            40
-## N24            20
-## O01 no_RT_PRIMERS
-## O02           320
-## O03           160
-## O04            80
-## O05            40
-## O06            20
-## O07            10
-## O08 no_RT_PRIMERS
-## O09            40
-## O10            20
-## O11            10
-## O12             5
-## O13           2.5
-## O14          1.25
-## O15 no_RT_PRIMERS
-## O16             5
-## O17           2.5
-## O18          1.25
-## O19         0.625
-## O20        0.3125
-## O21       0.15625
-## O22            10
-## O23             5
-## O24           2.5
-## P01 no_RT_PRIMERS
-## P02           160
-## P03            80
-## P04            40
-## P05            20
-## P06            10
-## P07             5
-## P08 no_RT_PRIMERS
-## P09            20
-## P10            10
-## P11             5
-## P12           2.5
-## P13          1.25
-## P14         0.625
-## P15 no_RT_PRIMERS
-## P16           2.5
-## P17          1.25
-## P18         0.625
-## P19        0.3125
-## P20       0.15625
-## P21      0.078125
-## P22          <NA>
-## P23 no_RT_PRIMERS
-## P24          <NA>
+##     well row col MASTER_MIX_vol     TSO TSO_vol BARCODE_ID BARCODE_SEQ RT_PRIMERS RT_PRIMERS_vol
+## A01  A01   A   1            350 80.0000     100          1      ACACAG      0.000              0
+## A02  A02   A   2            350 80.0000     100          2      ACACGT      0.125             25
+## A03  A03   A   3            350 80.0000     100          3      ACACTC      0.250             25
+## A04  A04   A   4            350 80.0000     100          4      ACAGAT      0.500             25
+## A05  A05   A   5            350 80.0000     100          5      ACAGCA      1.000             25
+## A06  A06   A   6            350 80.0000     100          6      ACAGTG      2.000             25
+## A07  A07   A   7            350 80.0000     100          7      ACATAC      4.000             25
+## A08  A08   A   8            350 80.0000     100          1      ACACAG      0.000              0
+## A09  A09   A   9            350 80.0000     100          2      ACACGT      0.125             25
+## A10  A10   A  10            350 80.0000     100          3      ACACTC      0.250             25
+## A11  A11   A  11            350 80.0000     100          4      ACAGAT      0.500             25
+## A12  A12   A  12            350 80.0000     100          5      ACAGCA      1.000             25
+## A13  A13   A  13            350 80.0000     100          6      ACAGTG      2.000             25
+## A14  A14   A  14            350 80.0000     100          7      ACATAC      4.000             25
+## A15  A15   A  15            350 80.0000     100          1      ACACAG      0.000              0
+## A16  A16   A  16            350 80.0000     100          2      ACACGT      0.125             25
+## A17  A17   A  17            350 80.0000     100          3      ACACTC      0.250             25
+## A18  A18   A  18            350 80.0000     100          4      ACAGAT      0.500             25
+## A19  A19   A  19            350 80.0000     100          5      ACAGCA      1.000             25
+## A20  A20   A  20            350 80.0000     100          6      ACAGTG      2.000             25
+## A21  A21   A  21            350 80.0000     100          7      ACATAC      4.000             25
+## A22  A22   A  22             NA      NA      NA         NA        <NA>         NA             NA
+## A23  A23   A  23             NA      NA      NA         NA        <NA>         NA             NA
+## A24  A24   A  24             NA      NA      NA         NA        <NA>         NA             NA
+## B01  B01   B   1            350 40.0000      50          8      ACATCT      0.000              0
+## B02  B02   B   2            350 40.0000      50          9      ACATGA      0.125             25
+## B03  B03   B   3            350 40.0000      50         10      AGTACG      0.250             25
+## B04  B04   B   4            350 40.0000      50         11      AGTAGC      0.500             25
+## B05  B05   B   5            350 40.0000      50         12      AGTATA      1.000             25
+## B06  B06   B   6            350 40.0000      50         13      AGTCAG      2.000             25
+## B07  B07   B   7            350 40.0000      50         14      AGTCGT      4.000             25
+## B08  B08   B   8            350 40.0000      50          8      ACATCT      0.000              0
+## B09  B09   B   9            350 40.0000      50          9      ACATGA      0.125             25
+## B10  B10   B  10            350 40.0000      50         10      AGTACG      0.250             25
+## B11  B11   B  11            350 40.0000      50         11      AGTAGC      0.500             25
+## B12  B12   B  12            350 40.0000      50         12      AGTATA      1.000             25
+## B13  B13   B  13            350 40.0000      50         13      AGTCAG      2.000             25
+## B14  B14   B  14            350 40.0000      50         14      AGTCGT      4.000             25
+## B15  B15   B  15            350 40.0000      50          8      ACATCT      0.000              0
+## B16  B16   B  16            350 40.0000      50          9      ACATGA      0.125             25
+## B17  B17   B  17            350 40.0000      50         10      AGTACG      0.250             25
+## B18  B18   B  18            350 40.0000      50         11      AGTAGC      0.500             25
+## B19  B19   B  19            350 40.0000      50         12      AGTATA      1.000             25
+## B20  B20   B  20            350 40.0000      50         13      AGTCAG      2.000             25
+## B21  B21   B  21            350 40.0000      50         14      AGTCGT      4.000             25
+## B22  B22   B  22             NA      NA      NA         NA        <NA>         NA             NA
+## B23  B23   B  23             NA      NA      NA         NA        <NA>         NA             NA
+## B24  B24   B  24             NA      NA      NA         NA        <NA>         NA             NA
+## C01  C01   C   1            350 20.0000      25         15      AGTCTC      0.000              0
+## C02  C02   C   2            350 20.0000      25         16      AGTGAT      0.125             25
+## C03  C03   C   3            350 20.0000      25         17      AGTGCA      0.250             25
+## C04  C04   C   4            350 20.0000      25         18      AGTGTG      0.500             25
+## C05  C05   C   5            350 20.0000      25         19      ATCACG      1.000             25
+## C06  C06   C   6            350 20.0000      25         20      ATCAGC      2.000             25
+## C07  C07   C   7            350 20.0000      25         21      ATCATA      4.000             25
+## C08  C08   C   8            350 20.0000      25         15      AGTCTC      0.000              0
+## C09  C09   C   9            350 20.0000      25         16      AGTGAT      0.125             25
+## C10  C10   C  10            350 20.0000      25         17      AGTGCA      0.250             25
+## C11  C11   C  11            350 20.0000      25         18      AGTGTG      0.500             25
+## C12  C12   C  12            350 20.0000      25         19      ATCACG      1.000             25
+## C13  C13   C  13            350 20.0000      25         20      ATCAGC      2.000             25
+## C14  C14   C  14            350 20.0000      25         21      ATCATA      4.000             25
+## C15  C15   C  15            350 20.0000      25         15      AGTCTC      0.000              0
+## C16  C16   C  16            350 20.0000      25         16      AGTGAT      0.125             25
+## C17  C17   C  17            350 20.0000      25         17      AGTGCA      0.250             25
+## C18  C18   C  18            350 20.0000      25         18      AGTGTG      0.500             25
+## C19  C19   C  19            350 20.0000      25         19      ATCACG      1.000             25
+## C20  C20   C  20            350 20.0000      25         20      ATCAGC      2.000             25
+## C21  C21   C  21            350 20.0000      25         21      ATCATA      4.000             25
+## C22  C22   C  22             NA      NA      NA         NA        <NA>         NA             NA
+## C23  C23   C  23             NA      NA      NA         NA        <NA>         NA             NA
+## C24  C24   C  24             NA      NA      NA         NA        <NA>         NA             NA
+## D01  D01   D   1            350 10.0000     100         22      ATCGAT      0.000              0
+## D02  D02   D   2            350 10.0000     100         23      ATCGCA      0.125             25
+## D03  D03   D   3            350 10.0000     100         24      ATCGTG      0.250             25
+## D04  D04   D   4            350 10.0000     100         25      ATCTAC      0.500             25
+## D05  D05   D   5            350 10.0000     100         26      ATCTCT      1.000             25
+## D06  D06   D   6            350 10.0000     100         27      ATCTGA      2.000             25
+## D07  D07   D   7            350 10.0000     100         28      CACACG      4.000             25
+## D08  D08   D   8            350 10.0000     100         22      ATCGAT      0.000              0
+## D09  D09   D   9            350 10.0000     100         23      ATCGCA      0.125             25
+## D10  D10   D  10            350 10.0000     100         24      ATCGTG      0.250             25
+## D11  D11   D  11            350 10.0000     100         25      ATCTAC      0.500             25
+## D12  D12   D  12            350 10.0000     100         26      ATCTCT      1.000             25
+## D13  D13   D  13            350 10.0000     100         27      ATCTGA      2.000             25
+## D14  D14   D  14            350 10.0000     100         28      CACACG      4.000             25
+## D15  D15   D  15            350 10.0000     100         22      ATCGAT      0.000              0
+## D16  D16   D  16            350 10.0000     100         23      ATCGCA      0.125             25
+## D17  D17   D  17            350 10.0000     100         24      ATCGTG      0.250             25
+## D18  D18   D  18            350 10.0000     100         25      ATCTAC      0.500             25
+## D19  D19   D  19            350 10.0000     100         26      ATCTCT      1.000             25
+## D20  D20   D  20            350 10.0000     100         27      ATCTGA      2.000             25
+## D21  D21   D  21            350 10.0000     100         28      CACACG      4.000             25
+## D22  D22   D  22             NA      NA      NA         NA        <NA>         NA             NA
+## D23  D23   D  23             NA      NA      NA         NA        <NA>         NA             NA
+## D24  D24   D  24             NA      NA      NA         NA        <NA>         NA             NA
+## E01  E01   E   1            350  5.0000      50         29      CACAGC      0.000              0
+## E02  E02   E   2            350  5.0000      50         30      CACATA      0.125             25
+## E03  E03   E   3            350  5.0000      50         31      CACGAT      0.250             25
+## E04  E04   E   4            350  5.0000      50         32      CACGCA      0.500             25
+## E05  E05   E   5            350  5.0000      50         33      CACGTG      1.000             25
+## E06  E06   E   6            350  5.0000      50         34      CACTAC      2.000             25
+## E07  E07   E   7            350  5.0000      50         35      CACTCT      4.000             25
+## E08  E08   E   8            350  5.0000      50         29      CACAGC      0.000              0
+## E09  E09   E   9            350  5.0000      50         30      CACATA      0.125             25
+## E10  E10   E  10            350  5.0000      50         31      CACGAT      0.250             25
+## E11  E11   E  11            350  5.0000      50         32      CACGCA      0.500             25
+## E12  E12   E  12            350  5.0000      50         33      CACGTG      1.000             25
+## E13  E13   E  13            350  5.0000      50         34      CACTAC      2.000             25
+## E14  E14   E  14            350  5.0000      50         35      CACTCT      4.000             25
+## E15  E15   E  15            350  5.0000      50         29      CACAGC      0.000              0
+## E16  E16   E  16            350  5.0000      50         30      CACATA      0.125             25
+## E17  E17   E  17            350  5.0000      50         31      CACGAT      0.250             25
+## E18  E18   E  18            350  5.0000      50         32      CACGCA      0.500             25
+## E19  E19   E  19            350  5.0000      50         33      CACGTG      1.000             25
+## E20  E20   E  20            350  5.0000      50         34      CACTAC      2.000             25
+## E21  E21   E  21            350  5.0000      50         35      CACTCT      4.000             25
+## E22  E22   E  22             NA      NA      NA         NA        <NA>         NA             NA
+## E23  E23   E  23             NA      NA      NA         NA        <NA>         NA             NA
+## E24  E24   E  24             NA      NA      NA         NA        <NA>         NA             NA
+## F01  F01   F   1            350  2.5000      25         36      CACTGA      0.000              0
+## F02  F02   F   2            350  2.5000      25         37      CGACAG      0.125             25
+## F03  F03   F   3            350  2.5000      25         38      CGACGT      0.250             25
+## F04  F04   F   4            350  2.5000      25         39      CGACTC      0.500             25
+## F05  F05   F   5            350  2.5000      25         40      CGAGAT      1.000             25
+## F06  F06   F   6            350  2.5000      25         41      CGAGCA      2.000             25
+## F07  F07   F   7            350  2.5000      25         42      CGAGTG      4.000             25
+## F08  F08   F   8            350  2.5000      25         36      CACTGA      0.000              0
+## F09  F09   F   9            350  2.5000      25         37      CGACAG      0.125             25
+## F10  F10   F  10            350  2.5000      25         38      CGACGT      0.250             25
+## F11  F11   F  11            350  2.5000      25         39      CGACTC      0.500             25
+## F12  F12   F  12            350  2.5000      25         40      CGAGAT      1.000             25
+## F13  F13   F  13            350  2.5000      25         41      CGAGCA      2.000             25
+## F14  F14   F  14            350  2.5000      25         42      CGAGTG      4.000             25
+## F15  F15   F  15            350  2.5000      25         36      CACTGA      0.000              0
+## F16  F16   F  16            350  2.5000      25         37      CGACAG      0.125             25
+## F17  F17   F  17            350  2.5000      25         38      CGACGT      0.250             25
+## F18  F18   F  18            350  2.5000      25         39      CGACTC      0.500             25
+## F19  F19   F  19            350  2.5000      25         40      CGAGAT      1.000             25
+## F20  F20   F  20            350  2.5000      25         41      CGAGCA      2.000             25
+## F21  F21   F  21            350  2.5000      25         42      CGAGTG      4.000             25
+## F22  F22   F  22             NA      NA      NA         NA        <NA>         NA             NA
+## F23  F23   F  23             NA      NA      NA         NA        <NA>         NA             NA
+## F24  F24   F  24             NA      NA      NA         NA        <NA>         NA             NA
+## G01  G01   G   1            350  1.2500     100         43      CGATAC      0.000              0
+## G02  G02   G   2            350  1.2500     100         44      CGATCT      0.125             25
+## G03  G03   G   3            350  1.2500     100         45      CGATGA      0.250             25
+## G04  G04   G   4            350  1.2500     100         46      CTGACG      0.500             25
+## G05  G05   G   5            350  1.2500     100         47      CTGAGC      1.000             25
+## G06  G06   G   6            350  1.2500     100         48      CTGATA      2.000             25
+## G07  G07   G   7            350  1.2500     100         49      CTGCAG      4.000             25
+## G08  G08   G   8            350  1.2500     100         43      CGATAC      0.000              0
+## G09  G09   G   9            350  1.2500     100         44      CGATCT      0.125             25
+## G10  G10   G  10            350  1.2500     100         45      CGATGA      0.250             25
+## G11  G11   G  11            350  1.2500     100         46      CTGACG      0.500             25
+## G12  G12   G  12            350  1.2500     100         47      CTGAGC      1.000             25
+## G13  G13   G  13            350  1.2500     100         48      CTGATA      2.000             25
+## G14  G14   G  14            350  1.2500     100         49      CTGCAG      4.000             25
+## G15  G15   G  15            350  1.2500     100         43      CGATAC      0.000              0
+## G16  G16   G  16            350  1.2500     100         44      CGATCT      0.125             25
+## G17  G17   G  17            350  1.2500     100         45      CGATGA      0.250             25
+## G18  G18   G  18            350  1.2500     100         46      CTGACG      0.500             25
+## G19  G19   G  19            350  1.2500     100         47      CTGAGC      1.000             25
+## G20  G20   G  20            350  1.2500     100         48      CTGATA      2.000             25
+## G21  G21   G  21            350  1.2500     100         49      CTGCAG      4.000             25
+## G22  G22   G  22             NA      NA      NA         NA        <NA>         NA             NA
+## G23  G23   G  23             NA      NA      NA         NA        <NA>         NA             NA
+## G24  G24   G  24             NA      NA      NA         NA        <NA>         NA             NA
+## H01  H01   H   1            350  0.6250      50         50      CTGCGT      0.000              0
+## H02  H02   H   2            350  0.6250      50         51      CTGCTC      0.125             25
+## H03  H03   H   3            350  0.6250      50         52      CTGTAC      0.250             25
+## H04  H04   H   4            350  0.6250      50         53      CTGTCT      0.500             25
+## H05  H05   H   5            350  0.6250      50         54      CTGTGA      1.000             25
+## H06  H06   H   6            350  0.6250      50         55      GAGACG      2.000             25
+## H07  H07   H   7            350  0.6250      50         56      GAGAGC      4.000             25
+## H08  H08   H   8            350  0.6250      50         50      CTGCGT      0.000              0
+## H09  H09   H   9            350  0.6250      50         51      CTGCTC      0.125             25
+## H10  H10   H  10            350  0.6250      50         52      CTGTAC      0.250             25
+## H11  H11   H  11            350  0.6250      50         53      CTGTCT      0.500             25
+## H12  H12   H  12            350  0.6250      50         54      CTGTGA      1.000             25
+## H13  H13   H  13            350  0.6250      50         55      GAGACG      2.000             25
+## H14  H14   H  14            350  0.6250      50         56      GAGAGC      4.000             25
+## H15  H15   H  15            350  0.6250      50         50      CTGCGT      0.000              0
+## H16  H16   H  16            350  0.6250      50         51      CTGCTC      0.125             25
+## H17  H17   H  17            350  0.6250      50         52      CTGTAC      0.250             25
+## H18  H18   H  18            350  0.6250      50         53      CTGTCT      0.500             25
+## H19  H19   H  19            350  0.6250      50         54      CTGTGA      1.000             25
+## H20  H20   H  20            350  0.6250      50         55      GAGACG      2.000             25
+## H21  H21   H  21            350  0.6250      50         56      GAGAGC      4.000             25
+## H22  H22   H  22             NA      NA      NA         NA        <NA>         NA             NA
+## H23  H23   H  23             NA      NA      NA         NA        <NA>         NA             NA
+## H24  H24   H  24             NA      NA      NA         NA        <NA>         NA             NA
+## I01  I01   I   1            350  0.3125      25         57      GAGATA      0.000              0
+## I02  I02   I   2            350  0.3125      25         58      GAGCAG      0.125             25
+## I03  I03   I   3            350  0.3125      25         59      GAGCGT      0.250             25
+## I04  I04   I   4            350  0.3125      25         60      GAGCTC      0.500             25
+## I05  I05   I   5            350  0.3125      25         61      GAGTAC      1.000             25
+## I06  I06   I   6            350  0.3125      25         62      GAGTCT      2.000             25
+## I07  I07   I   7            350  0.3125      25         63      GAGTGA      4.000             25
+## I08  I08   I   8            350  0.3125      25         57      GAGATA      0.000              0
+## I09  I09   I   9            350  0.3125      25         58      GAGCAG      0.125             25
+## I10  I10   I  10            350  0.3125      25         59      GAGCGT      0.250             25
+## I11  I11   I  11            350  0.3125      25         60      GAGCTC      0.500             25
+## I12  I12   I  12            350  0.3125      25         61      GAGTAC      1.000             25
+## I13  I13   I  13            350  0.3125      25         62      GAGTCT      2.000             25
+## I14  I14   I  14            350  0.3125      25         63      GAGTGA      4.000             25
+## I15  I15   I  15            350  0.3125      25         57      GAGATA      0.000              0
+## I16  I16   I  16            350  0.3125      25         58      GAGCAG      0.125             25
+## I17  I17   I  17            350  0.3125      25         59      GAGCGT      0.250             25
+## I18  I18   I  18            350  0.3125      25         60      GAGCTC      0.500             25
+## I19  I19   I  19            350  0.3125      25         61      GAGTAC      1.000             25
+## I20  I20   I  20            350  0.3125      25         62      GAGTCT      2.000             25
+## I21  I21   I  21            350  0.3125      25         63      GAGTGA      4.000             25
+## I22  I22   I  22             NA      NA      NA         NA        <NA>         NA             NA
+## I23  I23   I  23             NA      NA      NA         NA        <NA>         NA             NA
+## I24  I24   I  24             NA      NA      NA         NA        <NA>         NA             NA
+## J01  J01   J   1            350 10.0000     100         64      GCTACG      0.000              0
+## J02  J02   J   2            350 10.0000     100         65      GCTAGC      0.125             25
+## J03  J03   J   3            350 10.0000     100         66      GCTATA      0.250             25
+## J04  J04   J   4            350 10.0000     100         67      GCTCAG      0.500             25
+## J05  J05   J   5            350 10.0000     100         68      GCTCGT      1.000             25
+## J06  J06   J   6            350 10.0000     100         69      GCTCTC      2.000             25
+## J07  J07   J   7            350 10.0000     100         70      GCTGAT      4.000             25
+## J08  J08   J   8            350 10.0000     100         64      GCTACG      0.000              0
+## J09  J09   J   9            350 10.0000     100         65      GCTAGC      0.125             25
+## J10  J10   J  10            350 10.0000     100         66      GCTATA      0.250             25
+## J11  J11   J  11            350 10.0000     100         67      GCTCAG      0.500             25
+## J12  J12   J  12            350 10.0000     100         68      GCTCGT      1.000             25
+## J13  J13   J  13            350 10.0000     100         69      GCTCTC      2.000             25
+## J14  J14   J  14            350 10.0000     100         70      GCTGAT      4.000             25
+## J15  J15   J  15            350 10.0000     100         64      GCTACG      0.000              0
+## J16  J16   J  16            350 10.0000     100         65      GCTAGC      0.125             25
+## J17  J17   J  17            350 10.0000     100         66      GCTATA      0.250             25
+## J18  J18   J  18            350 10.0000     100         67      GCTCAG      0.500             25
+## J19  J19   J  19            350 10.0000     100         68      GCTCGT      1.000             25
+## J20  J20   J  20            350 10.0000     100         69      GCTCTC      2.000             25
+## J21  J21   J  21            350 10.0000     100         70      GCTGAT      4.000             25
+## J22  J22   J  22             NA      NA      NA         NA        <NA>         NA             NA
+## J23  J23   J  23             NA      NA      NA         NA        <NA>         NA             NA
+## J24  J24   J  24             NA      NA      NA         NA        <NA>         NA             NA
+## K01  K01   K   1            350 80.0000     100          1      ACACAG      0.000              0
+## K02  K02   K   2            350 80.0000     100          2      ACACGT      0.125             25
+## K03  K03   K   3            350 80.0000     100          3      ACACTC      0.250             25
+## K04  K04   K   4            350 80.0000     100          4      ACAGAT      0.500             25
+## K05  K05   K   5            350 80.0000     100          5      ACAGCA      1.000             25
+## K06  K06   K   6            350 80.0000     100          6      ACAGTG      2.000             25
+## K07  K07   K   7            350 80.0000     100          7      ACATAC      4.000             25
+## K08  K08   K   8            350 10.0000     100         22      ATCGAT      0.000              0
+## K09  K09   K   9            350 10.0000     100         23      ATCGCA      0.125             25
+## K10  K10   K  10            350 10.0000     100         24      ATCGTG      0.250             25
+## K11  K11   K  11            350 10.0000     100         25      ATCTAC      0.500             25
+## K12  K12   K  12            350 10.0000     100         26      ATCTCT      1.000             25
+## K13  K13   K  13            350 10.0000     100         27      ATCTGA      2.000             25
+## K14  K14   K  14            350 10.0000     100         28      CACACG      4.000             25
+## K15  K15   K  15            350  1.2500     100         43      CGATAC      0.000              0
+## K16  K16   K  16            350  1.2500     100         44      CGATCT      0.125             25
+## K17  K17   K  17            350  1.2500     100         45      CGATGA      0.250             25
+## K18  K18   K  18            350  1.2500     100         46      CTGACG      0.500             25
+## K19  K19   K  19            350  1.2500     100         47      CTGAGC      1.000             25
+## K20  K20   K  20            350  1.2500     100         48      CTGATA      2.000             25
+## K21  K21   K  21            350  1.2500     100         49      CTGCAG      4.000             25
+## K22  K22   K  22            350 10.0000     100         65      GCTAGC      0.125             25
+## K23  K23   K  23            350 10.0000     100         66      GCTATA      0.250             25
+## K24  K24   K  24            350 10.0000     100         67      GCTCAG      0.500             25
+## L01  L01   L   1            350 40.0000      50          8      ACATCT      0.000              0
+## L02  L02   L   2            350 40.0000      50          9      ACATGA      0.125             25
+## L03  L03   L   3            350 40.0000      50         10      AGTACG      0.250             25
+## L04  L04   L   4            350 40.0000      50         11      AGTAGC      0.500             25
+## L05  L05   L   5            350 40.0000      50         12      AGTATA      1.000             25
+## L06  L06   L   6            350 40.0000      50         13      AGTCAG      2.000             25
+## L07  L07   L   7            350 40.0000      50         14      AGTCGT      4.000             25
+## L08  L08   L   8            350  5.0000      50         29      CACAGC      0.000              0
+## L09  L09   L   9            350  5.0000      50         30      CACATA      0.125             25
+## L10  L10   L  10            350  5.0000      50         31      CACGAT      0.250             25
+## L11  L11   L  11            350  5.0000      50         32      CACGCA      0.500             25
+## L12  L12   L  12            350  5.0000      50         33      CACGTG      1.000             25
+## L13  L13   L  13            350  5.0000      50         34      CACTAC      2.000             25
+## L14  L14   L  14            350  5.0000      50         35      CACTCT      4.000             25
+## L15  L15   L  15            350  0.6250      50         50      CTGCGT      0.000              0
+## L16  L16   L  16            350  0.6250      50         51      CTGCTC      0.125             25
+## L17  L17   L  17            350  0.6250      50         52      CTGTAC      0.250             25
+## L18  L18   L  18            350  0.6250      50         53      CTGTCT      0.500             25
+## L19  L19   L  19            350  0.6250      50         54      CTGTGA      1.000             25
+## L20  L20   L  20            350  0.6250      50         55      GAGACG      2.000             25
+## L21  L21   L  21            350  0.6250      50         56      GAGAGC      4.000             25
+## L22  L22   L  22            350 10.0000     100         68      GCTCGT      1.000             25
+## L23  L23   L  23            350 10.0000     100         69      GCTCTC      2.000             25
+## L24  L24   L  24            350 10.0000     100         70      GCTGAT      4.000             25
+## M01  M01   M   1            350 20.0000      25         15      AGTCTC      0.000              0
+## M02  M02   M   2            350 20.0000      25         16      AGTGAT      0.125             25
+## M03  M03   M   3            350 20.0000      25         17      AGTGCA      0.250             25
+## M04  M04   M   4            350 20.0000      25         18      AGTGTG      0.500             25
+## M05  M05   M   5            350 20.0000      25         19      ATCACG      1.000             25
+## M06  M06   M   6            350 20.0000      25         20      ATCAGC      2.000             25
+## M07  M07   M   7            350 20.0000      25         21      ATCATA      4.000             25
+## M08  M08   M   8            350  2.5000      25         36      CACTGA      0.000              0
+## M09  M09   M   9            350  2.5000      25         37      CGACAG      0.125             25
+## M10  M10   M  10            350  2.5000      25         38      CGACGT      0.250             25
+## M11  M11   M  11            350  2.5000      25         39      CGACTC      0.500             25
+## M12  M12   M  12            350  2.5000      25         40      CGAGAT      1.000             25
+## M13  M13   M  13            350  2.5000      25         41      CGAGCA      2.000             25
+## M14  M14   M  14            350  2.5000      25         42      CGAGTG      4.000             25
+## M15  M15   M  15            350  0.3125      25         57      GAGATA      0.000              0
+## M16  M16   M  16            350  0.3125      25         58      GAGCAG      0.125             25
+## M17  M17   M  17            350  0.3125      25         59      GAGCGT      0.250             25
+## M18  M18   M  18            350  0.3125      25         60      GAGCTC      0.500             25
+## M19  M19   M  19            350  0.3125      25         61      GAGTAC      1.000             25
+## M20  M20   M  20            350  0.3125      25         62      GAGTCT      2.000             25
+## M21  M21   M  21            350  0.3125      25         63      GAGTGA      4.000             25
+## M22  M22   M  22             NA      NA      NA         NA        <NA>         NA             NA
+## M23  M23   M  23            350 10.0000     100         64      GCTACG      0.000              0
+## M24  M24   M  24             NA      NA      NA         NA        <NA>         NA             NA
+## N01  N01   N   1            350 80.0000     100          1      ACACAG      0.000              0
+## N02  N02   N   2            350 80.0000     100          2      ACACGT      0.125             25
+## N03  N03   N   3            350 80.0000     100          3      ACACTC      0.250             25
+## N04  N04   N   4            350 80.0000     100          4      ACAGAT      0.500             25
+## N05  N05   N   5            350 80.0000     100          5      ACAGCA      1.000             25
+## N06  N06   N   6            350 80.0000     100          6      ACAGTG      2.000             25
+## N07  N07   N   7            350 80.0000     100          7      ACATAC      4.000             25
+## N08  N08   N   8            350 10.0000     100         22      ATCGAT      0.000              0
+## N09  N09   N   9            350 10.0000     100         23      ATCGCA      0.125             25
+## N10  N10   N  10            350 10.0000     100         24      ATCGTG      0.250             25
+## N11  N11   N  11            350 10.0000     100         25      ATCTAC      0.500             25
+## N12  N12   N  12            350 10.0000     100         26      ATCTCT      1.000             25
+## N13  N13   N  13            350 10.0000     100         27      ATCTGA      2.000             25
+## N14  N14   N  14            350 10.0000     100         28      CACACG      4.000             25
+## N15  N15   N  15            350  1.2500     100         43      CGATAC      0.000              0
+## N16  N16   N  16            350  1.2500     100         44      CGATCT      0.125             25
+## N17  N17   N  17            350  1.2500     100         45      CGATGA      0.250             25
+## N18  N18   N  18            350  1.2500     100         46      CTGACG      0.500             25
+## N19  N19   N  19            350  1.2500     100         47      CTGAGC      1.000             25
+## N20  N20   N  20            350  1.2500     100         48      CTGATA      2.000             25
+## N21  N21   N  21            350  1.2500     100         49      CTGCAG      4.000             25
+## N22  N22   N  22            350 10.0000     100         65      GCTAGC      0.125             25
+## N23  N23   N  23            350 10.0000     100         66      GCTATA      0.250             25
+## N24  N24   N  24            350 10.0000     100         67      GCTCAG      0.500             25
+## O01  O01   O   1            350 40.0000      50          8      ACATCT      0.000              0
+## O02  O02   O   2            350 40.0000      50          9      ACATGA      0.125             25
+## O03  O03   O   3            350 40.0000      50         10      AGTACG      0.250             25
+## O04  O04   O   4            350 40.0000      50         11      AGTAGC      0.500             25
+## O05  O05   O   5            350 40.0000      50         12      AGTATA      1.000             25
+## O06  O06   O   6            350 40.0000      50         13      AGTCAG      2.000             25
+## O07  O07   O   7            350 40.0000      50         14      AGTCGT      4.000             25
+## O08  O08   O   8            350  5.0000      50         29      CACAGC      0.000              0
+## O09  O09   O   9            350  5.0000      50         30      CACATA      0.125             25
+## O10  O10   O  10            350  5.0000      50         31      CACGAT      0.250             25
+## O11  O11   O  11            350  5.0000      50         32      CACGCA      0.500             25
+## O12  O12   O  12            350  5.0000      50         33      CACGTG      1.000             25
+## O13  O13   O  13            350  5.0000      50         34      CACTAC      2.000             25
+## O14  O14   O  14            350  5.0000      50         35      CACTCT      4.000             25
+## O15  O15   O  15            350  0.6250      50         50      CTGCGT      0.000              0
+## O16  O16   O  16            350  0.6250      50         51      CTGCTC      0.125             25
+## O17  O17   O  17            350  0.6250      50         52      CTGTAC      0.250             25
+## O18  O18   O  18            350  0.6250      50         53      CTGTCT      0.500             25
+## O19  O19   O  19            350  0.6250      50         54      CTGTGA      1.000             25
+## O20  O20   O  20            350  0.6250      50         55      GAGACG      2.000             25
+## O21  O21   O  21            350  0.6250      50         56      GAGAGC      4.000             25
+## O22  O22   O  22            350 10.0000     100         68      GCTCGT      1.000             25
+## O23  O23   O  23            350 10.0000     100         69      GCTCTC      2.000             25
+## O24  O24   O  24            350 10.0000     100         70      GCTGAT      4.000             25
+## P01  P01   P   1            350 20.0000      25         15      AGTCTC      0.000              0
+## P02  P02   P   2            350 20.0000      25         16      AGTGAT      0.125             25
+## P03  P03   P   3            350 20.0000      25         17      AGTGCA      0.250             25
+## P04  P04   P   4            350 20.0000      25         18      AGTGTG      0.500             25
+## P05  P05   P   5            350 20.0000      25         19      ATCACG      1.000             25
+## P06  P06   P   6            350 20.0000      25         20      ATCAGC      2.000             25
+## P07  P07   P   7            350 20.0000      25         21      ATCATA      4.000             25
+## P08  P08   P   8            350  2.5000      25         36      CACTGA      0.000              0
+## P09  P09   P   9            350  2.5000      25         37      CGACAG      0.125             25
+## P10  P10   P  10            350  2.5000      25         38      CGACGT      0.250             25
+## P11  P11   P  11            350  2.5000      25         39      CGACTC      0.500             25
+## P12  P12   P  12            350  2.5000      25         40      CGAGAT      1.000             25
+## P13  P13   P  13            350  2.5000      25         41      CGAGCA      2.000             25
+## P14  P14   P  14            350  2.5000      25         42      CGAGTG      4.000             25
+## P15  P15   P  15            350  0.3125      25         57      GAGATA      0.000              0
+## P16  P16   P  16            350  0.3125      25         58      GAGCAG      0.125             25
+## P17  P17   P  17            350  0.3125      25         59      GAGCGT      0.250             25
+## P18  P18   P  18            350  0.3125      25         60      GAGCTC      0.500             25
+## P19  P19   P  19            350  0.3125      25         61      GAGTAC      1.000             25
+## P20  P20   P  20            350  0.3125      25         62      GAGTCT      2.000             25
+## P21  P21   P  21            350  0.3125      25         63      GAGTGA      4.000             25
+## P22  P22   P  22             NA      NA      NA         NA        <NA>         NA             NA
+## P23  P23   P  23            350 10.0000     100         64      GCTACG      0.000              0
+## P24  P24   P  24             NA      NA      NA         NA        <NA>         NA             NA
+##       RNA RNA_vol H2O_vol total_volume PRIMERS_RATIO
+## A01 1e+02      25      25          500 no_RT_PRIMERS
+## A02 1e+02      25       0          500           640
+## A03 1e+02      25       0          500           320
+## A04 1e+02      25       0          500           160
+## A05 1e+02      25       0          500            80
+## A06 1e+02      25       0          500            40
+## A07 1e+02      25       0          500            20
+## A08 1e+01      25      25          500 no_RT_PRIMERS
+## A09 1e+01      25       0          500           640
+## A10 1e+01      25       0          500           320
+## A11 1e+01      25       0          500           160
+## A12 1e+01      25       0          500            80
+## A13 1e+01      25       0          500            40
+## A14 1e+01      25       0          500            20
+## A15 1e+00      25      25          500 no_RT_PRIMERS
+## A16 1e+00      25       0          500           640
+## A17 1e+00      25       0          500           320
+## A18 1e+00      25       0          500           160
+## A19 1e+00      25       0          500            80
+## A20 1e+00      25       0          500            40
+## A21 1e+00      25       0          500            20
+## A22    NA      NA      NA           NA          <NA>
+## A23    NA      NA      NA           NA          <NA>
+## A24    NA      NA      NA           NA          <NA>
+## B01 1e+02      25      75          500 no_RT_PRIMERS
+## B02 1e+02      25      50          500           320
+## B03 1e+02      25      50          500           160
+## B04 1e+02      25      50          500            80
+## B05 1e+02      25      50          500            40
+## B06 1e+02      25      50          500            20
+## B07 1e+02      25      50          500            10
+## B08 1e+01      25      75          500 no_RT_PRIMERS
+## B09 1e+01      25      50          500           320
+## B10 1e+01      25      50          500           160
+## B11 1e+01      25      50          500            80
+## B12 1e+01      25      50          500            40
+## B13 1e+01      25      50          500            20
+## B14 1e+01      25      50          500            10
+## B15 1e+00      25      75          500 no_RT_PRIMERS
+## B16 1e+00      25      50          500           320
+## B17 1e+00      25      50          500           160
+## B18 1e+00      25      50          500            80
+## B19 1e+00      25      50          500            40
+## B20 1e+00      25      50          500            20
+## B21 1e+00      25      50          500            10
+## B22    NA      NA      NA           NA          <NA>
+## B23    NA      NA      NA           NA          <NA>
+## B24    NA      NA      NA           NA          <NA>
+## C01 1e+02      25     100          500 no_RT_PRIMERS
+## C02 1e+02      25      75          500           160
+## C03 1e+02      25      75          500            80
+## C04 1e+02      25      75          500            40
+## C05 1e+02      25      75          500            20
+## C06 1e+02      25      75          500            10
+## C07 1e+02      25      75          500             5
+## C08 1e+01      25     100          500 no_RT_PRIMERS
+## C09 1e+01      25      75          500           160
+## C10 1e+01      25      75          500            80
+## C11 1e+01      25      75          500            40
+## C12 1e+01      25      75          500            20
+## C13 1e+01      25      75          500            10
+## C14 1e+01      25      75          500             5
+## C15 1e+00      25     100          500 no_RT_PRIMERS
+## C16 1e+00      25      75          500           160
+## C17 1e+00      25      75          500            80
+## C18 1e+00      25      75          500            40
+## C19 1e+00      25      75          500            20
+## C20 1e+00      25      75          500            10
+## C21 1e+00      25      75          500             5
+## C22    NA      NA      NA           NA          <NA>
+## C23    NA      NA      NA           NA          <NA>
+## C24    NA      NA      NA           NA          <NA>
+## D01 1e+02      25      25          500 no_RT_PRIMERS
+## D02 1e+02      25       0          500            80
+## D03 1e+02      25       0          500            40
+## D04 1e+02      25       0          500            20
+## D05 1e+02      25       0          500            10
+## D06 1e+02      25       0          500             5
+## D07 1e+02      25       0          500           2.5
+## D08 1e+01      25      25          500 no_RT_PRIMERS
+## D09 1e+01      25       0          500            80
+## D10 1e+01      25       0          500            40
+## D11 1e+01      25       0          500            20
+## D12 1e+01      25       0          500            10
+## D13 1e+01      25       0          500             5
+## D14 1e+01      25       0          500           2.5
+## D15 1e+00      25      25          500 no_RT_PRIMERS
+## D16 1e+00      25       0          500            80
+## D17 1e+00      25       0          500            40
+## D18 1e+00      25       0          500            20
+## D19 1e+00      25       0          500            10
+## D20 1e+00      25       0          500             5
+## D21 1e+00      25       0          500           2.5
+## D22    NA      NA      NA           NA          <NA>
+## D23    NA      NA      NA           NA          <NA>
+## D24    NA      NA      NA           NA          <NA>
+## E01 1e+02      25      75          500 no_RT_PRIMERS
+## E02 1e+02      25      50          500            40
+## E03 1e+02      25      50          500            20
+## E04 1e+02      25      50          500            10
+## E05 1e+02      25      50          500             5
+## E06 1e+02      25      50          500           2.5
+## E07 1e+02      25      50          500          1.25
+## E08 1e+01      25      75          500 no_RT_PRIMERS
+## E09 1e+01      25      50          500            40
+## E10 1e+01      25      50          500            20
+## E11 1e+01      25      50          500            10
+## E12 1e+01      25      50          500             5
+## E13 1e+01      25      50          500           2.5
+## E14 1e+01      25      50          500          1.25
+## E15 1e+00      25      75          500 no_RT_PRIMERS
+## E16 1e+00      25      50          500            40
+## E17 1e+00      25      50          500            20
+## E18 1e+00      25      50          500            10
+## E19 1e+00      25      50          500             5
+## E20 1e+00      25      50          500           2.5
+## E21 1e+00      25      50          500          1.25
+## E22    NA      NA      NA           NA          <NA>
+## E23    NA      NA      NA           NA          <NA>
+## E24    NA      NA      NA           NA          <NA>
+## F01 1e+02      25     100          500 no_RT_PRIMERS
+## F02 1e+02      25      75          500            20
+## F03 1e+02      25      75          500            10
+## F04 1e+02      25      75          500             5
+## F05 1e+02      25      75          500           2.5
+## F06 1e+02      25      75          500          1.25
+## F07 1e+02      25      75          500         0.625
+## F08 1e+01      25     100          500 no_RT_PRIMERS
+## F09 1e+01      25      75          500            20
+## F10 1e+01      25      75          500            10
+## F11 1e+01      25      75          500             5
+## F12 1e+01      25      75          500           2.5
+## F13 1e+01      25      75          500          1.25
+## F14 1e+01      25      75          500         0.625
+## F15 1e+00      25     100          500 no_RT_PRIMERS
+## F16 1e+00      25      75          500            20
+## F17 1e+00      25      75          500            10
+## F18 1e+00      25      75          500             5
+## F19 1e+00      25      75          500           2.5
+## F20 1e+00      25      75          500          1.25
+## F21 1e+00      25      75          500         0.625
+## F22    NA      NA      NA           NA          <NA>
+## F23    NA      NA      NA           NA          <NA>
+## F24    NA      NA      NA           NA          <NA>
+## G01 1e+02      25      25          500 no_RT_PRIMERS
+## G02 1e+02      25       0          500            10
+## G03 1e+02      25       0          500             5
+## G04 1e+02      25       0          500           2.5
+## G05 1e+02      25       0          500          1.25
+## G06 1e+02      25       0          500         0.625
+## G07 1e+02      25       0          500        0.3125
+## G08 1e+01      25      25          500 no_RT_PRIMERS
+## G09 1e+01      25       0          500            10
+## G10 1e+01      25       0          500             5
+## G11 1e+01      25       0          500           2.5
+## G12 1e+01      25       0          500          1.25
+## G13 1e+01      25       0          500         0.625
+## G14 1e+01      25       0          500        0.3125
+## G15 1e+00      25      25          500 no_RT_PRIMERS
+## G16 1e+00      25       0          500            10
+## G17 1e+00      25       0          500             5
+## G18 1e+00      25       0          500           2.5
+## G19 1e+00      25       0          500          1.25
+## G20 1e+00      25       0          500         0.625
+## G21 1e+00      25       0          500        0.3125
+## G22    NA      NA      NA           NA          <NA>
+## G23    NA      NA      NA           NA          <NA>
+## G24    NA      NA      NA           NA          <NA>
+## H01 1e+02      25      75          500 no_RT_PRIMERS
+## H02 1e+02      25      50          500             5
+## H03 1e+02      25      50          500           2.5
+## H04 1e+02      25      50          500          1.25
+## H05 1e+02      25      50          500         0.625
+## H06 1e+02      25      50          500        0.3125
+## H07 1e+02      25      50          500       0.15625
+## H08 1e+01      25      75          500 no_RT_PRIMERS
+## H09 1e+01      25      50          500             5
+## H10 1e+01      25      50          500           2.5
+## H11 1e+01      25      50          500          1.25
+## H12 1e+01      25      50          500         0.625
+## H13 1e+01      25      50          500        0.3125
+## H14 1e+01      25      50          500       0.15625
+## H15 1e+00      25      75          500 no_RT_PRIMERS
+## H16 1e+00      25      50          500             5
+## H17 1e+00      25      50          500           2.5
+## H18 1e+00      25      50          500          1.25
+## H19 1e+00      25      50          500         0.625
+## H20 1e+00      25      50          500        0.3125
+## H21 1e+00      25      50          500       0.15625
+## H22    NA      NA      NA           NA          <NA>
+## H23    NA      NA      NA           NA          <NA>
+## H24    NA      NA      NA           NA          <NA>
+## I01 1e+02      25     100          500 no_RT_PRIMERS
+## I02 1e+02      25      75          500           2.5
+## I03 1e+02      25      75          500          1.25
+## I04 1e+02      25      75          500         0.625
+## I05 1e+02      25      75          500        0.3125
+## I06 1e+02      25      75          500       0.15625
+## I07 1e+02      25      75          500      0.078125
+## I08 1e+01      25     100          500 no_RT_PRIMERS
+## I09 1e+01      25      75          500           2.5
+## I10 1e+01      25      75          500          1.25
+## I11 1e+01      25      75          500         0.625
+## I12 1e+01      25      75          500        0.3125
+## I13 1e+01      25      75          500       0.15625
+## I14 1e+01      25      75          500      0.078125
+## I15 1e+00      25     100          500 no_RT_PRIMERS
+## I16 1e+00      25      75          500           2.5
+## I17 1e+00      25      75          500          1.25
+## I18 1e+00      25      75          500         0.625
+## I19 1e+00      25      75          500        0.3125
+## I20 1e+00      25      75          500       0.15625
+## I21 1e+00      25      75          500      0.078125
+## I22    NA      NA      NA           NA          <NA>
+## I23    NA      NA      NA           NA          <NA>
+## I24    NA      NA      NA           NA          <NA>
+## J01 0e+00       0      50          500 no_RT_PRIMERS
+## J02 0e+00       0      25          500            80
+## J03 0e+00       0      25          500            40
+## J04 0e+00       0      25          500            20
+## J05 0e+00       0      25          500            10
+## J06 0e+00       0      25          500             5
+## J07 0e+00       0      25          500           2.5
+## J08 0e+00       0      50          500 no_RT_PRIMERS
+## J09 0e+00       0      25          500            80
+## J10 0e+00       0      25          500            40
+## J11 0e+00       0      25          500            20
+## J12 0e+00       0      25          500            10
+## J13 0e+00       0      25          500             5
+## J14 0e+00       0      25          500           2.5
+## J15 0e+00       0      50          500 no_RT_PRIMERS
+## J16 0e+00       0      25          500            80
+## J17 0e+00       0      25          500            40
+## J18 0e+00       0      25          500            20
+## J19 0e+00       0      25          500            10
+## J20 0e+00       0      25          500             5
+## J21 0e+00       0      25          500           2.5
+## J22    NA      NA      NA           NA          <NA>
+## J23    NA      NA      NA           NA          <NA>
+## J24    NA      NA      NA           NA          <NA>
+## K01 1e-01      25      25          500 no_RT_PRIMERS
+## K02 1e-01      25       0          500           640
+## K03 1e-01      25       0          500           320
+## K04 1e-01      25       0          500           160
+## K05 1e-01      25       0          500            80
+## K06 1e-01      25       0          500            40
+## K07 1e-01      25       0          500            20
+## K08 1e-01      25      25          500 no_RT_PRIMERS
+## K09 1e-01      25       0          500            80
+## K10 1e-01      25       0          500            40
+## K11 1e-01      25       0          500            20
+## K12 1e-01      25       0          500            10
+## K13 1e-01      25       0          500             5
+## K14 1e-01      25       0          500           2.5
+## K15 1e-01      25      25          500 no_RT_PRIMERS
+## K16 1e-01      25       0          500            10
+## K17 1e-01      25       0          500             5
+## K18 1e-01      25       0          500           2.5
+## K19 1e-01      25       0          500          1.25
+## K20 1e-01      25       0          500         0.625
+## K21 1e-01      25       0          500        0.3125
+## K22 0e+00       0      25          500            80
+## K23 0e+00       0      25          500            40
+## K24 0e+00       0      25          500            20
+## L01 1e-01      25      75          500 no_RT_PRIMERS
+## L02 1e-01      25      50          500           320
+## L03 1e-01      25      50          500           160
+## L04 1e-01      25      50          500            80
+## L05 1e-01      25      50          500            40
+## L06 1e-01      25      50          500            20
+## L07 1e-01      25      50          500            10
+## L08 1e-01      25      75          500 no_RT_PRIMERS
+## L09 1e-01      25      50          500            40
+## L10 1e-01      25      50          500            20
+## L11 1e-01      25      50          500            10
+## L12 1e-01      25      50          500             5
+## L13 1e-01      25      50          500           2.5
+## L14 1e-01      25      50          500          1.25
+## L15 1e-01      25      75          500 no_RT_PRIMERS
+## L16 1e-01      25      50          500             5
+## L17 1e-01      25      50          500           2.5
+## L18 1e-01      25      50          500          1.25
+## L19 1e-01      25      50          500         0.625
+## L20 1e-01      25      50          500        0.3125
+## L21 1e-01      25      50          500       0.15625
+## L22 0e+00       0      25          500            10
+## L23 0e+00       0      25          500             5
+## L24 0e+00       0      25          500           2.5
+## M01 1e-01      25     100          500 no_RT_PRIMERS
+## M02 1e-01      25      75          500           160
+## M03 1e-01      25      75          500            80
+## M04 1e-01      25      75          500            40
+## M05 1e-01      25      75          500            20
+## M06 1e-01      25      75          500            10
+## M07 1e-01      25      75          500             5
+## M08 1e-01      25     100          500 no_RT_PRIMERS
+## M09 1e-01      25      75          500            20
+## M10 1e-01      25      75          500            10
+## M11 1e-01      25      75          500             5
+## M12 1e-01      25      75          500           2.5
+## M13 1e-01      25      75          500          1.25
+## M14 1e-01      25      75          500         0.625
+## M15 1e-01      25     100          500 no_RT_PRIMERS
+## M16 1e-01      25      75          500           2.5
+## M17 1e-01      25      75          500          1.25
+## M18 1e-01      25      75          500         0.625
+## M19 1e-01      25      75          500        0.3125
+## M20 1e-01      25      75          500       0.15625
+## M21 1e-01      25      75          500      0.078125
+## M22    NA      NA      NA           NA          <NA>
+## M23 0e+00       0      50          500 no_RT_PRIMERS
+## M24    NA      NA      NA           NA          <NA>
+## N01 1e-02      25      25          500 no_RT_PRIMERS
+## N02 1e-02      25       0          500           640
+## N03 1e-02      25       0          500           320
+## N04 1e-02      25       0          500           160
+## N05 1e-02      25       0          500            80
+## N06 1e-02      25       0          500            40
+## N07 1e-02      25       0          500            20
+## N08 1e-02      25      25          500 no_RT_PRIMERS
+## N09 1e-02      25       0          500            80
+## N10 1e-02      25       0          500            40
+## N11 1e-02      25       0          500            20
+## N12 1e-02      25       0          500            10
+## N13 1e-02      25       0          500             5
+## N14 1e-02      25       0          500           2.5
+## N15 1e-02      25      25          500 no_RT_PRIMERS
+## N16 1e-02      25       0          500            10
+## N17 1e-02      25       0          500             5
+## N18 1e-02      25       0          500           2.5
+## N19 1e-02      25       0          500          1.25
+## N20 1e-02      25       0          500         0.625
+## N21 1e-02      25       0          500        0.3125
+## N22 0e+00       0      25          500            80
+## N23 0e+00       0      25          500            40
+## N24 0e+00       0      25          500            20
+## O01 1e-02      25      75          500 no_RT_PRIMERS
+## O02 1e-02      25      50          500           320
+## O03 1e-02      25      50          500           160
+## O04 1e-02      25      50          500            80
+## O05 1e-02      25      50          500            40
+## O06 1e-02      25      50          500            20
+## O07 1e-02      25      50          500            10
+## O08 1e-02      25      75          500 no_RT_PRIMERS
+## O09 1e-02      25      50          500            40
+## O10 1e-02      25      50          500            20
+## O11 1e-02      25      50          500            10
+## O12 1e-02      25      50          500             5
+## O13 1e-02      25      50          500           2.5
+## O14 1e-02      25      50          500          1.25
+## O15 1e-02      25      75          500 no_RT_PRIMERS
+## O16 1e-02      25      50          500             5
+## O17 1e-02      25      50          500           2.5
+## O18 1e-02      25      50          500          1.25
+## O19 1e-02      25      50          500         0.625
+## O20 1e-02      25      50          500        0.3125
+## O21 1e-02      25      50          500       0.15625
+## O22 0e+00       0      25          500            10
+## O23 0e+00       0      25          500             5
+## O24 0e+00       0      25          500           2.5
+## P01 1e-02      25     100          500 no_RT_PRIMERS
+## P02 1e-02      25      75          500           160
+## P03 1e-02      25      75          500            80
+## P04 1e-02      25      75          500            40
+## P05 1e-02      25      75          500            20
+## P06 1e-02      25      75          500            10
+## P07 1e-02      25      75          500             5
+## P08 1e-02      25     100          500 no_RT_PRIMERS
+## P09 1e-02      25      75          500            20
+## P10 1e-02      25      75          500            10
+## P11 1e-02      25      75          500             5
+## P12 1e-02      25      75          500           2.5
+## P13 1e-02      25      75          500          1.25
+## P14 1e-02      25      75          500         0.625
+## P15 1e-02      25     100          500 no_RT_PRIMERS
+## P16 1e-02      25      75          500           2.5
+## P17 1e-02      25      75          500          1.25
+## P18 1e-02      25      75          500         0.625
+## P19 1e-02      25      75          500        0.3125
+## P20 1e-02      25      75          500       0.15625
+## P21 1e-02      25      75          500      0.078125
+## P22    NA      NA      NA           NA          <NA>
+## P23 0e+00       0      50          500 no_RT_PRIMERS
+## P24    NA      NA      NA           NA          <NA>
 ```
 
 ```r
@@ -1583,40 +1594,30 @@ summary(plate)
 ```
 
 ```
-##       Well          Row           Col      MASTER_MIX_vol      TSO             TSO_vol        BARCODE_ID  
-##  A01    :  1   A      : 24   1      : 16   Min.   :350    Min.   : 0.3125   Min.   : 25.0   Min.   : 1.0  
-##  A02    :  1   B      : 24   2      : 16   1st Qu.:350    1st Qu.: 1.2500   1st Qu.: 25.0   1st Qu.:18.0  
-##  A03    :  1   C      : 24   3      : 16   Median :350    Median : 7.5000   Median : 50.0   Median :35.5  
-##  A04    :  1   D      : 24   4      : 16   Mean   :350    Mean   :16.9688   Mean   : 62.5   Mean   :35.5  
-##  A05    :  1   E      : 24   5      : 16   3rd Qu.:350    3rd Qu.:20.0000   3rd Qu.:100.0   3rd Qu.:53.0  
-##  A06    :  1   F      : 24   6      : 16   Max.   :350    Max.   :80.0000   Max.   :100.0   Max.   :70.0  
-##  (Other):378   (Other):240   (Other):288   NA's   :34     NA's   :34        NA's   :34      NA's   :34    
-##    RT_PRIMERS    RT_PRIMERS_vol       RNA           RNA_vol        H2O_vol        total_volume PRIMERS_RATIO     
-##  Min.   :0.000   Min.   : 0.00   Min.   :0e+00   Min.   : 0.0   Min.   :  0.00   Min.   :500   Length:384        
-##  1st Qu.:0.125   1st Qu.:25.00   1st Qu.:1e-02   1st Qu.:25.0   1st Qu.:  0.00   1st Qu.:500   Class :character  
-##  Median :0.500   Median :25.00   Median :1e+00   Median :25.0   Median : 50.00   Median :500   Mode  :character  
-##  Mean   :1.125   Mean   :21.43   Mean   :2e+01   Mean   :22.5   Mean   : 43.57   Mean   :500                     
-##  3rd Qu.:2.000   3rd Qu.:25.00   3rd Qu.:1e+01   3rd Qu.:25.0   3rd Qu.: 75.00   3rd Qu.:500                     
-##  Max.   :4.000   Max.   :25.00   Max.   :1e+02   Max.   :25.0   Max.   :100.00   Max.   :500                     
-##  NA's   :34      NA's   :34      NA's   :34      NA's   :34     NA's   :34       NA's   :34
-```
-
-```r
-plate$BARCODE_ID
-```
-
-```
-##   [1]  1  2  3  4  5  6  7  1  2  3  4  5  6  7  1  2  3  4  5  6  7 NA NA NA  8  9 10 11 12 13 14  8  9 10 11 12 13 14
-##  [39]  8  9 10 11 12 13 14 NA NA NA 15 16 17 18 19 20 21 15 16 17 18 19 20 21 15 16 17 18 19 20 21 NA NA NA 22 23 24 25
-##  [77] 26 27 28 22 23 24 25 26 27 28 22 23 24 25 26 27 28 NA NA NA 29 30 31 32 33 34 35 29 30 31 32 33 34 35 29 30 31 32
-## [115] 33 34 35 NA NA NA 36 37 38 39 40 41 42 36 37 38 39 40 41 42 36 37 38 39 40 41 42 NA NA NA 43 44 45 46 47 48 49 43
-## [153] 44 45 46 47 48 49 43 44 45 46 47 48 49 NA NA NA 50 51 52 53 54 55 56 50 51 52 53 54 55 56 50 51 52 53 54 55 56 NA
-## [191] NA NA 57 58 59 60 61 62 63 57 58 59 60 61 62 63 57 58 59 60 61 62 63 NA NA NA 64 65 66 67 68 69 70 64 65 66 67 68
-## [229] 69 70 64 65 66 67 68 69 70 NA NA NA  1  2  3  4  5  6  7 22 23 24 25 26 27 28 43 44 45 46 47 48 49 65 66 67  8  9
-## [267] 10 11 12 13 14 29 30 31 32 33 34 35 50 51 52 53 54 55 56 68 69 70 15 16 17 18 19 20 21 36 37 38 39 40 41 42 57 58
-## [305] 59 60 61 62 63 NA 64 NA  1  2  3  4  5  6  7 22 23 24 25 26 27 28 43 44 45 46 47 48 49 65 66 67  8  9 10 11 12 13
-## [343] 14 29 30 31 32 33 34 35 50 51 52 53 54 55 56 68 69 70 15 16 17 18 19 20 21 36 37 38 39 40 41 42 57 58 59 60 61 62
-## [381] 63 NA 64 NA
+##       well          row           col      MASTER_MIX_vol      TSO             TSO_vol     
+##  A01    :  1   A      : 24   1      : 16   Min.   :350    Min.   : 0.3125   Min.   : 25.0  
+##  A02    :  1   B      : 24   2      : 16   1st Qu.:350    1st Qu.: 1.2500   1st Qu.: 25.0  
+##  A03    :  1   C      : 24   3      : 16   Median :350    Median : 7.5000   Median : 50.0  
+##  A04    :  1   D      : 24   4      : 16   Mean   :350    Mean   :16.9688   Mean   : 62.5  
+##  A05    :  1   E      : 24   5      : 16   3rd Qu.:350    3rd Qu.:20.0000   3rd Qu.:100.0  
+##  A06    :  1   F      : 24   6      : 16   Max.   :350    Max.   :80.0000   Max.   :100.0  
+##  (Other):378   (Other):240   (Other):288   NA's   :34     NA's   :34        NA's   :34     
+##    BARCODE_ID   BARCODE_SEQ          RT_PRIMERS    RT_PRIMERS_vol       RNA           RNA_vol    
+##  Min.   : 1.0   Length:384         Min.   :0.000   Min.   : 0.00   Min.   :0e+00   Min.   : 0.0  
+##  1st Qu.:18.0   Class :character   1st Qu.:0.125   1st Qu.:25.00   1st Qu.:1e-02   1st Qu.:25.0  
+##  Median :35.5   Mode  :character   Median :0.500   Median :25.00   Median :1e+00   Median :25.0  
+##  Mean   :35.5                      Mean   :1.125   Mean   :21.43   Mean   :2e+01   Mean   :22.5  
+##  3rd Qu.:53.0                      3rd Qu.:2.000   3rd Qu.:25.00   3rd Qu.:1e+01   3rd Qu.:25.0  
+##  Max.   :70.0                      Max.   :4.000   Max.   :25.00   Max.   :1e+02   Max.   :25.0  
+##  NA's   :34                        NA's   :34      NA's   :34      NA's   :34      NA's   :34    
+##     H2O_vol        total_volume PRIMERS_RATIO     
+##  Min.   :  0.00   Min.   :500   Length:384        
+##  1st Qu.:  0.00   1st Qu.:500   Class :character  
+##  Median : 50.00   Median :500   Mode  :character  
+##  Mean   : 43.57   Mean   :500                     
+##  3rd Qu.: 75.00   3rd Qu.:500                     
+##  Max.   :100.00   Max.   :500                     
+##  NA's   :34       NA's   :34
 ```
 
 ```r
@@ -1719,61 +1720,83 @@ plate$PRIMERS_RATIO
 ```
 
 ```
-##   [1] "no_RT_PRIMERS" "640"           "320"           "160"           "80"            "40"            "20"           
-##   [8] "no_RT_PRIMERS" "640"           "320"           "160"           "80"            "40"            "20"           
-##  [15] "no_RT_PRIMERS" "640"           "320"           "160"           "80"            "40"            "20"           
-##  [22] NA              NA              NA              "no_RT_PRIMERS" "320"           "160"           "80"           
-##  [29] "40"            "20"            "10"            "no_RT_PRIMERS" "320"           "160"           "80"           
-##  [36] "40"            "20"            "10"            "no_RT_PRIMERS" "320"           "160"           "80"           
-##  [43] "40"            "20"            "10"            NA              NA              NA              "no_RT_PRIMERS"
-##  [50] "160"           "80"            "40"            "20"            "10"            "5"             "no_RT_PRIMERS"
-##  [57] "160"           "80"            "40"            "20"            "10"            "5"             "no_RT_PRIMERS"
-##  [64] "160"           "80"            "40"            "20"            "10"            "5"             NA             
-##  [71] NA              NA              "no_RT_PRIMERS" "80"            "40"            "20"            "10"           
-##  [78] "5"             "2.5"           "no_RT_PRIMERS" "80"            "40"            "20"            "10"           
-##  [85] "5"             "2.5"           "no_RT_PRIMERS" "80"            "40"            "20"            "10"           
-##  [92] "5"             "2.5"           NA              NA              NA              "no_RT_PRIMERS" "40"           
-##  [99] "20"            "10"            "5"             "2.5"           "1.25"          "no_RT_PRIMERS" "40"           
-## [106] "20"            "10"            "5"             "2.5"           "1.25"          "no_RT_PRIMERS" "40"           
-## [113] "20"            "10"            "5"             "2.5"           "1.25"          NA              NA             
-## [120] NA              "no_RT_PRIMERS" "20"            "10"            "5"             "2.5"           "1.25"         
-## [127] "0.625"         "no_RT_PRIMERS" "20"            "10"            "5"             "2.5"           "1.25"         
-## [134] "0.625"         "no_RT_PRIMERS" "20"            "10"            "5"             "2.5"           "1.25"         
-## [141] "0.625"         NA              NA              NA              "no_RT_PRIMERS" "10"            "5"            
-## [148] "2.5"           "1.25"          "0.625"         "0.3125"        "no_RT_PRIMERS" "10"            "5"            
-## [155] "2.5"           "1.25"          "0.625"         "0.3125"        "no_RT_PRIMERS" "10"            "5"            
-## [162] "2.5"           "1.25"          "0.625"         "0.3125"        NA              NA              NA             
-## [169] "no_RT_PRIMERS" "5"             "2.5"           "1.25"          "0.625"         "0.3125"        "0.15625"      
-## [176] "no_RT_PRIMERS" "5"             "2.5"           "1.25"          "0.625"         "0.3125"        "0.15625"      
-## [183] "no_RT_PRIMERS" "5"             "2.5"           "1.25"          "0.625"         "0.3125"        "0.15625"      
-## [190] NA              NA              NA              "no_RT_PRIMERS" "2.5"           "1.25"          "0.625"        
-## [197] "0.3125"        "0.15625"       "0.078125"      "no_RT_PRIMERS" "2.5"           "1.25"          "0.625"        
-## [204] "0.3125"        "0.15625"       "0.078125"      "no_RT_PRIMERS" "2.5"           "1.25"          "0.625"        
-## [211] "0.3125"        "0.15625"       "0.078125"      NA              NA              NA              "no_RT_PRIMERS"
-## [218] "80"            "40"            "20"            "10"            "5"             "2.5"           "no_RT_PRIMERS"
-## [225] "80"            "40"            "20"            "10"            "5"             "2.5"           "no_RT_PRIMERS"
-## [232] "80"            "40"            "20"            "10"            "5"             "2.5"           NA             
-## [239] NA              NA              "no_RT_PRIMERS" "640"           "320"           "160"           "80"           
-## [246] "40"            "20"            "no_RT_PRIMERS" "80"            "40"            "20"            "10"           
-## [253] "5"             "2.5"           "no_RT_PRIMERS" "10"            "5"             "2.5"           "1.25"         
-## [260] "0.625"         "0.3125"        "80"            "40"            "20"            "no_RT_PRIMERS" "320"          
-## [267] "160"           "80"            "40"            "20"            "10"            "no_RT_PRIMERS" "40"           
-## [274] "20"            "10"            "5"             "2.5"           "1.25"          "no_RT_PRIMERS" "5"            
-## [281] "2.5"           "1.25"          "0.625"         "0.3125"        "0.15625"       "10"            "5"            
-## [288] "2.5"           "no_RT_PRIMERS" "160"           "80"            "40"            "20"            "10"           
-## [295] "5"             "no_RT_PRIMERS" "20"            "10"            "5"             "2.5"           "1.25"         
-## [302] "0.625"         "no_RT_PRIMERS" "2.5"           "1.25"          "0.625"         "0.3125"        "0.15625"      
-## [309] "0.078125"      NA              "no_RT_PRIMERS" NA              "no_RT_PRIMERS" "640"           "320"          
-## [316] "160"           "80"            "40"            "20"            "no_RT_PRIMERS" "80"            "40"           
-## [323] "20"            "10"            "5"             "2.5"           "no_RT_PRIMERS" "10"            "5"            
-## [330] "2.5"           "1.25"          "0.625"         "0.3125"        "80"            "40"            "20"           
-## [337] "no_RT_PRIMERS" "320"           "160"           "80"            "40"            "20"            "10"           
-## [344] "no_RT_PRIMERS" "40"            "20"            "10"            "5"             "2.5"           "1.25"         
-## [351] "no_RT_PRIMERS" "5"             "2.5"           "1.25"          "0.625"         "0.3125"        "0.15625"      
-## [358] "10"            "5"             "2.5"           "no_RT_PRIMERS" "160"           "80"            "40"           
-## [365] "20"            "10"            "5"             "no_RT_PRIMERS" "20"            "10"            "5"            
-## [372] "2.5"           "1.25"          "0.625"         "no_RT_PRIMERS" "2.5"           "1.25"          "0.625"        
-## [379] "0.3125"        "0.15625"       "0.078125"      NA              "no_RT_PRIMERS" NA
+##   [1] "no_RT_PRIMERS" "640"           "320"           "160"           "80"           
+##   [6] "40"            "20"            "no_RT_PRIMERS" "640"           "320"          
+##  [11] "160"           "80"            "40"            "20"            "no_RT_PRIMERS"
+##  [16] "640"           "320"           "160"           "80"            "40"           
+##  [21] "20"            NA              NA              NA              "no_RT_PRIMERS"
+##  [26] "320"           "160"           "80"            "40"            "20"           
+##  [31] "10"            "no_RT_PRIMERS" "320"           "160"           "80"           
+##  [36] "40"            "20"            "10"            "no_RT_PRIMERS" "320"          
+##  [41] "160"           "80"            "40"            "20"            "10"           
+##  [46] NA              NA              NA              "no_RT_PRIMERS" "160"          
+##  [51] "80"            "40"            "20"            "10"            "5"            
+##  [56] "no_RT_PRIMERS" "160"           "80"            "40"            "20"           
+##  [61] "10"            "5"             "no_RT_PRIMERS" "160"           "80"           
+##  [66] "40"            "20"            "10"            "5"             NA             
+##  [71] NA              NA              "no_RT_PRIMERS" "80"            "40"           
+##  [76] "20"            "10"            "5"             "2.5"           "no_RT_PRIMERS"
+##  [81] "80"            "40"            "20"            "10"            "5"            
+##  [86] "2.5"           "no_RT_PRIMERS" "80"            "40"            "20"           
+##  [91] "10"            "5"             "2.5"           NA              NA             
+##  [96] NA              "no_RT_PRIMERS" "40"            "20"            "10"           
+## [101] "5"             "2.5"           "1.25"          "no_RT_PRIMERS" "40"           
+## [106] "20"            "10"            "5"             "2.5"           "1.25"         
+## [111] "no_RT_PRIMERS" "40"            "20"            "10"            "5"            
+## [116] "2.5"           "1.25"          NA              NA              NA             
+## [121] "no_RT_PRIMERS" "20"            "10"            "5"             "2.5"          
+## [126] "1.25"          "0.625"         "no_RT_PRIMERS" "20"            "10"           
+## [131] "5"             "2.5"           "1.25"          "0.625"         "no_RT_PRIMERS"
+## [136] "20"            "10"            "5"             "2.5"           "1.25"         
+## [141] "0.625"         NA              NA              NA              "no_RT_PRIMERS"
+## [146] "10"            "5"             "2.5"           "1.25"          "0.625"        
+## [151] "0.3125"        "no_RT_PRIMERS" "10"            "5"             "2.5"          
+## [156] "1.25"          "0.625"         "0.3125"        "no_RT_PRIMERS" "10"           
+## [161] "5"             "2.5"           "1.25"          "0.625"         "0.3125"       
+## [166] NA              NA              NA              "no_RT_PRIMERS" "5"            
+## [171] "2.5"           "1.25"          "0.625"         "0.3125"        "0.15625"      
+## [176] "no_RT_PRIMERS" "5"             "2.5"           "1.25"          "0.625"        
+## [181] "0.3125"        "0.15625"       "no_RT_PRIMERS" "5"             "2.5"          
+## [186] "1.25"          "0.625"         "0.3125"        "0.15625"       NA             
+## [191] NA              NA              "no_RT_PRIMERS" "2.5"           "1.25"         
+## [196] "0.625"         "0.3125"        "0.15625"       "0.078125"      "no_RT_PRIMERS"
+## [201] "2.5"           "1.25"          "0.625"         "0.3125"        "0.15625"      
+## [206] "0.078125"      "no_RT_PRIMERS" "2.5"           "1.25"          "0.625"        
+## [211] "0.3125"        "0.15625"       "0.078125"      NA              NA             
+## [216] NA              "no_RT_PRIMERS" "80"            "40"            "20"           
+## [221] "10"            "5"             "2.5"           "no_RT_PRIMERS" "80"           
+## [226] "40"            "20"            "10"            "5"             "2.5"          
+## [231] "no_RT_PRIMERS" "80"            "40"            "20"            "10"           
+## [236] "5"             "2.5"           NA              NA              NA             
+## [241] "no_RT_PRIMERS" "640"           "320"           "160"           "80"           
+## [246] "40"            "20"            "no_RT_PRIMERS" "80"            "40"           
+## [251] "20"            "10"            "5"             "2.5"           "no_RT_PRIMERS"
+## [256] "10"            "5"             "2.5"           "1.25"          "0.625"        
+## [261] "0.3125"        "80"            "40"            "20"            "no_RT_PRIMERS"
+## [266] "320"           "160"           "80"            "40"            "20"           
+## [271] "10"            "no_RT_PRIMERS" "40"            "20"            "10"           
+## [276] "5"             "2.5"           "1.25"          "no_RT_PRIMERS" "5"            
+## [281] "2.5"           "1.25"          "0.625"         "0.3125"        "0.15625"      
+## [286] "10"            "5"             "2.5"           "no_RT_PRIMERS" "160"          
+## [291] "80"            "40"            "20"            "10"            "5"            
+## [296] "no_RT_PRIMERS" "20"            "10"            "5"             "2.5"          
+## [301] "1.25"          "0.625"         "no_RT_PRIMERS" "2.5"           "1.25"         
+## [306] "0.625"         "0.3125"        "0.15625"       "0.078125"      NA             
+## [311] "no_RT_PRIMERS" NA              "no_RT_PRIMERS" "640"           "320"          
+## [316] "160"           "80"            "40"            "20"            "no_RT_PRIMERS"
+## [321] "80"            "40"            "20"            "10"            "5"            
+## [326] "2.5"           "no_RT_PRIMERS" "10"            "5"             "2.5"          
+## [331] "1.25"          "0.625"         "0.3125"        "80"            "40"           
+## [336] "20"            "no_RT_PRIMERS" "320"           "160"           "80"           
+## [341] "40"            "20"            "10"            "no_RT_PRIMERS" "40"           
+## [346] "20"            "10"            "5"             "2.5"           "1.25"         
+## [351] "no_RT_PRIMERS" "5"             "2.5"           "1.25"          "0.625"        
+## [356] "0.3125"        "0.15625"       "10"            "5"             "2.5"          
+## [361] "no_RT_PRIMERS" "160"           "80"            "40"            "20"           
+## [366] "10"            "5"             "no_RT_PRIMERS" "20"            "10"           
+## [371] "5"             "2.5"           "1.25"          "0.625"         "no_RT_PRIMERS"
+## [376] "2.5"           "1.25"          "0.625"         "0.3125"        "0.15625"      
+## [381] "0.078125"      NA              "no_RT_PRIMERS" NA
 ```
 
 ```r
@@ -1786,13 +1809,13 @@ Plate maps
 
 ```r
 plateMap <- function(x, title) {
-  platetools::raw_map(plate[[x]], well=plate$Well, plate="384") +
+  platetools::raw_map(plate[[x]], well=plate$well, plate="384") +
   ggtitle(title) +
   viridis::scale_fill_viridis(breaks = unique(plate[[x]]))
 }
 
 plateMapLog <- function(x, title) {
-  platetools::raw_map(plate[[x]], well=plate$Well, plate="384") +
+  platetools::raw_map(plate[[x]], well=plate$well, plate="384") +
   ggtitle(title) +
   viridis::scale_fill_viridis(breaks = unique(plate[[x]]), trans = "log")
 }
@@ -1814,6 +1837,13 @@ TSO
 ```
 
 ![](Labcyte-RT_files/figure-html/plot_TSO_volume-1.png)<!-- -->
+
+
+```r
+(plot_BARCODES <- plateMap("BARCODE_ID", "Barcode ID"))
+```
+
+![](Labcyte-RT_files/figure-html/plot_barcode_IDs-1.png)<!-- -->
 
 ![](images/destination_TSO_2.JPG)
 
@@ -1859,7 +1889,7 @@ Ratio TSO / RT
 
 
 ```r
-(plot_TSO_RT_ratio <- platetools::raw_map(plate$TSO / plate$RT_PRIMERS, well=plate$Well, plate="384") +
+(plot_TSO_RT_ratio <- platetools::raw_map(plate$TSO / plate$RT_PRIMERS, well=plate$well, plate="384") +
   ggtitle("TSO / RT primer concentration") +
   viridis::scale_fill_viridis(breaks = unique(plate$TSO / plate$RT_PRIMERS), trans = "log"))
 ```
@@ -1932,7 +1962,7 @@ sessionInfo()
 ```
 
 ```
-## R version 3.4.0 (2017-04-21)
+## R version 3.4.3 (2017-11-30)
 ## Platform: x86_64-pc-linux-gnu (64-bit)
 ## Running under: Debian GNU/Linux 9 (stretch)
 ## 
@@ -1941,31 +1971,23 @@ sessionInfo()
 ## LAPACK: /usr/lib/lapack/liblapack.so.3.7.0
 ## 
 ## locale:
-##  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8        LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8   
-##  [6] LC_MESSAGES=C.UTF-8    LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C           LC_TELEPHONE=C        
-## [11] LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   
+##  [1] LC_CTYPE=en_GB.UTF-8       LC_NUMERIC=C               LC_TIME=en_GB.UTF-8       
+##  [4] LC_COLLATE=en_GB.UTF-8     LC_MONETARY=en_GB.UTF-8    LC_MESSAGES=en_GB.UTF-8   
+##  [7] LC_PAPER=en_GB.UTF-8       LC_NAME=C                  LC_ADDRESS=C              
+## [10] LC_TELEPHONE=C             LC_MEASUREMENT=en_GB.UTF-8 LC_IDENTIFICATION=C       
 ## 
 ## attached base packages:
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] bindrcpp_0.2  plyr_1.8.4    ggplot2_2.2.1 magrittr_1.5 
+## [1] bindrcpp_0.2     platetools_0.0.2 plyr_1.8.4       ggplot2_2.2.1    magrittr_1.5    
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] gtools_3.5.0             purrr_0.2.3              lattice_0.20-35          colorspace_1.3-2        
-##  [5] htmltools_0.3.6          stats4_3.4.0             viridisLite_0.2.0        yaml_2.1.14             
-##  [9] mgcv_1.8-17              rlang_0.1.2              ggpubr_0.1.5             glue_1.1.1              
-## [13] BiocGenerics_0.22.1      RColorBrewer_1.1-2       lambda.r_1.2             platetools_0.0.2        
-## [17] GenomeInfoDbData_0.99.0  bindr_0.1                stringr_1.2.0            zlibbioc_1.22.0         
-## [21] smallCAGEqc_0.12.2.99999 munsell_0.4.3            gtable_0.2.0             futile.logger_1.4.3     
-## [25] evaluate_0.10.1          labeling_0.3             knitr_1.17               permute_0.9-4           
-## [29] IRanges_2.10.3           GenomeInfoDb_1.12.3      parallel_3.4.0           Rcpp_0.12.12            
-## [33] scales_0.5.0             backports_1.1.1          gdata_2.18.0             vegan_2.4-4             
-## [37] S4Vectors_0.14.5         XVector_0.16.0           gridExtra_2.3            digest_0.6.12           
-## [41] stringi_1.1.5            dplyr_0.7.4              cowplot_0.8.0            GenomicRanges_1.28.4    
-## [45] grid_3.4.0               rprojroot_1.2            tools_3.4.0              bitops_1.0-6            
-## [49] lazyeval_0.2.0           RCurl_1.95-4.8           tibble_1.3.4             cluster_2.0.6           
-## [53] futile.options_1.0.0     pkgconfig_2.0.1          MASS_7.3-47              Matrix_1.2-10           
-## [57] assertthat_0.2.0         rmarkdown_1.6.0.9001     reshape_0.8.7            viridis_0.4.0           
-## [61] R6_2.2.2                 VennDiagram_1.6.17       nlme_3.1-131             compiler_3.4.0
+##  [1] Rcpp_0.12.14       ggpubr_0.1.6       bindr_0.1          knitr_1.17         cowplot_0.9.2     
+##  [6] munsell_0.4.3      viridisLite_0.2.0  colorspace_1.3-2   R6_2.2.2           rlang_0.1.4       
+## [11] stringr_1.2.0      dplyr_0.7.4        tools_3.4.3        grid_3.4.3         gtable_0.2.0      
+## [16] htmltools_0.3.6    yaml_2.1.15        lazyeval_0.2.1     rprojroot_1.2      digest_0.6.12     
+## [21] assertthat_0.2.0   tibble_1.3.4       gridExtra_2.3      purrr_0.2.4        RColorBrewer_1.1-2
+## [26] viridis_0.4.0      glue_1.2.0         evaluate_0.10.1    rmarkdown_1.8      labeling_0.3      
+## [31] stringi_1.1.6      compiler_3.4.3     scales_0.5.0       backports_1.1.1    pkgconfig_2.0.1
 ```
