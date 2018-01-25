@@ -662,6 +662,25 @@ plate %<>%
   set_block("N01~P21", "RNA_vol", 25)
 ```
 
+RNA group
+---------
+
+Wells that will be indexed together, including negative controls with no RNA.
+
+```{r RNA_group}
+plate %<>%
+  set_block("A01~J07", "RNA_group", "100ng") %>%
+  set_block("A08~J14", "RNA_group",  "10ng") %>%
+  set_block("A15~J21", "RNA_group",   "1ng") %>%
+  set_block("K01~L24", "RNA_group", "100pg") %>%
+  set_block("M01~M21", "RNA_group", "100pg") %>%
+  set_block("M23",     "RNA_group", "100pg") %>%
+  set_block("N01~O24", "RNA_group",  "10pg") %>%
+  set_block("P01~P21", "RNA_group",  "10pg") %>%
+  set_block("P23",     "RNA_group",  "10pg")
+plate$RNA_group %<>% factor(levels=c("100ng", "10ng", "1ng", "100pg", "10pg"))
+```
+
 H2O
 ====
 
@@ -883,6 +902,12 @@ RNA mass
 ```{r plot_RNA_vol}
 (plot_RNA_vol <- plateMap("RNA_vol", "RNA volume"))
 ```
+
+```{r plot_RNA_group}
+(plot_RNA_group <- platetools::raw_map(plate[["RNA_group"]], well=plate$well, plate="384") +
+  ggtitle("RNA group"))
+```
+
 
 ![](images/destination_RNA_2.JPG)
 
