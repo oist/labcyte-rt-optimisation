@@ -7,3 +7,7 @@ read the results by preparing nanoCAGE libraries of the cDNAs.
 
 See also <http://dgt-gitlab.gsc.riken.jp/gitlab/plessy/Labcyte-qPCR> for a proof
 of principle on qPCR optimisation.
+
+ - [Model destination plate](Labcyte-RT.md)
+ - [Experiment one](Labcyte-RT_Data_Analysis.md) (a single plate)
+ - [Experiment two](Labcyte-RT_Data_Analysis2.md) (same model, three replicates)
