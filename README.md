@@ -10,4 +10,4 @@ of principle on qPCR optimisation.
 
  - [Model destination plate](Labcyte-RT.md)
  - [Experiment one](Labcyte-RT_Data_Analysis.md) (a single plate)
- - [Experiment two](Labcyte-RT_Data_Analysis2.md) (same model, three replicates)
+ - [Experiment two](Labcyte-RT_Data_Analysis_2.md) (same model, three replicates)
