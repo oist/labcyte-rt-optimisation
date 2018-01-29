@@ -84,6 +84,7 @@ ce$barcode
 
 ```{r PLATE}
 plate <- read.table("plate.txt", sep = "\t", header = TRUE)
+plate$TSO %<>% factor
 ce %<>% cbind(plate[match( paste(ce$barcode, ce$group)
                          , paste(plate$BARCODE_SEQ, plate$RNA_group)), ])
 ```
@@ -169,11 +170,15 @@ plotAnnot(ce, "qc", group = "group_repl")
 plotAnnot(ce, "qc", group = "group_repl", normalise = FALSE)
 ```
 
-There is a trend decreasing sequence yield with decreasing TSO amounts.  But
-what is wrong with TSO = 40 ??
+There is a trend decreasing sequence yield with decreasing TSO amounts.
+Interestingly, the optimum seems to be lower when RNA quantity is lower.
+
+But what is wrong with TSO == 40 ??  (and to some extent with TSO == 1.25)
 
 ```{r}
-plotAnnot(ce, "qc", group = "TSO", normalise = F)
+plotAnnot(ce, "qc", group = "TSO", normalise = FALSE, facet = "group")
+plotAnnot(ce, "qc", group = "TSO", normalise = FALSE, facet = "RT_PRIMERS")
+plotAnnot(ce, "qc", group = "TSO", normalise = TRUE)
 ```
 
 ```{r}
@@ -181,7 +186,7 @@ plotAnnot(ce, "qc", group = "TSO_vol", normalise = FALSE)
 ```
 
 ```{r}
-plotAnnot(ce, "qc", group = "PRIMERS_RATIO", normalise = FALSE)
+plotAnnot(ce, "qc", group = "PRIMERS_RATIO", normalise = FALSE, facet = "group")
 ```
 
 
@@ -195,8 +200,9 @@ Collect Gencode annotations and gene symbols via a local GENCODE file
 annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
 
 plotAnnot(ce, "counts", group = "group_repl")
-plotAnnot(ce, "counts", group = ce$group_repl, normalise = FALSE)
+plotAnnot(ce, "counts", group = "TSO", normalise = FALSE, facet = "group")
 ```
+
 
 CTSS ANALYSIS
 =============
@@ -204,101 +210,50 @@ CTSS ANALYSIS
 Number of nanoCAGE tags mapping at CTSS positions in each group of samples
 --------------------------------------------------------------------------
   
-```{r CTSS_counts_distribution, dev=c('png'), fig.show='hide', results='hide', message = FALSE, warning=FALSE}
-## Figures not displayed on the html/pdf output
-plotReverseCumulatives(myCAGEexp[,1:7], onePlot = TRUE)
-plotReverseCumulatives(myCAGEexp[,8:14], onePlot = TRUE)
-plotReverseCumulatives(myCAGEexp[,15:21], onePlot = TRUE)
-plotReverseCumulatives(myCAGEexp[,22:28], onePlot = TRUE)
-plotReverseCumulatives(myCAGEexp[,29:35], onePlot = TRUE)
-plotReverseCumulatives(myCAGEexp[,36:42], onePlot = TRUE)
-#plotReverseCumulatives(myCAGEexp$RNA == "10", onePlot = TRUE)
-#plotReverseCumulatives(myCAGEexp[,43:49], onePlot = TRUE)
-#plotReverseCumulatives(myCAGEexp[,50:56], onePlot = TRUE)
-#plotReverseCumulatives(myCAGEexp[,57:63], onePlot = TRUE)
-#plotReverseCumulatives(myCAGEexp[,64:70], onePlot = TRUE)
+```{r CTSS_counts_distribution}
+plotReverseCumulatives(ce, onePlot = TRUE, fitInRange = NULL, legend = NULL)
 ```
 
 Number of nanoCAGE tags mapping at CTSS positions in each sample
 ----------------------------------------------------------------
   
 ```{r ctss-analysis}
-(myCAGEexp$l1 <- colSums(CTSStagCountDf(myCAGEexp) > 0))
+ce$l1 <- sapply(CTSStagCountDF(ce), function(x) sum(decode(x) > 0))
 ```
 
-Create CTSS clusters
---------------------
-
-```{r create_CTSS_clusters, message = FALSE, warning=FALSE}
-clusterCTSS(myCAGEexp, thresholdIsTpm = FALSE, useMulticore = TRUE, nrPassThreshold = 2, removeSingletons = TRUE)
-cumulativeCTSSdistribution(myCAGEexp, clusters = "tagClusters", useMulticore = TRUE)
-quantilePositions(myCAGEexp, clusters = "tagClusters", qLow = 0.1, qUp = 0.9, useMulticore = TRUE)
-```
-
-
-Plot interquantile width of CTSS clusters 
------------------------------------------
-
-```{r CTSS_clusters_interquantile_width, dev = c('png'), fig.show='hide', results='hide', message = FALSE, warning=FALSE}
-## Figures not displayed on the html/pdf output
-#par(mfrow=c(4,6))
-plotInterquantileWidth(myCAGEexp, clusters= "tagClusters", tpmTreshold = 3, qLow = 0.1, qUp = 0.9)
-```
-
-Create consensus promoters across samples
------------------------------------------
-  
-```{r aggregate_CTSS_tag_clusters}
-aggregateTagClusters(myCAGEexp, tpmThreshold = 5, qLow = 0.1, qUp = 0.9, maxDist = 100)
-#myCAGEexp$promoter / myCAGEexp$librarySizes *100
-#myCAGEexp
-```
-
-Analyse consensus promoters distribution across samples  
--------------------------------------------------------
-
-```{r analyse_consensus_CTSS_clusters_distribution, echo = FALSE}
-#cumulativeCTSSdistribution(myCAGEexp, clusters = "consensusClusters", useMulticore = TRUE)
-#quantilePositions(myCAGEexp, clusters = "consensusClusters", qLow = 0.1, qUp = 0.9, useMulticore = TRUE)
-```
-
-```{r plot_interquantile_width, dev = c('png'), echo = FALSE}
-#not functionnal yet...
-#plotInterquantileWidth(myCAGEexp, clusters= "consensusClusters", tpmTreshold = 3, qLow = 0.1, qUp = 0.9)
-```
-
+Gene expression analysis
+========================
 
 Make a gene expression table (not really required now).
 
 ```{r CTSStoGenes-CAGEexp}
-CTSStoGenes(myCAGEexp)
-#CTSScoordinatesGR(myCAGEexp)
+CTSStoGenes(ce)
 ```
 
 Promoter rate
+=============
+
 ```{r promoter rate}
-myCAGEexp$promoter_rate <- myCAGEexp$promoter / myCAGEexp$librarySizes *100
-myCAGEexp$promoter_rate
+ce$promoter_rate <- ce$promoter / ce$librarySizes *100
 ```
 
 Promoter rate
 ```{r plot promoter rate, dev=c('png'), fig.height=8, fig.width=10}
-#plot(myCAGEexp$promoter_rate ~ myCAGEexp$barcode_ID)
-dotsize <- 0.08
-ggplot(colData(myCAGEexp) %>% data.frame, aes(x=barcode_ID, y=promoter_rate)) +
-  stat_summary(fun.y=mean, fun.ymin=mean, fun.ymax=mean, geom="crossbar", color="gray") +
-  geom_dotplot(aes(fill=group), binaxis='y', binwidth=1.5, dotsize=dotsize, stackdir='center') + theme_bw() +
-  xlab("Barocde_ID") +
-  ylab("Promoter rate") +
-  scale_x_continuous(breaks = c(1:70)) +
-  labs(title = "Promoter rate per barcoded TSO") +
-  coord_flip()
+# dotsize <- 0.08
+# ggplot(colData(ce) %>% data.frame, aes(x=RNA_group, y=promoter_rate)) +
+#   stat_summary(fun.y=mean, fun.ymin=mean, fun.ymax=mean, geom="crossbar", color="gray") +
+#   geom_dotplot(aes(fill=TSO), binaxis='y', binwidth=1.5, dotsize=dotsize, stackdir='center') + theme_bw() +
+#   xlab("RNA group") +
+#   ylab("Promoter rate") +
+#   scale_x_continuous(breaks = c(1:70)) +
+#   labs(title = "Promoter rate per RNA gropu") +
+#   coord_flip()
 ```
 
 Save myCAGEexp file.
 
 ```{r save myCAGEexp object}
-saveRDS(myCAGEexp, "myCAGEexp.Rds")
+#saveRDS(ce, "ce.Rds")
 ```
 
 QC PLOTS
@@ -311,173 +266,104 @@ Boxplots
 
 ```{r extracted_barcode, dev=c('png')}
 par(mar=c(5,5,2,2), cex.main = 1, font.main = 2)
-boxplot(extracted ~ barcode_ID, xlab = "Barcode ID", ylab = "Extracted reads", data = colData(myCAGEexp), cex.axis = 0.6, las = 3, main = "Number of extracted reads per sample")
+boxplot(extracted ~ RNA_group, xlab = "RNA_group", ylab = "Extracted reads", data = colData(ce), cex.axis = 0.6, las = 3, main = "Number of extracted reads per sample")
 ```
 
 ```{r extracted_RT, dev=c('png')}
 par(mar=c(5,5,2,2), cex.main = 1, font.main = 2)
-boxplot(extracted ~ RT_PRIMERS, ylab = "Extracted reads", xlab = "RT_PRIMERS concentration (uM)", data = colData(myCAGEexp), cex.axis = 0.7, las = 3, main = "Number of extracted reads for different RT_PRIMERS concentrations")
+boxplot(extracted ~ RT_PRIMERS, ylab = "Extracted reads", xlab = "RT_PRIMERS concentration (uM)", data = colData(ce), cex.axis = 0.7, las = 3, main = "Number of extracted reads for different RT_PRIMERS concentrations")
 ```
 
 ```{r extracted_TSO, dev=c('png')}
 par(mar=c(5,5,2,2), cex.main = 1, font.main = 2)
-boxplot(extracted ~ TSO, ylab = "Extracted reads", xlab = "TSO concentration (uM)", data = colData(myCAGEexp), cex.axis = 0.7, las = 3, main = "Number of extracted reads for different TSO concentrations")
+boxplot(extracted ~ TSO, ylab = "Extracted reads", xlab = "TSO concentration (uM)", data = colData(ce), cex.axis = 0.7, las = 3, main = "Number of extracted reads for different TSO concentrations")
 ```
 
 ```{r extracted_ratio, dev=c('png')}
 par(mar=c(7,5,2,2), cex.main = 1, font.main = 2)
-boxplot(extracted ~ PRIMERS_RATIO, ylab = "Extracted reads", xlab = "Primers ratio", data = colData(myCAGEexp), cex.axis = 0.7, las = 3, main = "Number of extracted reads for different primers ratio")
+boxplot(extracted ~ PRIMERS_RATIO, ylab = "Extracted reads", xlab = "Primers ratio", data = colData(ce), cex.axis = 0.7, las = 3, main = "Number of extracted reads for different primers ratio")
 ```
 
 ### Artefacts
 
 ```{r artefacts_barcode, dev=c('png')}
 par(mar=c(5,5,2,2), cex.main = 1, font.main = 2)
-boxplot(tagdust / extracted ~ barcode_ID, xlab = "Barcode ID", ylab = "Artefacts/extracted reads", data = colData(myCAGEexp), cex.axis = 0.6, las = 3, main = "Ratio artefacts/extracted per sample")
+boxplot(tagdust / extracted ~ RNA_group, xlab = "RNA_group", ylab = "Artefacts/extracted reads", data = colData(ce), cex.axis = 0.6, las = 3, main = "Ratio artefacts/extracted per sample")
 ```
 
 ```{r artefacts_RT, dev=c('png')}
 par(mar=c(5,5,2,2), cex.main = 1, font.main = 2)
-boxplot(tagdust / extracted ~ RT_PRIMERS, ylab = "Artefacts/extracted reads", xlab = "RT_PRIMERS concentration (uM)", data = colData(myCAGEexp), cex.axis = 0.7, las = 3, main = "Ratio artefacts/extracted for different RT_PRIMERS concentrations")
+boxplot(tagdust / extracted ~ RT_PRIMERS, ylab = "Artefacts/extracted reads", xlab = "RT_PRIMERS concentration (uM)", data = colData(ce), cex.axis = 0.7, las = 3, main = "Ratio artefacts/extracted for different RT_PRIMERS concentrations")
 ```
 
 ```{r artefacts_TSO, dev=c('png')}
 par(mar=c(5,5,2,2), cex.main = 1, font.main = 2)
-boxplot(tagdust / extracted ~ TSO, ylab = "Artefacts/extracted reads", xlab = "TSO concentration (uM)", data = colData(myCAGEexp), cex.axis = 0.7, las = 3, main = "Ratio artefacts/extracted for different TSO concentrations")
+boxplot(tagdust / extracted ~ TSO, ylab = "Artefacts/extracted reads", xlab = "TSO concentration (uM)", data = colData(ce), cex.axis = 0.7, las = 3, main = "Ratio artefacts/extracted for different TSO concentrations")
 ```
 
 ```{r artefacts_ratio, dev=c('png')}
 par(mar=c(7,5,2,2), cex.main = 1, font.main = 2)
-boxplot(tagdust / extracted ~ PRIMERS_RATIO, ylab = "Artefacts/extracted reads", xlab = "Primers ratio", data = colData(myCAGEexp), cex.axis = 0.7, las = 3, main = "Ratio artefacts/extracted for different primers ratio")
+boxplot(tagdust / extracted ~ PRIMERS_RATIO, ylab = "Artefacts/extracted reads", xlab = "Primers ratio", data = colData(ce), cex.axis = 0.7, las = 3, main = "Ratio artefacts/extracted for different primers ratio")
 ```
 
 ### Counts
 
 ```{r counts_barcode, dev=c('png')}
 par(mar=c(5,5,2,2), cex.main = 1, font.main = 2)
-boxplot(counts ~ barcode_ID, xlab = "Barcode ID", ylab = "Counts", data = colData(myCAGEexp), cex.axis = 0.6, las = 3, main = "Number of read counts per sample")
+boxplot(librarySizes ~ RNA_group, xlab = "RNgroup", ylab = "Counts", data = colData(ce), cex.axis = 0.6, las = 3, main = "Number of read counts per sample")
 ```
 
 ```{r counts_RT, dev=c('png')}
 par(mar=c(5,5,2,2), cex.main = 1, font.main = 2)
-boxplot(counts ~ RT_PRIMERS, ylab = "Counts", xlab = "RT_PRIMERS concentration (uM)", data = colData(myCAGEexp), cex.axis = 0.7, las = 3, main = "Number of read counts for different RT_PRIMERS concentrations")
+boxplot(librarySizes ~ RT_PRIMERS, ylab = "Counts", xlab = "RT_PRIMERS concentration (uM)", data = colData(ce), cex.axis = 0.7, las = 3, main = "Number of read counts for different RT_PRIMERS concentrations")
 ```
 
 ```{r counts_TSO, dev=c('png')}
 par(mar=c(5,5,2,2), cex.main = 1, font.main = 2)
-boxplot(counts ~ TSO, ylab = "Counts", xlab = "TSO concentration (uM)", data = colData(myCAGEexp), cex.axis = 0.7, las = 3, main = "Number of read counts for different TSO concentrations")
+boxplot(librarySizes ~ TSO, ylab = "Counts", xlab = "TSO concentration (uM)", data = colData(ce), cex.axis = 0.7, las = 3, main = "Number of read counts for different TSO concentrations")
 ```
 
 ```{r counts_ratio, dev=c('png')}
 par(mar=c(7,5,2,2), cex.main = 1, font.main = 2)
-boxplot(counts ~ PRIMERS_RATIO, ylab = "Counts", xlab = "Primers ratio", data = colData(myCAGEexp), cex.axis = 0.7, las = 3, main = "Number of read counts for different primers ratio")
+boxplot(librarySizes ~ PRIMERS_RATIO, ylab = "Counts", xlab = "Primers ratio", data = colData(ce), cex.axis = 0.7, las = 3, main = "Number of read counts for different primers ratio")
 ```
 
 ### Genes
 
 ```{r genes_barcode, dev=c('png')}
 par(mar=c(5,5,2,2), cex.main = 1, font.main = 2)
-boxplot(genes ~ barcode_ID, xlab = "Barcode ID", ylab = "Genes", data = colData(myCAGEexp), cex.axis = 0.6, las = 3, main = "Number of genes detected per sample")
+boxplot(genes ~ RNA_group, xlab = "RNA_group", ylab = "Genes", data = colData(ce), cex.axis = 0.6, las = 3, main = "Number of genes detected per sample")
 ```
 
 ```{r genes_RT, dev=c('png')}
 par(mar=c(5,5,2,2), cex.main = 1, font.main = 2)
-boxplot(genes ~ RT_PRIMERS, ylab = "Genes", xlab = "RT_PRIMERS concentration (uM)", data = colData(myCAGEexp), cex.axis = 0.7, las = 3, main = "Number of genes detected for different RT_PRIMERS concentrations")
+boxplot(genes ~ RT_PRIMERS, ylab = "Genes", xlab = "RT_PRIMERS concentration (uM)", data = colData(ce), cex.axis = 0.7, las = 3, main = "Number of genes detected for different RT_PRIMERS concentrations")
 ```
 
 ```{r genes_TSO, dev=c('png')}
 par(mar=c(5,5,2,2), cex.main = 1, font.main = 2)
-boxplot(genes ~ TSO, ylab = "Genes", xlab = "TSO concentration (uM)", data = colData(myCAGEexp), cex.axis = 0.7, las = 3, main = "Number of genes detected for different TSO concentrations")
+boxplot(genes ~ TSO, ylab = "Genes", xlab = "TSO concentration (uM)", data = colData(ce), cex.axis = 0.7, las = 3, main = "Number of genes detected for different TSO concentrations")
 ```
 
 ```{r genes_ratio, dev=c('png')}
 par(mar=c(7,5,2,2), cex.main = 1, font.main = 2)
-boxplot(genes ~ PRIMERS_RATIO, ylab = "Genes", xlab = "Primers ratio", data = colData(myCAGEexp), cex.axis = 0.7, las = 3, main = "Number of genes detected for different primers ratio")
-```
-
-Dotplots
---------
-
-### Extracted reads
-
-```{r extracted_reads, dev=c('png'), fig.height=5.5, fig.width=10}
-dotsize <- 25000
-ggplot(colData(myCAGEexp) %>% data.frame, aes(x=PRIMERS_RATIO, y=extracted)) +
-  stat_summary(fun.y=mean, fun.ymin=mean, fun.ymax=mean, geom="crossbar", color="gray") +
-  geom_dotplot(aes(fill=group), binaxis='y', binwidth=1.5, dotsize=dotsize, stackdir='center') + theme_bw() +
-  xlab("Primers ratio\n (TSO/RT_primers)") +
-  labs(title = "Number of sequencing reads extracted") +
-  coord_flip()
-```
-
-### Artefacts
-
-```{r, ratio_artefact_extracted, dev=c('png'), fig.height=5.5, fig.width=10}
-dotsize <- 5000
-ggplot(colData(myCAGEexp) %>% data.frame, aes(x=PRIMERS_RATIO, y=tagdust)) +
-  stat_summary(fun.y=mean, fun.ymin=mean, fun.ymax=mean, geom="crossbar", color="gray") +
-  geom_dotplot(aes(fill=group), binaxis='y', binwidth=1, dotsize=dotsize, stackdir='center') + theme_bw() +
-  xlab("Primers ratio\n (TSO/RT_primers)") +
-  labs(title = "Artefacts reads per sample") +
-  coord_flip()
-```
-
-Counts
-------
-
-### Gene counts
-
-```{r gene-count by group, dev=c('png'), fig.height=5.5, fig.width=10}
-dotsize <- 100
-ggplot(colData(myCAGEexp) %>% data.frame, aes(x=PRIMERS_RATIO, y=genes)) +
-  stat_summary(fun.y=mean, fun.ymin=mean, fun.ymax=mean, geom="crossbar", color="gray") +
-  geom_dotplot(aes(fill=group), binaxis='y', binwidth=1, dotsize=dotsize, stackdir='center') + theme_bw() +
-  xlab("Primers ratio\n (TSO/RT_primers)") +
-  labs(title = "Average number of genes detected in each group") +
-  coord_flip()
-```
-
-### Transcript counts
-
-```{r transcripts-count by group, dev=c('png'), fig.height=5.5, fig.width=10}
-dotsize <- 4000
-ggplot(colData(myCAGEexp) %>% data.frame, aes(x=PRIMERS_RATIO, y=counts)) +
-stat_summary(fun.y=mean, fun.ymin=mean, fun.ymax=mean, geom="crossbar", color="gray") +
-geom_dotplot(aes(fill=group), binaxis='y', binwidth=1, dotsize=dotsize, stackdir='center') + theme_bw() +
-xlab("Primers ratio\n (TSO/RT_primers)") +
-labs(title = "Average number of molecules detected in each group") +
-coord_flip()
-```
-
-Barplots
---------
-
-### Quality control by sample
-
-```{r qc-barplots, dev=c('png'), message = FALSE, warning = FALSE, fig.height=5.5, fig.width=10}
-plotAnnot(myCAGEexp, "qc", "Quality control by sample", "barcode_ID", normalise = F)
-```
-
-### Annotations by sample
-
-```{r annot-barplots, dev=c('png'), message = FALSE, warning = FALSE, fig.height=5.5, fig.width=10}
-plotAnnot(myCAGEexp, "counts", "Annotations by sample", "barcode_ID", normalise = F)
+boxplot(genes ~ PRIMERS_RATIO, ylab = "Genes", xlab = "Primers ratio", data = colData(ce), cex.axis = 0.7, las = 3, main = "Number of genes detected for different primers ratio")
 ```
 
 Rarefaction
 ------------
 
 ```{r, message = FALSE}
-rar1 <- hanabi(CTSStagCountDF(myCAGEexp), from = 0)
-rarc <- hanabi(assay(consensusClustersSE(myCAGEexp)) %>% as.data.frame, from = 0)
-rarg <- hanabi(assay(GeneExpSE(myCAGEexp)) %>% as.data.frame, from = 0)
-save(rar1, rarg, file="rar.Rda") 
+rar1 <- hanabi(CTSStagCountDF(ce), from = 0)
+#rarc <- hanabi(assay(consensusClustersSE(myCAGEexp)) %>% as.data.frame, from = 0)
+rarg <- hanabi(assay(GeneExpSE(ce)), from = 0)
+#save(rar1, rarg, file="rar.Rda") 
 ```
 
 ### Plot TSS discovery
 
 ```{r hanabi-TSS_byrep, dev=c('png')}
-hanabiPlot(rar1, ylab='number of TSS detected', xlab='number of unique molecule counts', main=paste("TSS discovery"), group=myCAGEexp$group, legend.pos = "bottomright")
+hanabiPlot(rar1, ylab='number of TSS detected', xlab='number of unique molecule counts', main=paste("TSS discovery"), group=ce$TSO, legend.pos = "bottomright")
 ```
 
 ### Plot Cluster discovery
@@ -489,163 +375,9 @@ hanabiPlot(rar1, ylab='number of TSS detected', xlab='number of unique molecule 
 ### Plot Gene discovery
 
 ```{r hanabi-gene_byrep, dev=c('png')}
-hanabiPlot(rarg, ylab='number of genes detected', xlab='number of unique molecule counts', main=paste("Gene discovery"), group=myCAGEexp$group, legend.pos = "bottomright")
+hanabiPlot(rarg, ylab='number of genes detected', xlab='number of unique molecule counts', main=paste("Gene discovery"), group=ce$TSO, legend.pos = "bottomright")
 ```
 
-Correlation of CTSS clusters expression across samples (sample distance)
-========================================================================
-
-Create the correlation matrix
------------------------------
-
-```{r cor_data, message = FALSE}
-c <- assay(consensusClustersSE(myCAGEexp)) %>% as.data.frame
-cor_clusters <- cor(log1p(c))
-cor_clusters[cor_clusters == 1] <- NA
-```
-
-Heatmap
--------
-
-```{r pheatmap_cor_clusters, dev=c('png'), fig.height= 14, fig.width = 14}
-#col <- colorRampPalette( rev(brewer.pal(9, "RdBu")) )(255)
-ann_col <- data.frame(row.names = rownames(colData(myCAGEexp)), TSO_conc. = myCAGEexp$TSO)
-#ann_col$protocol <- sub("CONTROL", "CTL", ann_col$protocol)
-ann_row <- data.frame(row.names = rownames(colData(myCAGEexp)), RT_PRIMERS_conc. = myCAGEexp$RT_PRIMERS)
-#ann_row$step <- sub("0", "CTL", ann_row$step)
-#colnames(cor_clusters) <- myCAGEexp$barcode_ID
-pheatmap::pheatmap(cor_clusters, show_colnames = F, annotation_col = ann_col, annotation_row = ann_row, labels_row = myCAGEexp$barcode_ID, main = "Correlation of consensus clusters expression across samples\n", display_numbers = TRUE, fontsize_number = 4)
-```
-
-Principal Component Analysis (PCA)
-==================================
-
-Define PCA axis based on correlation matrix
---------------------------------------------
-
-```{r PCA_data}
-cor_clusters <- cor(log1p(c))
-PCA <- prcomp(cor_clusters, scale. = TRUE)
-dfdf <- stats:::summary.prcomp(PCA)$importance[2, ]
-```
-
-List of principal components identified ranked by % of explained variability: 
-
-```{r, echo = FALSE}
-dfdf
-```
-
-PCA Plot 1: PC1 vs. PC2 annotated by `PRIMERS_RATIO`
-----------------------------------------------------
-
-```{r PCA_1, dev=c('png'), message = FALSE, warning = FALSE}
-ggbiplot::ggbiplot(PCA, choices=c(1,2), obs.scale = 1, var.scale = 1, groups = as.character(colData(myCAGEexp)$TSO), var.axes = FALSE, labels = colData(myCAGEexp)$genes, ellipse = T, margins = c(9,9))
-```
-
-Plate maps
-==========
-
-Create plate object
-
-```{r}
-plate <- as.data.frame(colData(myCAGEexp))
-```
-
-```{r}
-plateMap <- function(x, title) {
-  platetools::raw_map(plate[[x]], well=plate$Well, plate="384") +
-  ggtitle(title) +
-  viridis::scale_fill_viridis(breaks = unique(plate[[x]]))
-}
-
-plateMapLog <- function(x, title) {
-  platetools::raw_map(plate[[x]], well=plate$Well, plate="384") +
-  ggtitle(title) +
-  viridis::scale_fill_viridis(breaks = unique(plate[[x]]), trans = "log")
-}
-```
-
-RT primers
-----------
-
-```{r plot_RT_concentration}
-(plot_RT <- plateMapLog("RT_PRIMERS", "RT primer concentration"))
-```
-
-TSO
----
-
-```{r plot_TSO_concentration}
-(plot_TSO <- plateMapLog("TSO", "TSO concentration"))
-```
-
-Ratio TSO / RT
---------------
-
-```{r plot_TSO_RT_ratio}
-(plot_TSO_RT_ratio <- platetools::raw_map(plate$TSO / plate$RT_PRIMERS, well=plate$Well, plate="384") +
-  ggtitle("TSO / RT primer concentration") +
-  viridis::scale_fill_viridis(breaks = unique(plate$TSO / plate$RT_PRIMERS), trans = "log"))
-```
-
-Extracted
-----------
-
-```{r plot_extracted}
-(plot_extracted <- plateMapLog("extracted", "Extracted reads"))
-```
-
-Artefacts
-----------
-
-```{r plot_artefacts}
-(plot_artefacts <- plateMapLog("tagdust", "Artefacts"))
-```
-
-rDNA
-----
-
-```{r plot_rDNA}
-(plot_rDNA <- plateMapLog("rdna", "Reads mapping to rDNA"))
-```
-
-Genes
-------
-
-```{r plot_genes}
-(plot_genes <- plateMapLog("genes", "Genes detected"))
-```
-
-Counts
-------
-
-```{r plot_molecules}
-(plot_counts <- plateMapLog("counts", "Molecules detected"))
-```
-
-Promoters
----------
-
-```{r plot_promoters}
-(plot_promoters <- plateMapLog("promoter", "Promoters detected"))
-```
-
-Grand summary plots
-===================
-
-Extracted. artefacts, rDNA
---------------------------
-
-```{r plate_reads, fig.height=7, fig.width=20}
-ggpubr::ggarrange(ncol = 3, nrow = 2, plot_RT, plot_TSO, plot_TSO_RT_ratio, plot_extracted, plot_artefacts, plot_rDNA)
-```
-
-Molecules, genes and promoters
--------------------------------
-
-```{r plate_counts, fig.height=7, fig.width=20}
-ggpubr::ggarrange(ncol = 3, nrow = 2, plot_RT, plot_TSO, plot_TSO_RT_ratio, plot_counts, plot_genes, plot_promoters)
-```
 
 ```{r}
 sessionInfo()
