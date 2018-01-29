@@ -64,22 +64,19 @@ ce$inputFilesType <- c("bed")
 ce$sampleLabels <- as.character(ce$samplename)
 ce
 
-system("cut -f 6,8 -d , 180123_M00528_0325_000000000-B4PCK.SampleSheet.csv | grep g_ | sort | cut -f 2 -d _ | sed 's/\r//'", intern = TRUE)
-
-# Extract group names from sample sheet.
+# Replace indexes in group names by RNA amounts extracted from sample sheet.
 levels(ce$group) <- system("cut -f 6,8 -d , 180123_M00528_0325_000000000-B4PCK.SampleSheet.csv | grep g_ | sort | cut -f2 -d, | cut -f1 -d_", intern = TRUE)
 
 # Sort the levels by RNA amount
 ce$group %<>% factor(levels = c("100ng", "10ng", "1ng", "100pg", "10pg"))
 
-ce$repl <- ce$group
+ce$repl <- ce$index
 levels(ce$repl) <- system("cut -f 6,8 -d , 180123_M00528_0325_000000000-B4PCK.SampleSheet.csv | grep g_ | sort | cut -f 2 -d _ | sed 's/\r//'", intern = TRUE)
 
 ce$group_repl <- paste(ce$group, ce$repl) %>%
                   factor(levels = c( paste("100ng", 1:3),   paste("10ng", 1:3)
                                    , paste("1ng",   1:3),   paste("100pg", 1:3)
                                    , paste("10pg",  1:3)))
-ce$barcode
 ```
 
 ```{r PLATE}
