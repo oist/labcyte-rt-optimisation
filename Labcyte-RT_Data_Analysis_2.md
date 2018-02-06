@@ -16,6 +16,7 @@ Data load and QC in R
 ```r
 library("CAGEr")
 library("ggplot2")
+library("lattice")
 library("magrittr")
 library("MultiAssayExperiment")
 library("RColorBrewer")
@@ -142,19 +143,15 @@ ce$group %<>% factor(levels = c("100ng", "10ng", "1ng", "100pg", "10pg"))
 
 ce$repl <- ce$index
 levels(ce$repl) <- system("cut -f 6,8 -d , 180123_M00528_0325_000000000-B4PCK.SampleSheet.csv | grep g_ | sort | cut -f 2 -d _ | sed 's/\r//'", intern = TRUE)
-
-ce$group_repl <- paste(ce$group, ce$repl) %>%
-                  factor(levels = c( paste("100ng", 1:3),   paste("10ng", 1:3)
-                                   , paste("1ng",   1:3),   paste("100pg", 1:3)
-                                   , paste("10pg",  1:3)))
+ce$repl %<>% factor(levels = 1:3)
 ```
 
 
 ```r
 plate <- read.table("plate.txt", sep = "\t", header = TRUE)
-plate$TSO %<>% factor
 ce %<>% cbind(plate[match( paste(ce$barcode, ce$group)
                          , paste(plate$BARCODE_SEQ, plate$RNA_group)), ])
+rm(plate)
 ```
 
 
@@ -294,7 +291,10 @@ ce$PRIMERS_RATIO %<>%
 
 ### By group and replicates
 
-In all conditions, there are a large number of unmapped sequences.  What are they ?
+In all conditions, there are a large number of unmapped sequences.
+Close inspection of the alignment files and pipeline reports suggest that
+sequence quality was so low that a large number of reads 1 in the pairs have too
+many sequence errors to be mapped.
 
 
 ```r
@@ -311,10 +311,18 @@ plotAnnot(ce, scope = msScope_qcSI, group = "repl", normalise = FALSE, facet="gr
 
 ![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-4-2.png)<!-- -->
 
+### By TSO concentration
+
 There is a trend decreasing sequence yield with decreasing TSO amounts.
 Interestingly, the optimum seems to be lower when RNA quantity is lower.
 
 But what is wrong with TSO == 40 ??  (and to some extent with TSO == 1.25)
+We are checking this by making a new experiment where the source plate was
+re-prepared from scratch and concentration range has more points near 40.
+
+rRNA rate seems to increase when TSO concentration is reduced.
+
+Strand invation seems to depend more on RNA quantity than on TSO concentration ?!
 
 
 ```r
@@ -324,16 +332,47 @@ plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = FALSE, facet = "g
 ![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
 ```r
-plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = FALSE, facet = "RT_PRIMERS")
+plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = TRUE,  facet = "group")
 ```
 
 ![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-5-2.png)<!-- -->
 
 ```r
-plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = TRUE)
+plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = FALSE, facet = "RT_PRIMERS")
 ```
 
 ![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-5-3.png)<!-- -->
+
+Barcode "CTGTCT" gave large amounts of artefacts.  This is not the case for its
+nearest similar barcode "CTGCTC".
+
+Barcodes "ATCAGC" and "CACACG" yielded a large amount of extracted reads.
+
+
+```r
+ggplot.CAGEexp <- function(data, ...)
+  ggplot(as.data.frame(colData(data)), ...)
+
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = librarySizes)) + facet_wrap(~repl + group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("molecules")
+```
+
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/ggplot_wrapper-1.png)<!-- -->
+
+```r
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = extracted)) + facet_wrap(~repl + group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("extracted")
+```
+
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/ggplot_wrapper-2.png)<!-- -->
+
+```r
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = tagdust / extracted * 100)) + facet_wrap(~repl + group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("%tagdust")
+```
+
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/ggplot_wrapper-3.png)<!-- -->
+
+Reactions that received multiple droplets of TSOs did not fail (here we are averaging
+very different TSO concentrations, to the point is just to show that for volumes
+of 100 and 50, we have roughly the same amount of data.)
 
 
 ```r
@@ -341,6 +380,8 @@ plotAnnot(ce, scope = msScope_qcSI, group = "TSO_vol", normalise = FALSE)
 ```
 
 ![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+
+### By primer ratio
 
 
 ```r
@@ -359,39 +400,88 @@ Collect Gencode annotations and gene symbols via a local GENCODE file
 
 ```r
 annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
+```
 
+
+```r
 plotAnnot(ce, scope = msScope_counts, group = "repl", facet = "group") +
   facet_wrap("facet", nrow = 5)
 ```
 
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/annotate_CTSS-1.png)<!-- -->
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/CTSS_annotation_plot_per_replicate-1.png)<!-- -->
 
 ```r
 plotAnnot(ce, scope = msScope_counts, group = "repl", facet = "group", norm = F) +
   facet_wrap("facet", nrow = 5)
 ```
 
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/annotate_CTSS-2.png)<!-- -->
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/CTSS_annotation_plot_per_replicate-2.png)<!-- -->
+
 
 ```r
-plotAnnot(ce, scope = msScope_counts, group = "TSO", normalise = FALSE, facet = "group")
+plotAnnot(ce, scope = msScope_counts, group = "TSO", normalise = FALSE, facet = "group") +
+  facet_wrap("facet", ncol = 5)
 ```
 
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/annotate_CTSS-3.png)<!-- -->
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/CTSS_annotation_plot_per_group-1.png)<!-- -->
 
+```r
+plotAnnot(ce, scope = msScope_counts, group = "TSO", normalise = TRUE,  facet = "group") +
+  facet_wrap("facet", ncol = 5)
+```
+
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/CTSS_annotation_plot_per_group-2.png)<!-- -->
+
+Count QC with TSO concentration 40 removed...
+
+
+```r
+ce2 <- ce
+ce2 <- ce2[,ce2$TSO != 40]
+```
+
+```
+## harmonizing input:
+##   removing 90 sampleMap rows with 'colname' not in colnames of experiments
+##   removing 90 colData rownames not in sampleMap 'primary'
+```
+
+```r
+plotAnnot(ce2, scope = "counts", group = "TSO", normalise = FALSE, facet = "group") +
+  facet_wrap("facet", ncol = 5) + ggtitle("")
+```
+
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/CTSS_annotation_plot_per_group_no40-1.png)<!-- -->
+
+
+
+```r
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = promoter / librarySizes * 100)) + facet_wrap(~repl + group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("promoter rate")
+```
+
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/CTSS_annotation_heatmaps_all-1.png)<!-- -->
+
+```r
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = (properpairs - librarySizes) / librarySizes)) + facet_wrap(~repl + group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("PCR duplicates %")
+```
+
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/CTSS_annotation_heatmaps_all-2.png)<!-- -->
+
+
+```r
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = promoter / librarySizes * 100)) + facet_wrap(~group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("promoter rate")
+```
+
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/CTSS_annotation_heatmaps_per_group-1.png)<!-- -->
+
+```r
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = (properpairs - librarySizes) / librarySizes)) + facet_wrap(~group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("PCR duplicates %")
+```
+
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/CTSS_annotation_heatmaps_per_group-2.png)<!-- -->
 
 CTSS ANALYSIS
 =============
-
-Number of nanoCAGE tags mapping at CTSS positions in each group of samples
---------------------------------------------------------------------------
-  
-
-```r
-plotReverseCumulatives(ce, onePlot = TRUE, fitInRange = NULL, legend = NULL)
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/CTSS_counts_distribution-1.png)<!-- -->
 
 Number of nanoCAGE tags mapping at CTSS positions in each sample
 ----------------------------------------------------------------
@@ -411,179 +501,41 @@ Make a gene expression table (not really required now).
 CTSStoGenes(ce)
 ```
 
-Promoter rate
-=============
+
+```r
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = genes)) + facet_wrap(~repl + group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("Gene discovery")
+```
+
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/CTSS_ngenes_heatmaps_all-1.png)<!-- -->
 
 
 ```r
-ce$promoter_rate <- ce$promoter / ce$librarySizes *100
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = genes)) + facet_wrap(~group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("Gene discovery")
 ```
 
-Promoter rate
-
-```r
-# dotsize <- 0.08
-# ggplot(colData(ce) %>% data.frame, aes(x=RNA_group, y=promoter_rate)) +
-#   stat_summary(fun.y=mean, fun.ymin=mean, fun.ymax=mean, geom="crossbar", color="gray") +
-#   geom_dotplot(aes(fill=TSO), binaxis='y', binwidth=1.5, dotsize=dotsize, stackdir='center') + theme_bw() +
-#   xlab("RNA group") +
-#   ylab("Promoter rate") +
-#   scale_x_continuous(breaks = c(1:70)) +
-#   labs(title = "Promoter rate per RNA gropu") +
-#   coord_flip()
-```
-
-Save myCAGEexp file.
-
-
-```r
-#saveRDS(ce, "ce.Rds")
-```
-
-QC PLOTS
-========
-
-Boxplots
---------
-
-### Extracted reads
-
-
-```r
-par(mar=c(5,5,2,2), cex.main = 1, font.main = 2)
-boxplot(extracted ~ RNA_group, xlab = "RNA_group", ylab = "Extracted reads", data = colData(ce), cex.axis = 0.6, las = 3, main = "Number of extracted reads per sample")
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/extracted_barcode-1.png)<!-- -->
-
-
-```r
-par(mar=c(5,5,2,2), cex.main = 1, font.main = 2)
-boxplot(extracted ~ RT_PRIMERS, ylab = "Extracted reads", xlab = "RT_PRIMERS concentration (uM)", data = colData(ce), cex.axis = 0.7, las = 3, main = "Number of extracted reads for different RT_PRIMERS concentrations")
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/extracted_RT-1.png)<!-- -->
-
-
-```r
-par(mar=c(5,5,2,2), cex.main = 1, font.main = 2)
-boxplot(extracted ~ TSO, ylab = "Extracted reads", xlab = "TSO concentration (uM)", data = colData(ce), cex.axis = 0.7, las = 3, main = "Number of extracted reads for different TSO concentrations")
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/extracted_TSO-1.png)<!-- -->
-
-
-```r
-par(mar=c(7,5,2,2), cex.main = 1, font.main = 2)
-boxplot(extracted ~ PRIMERS_RATIO, ylab = "Extracted reads", xlab = "Primers ratio", data = colData(ce), cex.axis = 0.7, las = 3, main = "Number of extracted reads for different primers ratio")
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/extracted_ratio-1.png)<!-- -->
-
-### Artefacts
-
-
-```r
-par(mar=c(5,5,2,2), cex.main = 1, font.main = 2)
-boxplot(tagdust / extracted ~ RNA_group, xlab = "RNA_group", ylab = "Artefacts/extracted reads", data = colData(ce), cex.axis = 0.6, las = 3, main = "Ratio artefacts/extracted per sample")
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/artefacts_barcode-1.png)<!-- -->
-
-
-```r
-par(mar=c(5,5,2,2), cex.main = 1, font.main = 2)
-boxplot(tagdust / extracted ~ RT_PRIMERS, ylab = "Artefacts/extracted reads", xlab = "RT_PRIMERS concentration (uM)", data = colData(ce), cex.axis = 0.7, las = 3, main = "Ratio artefacts/extracted for different RT_PRIMERS concentrations")
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/artefacts_RT-1.png)<!-- -->
-
-
-```r
-par(mar=c(5,5,2,2), cex.main = 1, font.main = 2)
-boxplot(tagdust / extracted ~ TSO, ylab = "Artefacts/extracted reads", xlab = "TSO concentration (uM)", data = colData(ce), cex.axis = 0.7, las = 3, main = "Ratio artefacts/extracted for different TSO concentrations")
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/artefacts_TSO-1.png)<!-- -->
-
-
-```r
-par(mar=c(7,5,2,2), cex.main = 1, font.main = 2)
-boxplot(tagdust / extracted ~ PRIMERS_RATIO, ylab = "Artefacts/extracted reads", xlab = "Primers ratio", data = colData(ce), cex.axis = 0.7, las = 3, main = "Ratio artefacts/extracted for different primers ratio")
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/artefacts_ratio-1.png)<!-- -->
-
-### Counts
-
-
-```r
-par(mar=c(5,5,2,2), cex.main = 1, font.main = 2)
-boxplot(librarySizes ~ RNA_group, xlab = "RNgroup", ylab = "Counts", data = colData(ce), cex.axis = 0.6, las = 3, main = "Number of read counts per sample")
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/counts_barcode-1.png)<!-- -->
-
-
-```r
-par(mar=c(5,5,2,2), cex.main = 1, font.main = 2)
-boxplot(librarySizes ~ RT_PRIMERS, ylab = "Counts", xlab = "RT_PRIMERS concentration (uM)", data = colData(ce), cex.axis = 0.7, las = 3, main = "Number of read counts for different RT_PRIMERS concentrations")
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/counts_RT-1.png)<!-- -->
-
-
-```r
-par(mar=c(5,5,2,2), cex.main = 1, font.main = 2)
-boxplot(librarySizes ~ TSO, ylab = "Counts", xlab = "TSO concentration (uM)", data = colData(ce), cex.axis = 0.7, las = 3, main = "Number of read counts for different TSO concentrations")
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/counts_TSO-1.png)<!-- -->
-
-
-```r
-par(mar=c(7,5,2,2), cex.main = 1, font.main = 2)
-boxplot(librarySizes ~ PRIMERS_RATIO, ylab = "Counts", xlab = "Primers ratio", data = colData(ce), cex.axis = 0.7, las = 3, main = "Number of read counts for different primers ratio")
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/counts_ratio-1.png)<!-- -->
-
-### Genes
-
-
-```r
-par(mar=c(5,5,2,2), cex.main = 1, font.main = 2)
-boxplot(genes ~ RNA_group, xlab = "RNA_group", ylab = "Genes", data = colData(ce), cex.axis = 0.6, las = 3, main = "Number of genes detected per sample")
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/genes_barcode-1.png)<!-- -->
-
-
-```r
-par(mar=c(5,5,2,2), cex.main = 1, font.main = 2)
-boxplot(genes ~ RT_PRIMERS, ylab = "Genes", xlab = "RT_PRIMERS concentration (uM)", data = colData(ce), cex.axis = 0.7, las = 3, main = "Number of genes detected for different RT_PRIMERS concentrations")
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/genes_RT-1.png)<!-- -->
-
-
-```r
-par(mar=c(5,5,2,2), cex.main = 1, font.main = 2)
-boxplot(genes ~ TSO, ylab = "Genes", xlab = "TSO concentration (uM)", data = colData(ce), cex.axis = 0.7, las = 3, main = "Number of genes detected for different TSO concentrations")
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/genes_TSO-1.png)<!-- -->
-
-
-```r
-par(mar=c(7,5,2,2), cex.main = 1, font.main = 2)
-boxplot(genes ~ PRIMERS_RATIO, ylab = "Genes", xlab = "Primers ratio", data = colData(ce), cex.axis = 0.7, las = 3, main = "Number of genes detected for different primers ratio")
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/genes_ratio-1.png)<!-- -->
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/CTSS_ngenes_heatmaps_per_group-1.png)<!-- -->
 
 Rarefaction
 ------------
+
+
+```r
+ce$r100l1 <- rarefy(t(CTSStagCountDA(ce)),10)
+```
+
+```
+## Warning in rarefy(t(CTSStagCountDA(ce)), 10): Requested 'sample' was larger
+## than smallest site maximum (0)
+```
+
+```r
+ce$r100l1[librarySizes(ce) < 10] <- NA
+
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = r100l1)) + facet_wrap(~group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("Richness (on a scale of 10)")
+```
+
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+
 
 
 ```r
@@ -646,50 +598,51 @@ sessionInfo()
 ## [8] methods   base     
 ## 
 ## other attached packages:
-##  [1] vegan_2.4-5                 lattice_0.20-35            
-##  [3] permute_0.9-4               SummarizedExperiment_1.9.3 
-##  [5] DelayedArray_0.4.1          matrixStats_0.52.2         
-##  [7] Biobase_2.38.0              GenomicRanges_1.31.3       
-##  [9] GenomeInfoDb_1.14.0         IRanges_2.13.4             
-## [11] S4Vectors_0.17.12           BiocGenerics_0.24.0        
-## [13] RColorBrewer_1.1-2          MultiAssayExperiment_1.5.41
-## [15] magrittr_1.5                ggplot2_2.2.1              
+##  [1] vegan_2.4-5                 permute_0.9-4              
+##  [3] SummarizedExperiment_1.9.3  DelayedArray_0.4.1         
+##  [5] matrixStats_0.52.2          Biobase_2.38.0             
+##  [7] GenomicRanges_1.31.3        GenomeInfoDb_1.14.0        
+##  [9] IRanges_2.13.4              S4Vectors_0.17.12          
+## [11] BiocGenerics_0.24.0         RColorBrewer_1.1-2         
+## [13] MultiAssayExperiment_1.5.41 magrittr_1.5               
+## [15] lattice_0.20-35             ggplot2_2.2.1              
 ## [17] CAGEr_1.21.4.5             
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] tidyr_0.7.2                       VGAM_1.0-4                       
-##  [3] splines_3.4.3                     gtools_3.5.0                     
-##  [5] assertthat_0.2.0                  BSgenome_1.46.0                  
-##  [7] GenomeInfoDbData_0.99.1           Rsamtools_1.30.0                 
-##  [9] yaml_2.1.15                       backports_1.1.1                  
-## [11] glue_1.2.0                        digest_0.6.12                    
-## [13] XVector_0.19.1                    platetools_0.0.2                 
-## [15] colorspace_1.3-2                  htmltools_0.3.6                  
-## [17] Matrix_1.2-12                     plyr_1.8.4                       
-## [19] pkgconfig_2.0.1                   XML_3.98-1.9                     
-## [21] smallCAGEqc_0.12.2.999999         zlibbioc_1.24.0                  
-## [23] purrr_0.2.4                       scales_0.5.0                     
-## [25] gdata_2.18.0                      stringdist_0.9.4.6               
-## [27] VennDiagram_1.6.18                BiocParallel_1.12.0              
-## [29] tibble_1.3.4                      beanplot_1.2                     
-## [31] mgcv_1.8-22                       lazyeval_0.2.1                   
-## [33] memoise_1.1.0                     evaluate_0.10.1                  
-## [35] BSgenome.Mmusculus.UCSC.mm9_1.4.0 nlme_3.1-131                     
-## [37] MASS_7.3-47                       tools_3.4.3                      
-## [39] data.table_1.10.4-3               stringr_1.2.0                    
-## [41] munsell_0.4.3                     cluster_2.0.6                    
-## [43] bindrcpp_0.2                      lambda.r_1.2                     
-## [45] Biostrings_2.46.0                 som_0.3-5.1                      
-## [47] compiler_3.4.3                    rlang_0.1.4                      
-## [49] futile.logger_1.4.3               grid_3.4.3                       
-## [51] RCurl_1.95-4.10                   labeling_0.3                     
-## [53] bitops_1.0-6                      rmarkdown_1.8                    
-## [55] gtable_0.2.0                      codetools_0.2-15                 
-## [57] reshape_0.8.7                     R6_2.2.2                         
-## [59] reshape2_1.4.2                    GenomicAlignments_1.14.1         
-## [61] dplyr_0.7.4                       knitr_1.17                       
-## [63] rtracklayer_1.38.3                bindr_0.1                        
-## [65] rprojroot_1.2                     futile.options_1.0.0             
-## [67] KernSmooth_2.23-15                stringi_1.1.6                    
-## [69] Rcpp_0.12.14
+##  [1] nlme_3.1-131                      bitops_1.0-6                     
+##  [3] rprojroot_1.2                     tools_3.4.3                      
+##  [5] backports_1.1.1                   R6_2.2.2                         
+##  [7] platetools_0.0.2                  KernSmooth_2.23-15               
+##  [9] lazyeval_0.2.1                    mgcv_1.8-22                      
+## [11] colorspace_1.3-2                  gridExtra_2.3                    
+## [13] compiler_3.4.3                    VennDiagram_1.6.18               
+## [15] rtracklayer_1.38.3                labeling_0.3                     
+## [17] scales_0.5.0                      stringr_1.2.0                    
+## [19] digest_0.6.12                     Rsamtools_1.30.0                 
+## [21] rmarkdown_1.8                     stringdist_0.9.4.6               
+## [23] XVector_0.19.1                    pkgconfig_2.0.1                  
+## [25] htmltools_0.3.6                   BSgenome_1.46.0                  
+## [27] rlang_0.1.4                       VGAM_1.0-4                       
+## [29] bindr_0.1                         BiocParallel_1.12.0              
+## [31] gtools_3.5.0                      dplyr_0.7.4                      
+## [33] RCurl_1.95-4.10                   GenomeInfoDbData_0.99.1          
+## [35] futile.logger_1.4.3               smallCAGEqc_0.12.2.999999        
+## [37] Matrix_1.2-12                     Rcpp_0.12.14                     
+## [39] munsell_0.4.3                     viridis_0.4.0                    
+## [41] stringi_1.1.6                     yaml_2.1.15                      
+## [43] MASS_7.3-47                       zlibbioc_1.24.0                  
+## [45] plyr_1.8.4                        grid_3.4.3                       
+## [47] gdata_2.18.0                      Biostrings_2.46.0                
+## [49] splines_3.4.3                     knitr_1.17                       
+## [51] beanplot_1.2                      reshape2_1.4.2                   
+## [53] codetools_0.2-15                  futile.options_1.0.0             
+## [55] XML_3.98-1.9                      glue_1.2.0                       
+## [57] evaluate_0.10.1                   lambda.r_1.2                     
+## [59] data.table_1.10.4-3               gtable_0.2.0                     
+## [61] BSgenome.Mmusculus.UCSC.mm9_1.4.0 purrr_0.2.4                      
+## [63] tidyr_0.7.2                       reshape_0.8.7                    
+## [65] assertthat_0.2.0                  viridisLite_0.2.0                
+## [67] tibble_1.3.4                      som_0.3-5.1                      
+## [69] GenomicAlignments_1.14.1          memoise_1.1.0                    
+## [71] bindrcpp_0.2                      cluster_2.0.6
 ```
