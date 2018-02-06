@@ -166,10 +166,46 @@ Create a CAGEexp object and load expression data
 
 ```r
 getCTSS(ce, useMulticore = TRUE)
+removeStrandInvaders(ce)
+```
+
+```
+## Loading required namespace: BSgenome.Mmusculus.UCSC.mm9
 ```
 
 Quality controls
 ----------------
+
+Custom _scopes_ displaying _strand invasion_ artefacts.
+
+
+```r
+msScope_qcSI <- function(libs) {
+  libs$Tag_dust     <- libs$extracted   - libs$rdna - libs$spikes - libs$cleaned
+  libs$rDNA         <- libs$rdna
+  libs$Spikes       <- libs$spikes
+  libs$Unmapped     <- libs$cleaned     - libs$mapped
+  libs$Non_proper   <- libs$mapped      - libs$properpairs
+  libs$Duplicates   <- libs$properpairs - libs$librarySizes - libs$strandInvaders
+  libs$Invaders     <- libs$strandInvaders
+  libs$Counts       <- libs$librarySizes
+  list( libs    = libs
+      , columns = c( "Tag_dust", "rDNA", "Spikes", "Unmapped"
+                   , "Non_proper", "Duplicates", "Invaders", "Counts")
+      , total   = libs$extracted)
+}
+
+msScope_counts <- function(libs) {
+  libs$Promoter   <- libs$promoter
+  libs$Exon       <- libs$exon
+  libs$Intron     <- libs$intron
+  libs$Intergenic <- libs$librarySizes - libs$promoter - libs$intron - libs$exon
+  libs$Invaders   <- libs$strandInvaders
+  list( libs    = libs
+      , columns = c("Promoter", "Exon", "Intron", "Intergenic", "Invaders")
+      , total   = libs$librarySizes + libs$strandInvaders)
+}
+```
 
 ### By RNA input
 
@@ -178,7 +214,7 @@ samples with RNA.
 
 
 ```r
-plotAnnot( ce, "qc", group = "RNA", normalise = FALSE
+plotAnnot( ce, scope = msScope_qcSI, group = "RNA", normalise = FALSE
          , title = "QC control, by ng of input RNA (sequence counts)")
 ```
 
@@ -189,7 +225,7 @@ the sequences might be _in silico_ or _in vitro_ contaminations.
 
 
 ```r
-plotAnnot( ce, "qc", group = "RNA", normalise = TRUE
+plotAnnot( ce, scope = msScope_qcSI, group = "RNA", normalise = TRUE
          , title = "QC control, by ng of input RNA (normalised to 100 %)")
 ```
 
@@ -219,7 +255,7 @@ samples is a bit high for such an explanation.
 
 
 ```r
-plotAnnot( ce, "qc", group = "RT_PRIMERS", normalise = FALSE
+plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
          , title = "QC control, by amount of RT primers (in μM)")
 ```
 
@@ -227,7 +263,7 @@ plotAnnot( ce, "qc", group = "RT_PRIMERS", normalise = FALSE
 
 
 ```r
-plotAnnot( ce, "qc", group = "RT_PRIMERS", normalise = TRUE
+plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = TRUE
          , title = "QC control, by amount of RT primers (normalised to 100 %)")
 ```
 
@@ -262,13 +298,15 @@ In all conditions, there are a large number of unmapped sequences.  What are the
 
 
 ```r
-plotAnnot(ce, "qc", group = "group_repl")
+plotAnnot(ce, scope = msScope_qcSI, group = "repl", facet="group") +
+  facet_wrap(~facet, nrow = 5)
 ```
 
 ![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
 
 ```r
-plotAnnot(ce, "qc", group = "group_repl", normalise = FALSE)
+plotAnnot(ce, scope = msScope_qcSI, group = "repl", normalise = FALSE, facet="group") +
+  facet_wrap(~facet, nrow = 5)
 ```
 
 ![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-4-2.png)<!-- -->
@@ -280,33 +318,33 @@ But what is wrong with TSO == 40 ??  (and to some extent with TSO == 1.25)
 
 
 ```r
-plotAnnot(ce, "qc", group = "TSO", normalise = FALSE, facet = "group")
+plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = FALSE, facet = "group")
 ```
 
 ![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
 ```r
-plotAnnot(ce, "qc", group = "TSO", normalise = FALSE, facet = "RT_PRIMERS")
+plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = FALSE, facet = "RT_PRIMERS")
 ```
 
 ![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-5-2.png)<!-- -->
 
 ```r
-plotAnnot(ce, "qc", group = "TSO", normalise = TRUE)
+plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = TRUE)
 ```
 
 ![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-5-3.png)<!-- -->
 
 
 ```r
-plotAnnot(ce, "qc", group = "TSO_vol", normalise = FALSE)
+plotAnnot(ce, scope = msScope_qcSI, group = "TSO_vol", normalise = FALSE)
 ```
 
 ![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
 
 ```r
-plotAnnot(ce, "qc", group = "PRIMERS_RATIO", normalise = FALSE, facet = "group")
+plotAnnot(ce, scope = msScope_qcSI, group = "PRIMERS_RATIO", normalise = FALSE, facet = "group")
 ```
 
 ![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
@@ -322,16 +360,24 @@ Collect Gencode annotations and gene symbols via a local GENCODE file
 ```r
 annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
 
-plotAnnot(ce, "counts", group = "group_repl")
+plotAnnot(ce, scope = msScope_counts, group = "repl", facet = "group") +
+  facet_wrap("facet", nrow = 5)
 ```
 
 ![](Labcyte-RT_Data_Analysis_2_files/figure-html/annotate_CTSS-1.png)<!-- -->
 
 ```r
-plotAnnot(ce, "counts", group = "TSO", normalise = FALSE, facet = "group")
+plotAnnot(ce, scope = msScope_counts, group = "repl", facet = "group", norm = F) +
+  facet_wrap("facet", nrow = 5)
 ```
 
 ![](Labcyte-RT_Data_Analysis_2_files/figure-html/annotate_CTSS-2.png)<!-- -->
+
+```r
+plotAnnot(ce, scope = msScope_counts, group = "TSO", normalise = FALSE, facet = "group")
+```
+
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/annotate_CTSS-3.png)<!-- -->
 
 
 CTSS ANALYSIS
@@ -608,41 +654,42 @@ sessionInfo()
 ## [11] S4Vectors_0.17.12           BiocGenerics_0.24.0        
 ## [13] RColorBrewer_1.1-2          MultiAssayExperiment_1.5.41
 ## [15] magrittr_1.5                ggplot2_2.2.1              
-## [17] CAGEr_1.21.4.4             
+## [17] CAGEr_1.21.4.5             
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] tidyr_0.7.2               VGAM_1.0-4               
-##  [3] splines_3.4.3             gtools_3.5.0             
-##  [5] assertthat_0.2.0          BSgenome_1.46.0          
-##  [7] GenomeInfoDbData_0.99.1   Rsamtools_1.30.0         
-##  [9] yaml_2.1.15               backports_1.1.1          
-## [11] glue_1.2.0                digest_0.6.12            
-## [13] XVector_0.19.1            platetools_0.0.2         
-## [15] colorspace_1.3-2          htmltools_0.3.6          
-## [17] Matrix_1.2-12             plyr_1.8.4               
-## [19] pkgconfig_2.0.1           XML_3.98-1.9             
-## [21] smallCAGEqc_0.12.2.999999 zlibbioc_1.24.0          
-## [23] purrr_0.2.4               scales_0.5.0             
-## [25] gdata_2.18.0              VennDiagram_1.6.18       
-## [27] BiocParallel_1.12.0       tibble_1.3.4             
-## [29] beanplot_1.2              mgcv_1.8-22              
-## [31] lazyeval_0.2.1            memoise_1.1.0            
-## [33] evaluate_0.10.1           nlme_3.1-131             
-## [35] MASS_7.3-47               tools_3.4.3              
-## [37] data.table_1.10.4-3       stringr_1.2.0            
-## [39] munsell_0.4.3             cluster_2.0.6            
-## [41] bindrcpp_0.2              lambda.r_1.2             
-## [43] Biostrings_2.46.0         som_0.3-5.1              
-## [45] compiler_3.4.3            rlang_0.1.4              
-## [47] futile.logger_1.4.3       grid_3.4.3               
-## [49] RCurl_1.95-4.10           labeling_0.3             
-## [51] bitops_1.0-6              rmarkdown_1.8            
-## [53] gtable_0.2.0              codetools_0.2-15         
-## [55] reshape_0.8.7             R6_2.2.2                 
-## [57] reshape2_1.4.2            GenomicAlignments_1.14.1 
-## [59] dplyr_0.7.4               knitr_1.17               
-## [61] rtracklayer_1.38.3        bindr_0.1                
-## [63] rprojroot_1.2             futile.options_1.0.0     
-## [65] KernSmooth_2.23-15        stringi_1.1.6            
-## [67] Rcpp_0.12.14
+##  [1] tidyr_0.7.2                       VGAM_1.0-4                       
+##  [3] splines_3.4.3                     gtools_3.5.0                     
+##  [5] assertthat_0.2.0                  BSgenome_1.46.0                  
+##  [7] GenomeInfoDbData_0.99.1           Rsamtools_1.30.0                 
+##  [9] yaml_2.1.15                       backports_1.1.1                  
+## [11] glue_1.2.0                        digest_0.6.12                    
+## [13] XVector_0.19.1                    platetools_0.0.2                 
+## [15] colorspace_1.3-2                  htmltools_0.3.6                  
+## [17] Matrix_1.2-12                     plyr_1.8.4                       
+## [19] pkgconfig_2.0.1                   XML_3.98-1.9                     
+## [21] smallCAGEqc_0.12.2.999999         zlibbioc_1.24.0                  
+## [23] purrr_0.2.4                       scales_0.5.0                     
+## [25] gdata_2.18.0                      stringdist_0.9.4.6               
+## [27] VennDiagram_1.6.18                BiocParallel_1.12.0              
+## [29] tibble_1.3.4                      beanplot_1.2                     
+## [31] mgcv_1.8-22                       lazyeval_0.2.1                   
+## [33] memoise_1.1.0                     evaluate_0.10.1                  
+## [35] BSgenome.Mmusculus.UCSC.mm9_1.4.0 nlme_3.1-131                     
+## [37] MASS_7.3-47                       tools_3.4.3                      
+## [39] data.table_1.10.4-3               stringr_1.2.0                    
+## [41] munsell_0.4.3                     cluster_2.0.6                    
+## [43] bindrcpp_0.2                      lambda.r_1.2                     
+## [45] Biostrings_2.46.0                 som_0.3-5.1                      
+## [47] compiler_3.4.3                    rlang_0.1.4                      
+## [49] futile.logger_1.4.3               grid_3.4.3                       
+## [51] RCurl_1.95-4.10                   labeling_0.3                     
+## [53] bitops_1.0-6                      rmarkdown_1.8                    
+## [55] gtable_0.2.0                      codetools_0.2-15                 
+## [57] reshape_0.8.7                     R6_2.2.2                         
+## [59] reshape2_1.4.2                    GenomicAlignments_1.14.1         
+## [61] dplyr_0.7.4                       knitr_1.17                       
+## [63] rtracklayer_1.38.3                bindr_0.1                        
+## [65] rprojroot_1.2                     futile.options_1.0.0             
+## [67] KernSmooth_2.23-15                stringi_1.1.6                    
+## [69] Rcpp_0.12.14
 ```

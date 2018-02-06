@@ -91,16 +91,48 @@ Create a CAGEexp object and load expression data
 ------------------------------------------------
 
 ```{r new_CAGEexp, message = F, echo = FALSE}
-ce <- CAGEexp(colData = ce)
-genomeName(ce) <- "BSgenome.Mmusculus.UCSC.mm9"
+ce <- CAGEexp( colData    = ce
+             , genomeName = "BSgenome.Mmusculus.UCSC.mm9")
 ```
 
 ```{r get_CTSS_data}
 getCTSS(ce, useMulticore = TRUE)
+removeStrandInvaders(ce)
 ```
 
 Quality controls
 ----------------
+
+Custom _scopes_ displaying _strand invasion_ artefacts.
+
+```{r custom_plotAnnot_scopes}
+msScope_qcSI <- function(libs) {
+  libs$Tag_dust     <- libs$extracted   - libs$rdna - libs$spikes - libs$cleaned
+  libs$rDNA         <- libs$rdna
+  libs$Spikes       <- libs$spikes
+  libs$Unmapped     <- libs$cleaned     - libs$mapped
+  libs$Non_proper   <- libs$mapped      - libs$properpairs
+  libs$Duplicates   <- libs$properpairs - libs$librarySizes - libs$strandInvaders
+  libs$Invaders     <- libs$strandInvaders
+  libs$Counts       <- libs$librarySizes
+  list( libs    = libs
+      , columns = c( "Tag_dust", "rDNA", "Spikes", "Unmapped"
+                   , "Non_proper", "Duplicates", "Invaders", "Counts")
+      , total   = libs$extracted)
+}
+
+msScope_counts <- function(libs) {
+  libs$Promoter   <- libs$promoter
+  libs$Exon       <- libs$exon
+  libs$Intron     <- libs$intron
+  libs$Intergenic <- libs$librarySizes - libs$promoter - libs$intron - libs$exon
+  libs$Invaders   <- libs$strandInvaders
+  list( libs    = libs
+      , columns = c("Promoter", "Exon", "Intron", "Intergenic", "Invaders")
+      , total   = libs$librarySizes + libs$strandInvaders)
+}
+
+```
 
 ### By RNA input
 
@@ -108,7 +140,7 @@ Negative controls with no RNA gave much less sequences than the regular
 samples with RNA.
 
 ```{r qc_RNA_quantity_raw}
-plotAnnot( ce, "qc", group = "RNA", normalise = FALSE
+plotAnnot( ce, scope = msScope_qcSI, group = "RNA", normalise = FALSE
          , title = "QC control, by ng of input RNA (sequence counts)")
 ```
 
@@ -116,7 +148,7 @@ The normalised QC profile is not much different, therefore
 the sequences might be _in silico_ or _in vitro_ contaminations.
 
 ```{r qc_RNA_quantity_norm}
-plotAnnot( ce, "qc", group = "RNA", normalise = TRUE
+plotAnnot( ce, scope = msScope_qcSI, group = "RNA", normalise = TRUE
          , title = "QC control, by ng of input RNA (normalised to 100 %)")
 ```
 
@@ -136,12 +168,12 @@ by contaminations, although the amount of sequences in the "no RT primer"
 samples is a bit high for such an explanation.
 
 ```{r qc_rt_primer_quantity_raw}
-plotAnnot( ce, "qc", group = "RT_PRIMERS", normalise = FALSE
+plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
          , title = "QC control, by amount of RT primers (in μM)")
 ```
 
 ```{r qc_rt_primer_quantity_norm}
-plotAnnot( ce, "qc", group = "RT_PRIMERS", normalise = TRUE
+plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = TRUE
          , title = "QC control, by amount of RT primers (normalised to 100 %)")
 ```
 
@@ -163,8 +195,10 @@ ce$PRIMERS_RATIO %<>%
 In all conditions, there are a large number of unmapped sequences.  What are they ?
 
 ```{r}
-plotAnnot(ce, "qc", group = "group_repl")
-plotAnnot(ce, "qc", group = "group_repl", normalise = FALSE)
+plotAnnot(ce, scope = msScope_qcSI, group = "repl", facet="group") +
+  facet_wrap(~facet, nrow = 5)
+plotAnnot(ce, scope = msScope_qcSI, group = "repl", normalise = FALSE, facet="group") +
+  facet_wrap(~facet, nrow = 5)
 ```
 
 There is a trend decreasing sequence yield with decreasing TSO amounts.
@@ -173,17 +207,17 @@ Interestingly, the optimum seems to be lower when RNA quantity is lower.
 But what is wrong with TSO == 40 ??  (and to some extent with TSO == 1.25)
 
 ```{r}
-plotAnnot(ce, "qc", group = "TSO", normalise = FALSE, facet = "group")
-plotAnnot(ce, "qc", group = "TSO", normalise = FALSE, facet = "RT_PRIMERS")
-plotAnnot(ce, "qc", group = "TSO", normalise = TRUE)
+plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = FALSE, facet = "group")
+plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = FALSE, facet = "RT_PRIMERS")
+plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = TRUE)
 ```
 
 ```{r}
-plotAnnot(ce, "qc", group = "TSO_vol", normalise = FALSE)
+plotAnnot(ce, scope = msScope_qcSI, group = "TSO_vol", normalise = FALSE)
 ```
 
 ```{r}
-plotAnnot(ce, "qc", group = "PRIMERS_RATIO", normalise = FALSE, facet = "group")
+plotAnnot(ce, scope = msScope_qcSI, group = "PRIMERS_RATIO", normalise = FALSE, facet = "group")
 ```
 
 
@@ -196,8 +230,11 @@ Collect Gencode annotations and gene symbols via a local GENCODE file
 ```{r annotate_CTSS}
 annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
 
-plotAnnot(ce, "counts", group = "group_repl")
-plotAnnot(ce, "counts", group = "TSO", normalise = FALSE, facet = "group")
+plotAnnot(ce, scope = msScope_counts, group = "repl", facet = "group") +
+  facet_wrap("facet", nrow = 5)
+plotAnnot(ce, scope = msScope_counts, group = "repl", facet = "group", norm = F) +
+  facet_wrap("facet", nrow = 5)
+plotAnnot(ce, scope = msScope_counts, group = "TSO", normalise = FALSE, facet = "group")
 ```
 
 
