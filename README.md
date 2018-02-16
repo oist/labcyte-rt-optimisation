@@ -15,4 +15,5 @@ of principle on qPCR optimisation.
  - [Experiment two](Labcyte-RT_Data_Analysis_2.md) (same model, three replicates). MiSeq ID: `180123_M00528_0325_000000000-B4PCK`. MOIRAI
      [[QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180123_M00528_0325_000000000-B4PCK.paired_raw_quality_control2.20180124101336/180123_M00528_0325_000000000-B4PCK.paired_raw_quality_control2.20180124101336.html)]
      [[MOIRAI](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180123_M00528_0325_000000000-B4PCK.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180124102551/180123_M00528_0325_000000000-B4PCK.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180124102551.html)]
- - [Experiment three](Labcyte-RT_Data_Analysis_3.md) (same model, different concentrations, three replicates, two enzymes). MiSeq ID: `180215_M00528_0330_000000000-B4GPD`.
+ - [Experiment three](Labcyte-RT_Data_Analysis_3.md) (same model, different concentrations, three replicates, two enzymes). MiSeq ID: `180215_M00528_0330_000000000-B4GPD`.MOIRAI
+     [[QC]( http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD.paired_raw_quality_control2.20180216100318/180215_M00528_0330_000000000-B4GPD.paired_raw_quality_control2.20180216100318.html)]
