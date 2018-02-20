@@ -1,0 +1,371 @@
+---
+title: "Labcyte-RT Data Analysis (3nd experiment, plates 1, 2 and 3.)"
+output:
+  html_document:
+    keep_md: yes
+    number_sections: yes
+    toc: yes
+---
+
+```{r echo = FALSE}
+knitr::opts_chunk$set(cache  = TRUE)
+knitr::opts_knit$set(verbose = TRUE)
+ggplot2::theme_set(ggplot2::theme_bw())
+```
+
+Data load and QC in R
+=====================
+
+```{r load_R_libraries, message = FALSE}
+library("CAGEr")
+library("ggplot2")
+#library("lattice")
+library("magrittr")
+library("MultiAssayExperiment")
+#library("RColorBrewer")
+library("SummarizedExperiment")
+library("vegan")
+```
+
+MOIRAI shortcuts
+
+```{r moirai_shortcuts}
+MISEQ_RUN      <- "180215_M00528_0330_000000000-B4GPD_p456"
+WORKFLOW       <- "OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1"
+MOIRAI_STAMP   <- "20180219140315"
+MOIRAI_PROJ    <- "project/Labcyte" 
+MOIRAI_USER    <- "nanoCAGE2" 
+ASSEMBLY       <- "mm9"
+BASEDIR        <- "/osc-fs_home/scratch/moirai"
+MOIRAI_BASE    <- file.path(BASEDIR, MOIRAI_USER)
+MOIRAI_RESULTS <- file.path(MOIRAI_BASE, MOIRAI_PROJ, paste(MISEQ_RUN, WORKFLOW, MOIRAI_STAMP, sep = "."))
+```
+
+Load CAGE libraries
+===================
+
+Load summary statistics from MOIRAI and polish the names
+--------------------------------------------------------
+
+```{r MOIRAI}
+ce <- smallCAGEqc::loadMoiraiStats(
+  pipeline  = WORKFLOW,
+  multiplex = file.path( MOIRAI_BASE, "input", paste0(MISEQ_RUN, ".multiplex.txt")),
+  summary   = file.path( MOIRAI_RESULTS, "text", "summary.txt")) %>% DataFrame
+
+ce$inputFiles <- paste0(MOIRAI_RESULTS, "/CAGEscan_fragments/", ce$samplename, ".bed")
+
+# Discard lines for which input files do not exist.
+ce <- ce[sapply(ce$inputFiles, file.exists),]
+
+# Discard lines for which input files are empty.
+ce <- ce[file.info(ce$inputFiles)$size != 0,]
+
+ce$inputFilesType <- c("bed")
+ce$sampleLabels <- as.character(ce$samplename)
+ce
+
+# Replace indexes in group names by RNA amounts extracted from sample sheet.
+levels(ce$group) <- system("cut -f 6,8 -d , 180123_M00528_0325_000000000-B4PCK.SampleSheet.csv | grep g_ | sort | cut -f2 -d, | cut -f1 -d_", intern = TRUE)
+
+# Sort the levels by RNA amount
+ce$group %<>% factor(levels = c("100ng", "10ng", "1ng", "100pg", "10pg"))
+
+ce$repl <- ce$index
+levels(ce$repl) <- system("cut -f 6,8 -d , 180123_M00528_0325_000000000-B4PCK.SampleSheet.csv | grep g_ | sort | cut -f 2 -d _ | sed 's/\r//'", intern = TRUE)
+ce$repl %<>% factor(levels = 1:3)
+```
+
+```{r PLATE}
+plate <- read.table("plate.txt", sep = "\t", header = TRUE)
+ce %<>% cbind(plate[match( paste(ce$barcode, ce$group)
+                         , paste(plate$BARCODE_SEQ, plate$RNA_group)), ])
+rm(plate)
+```
+
+
+Create a CAGEexp object and load expression data
+------------------------------------------------
+
+```{r new_CAGEexp, message = F, echo = FALSE}
+ce <- CAGEexp( colData    = ce
+             , genomeName = "BSgenome.Mmusculus.UCSC.mm9")
+```
+
+```{r get_CTSS_data}
+getCTSS(ce, useMulticore = TRUE)
+removeStrandInvaders(ce)
+```
+
+Quality controls
+----------------
+
+Custom _scopes_ displaying _strand invasion_ artefacts.
+
+```{r custom_plotAnnot_scopes}
+msScope_qcSI <- function(libs) {
+  libs$Tag_dust     <- libs$extracted   - libs$rdna - libs$spikes - libs$cleaned
+  libs$rDNA         <- libs$rdna
+  libs$Spikes       <- libs$spikes
+  libs$Unmapped     <- libs$cleaned     - libs$mapped
+  libs$Non_proper   <- libs$mapped      - libs$properpairs
+  libs$Duplicates   <- libs$properpairs - libs$librarySizes - libs$strandInvaders
+  libs$Invaders     <- libs$strandInvaders
+  libs$Counts       <- libs$librarySizes
+  list( libs    = libs
+      , columns = c( "Tag_dust", "rDNA", "Spikes", "Unmapped"
+                   , "Non_proper", "Duplicates", "Invaders", "Counts")
+      , total   = libs$extracted)
+}
+
+msScope_counts <- function(libs) {
+  libs$Promoter   <- libs$promoter
+  libs$Exon       <- libs$exon
+  libs$Intron     <- libs$intron
+  libs$Intergenic <- libs$librarySizes - libs$promoter - libs$intron - libs$exon
+  libs$Invaders   <- libs$strandInvaders
+  list( libs    = libs
+      , columns = c("Promoter", "Exon", "Intron", "Intergenic", "Invaders")
+      , total   = libs$librarySizes + libs$strandInvaders)
+}
+
+```
+
+### By RNA input
+
+Negative controls with no RNA gave much less sequences than the regular
+samples with RNA.
+
+```{r qc_RNA_quantity_raw}
+plotAnnot( ce, scope = msScope_qcSI, group = "RNA", normalise = FALSE
+         , title = "QC control, by ng of input RNA (sequence counts)")
+```
+
+The normalised QC profile is not much different, therefore
+the sequences might be _in silico_ or _in vitro_ contaminations.
+
+```{r qc_RNA_quantity_norm}
+plotAnnot( ce, scope = msScope_qcSI, group = "RNA", normalise = TRUE
+         , title = "QC control, by ng of input RNA (normalised to 100 %)")
+```
+
+### Removal of the RNA negative controls
+
+To ease data handling, the negative controls with no RNA are removed.
+
+```{r}
+ce <- ce[,ce$RNA != 0]
+```
+
+### By RT primer quantity
+
+Strangely, libraries made with no RT primers have a QC profile that is not
+dramatically different from other libraries.  This might again be explained
+by contaminations, although the amount of sequences in the "no RT primer"
+samples is a bit high for such an explanation.
+
+```{r qc_rt_primer_quantity_raw}
+plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
+         , title = "QC control, by amount of RT primers (in μM)")
+```
+
+```{r qc_rt_primer_quantity_norm}
+plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = TRUE
+         , title = "QC control, by amount of RT primers (normalised to 100 %)")
+```
+
+### Removal of the primer-negative controls
+
+To ease data handling (for instance when working with primer ratios), the
+negative controls with no primers are removed.
+
+```{r}
+ce <- ce[,ce$RT_PRIMERS != 0]
+ce$PRIMERS_RATIO %<>% droplevels
+ce$PRIMERS_RATIO %<>%
+  factor(levels = c( "0.078125", "0.15625", "0.3125", "0.625", "1.25", "2.5"
+                   , "5", "10", "20", "40", "80", "160", "320", "640"))
+```
+
+### By group and replicates
+
+In all conditions, there are a large number of unmapped sequences.
+Close inspection of the alignment files and pipeline reports suggest that
+sequence quality was so low that a large number of reads 1 in the pairs have too
+many sequence errors to be mapped.
+
+```{r}
+plotAnnot(ce, scope = msScope_qcSI, group = "repl", facet="group") +
+  facet_wrap(~facet, nrow = 5)
+plotAnnot(ce, scope = msScope_qcSI, group = "repl", normalise = FALSE, facet="group") +
+  facet_wrap(~facet, nrow = 5)
+```
+
+### By TSO concentration
+
+There is a trend decreasing sequence yield with decreasing TSO amounts.
+Interestingly, the optimum seems to be lower when RNA quantity is lower.
+
+But what is wrong with TSO == 40 ??  (and to some extent with TSO == 1.25)
+We are checking this by making a new experiment where the source plate was
+re-prepared from scratch and concentration range has more points near 40.
+
+rRNA rate seems to increase when TSO concentration is reduced.
+
+Strand invation seems to depend more on RNA quantity than on TSO concentration ?!
+
+```{r}
+plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = FALSE, facet = "group")
+plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = TRUE,  facet = "group")
+plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = FALSE, facet = "RT_PRIMERS")
+```
+
+Barcode "CTGTCT" gave large amounts of artefacts.  This is not the case for its
+nearest similar barcode "CTGCTC".
+
+Barcodes "ATCAGC" and "CACACG" yielded a large amount of extracted reads.
+
+```{r ggplot_wrapper}
+ggplot.CAGEexp <- function(data, ...)
+  ggplot(as.data.frame(colData(data)), ...)
+
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = librarySizes)) + facet_wrap(~repl + group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("molecules")
+
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = extracted)) + facet_wrap(~repl + group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("extracted")
+
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = tagdust / extracted * 100)) + facet_wrap(~repl + group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("%tagdust")
+```
+
+Reactions that received multiple droplets of TSOs did not fail (here we are averaging
+very different TSO concentrations, to the point is just to show that for volumes
+of 100 and 50, we have roughly the same amount of data.)
+
+```{r}
+plotAnnot(ce, scope = msScope_qcSI, group = "TSO_vol", normalise = FALSE)
+```
+
+### By primer ratio
+
+```{r}
+plotAnnot(ce, scope = msScope_qcSI, group = "PRIMERS_RATIO", normalise = FALSE, facet = "group")
+```
+
+
+Annotation with GENCODE
+-----------------------
+
+Collect Gencode annotations and gene symbols via a local GENCODE file
+(mm9 gencode not available in AnnotationHub)
+
+```{r annotate_CTSS}
+annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
+```
+
+```{r CTSS_annotation_plot_per_replicate}
+plotAnnot(ce, scope = msScope_counts, group = "repl", facet = "group") +
+  facet_wrap("facet", nrow = 5)
+plotAnnot(ce, scope = msScope_counts, group = "repl", facet = "group", norm = F) +
+  facet_wrap("facet", nrow = 5)
+```
+
+```{r CTSS_annotation_plot_per_group}
+plotAnnot(ce, scope = msScope_counts, group = "TSO", normalise = FALSE, facet = "group") +
+  facet_wrap("facet", ncol = 5)
+plotAnnot(ce, scope = msScope_counts, group = "TSO", normalise = TRUE,  facet = "group") +
+  facet_wrap("facet", ncol = 5)
+```
+
+Count QC with TSO concentration 40 removed...
+
+```{r CTSS_annotation_plot_per_group_no40, fig.height=4, fig.width=15}
+ce2 <- ce
+ce2 <- ce2[,ce2$TSO != 40]
+plotAnnot(ce2, scope = "counts", group = "TSO", normalise = FALSE, facet = "group") +
+  facet_wrap("facet", ncol = 5) + ggtitle("")
+```
+
+
+```{r CTSS_annotation_heatmaps_all}
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = promoter / librarySizes * 100)) + facet_wrap(~repl + group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("promoter rate")
+
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = (properpairs - librarySizes) / librarySizes)) + facet_wrap(~repl + group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("PCR duplicates %")
+```
+
+```{r CTSS_annotation_heatmaps_per_group, fig.height=4, fig.width=15}
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = promoter / librarySizes * 100)) + facet_wrap(~group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("promoter rate")
+
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = (properpairs - librarySizes) / librarySizes)) + facet_wrap(~group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("PCR duplicates %")
+```
+
+CTSS ANALYSIS
+=============
+
+Number of nanoCAGE tags mapping at CTSS positions in each sample
+----------------------------------------------------------------
+  
+```{r ctss-analysis}
+ce$l1 <- sapply(CTSStagCountDF(ce), function(x) sum(decode(x) > 0))
+```
+
+Gene expression analysis
+========================
+
+Make a gene expression table (not really required now).
+
+```{r CTSStoGenes-CAGEexp}
+CTSStoGenes(ce)
+```
+
+```{r CTSS_ngenes_heatmaps_all}
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = genes)) + facet_wrap(~repl + group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("Gene discovery")
+```
+
+```{r CTSS_ngenes_heatmaps_per_group, fig.height=4, fig.width=15}
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = genes)) + facet_wrap(~group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("Gene discovery")
+```
+
+Rarefaction
+------------
+
+```{r, message = FALSE, fig.height=4, fig.width=15}
+ce$r100l1 <- rarefy(t(CTSStagCountDA(ce)),10)
+ce$r100l1[librarySizes(ce) < 10] <- NA
+
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = r100l1)) + facet_wrap(~group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("Richness (on a scale of 10)")
+```
+
+
+```{r precompute_hanabi_objs}
+rar1 <- hanabi(CTSStagCountDF(ce), from = 0)
+#rarc <- hanabi(assay(consensusClustersSE(myCAGEexp)) %>% as.data.frame, from = 0)
+rarg <- hanabi(assay(GeneExpSE(ce)), from = 0)
+#save(rar1, rarg, file="rar.Rda") 
+```
+
+### Plot TSS discovery
+
+```{r hanabi-TSS_byrep, dev=c('png')}
+hanabiPlot(rar1, ylab='number of TSS detected', xlab='number of unique molecule counts', main=paste("TSS discovery"), group=ce$TSO, legend.pos = "bottomright")
+```
+
+### Plot Cluster discovery
+
+```{r hanabi-CTSS_clusters_byrep, dev=c('png')}
+#hanabiPlot(rarc, ylab='number of CTSS clusters detected', xlab='number of unique molecule counts', main=paste("Cluster discovery"), #group=myCAGEexp$group, legend.pos = "bottomright")
+```
+
+### Plot Gene discovery
+
+```{r hanabi-gene_byrep, dev=c('png')}
+hanabiPlot(rarg, ylab='number of genes detected', xlab='number of unique molecule counts', main=paste("Gene discovery"), group=ce$TSO, legend.pos = "bottomright")
+```
+
+Save the CAGEexp file.
+
+```{r save_myCAGEexp_object}
+saveRDS(ce, "Labcyte-RT_Data_Analysis_3b.Rds")
+```
+
+```{r}
+sessionInfo()
+```
