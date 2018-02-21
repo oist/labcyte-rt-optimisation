@@ -2015,6 +2015,111 @@ ggpubr::ggarrange( ncol = 2, nrow = 2
 
 ![](Labcyte-RT2_files/figure-html/plate_all_volumes-1.png)<!-- -->
 
+Concentration checks
+====================
+
+Data load
+---------
+
+Concentrations of the actual TSO solutions in the source plage, measured by ...
+
+Concentration factor was _27.8_ (_A260 × 27.8 = concentration_ in ng/μL).
+
+(Original file name `180221_KATO.xlsx`)
+
+
+```r
+conc <- gdata::read.xls("Labcyte-RT2.quantification.xlsx", nrow = 140)
+summary(conc)
+```
+
+```
+##  Plate.ID           Well.       Sample.ID     User.ID           Date.             Time.   
+##  Mode:logical   A1     :  2   A      :14   Default:140   2018-02-21:140   11:16:00.00:14  
+##  NA's:140       A10    :  2   B      :14                                  11:21:00.00:14  
+##                 A2     :  2   C      :14                                  11:08:00.00: 7  
+##                 A3     :  2   D      :14                                  11:09:00.00: 7  
+##                 A4     :  2   E      :14                                  11:12:00.00: 7  
+##                 A5     :  2   F      :14                                  11:13:00.00: 7  
+##                 (Other):128   (Other):56                                  (Other)    :84  
+##      Conc..         Units.        A260.            A280.           X260.280.        X260.230.     
+##  Min.   : 411.0   ng/ul:140   Min.   : 14.78   Min.   :  9.151   Min.   :0.3000   Min.   :0.2600  
+##  1st Qu.: 623.2               1st Qu.: 22.42   1st Qu.: 13.425   1st Qu.:0.5275   1st Qu.:0.5475  
+##  Median : 982.2               Median : 35.33   Median : 80.181   Median :1.1350   Median :1.3800  
+##  Mean   :1345.9               Mean   : 48.41   Mean   : 57.038   Mean   :1.1400   Mean   :1.5060  
+##  3rd Qu.:2316.2               3rd Qu.: 83.30   3rd Qu.: 87.474   3rd Qu.:1.6600   3rd Qu.:2.4025  
+##  Max.   :3044.0               Max.   :109.48   Max.   :124.622   Max.   :1.8400   Max.   :2.5300  
+##                                                                                                   
+##  Conc..Factor..ng.ul.  Cursor.Pos.   Cursor.abs.        X340.raw        NA.Type      X          
+##  Min.   :27.8         Min.   :260   Min.   : 14.78   Min.   :-0.02700   DNA:140   Mode:logical  
+##  1st Qu.:27.8         1st Qu.:260   1st Qu.: 22.42   1st Qu.: 0.01475             NA's:140      
+##  Median :27.8         Median :260   Median : 35.33   Median : 0.03750                           
+##  Mean   :27.8         Mean   :260   Mean   : 48.41   Mean   : 0.03551                           
+##  3rd Qu.:27.8         3rd Qu.:260   3rd Qu.: 83.30   3rd Qu.: 0.05850                           
+##  Max.   :27.8         Max.   :260   Max.   :109.48   Max.   : 0.10900                           
+## 
+```
+
+
+```r
+conc <- data.frame( Well = conc$Well
+                  , obs  = conc$Conc..
+                  , A260 = conc$A260.
+                  , A280 = conc$A280.)
+
+conc <- aggregate(conc[,-1], list(conc$Well), mean)
+colnames(conc) <- c("Well", "obs", "A260", "A280")
+conc$Well %<>% factor(levels = levels(conc$Well) %>% gtools::mixedsort())
+conc$exp <- 50
+conc[grep("[1-3]$", conc$Well), "exp"] <- 600
+conc[grep("[4-6]$", conc$Well), "exp"] <- 400
+```
+
+Histograms
+----------
+
+
+```r
+hist_obs  <- ggplot(conc, aes(obs,  fill = exp)) + geom_histogram() +
+  facet_wrap(~exp) + ggtitle("Observed concentrations (ng/μL)")
+hist_a260 <- ggplot(conc, aes(A260, fill = exp)) + geom_histogram() +
+  facet_wrap(~exp) + ggtitle("Absorbance at 260 nm")
+hist_a280 <- ggplot(conc, aes(A280, fill = exp)) + geom_histogram() +
+  facet_wrap(~exp) + ggtitle("Absorbance at 280 nm")
+
+ggpubr::ggarrange( ncol = 1, nrow = 3, hist_obs, hist_a260, hist_a280)
+```
+
+```
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+```
+
+![](Labcyte-RT2_files/figure-html/concentration_QC_histograms-1.png)<!-- -->
+
+Absorbances
+-----------
+
+
+```r
+ggplot(conc, aes(A260, A280, colour = exp)) + geom_point() +
+  ggtitle("Relation between absorbances at 260 and 280 nm")
+```
+
+![](Labcyte-RT2_files/figure-html/concentration_QC_abs_ratio-1.png)<!-- -->
+
+Concentrations
+--------------
+
+
+```r
+ggplot(conc, aes(obs,  exp, colour = exp))  + geom_point() +
+  ggtitle("Observed concentration and expected molarity")
+```
+
+![](Labcyte-RT2_files/figure-html/concentration_QC_obs_exp-1.png)<!-- -->
+
 Session information
 ===================
 
@@ -2045,11 +2150,12 @@ sessionInfo()
 ## [1] bindrcpp_0.2     platetools_0.0.2 plyr_1.8.4       ggplot2_2.2.1    magrittr_1.5    
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] Rcpp_0.12.14       ggpubr_0.1.6       bindr_0.1          knitr_1.17         cowplot_0.9.2     
-##  [6] munsell_0.4.3      viridisLite_0.2.0  colorspace_1.3-2   R6_2.2.2           rlang_0.1.4       
-## [11] stringr_1.2.0      dplyr_0.7.4        tools_3.4.3        grid_3.4.3         gtable_0.2.0      
-## [16] htmltools_0.3.6    yaml_2.1.15        lazyeval_0.2.1     rprojroot_1.2      digest_0.6.12     
-## [21] assertthat_0.2.0   tibble_1.3.4       gridExtra_2.3      purrr_0.2.4        RColorBrewer_1.1-2
-## [26] viridis_0.4.0      glue_1.2.0         evaluate_0.10.1    rmarkdown_1.8      labeling_0.3      
-## [31] stringi_1.1.6      compiler_3.4.3     scales_0.5.0       backports_1.1.1    pkgconfig_2.0.1
+##  [1] Rcpp_0.12.14       compiler_3.4.3     RColorBrewer_1.1-2 bindr_0.1          ggpubr_0.1.6      
+##  [6] viridis_0.4.0      tools_3.4.3        digest_0.6.12      evaluate_0.10.1    tibble_1.3.4      
+## [11] gtable_0.2.0       viridisLite_0.2.0  pkgconfig_2.0.1    rlang_0.1.4        yaml_2.1.15       
+## [16] gridExtra_2.3      dplyr_0.7.4        stringr_1.2.0      knitr_1.17         gtools_3.5.0      
+## [21] rprojroot_1.2      grid_3.4.3         cowplot_0.9.2      glue_1.2.0         R6_2.2.2          
+## [26] rmarkdown_1.8      gdata_2.18.0       purrr_0.2.4        backports_1.1.1    scales_0.5.0      
+## [31] htmltools_0.3.6    assertthat_0.2.0   colorspace_1.3-2   labeling_0.3       stringi_1.1.6     
+## [36] lazyeval_0.2.1     munsell_0.4.3
 ```

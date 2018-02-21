@@ -943,6 +943,67 @@ ggpubr::ggarrange( ncol = 2, nrow = 2
                  , plot_TSO_vol, plot_RT_vol, plot_RNA_vol, plot_H2O_vol)
 ```
 
+Concentration checks
+====================
+
+Data load
+---------
+
+Concentrations of the actual TSO solutions in the source plage, measured by ...
+
+Concentration factor was _27.8_ (_A260 × 27.8 = concentration_ in ng/μL).
+
+(Original file name `180221_KATO.xlsx`)
+
+```{r concentration_QC_load}
+conc <- gdata::read.xls("Labcyte-RT2.quantification.xlsx", nrow = 140)
+summary(conc)
+```
+
+```{r concentration_QC_prepare}
+conc <- data.frame( Well = conc$Well
+                  , obs  = conc$Conc..
+                  , A260 = conc$A260.
+                  , A280 = conc$A280.)
+
+conc <- aggregate(conc[,-1], list(conc$Well), mean)
+colnames(conc) <- c("Well", "obs", "A260", "A280")
+conc$Well %<>% factor(levels = levels(conc$Well) %>% gtools::mixedsort())
+conc$exp <- 50
+conc[grep("[1-3]$", conc$Well), "exp"] <- 600
+conc[grep("[4-6]$", conc$Well), "exp"] <- 400
+```
+
+Histograms
+----------
+
+```{r concentration_QC_histograms, warning = FALSE}
+hist_obs  <- ggplot(conc, aes(obs,  fill = exp)) + geom_histogram() +
+  facet_wrap(~exp) + ggtitle("Observed concentrations (ng/μL)")
+hist_a260 <- ggplot(conc, aes(A260, fill = exp)) + geom_histogram() +
+  facet_wrap(~exp) + ggtitle("Absorbance at 260 nm")
+hist_a280 <- ggplot(conc, aes(A280, fill = exp)) + geom_histogram() +
+  facet_wrap(~exp) + ggtitle("Absorbance at 280 nm")
+
+ggpubr::ggarrange( ncol = 1, nrow = 3, hist_obs, hist_a260, hist_a280)
+```
+
+Absorbances
+-----------
+
+```{r concentration_QC_abs_ratio}
+ggplot(conc, aes(A260, A280, colour = exp)) + geom_point() +
+  ggtitle("Relation between absorbances at 260 and 280 nm")
+```
+
+Concentrations
+--------------
+
+```{r concentration_QC_obs_exp}
+ggplot(conc, aes(obs,  exp, colour = exp))  + geom_point() +
+  ggtitle("Observed concentration and expected molarity")
+```
+
 Session information
 ===================
 
