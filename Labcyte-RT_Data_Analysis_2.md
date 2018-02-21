@@ -570,6 +570,12 @@ hanabiPlot(rarg, ylab='number of genes detected', xlab='number of unique molecul
 
 ![](Labcyte-RT_Data_Analysis_2_files/figure-html/hanabi-gene_byrep-1.png)<!-- -->
 
+Save the CAGEexp file.
+
+
+```r
+saveRDS(ce, "Labcyte-RT_Data_Analysis_2.Rds")
+```
 
 
 ```r
@@ -599,14 +605,14 @@ sessionInfo()
 ## 
 ## other attached packages:
 ##  [1] vegan_2.4-5                 permute_0.9-4              
-##  [3] SummarizedExperiment_1.9.3  DelayedArray_0.4.1         
+##  [3] SummarizedExperiment_1.9.14 DelayedArray_0.4.1         
 ##  [5] matrixStats_0.52.2          Biobase_2.38.0             
-##  [7] GenomicRanges_1.31.3        GenomeInfoDb_1.14.0        
-##  [9] IRanges_2.13.4              S4Vectors_0.17.12          
-## [11] BiocGenerics_0.24.0         RColorBrewer_1.1-2         
+##  [7] GenomicRanges_1.31.19       GenomeInfoDb_1.15.5        
+##  [9] IRanges_2.13.26             S4Vectors_0.17.32          
+## [11] BiocGenerics_0.25.3         RColorBrewer_1.1-2         
 ## [13] MultiAssayExperiment_1.5.41 magrittr_1.5               
 ## [15] lattice_0.20-35             ggplot2_2.2.1              
-## [17] CAGEr_1.21.4.5             
+## [17] CAGEr_1.21.5.1             
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] nlme_3.1-131                      bitops_1.0-6                     
@@ -616,12 +622,12 @@ sessionInfo()
 ##  [9] lazyeval_0.2.1                    mgcv_1.8-22                      
 ## [11] colorspace_1.3-2                  gridExtra_2.3                    
 ## [13] compiler_3.4.3                    VennDiagram_1.6.18               
-## [15] rtracklayer_1.38.3                labeling_0.3                     
+## [15] rtracklayer_1.39.9                labeling_0.3                     
 ## [17] scales_0.5.0                      stringr_1.2.0                    
-## [19] digest_0.6.12                     Rsamtools_1.30.0                 
+## [19] digest_0.6.12                     Rsamtools_1.31.3                 
 ## [21] rmarkdown_1.8                     stringdist_0.9.4.6               
-## [23] XVector_0.19.1                    pkgconfig_2.0.1                  
-## [25] htmltools_0.3.6                   BSgenome_1.46.0                  
+## [23] XVector_0.19.8                    pkgconfig_2.0.1                  
+## [25] htmltools_0.3.6                   BSgenome_1.47.5                  
 ## [27] rlang_0.1.4                       VGAM_1.0-4                       
 ## [29] bindr_0.1                         BiocParallel_1.12.0              
 ## [31] gtools_3.5.0                      dplyr_0.7.4                      
@@ -632,7 +638,7 @@ sessionInfo()
 ## [41] stringi_1.1.6                     yaml_2.1.15                      
 ## [43] MASS_7.3-47                       zlibbioc_1.24.0                  
 ## [45] plyr_1.8.4                        grid_3.4.3                       
-## [47] gdata_2.18.0                      Biostrings_2.46.0                
+## [47] gdata_2.18.0                      Biostrings_2.47.9                
 ## [49] splines_3.4.3                     knitr_1.17                       
 ## [51] beanplot_1.2                      reshape2_1.4.2                   
 ## [53] codetools_0.2-15                  futile.options_1.0.0             
@@ -643,6 +649,6 @@ sessionInfo()
 ## [63] tidyr_0.7.2                       reshape_0.8.7                    
 ## [65] assertthat_0.2.0                  viridisLite_0.2.0                
 ## [67] tibble_1.3.4                      som_0.3-5.1                      
-## [69] GenomicAlignments_1.14.1          memoise_1.1.0                    
+## [69] GenomicAlignments_1.15.12         memoise_1.1.0                    
 ## [71] bindrcpp_0.2                      cluster_2.0.6
 ```

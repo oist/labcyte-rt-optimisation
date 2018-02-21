@@ -360,6 +360,11 @@ hanabiPlot(rar1, ylab='number of TSS detected', xlab='number of unique molecule 
 hanabiPlot(rarg, ylab='number of genes detected', xlab='number of unique molecule counts', main=paste("Gene discovery"), group=ce$TSO, legend.pos = "bottomright")
 ```
 
+Save the CAGEexp file.
+
+```{r save_myCAGEexp_object}
+saveRDS(ce, "Labcyte-RT_Data_Analysis_2.Rds")
+```
 
 ```{r}
 sessionInfo()
