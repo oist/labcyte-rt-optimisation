@@ -268,7 +268,7 @@ levels(ce$plateID) &lt;- c(&quot;H&quot;, &quot;I&quot;, &quot;J&quot;)</code></
 </div>
 <div id="load-plate-design" class="section level2">
 <h2><span class="header-section-number">3.2</span> Load plate design</h2>
-<p>Using plate 2 design, see <a href="./Labcyte-RT2.md">Labcyte-RT2.md</a>.</p>
+<p>Using plate 2 design, see <a href="Labcyte-RT2.md" class="uri">Labcyte-RT2.md</a>.</p>
 <pre class="r"><code>plate &lt;- read.table(&quot;plate2.txt&quot;, sep = &quot;\t&quot;, header = TRUE)
 ce %&lt;&gt;% cbind(plate[match( paste(ce$barcode, ce$group)
                          , paste(plate$BARCODE_SEQ, plate$RNA_group)), ])

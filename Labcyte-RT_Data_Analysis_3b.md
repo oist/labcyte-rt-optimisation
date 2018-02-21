@@ -167,7 +167,7 @@ levels(ce$plateID) <- c("H", "I", "J")
 Load plate design
 -----------------
 
-Using plate 2 design, see [Labcyte-RT2.md](./Labcyte-RT2.md).
+Using plate 2 design, see [Labcyte-RT2.md](Labcyte-RT2.md).
 
 ```r
 plate <- read.table("plate2.txt", sep = "\t", header = TRUE)
