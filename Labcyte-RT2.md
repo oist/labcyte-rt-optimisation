@@ -2021,7 +2021,8 @@ Concentration checks
 Data load
 ---------
 
-Concentrations of the actual TSO solutions in the source plage, measured by ...
+Concentrations of the actual TSO solutions in the source plage, measured with
+the NanoDrop instrument for 8-strip tubes (NanoDrop 8000 ?).
 
 Concentration factor was _27.8_ (_A260 × 27.8 = concentration_ in ng/μL).
 
