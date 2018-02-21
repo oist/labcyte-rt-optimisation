@@ -191,74 +191,8 @@ ce &lt;- ce[file.info(ce$inputFiles)$size != 0,]
 
 ce$inputFilesType &lt;- c(&quot;bed&quot;)
 ce$sampleLabels &lt;- as.character(ce$samplename)
-ce</code></pre>
-<pre><code>## DataFrame with 982 rows and 16 columns
-##                      samplename    group  barcode    index     total
-##                        &lt;factor&gt; &lt;factor&gt; &lt;factor&gt; &lt;factor&gt; &lt;numeric&gt;
-## ACACAG_TAAGGCGA ACACAG_TAAGGCGA TAAGGCGA   ACACAG TAAGGCGA         0
-## ACACGT_TAAGGCGA ACACGT_TAAGGCGA TAAGGCGA   ACACGT TAAGGCGA         0
-## ACACTC_TAAGGCGA ACACTC_TAAGGCGA TAAGGCGA   ACACTC TAAGGCGA         0
-## ACAGAT_TAAGGCGA ACAGAT_TAAGGCGA TAAGGCGA   ACAGAT TAAGGCGA         0
-## ACAGCA_TAAGGCGA ACAGCA_TAAGGCGA TAAGGCGA   ACAGCA TAAGGCGA         0
-## ...                         ...      ...      ...      ...       ...
-## GCTATA_TGCAGCTA GCTATA_TGCAGCTA TGCAGCTA   GCTATA TGCAGCTA         0
-## GCTCAG_TGCAGCTA GCTCAG_TGCAGCTA TGCAGCTA   GCTCAG TGCAGCTA         0
-## GCTCGT_TGCAGCTA GCTCGT_TGCAGCTA TGCAGCTA   GCTCGT TGCAGCTA         0
-## GCTCTC_TGCAGCTA GCTCTC_TGCAGCTA TGCAGCTA   GCTCTC TGCAGCTA         0
-## GCTGAT_TGCAGCTA GCTGAT_TGCAGCTA TGCAGCTA   GCTGAT TGCAGCTA         0
-##                 extracted   cleaned   tagdust      rdna    spikes
-##                 &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;
-## ACACAG_TAAGGCGA       954       804         1       125        24
-## ACACGT_TAAGGCGA       882       710         0       150        22
-## ACACTC_TAAGGCGA      2574      2095         1       413        65
-## ACAGAT_TAAGGCGA      1570      1266         4       271        29
-## ACAGCA_TAAGGCGA      3424      2640         7       684        93
-## ...                   ...       ...       ...       ...       ...
-## GCTATA_TGCAGCTA         3         3         0         0         0
-## GCTCAG_TGCAGCTA        18         9         4         4         1
-## GCTCGT_TGCAGCTA        31        24         3         4         0
-## GCTCTC_TGCAGCTA        80        67         9         3         1
-## GCTGAT_TGCAGCTA       179       120        34        17         8
-##                    mapped properpairs    counts
-##                 &lt;numeric&gt;   &lt;numeric&gt; &lt;numeric&gt;
-## ACACAG_TAAGGCGA       804         221       221
-## ACACGT_TAAGGCGA       710         185       185
-## ACACTC_TAAGGCGA      2095         530       529
-## ACAGAT_TAAGGCGA      1266         325       324
-## ACAGCA_TAAGGCGA      2640         661       661
-## ...                   ...         ...       ...
-## GCTATA_TGCAGCTA         3           1         1
-## GCTCAG_TGCAGCTA         9           2         2
-## GCTCGT_TGCAGCTA        24           5         5
-## GCTCTC_TGCAGCTA        67          21        21
-## GCTGAT_TGCAGCTA       120          21        21
-##                                                                                                                                                                                                    inputFiles
-##                                                                                                                                                                                                   &lt;character&gt;
-## ACACAG_TAAGGCGA /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140254/CAGEscan_fragments/ACACAG_TAAGGCGA.bed
-## ACACGT_TAAGGCGA /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140254/CAGEscan_fragments/ACACGT_TAAGGCGA.bed
-## ACACTC_TAAGGCGA /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140254/CAGEscan_fragments/ACACTC_TAAGGCGA.bed
-## ACAGAT_TAAGGCGA /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140254/CAGEscan_fragments/ACAGAT_TAAGGCGA.bed
-## ACAGCA_TAAGGCGA /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140254/CAGEscan_fragments/ACAGCA_TAAGGCGA.bed
-## ...                                                                                                                                                                                                       ...
-## GCTATA_TGCAGCTA /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140254/CAGEscan_fragments/GCTATA_TGCAGCTA.bed
-## GCTCAG_TGCAGCTA /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140254/CAGEscan_fragments/GCTCAG_TGCAGCTA.bed
-## GCTCGT_TGCAGCTA /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140254/CAGEscan_fragments/GCTCGT_TGCAGCTA.bed
-## GCTCTC_TGCAGCTA /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140254/CAGEscan_fragments/GCTCTC_TGCAGCTA.bed
-## GCTGAT_TGCAGCTA /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140254/CAGEscan_fragments/GCTGAT_TGCAGCTA.bed
-##                 inputFilesType    sampleLabels
-##                    &lt;character&gt;     &lt;character&gt;
-## ACACAG_TAAGGCGA            bed ACACAG_TAAGGCGA
-## ACACGT_TAAGGCGA            bed ACACGT_TAAGGCGA
-## ACACTC_TAAGGCGA            bed ACACTC_TAAGGCGA
-## ACAGAT_TAAGGCGA            bed ACAGAT_TAAGGCGA
-## ACAGCA_TAAGGCGA            bed ACAGCA_TAAGGCGA
-## ...                        ...             ...
-## GCTATA_TGCAGCTA            bed GCTATA_TGCAGCTA
-## GCTCAG_TGCAGCTA            bed GCTCAG_TGCAGCTA
-## GCTCGT_TGCAGCTA            bed GCTCGT_TGCAGCTA
-## GCTCTC_TGCAGCTA            bed GCTCTC_TGCAGCTA
-## GCTGAT_TGCAGCTA            bed GCTGAT_TGCAGCTA</code></pre>
-<pre class="r"><code># Replace indexes in group names by RNA amounts extracted from sample sheet.
+
+# Replace indexes in group names by RNA amounts extracted from sample sheet.
 levels(ce$group) &lt;- system(&quot;grep TATCCTCT 180215_M00528_0330_000000000-B4GPD.SampleSheet.csv | cut -f 6,10 -d , | grep g_ | sort | cut -f2 -d, | cut -f1 -d_&quot;, intern = TRUE)
 
 # Sort the levels by RNA amount
@@ -270,7 +204,77 @@ ce$repl %&lt;&gt;% factor(levels = 1:3)
 
 # Define plate IDs
 ce$plateID &lt;- ce$repl
-levels(ce$plateID) &lt;- c(&quot;E&quot;, &quot;F&quot;, &quot;G&quot;)</code></pre>
+levels(ce$plateID) &lt;- c(&quot;E&quot;, &quot;F&quot;, &quot;G&quot;)
+rownames(ce) %&lt;&gt;% paste(ce$plateID, sep = &quot;_&quot;)
+ce$sampleLabels &lt;- rownames(ce)
+
+ce</code></pre>
+<pre><code>## DataFrame with 982 rows and 18 columns
+##                        samplename    group  barcode    index     total
+##                          &lt;factor&gt; &lt;factor&gt; &lt;factor&gt; &lt;factor&gt; &lt;numeric&gt;
+## ACACAG_TAAGGCGA_E ACACAG_TAAGGCGA    100ng   ACACAG TAAGGCGA         0
+## ACACGT_TAAGGCGA_E ACACGT_TAAGGCGA    100ng   ACACGT TAAGGCGA         0
+## ACACTC_TAAGGCGA_E ACACTC_TAAGGCGA    100ng   ACACTC TAAGGCGA         0
+## ACAGAT_TAAGGCGA_E ACAGAT_TAAGGCGA    100ng   ACAGAT TAAGGCGA         0
+## ACAGCA_TAAGGCGA_E ACAGCA_TAAGGCGA    100ng   ACAGCA TAAGGCGA         0
+## ...                           ...      ...      ...      ...       ...
+## GCTATA_TGCAGCTA_G GCTATA_TGCAGCTA     10pg   GCTATA TGCAGCTA         0
+## GCTCAG_TGCAGCTA_G GCTCAG_TGCAGCTA     10pg   GCTCAG TGCAGCTA         0
+## GCTCGT_TGCAGCTA_G GCTCGT_TGCAGCTA     10pg   GCTCGT TGCAGCTA         0
+## GCTCTC_TGCAGCTA_G GCTCTC_TGCAGCTA     10pg   GCTCTC TGCAGCTA         0
+## GCTGAT_TGCAGCTA_G GCTGAT_TGCAGCTA     10pg   GCTGAT TGCAGCTA         0
+##                   extracted   cleaned   tagdust      rdna    spikes
+##                   &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;
+## ACACAG_TAAGGCGA_E       954       804         1       125        24
+## ACACGT_TAAGGCGA_E       882       710         0       150        22
+## ACACTC_TAAGGCGA_E      2574      2095         1       413        65
+## ACAGAT_TAAGGCGA_E      1570      1266         4       271        29
+## ACAGCA_TAAGGCGA_E      3424      2640         7       684        93
+## ...                     ...       ...       ...       ...       ...
+## GCTATA_TGCAGCTA_G         3         3         0         0         0
+## GCTCAG_TGCAGCTA_G        18         9         4         4         1
+## GCTCGT_TGCAGCTA_G        31        24         3         4         0
+## GCTCTC_TGCAGCTA_G        80        67         9         3         1
+## GCTGAT_TGCAGCTA_G       179       120        34        17         8
+##                      mapped properpairs    counts
+##                   &lt;numeric&gt;   &lt;numeric&gt; &lt;numeric&gt;
+## ACACAG_TAAGGCGA_E       804         221       221
+## ACACGT_TAAGGCGA_E       710         185       185
+## ACACTC_TAAGGCGA_E      2095         530       529
+## ACAGAT_TAAGGCGA_E      1266         325       324
+## ACAGCA_TAAGGCGA_E      2640         661       661
+## ...                     ...         ...       ...
+## GCTATA_TGCAGCTA_G         3           1         1
+## GCTCAG_TGCAGCTA_G         9           2         2
+## GCTCGT_TGCAGCTA_G        24           5         5
+## GCTCTC_TGCAGCTA_G        67          21        21
+## GCTGAT_TGCAGCTA_G       120          21        21
+##                                                                                                                                                                                                      inputFiles
+##                                                                                                                                                                                                     &lt;character&gt;
+## ACACAG_TAAGGCGA_E /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140254/CAGEscan_fragments/ACACAG_TAAGGCGA.bed
+## ACACGT_TAAGGCGA_E /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140254/CAGEscan_fragments/ACACGT_TAAGGCGA.bed
+## ACACTC_TAAGGCGA_E /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140254/CAGEscan_fragments/ACACTC_TAAGGCGA.bed
+## ACAGAT_TAAGGCGA_E /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140254/CAGEscan_fragments/ACAGAT_TAAGGCGA.bed
+## ACAGCA_TAAGGCGA_E /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140254/CAGEscan_fragments/ACAGCA_TAAGGCGA.bed
+## ...                                                                                                                                                                                                         ...
+## GCTATA_TGCAGCTA_G /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140254/CAGEscan_fragments/GCTATA_TGCAGCTA.bed
+## GCTCAG_TGCAGCTA_G /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140254/CAGEscan_fragments/GCTCAG_TGCAGCTA.bed
+## GCTCGT_TGCAGCTA_G /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140254/CAGEscan_fragments/GCTCGT_TGCAGCTA.bed
+## GCTCTC_TGCAGCTA_G /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140254/CAGEscan_fragments/GCTCTC_TGCAGCTA.bed
+## GCTGAT_TGCAGCTA_G /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140254/CAGEscan_fragments/GCTGAT_TGCAGCTA.bed
+##                   inputFilesType      sampleLabels     repl  plateID
+##                      &lt;character&gt;       &lt;character&gt; &lt;factor&gt; &lt;factor&gt;
+## ACACAG_TAAGGCGA_E            bed ACACAG_TAAGGCGA_E        1        E
+## ACACGT_TAAGGCGA_E            bed ACACGT_TAAGGCGA_E        1        E
+## ACACTC_TAAGGCGA_E            bed ACACTC_TAAGGCGA_E        1        E
+## ACAGAT_TAAGGCGA_E            bed ACAGAT_TAAGGCGA_E        1        E
+## ACAGCA_TAAGGCGA_E            bed ACAGCA_TAAGGCGA_E        1        E
+## ...                          ...               ...      ...      ...
+## GCTATA_TGCAGCTA_G            bed GCTATA_TGCAGCTA_G        3        G
+## GCTCAG_TGCAGCTA_G            bed GCTCAG_TGCAGCTA_G        3        G
+## GCTCGT_TGCAGCTA_G            bed GCTCGT_TGCAGCTA_G        3        G
+## GCTCTC_TGCAGCTA_G            bed GCTCTC_TGCAGCTA_G        3        G
+## GCTGAT_TGCAGCTA_G            bed GCTGAT_TGCAGCTA_G        3        G</code></pre>
 </div>
 </div>
 <div id="load-plate-design" class="section level2">
