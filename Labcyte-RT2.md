@@ -2076,6 +2076,14 @@ conc[grep("[1-3]$", conc$Well), "exp"] <- 600
 conc[grep("[4-6]$", conc$Well), "exp"] <- 400
 ```
 
+Samples at expected 600 μM were diluted 5 times to stay in the instrument's
+dynamic range.  Correcting values.
+
+
+```r
+conc[conc$exp == 600, c("obs", "A260", "A280")] %<>% multiply_by(5)
+```
+
 Histograms
 ----------
 
@@ -2105,6 +2113,7 @@ Absorbances
 
 ```r
 ggplot(conc, aes(A260, A280, colour = exp)) + geom_point() +
+    scale_x_log10() + scale_y_log10() +
   ggtitle("Relation between absorbances at 260 and 280 nm")
 ```
 
@@ -2116,6 +2125,7 @@ Concentrations
 
 ```r
 ggplot(conc, aes(obs,  exp, colour = exp))  + geom_point() +
+  scale_x_log10() + scale_y_log10() +
   ggtitle("Observed concentration and expected molarity")
 ```
 
