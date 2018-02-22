@@ -1,0 +1,29 @@
+---
+title: "Labcyte-RT Data Analysis (merge 3nd experiment)"
+output:
+  html_document:
+    keep_md: yes
+    number_sections: yes
+    toc: yes
+---
+
+Load and merge CAGE data
+========================
+
+Data from plates 1~3 and 4~6 were first loaded in separate CAGEexp objects
+because our MOIRAI pipeline does not support dual indexing.  Here, we retreive
+the objects and merge them.  Merging is relatively slow, so this workflow
+just merges the `R` objects and saves the results to a file for further use
+by other workflows.
+
+```{r load_and_merge}
+library("CAGEr")
+ce1 <- readRDS("Labcyte-RT_Data_Analysis_3a.Rds")
+ce2 <- readRDS("Labcyte-RT_Data_Analysis_3b.Rds")
+ce  <- mergeCAGEsets(ce1, ce2)
+saveRDS(ce, "Labcyte-RT_Data_Analysis_3.Rds")
+```
+
+```{r sessionInfor}
+sessionInfo()
+```
