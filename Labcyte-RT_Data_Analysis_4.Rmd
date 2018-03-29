@@ -1,0 +1,195 @@
+---
+title: "Labcyte-RT Data Analysis (4th experiment)"
+output:
+  html_document:
+    keep_md: yes
+    number_sections: yes
+    toc: yes
+---
+
+```{r echo = FALSE}
+knitr::opts_chunk$set(cache  = TRUE)
+knitr::opts_knit$set(verbose = TRUE)
+ggplot2::theme_set(ggplot2::theme_bw())
+```
+
+Experiment 4
+============
+
+Here, we moved or replaced the contents of row B of the TSO source plate, to
+better understand why this row produces lower values regardless the
+TSO concentration.
+
+The reverse-transcriptase was SuperScript III.
+
+Load R packages
+===============
+
+```{r load_R_libraries, message = FALSE}
+library("CAGEr")
+library("ggplot2")
+library("magrittr")
+library("MultiAssayExperiment")
+library("SummarizedExperiment")
+```
+
+MOIRAI shortcuts
+
+```{r moirai_shortcuts, dependson = "load_R_libraries"}
+MISEQ_RUN      <- "180326_M00528_0346_000000000-B4GJR"
+WORKFLOW       <- "OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1"
+MOIRAI_STAMP   <- "20180328094540"
+MOIRAI_PROJ    <- "project/Labcyte" 
+MOIRAI_USER    <- "nanoCAGE2" 
+ASSEMBLY       <- "mm9"
+BASEDIR        <- "/osc-fs_home/scratch/moirai"
+MOIRAI_BASE    <- file.path(BASEDIR, MOIRAI_USER)
+MOIRAI_RESULTS <- file.path(MOIRAI_BASE, MOIRAI_PROJ, paste(MISEQ_RUN, WORKFLOW, MOIRAI_STAMP, sep = "."))
+```
+
+Load CAGE libraries
+===================
+
+Load summary statistics from MOIRAI and polish the names
+--------------------------------------------------------
+
+```{r MOIRAI, dependson = "moirai_shortcuts"}
+ce <- smallCAGEqc::loadMoiraiStats(
+  pipeline  = WORKFLOW,
+  multiplex = file.path( MOIRAI_BASE, "input", paste0(MISEQ_RUN, ".multiplex.txt")),
+  summary   = file.path( MOIRAI_RESULTS, "text", "summary.txt")) %>% DataFrame
+
+ce$inputFiles <- paste0(MOIRAI_RESULTS, "/CAGEscan_fragments/", ce$samplename, ".bed")
+
+# Discard lines for which input files do not exist.
+ce <- ce[sapply(ce$inputFiles, file.exists),]
+
+# Discard lines for which input files are empty.
+ce <- ce[file.info(ce$inputFiles)$size != 0,]
+
+ce$inputFilesType <- c("bed")
+ce$sampleLabels <- as.character(ce$samplename)
+
+# Replace indexes in group names by RNA amounts extracted from sample sheet.
+levels(ce$group) <- system("cut -f 6,8 -d , 180326_M00528_0346_000000000-B4GJR.SampleSheet.csv | grep g_ | sort | cut -f2 -d, | cut -f1 -d_", intern = TRUE)
+
+# Sort the levels by RNA amount
+ce$group %<>% factor(levels = c("100ng", "10ng", "1ng", "100pg", "10pg"))
+
+ce$repl <- ce$index
+levels(ce$repl) <- system("cut -f 6,8 -d , 180326_M00528_0346_000000000-B4GJR.SampleSheet.csv | grep g_ | sort | cut -f2 -d, | cut -f2 -d_ | cut -c1", intern = TRUE)
+ce$repl %<>% factor(levels = 1:2)
+
+# Define plate IDs
+ce$plateID <- ce$repl
+levels(ce$plateID) <- c("K", "L")
+
+rownames(ce) %<>% paste(ce$plateID, sep = "_")
+ce$sampleLabels <- rownames(ce)
+
+ce
+```
+
+
+Load plate design
+-----------------
+
+Using plate 2 design, see [Labcyte-RT2.md](Labcyte-RT2.md).
+```{r PLATE, dependson = "MOIRAI"}
+plate <- read.table("plate2.txt", sep = "\t", header = TRUE)
+ce %<>% cbind(plate[match( paste(ce$barcode, ce$group)
+                         , paste(plate$BARCODE_SEQ, plate$RNA_group)), ])
+rm(plate)
+```
+
+
+Create a CAGEexp object and load expression data
+------------------------------------------------
+
+```{r new_CAGEexp, message = F, echo = FALSE, dependson = "PLATE"}
+ce <- CAGEexp( colData    = ce
+             , genomeName = "BSgenome.Mmusculus.UCSC.mm9")
+```
+
+```{r get_CTSS_data, dependson = "new_CAGEexp"}
+getCTSS(ce, useMulticore = TRUE)
+removeStrandInvaders(ce)
+```
+
+
+Save the CAGEexp file
+---------------------
+
+```{r save_myCAGEexp_object, dependson = "get_CTSS_data"}
+saveRDS(ce, "Labcyte-RT_Data_Analysis_3b.Rds")
+```
+
+
+Quality controls
+================
+
+By RNA input
+------------
+
+Negative controls with no RNA gave much less sequences than the regular
+samples with RNA.
+
+```{r qc_RNA_quantity_raw, dependson = "get_CTSS_data"}
+plotAnnot( ce, scope = "qc", group = "repl", normalise = FALSE
+         , title = "QC control, by ng of input RNA (sequence counts)"
+         , facet="RNA") +
+  facet_wrap(~facet, nrow = 5)
+```
+
+The normalised QC profile is not much different, therefore
+the sequences might be _in silico_ or _in vitro_ contaminations.
+
+```{r qc_RNA_quantity_norm, dependson = "get_CTSS_data"}
+plotAnnot( ce, scope = "qc", group = "repl", normalise = TRUE
+         , title = "QC control, by ng of input RNA (normalised to 100 %)"
+         , facet="RNA") +
+  facet_wrap(~facet, nrow = 5)
+```
+
+
+By TSO concentration
+--------------------
+
+Problem with TSO == 60 ??  Mabye the stock primer had a defect.
+
+
+```{r TSO, dependson = "get_CTSS_data"}
+plotAnnot(ce, scope = "qc", group = "TSO", normalise = FALSE, facet = "group")
+```
+
+
+Annotation with GENCODE
+-----------------------
+
+Collect Gencode annotations and gene symbols via a local GENCODE file
+(mm9 gencode not available in AnnotationHub)
+
+Most pairs align in intergenic regions.  Is it because of the sequence error
+combined with very short read 1s ?
+
+```{r annotate_CTSS, dependson = "get_CTSS_data"}
+annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
+```
+
+```{r CTSS_annotation_plot_per_replicate, dependson = "annotate_CTSS"}
+plotAnnot( ce, scope = "counts", group = "repl"
+         , title = "QC annotation, by ng of input RNA (sequence counts)"
+         , facet = "group") +
+  facet_wrap("facet", nrow = 5)
+plotAnnot( ce, scope = "counts", group = "repl"
+         , title = "QC annotation, by ng of input RNA (normalised to 100%)"
+         , facet = "group", norm = F) +
+  facet_wrap("facet", nrow = 5)
+```
+
+Session information
+===================
+
+```{r}
+sessionInfo()
+```
