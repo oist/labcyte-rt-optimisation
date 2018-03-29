@@ -13,7 +13,7 @@ done
 
 for index in TAGGCATG CTCTCTAC CGAGGCTG AAGAGGCA GTAGAGGA
 do
-  for barcode in $(sed 1d multiplex.txt | cut -f3)
+  for barcode in $(sed 1d multiplex2.txt | cut -f3)
   do
     printf "${barcode}_${index}\t${index}\t${barcode}\t${index}\n" >> 180326_M00528_0346_000000000-B4GJR.multiplex.txt
   done
