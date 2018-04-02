@@ -84,7 +84,7 @@ libs$RNA <- as.numeric(libs$RNA)
 libs <- libs[order(-libs$PRIMERS_RATIO),]
 libs <- libs[order(-libs$RNA),]
 libs$PRIMERS_RATIO[is.na(libs$PRIMERS_RATIO)] <- "no_RT_PRIMERS"
-libs
+libs$plateID <- "A"
 ```
 
 Create a CAGEexp object and load expression data
@@ -96,7 +96,15 @@ ce <- CAGEexp(colData = DataFrame(libs)
                                         , inputFilesType = "bed"))
 
 getCTSS(ce, useMulticore = TRUE)
+removeStrandInvaders(ce)
 normalizeTagCount(ce, method = "simpleTpm")
+```
+
+Save the CAGEexp file
+---------------------
+
+```{r save_myCAGEexp_object, dependson = "get_CTSS_data"}
+saveRDS(ce, "Labcyte-RT_Data_Analysis.Rds")
 ```
 
 Number of sequencing reads extracted per sample
@@ -106,32 +114,138 @@ Number of sequencing reads extracted per sample
 data.frame(colData(ce)[,"extracted",drop=F])
 ```
 
-CTSS ANALYSIS
-=============
 
-Number of nanoCAGE tags mapping at CTSS positions in each group of samples
---------------------------------------------------------------------------
-  
-```{r CTSS_counts_distribution, dev=c('png'), fig.show='hide', results='hide', message = FALSE, warning=FALSE}
-## Figures not displayed on the html/pdf output
-plotReverseCumulatives(ce[,1:7], onePlot = TRUE)
-plotReverseCumulatives(ce[,8:14], onePlot = TRUE)
-plotReverseCumulatives(ce[,15:21], onePlot = TRUE)
-plotReverseCumulatives(ce[,22:28], onePlot = TRUE)
-plotReverseCumulatives(ce[,29:35], onePlot = TRUE)
-plotReverseCumulatives(ce[,36:42], onePlot = TRUE)
-plotReverseCumulatives(ce[,42:49], onePlot = TRUE, fitInRange = NULL)
-plotReverseCumulatives(ce[,50:56], onePlot = TRUE, fitInRange = NULL)
-plotReverseCumulatives(ce[,57:63], onePlot = TRUE, fitInRange = NULL)
-plotReverseCumulatives(ce[,64:70], onePlot = TRUE, fitInRange = NULL)
+Quality controls
+================
+
+Custom _scopes_ displaying _strand invasion_ artefacts.
+
+```{r custom_plotAnnot_scopes}
+msScope_qcSI <- function(libs) {
+  libs$Tag_dust     <- libs$extracted   - libs$rdna - libs$spikes - libs$cleaned
+  libs$rDNA         <- libs$rdna
+  libs$Spikes       <- libs$spikes
+  libs$Unmapped     <- libs$cleaned     - libs$mapped
+  libs$Non_proper   <- libs$mapped      - libs$properpairs
+  libs$Duplicates   <- libs$properpairs - libs$librarySizes - libs$strandInvaders
+  libs$Invaders     <- libs$strandInvaders
+  libs$Counts       <- libs$librarySizes
+  list( libs    = libs
+      , columns = c( "Tag_dust", "rDNA", "Spikes", "Unmapped"
+                   , "Non_proper", "Duplicates", "Invaders", "Counts")
+      , total   = libs$extracted)
+}
+
+msScope_counts <- function(libs) {
+  libs$Promoter   <- libs$promoter
+  libs$Exon       <- libs$exon
+  libs$Intron     <- libs$intron
+  libs$Intergenic <- libs$librarySizes - libs$promoter - libs$intron - libs$exon
+  libs$Invaders   <- libs$strandInvaders
+  list( libs    = libs
+      , columns = c("Promoter", "Exon", "Intron", "Intergenic", "Invaders")
+      , total   = libs$librarySizes + libs$strandInvaders)
+}
 ```
 
-Number of nanoCAGE tags mapping at CTSS positions in each sample
-----------------------------------------------------------------
-  
-```{r ctss-analysis}
-(ce$l1 <- colSums(CTSStagCountDf(ce) > 0))
+By RNA input
+------------
+
+```{r qc_RNA_quantity, dependson = "get_CTSS_data"}
+ggpubr::ggarrange(
+  plotAnnot( ce, scope = msScope_qcSI, group = "plateID", normalise = FALSE
+           , title = "sequence counts"
+           , facet="RNA") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_qcSI, group = "plateID", normalise = TRUE
+         , title = "normalised to 100 %"
+         , facet="RNA") +
+  facet_wrap(~facet, ncol = 1),
+  legend = "right",
+  common.legend = TRUE
+)
 ```
+
+
+### Removal of the RNA negative controls
+
+To ease data handling, the negative controls with no RNA are removed.
+
+```{r remove_noRNA_ctls, dependson = "load_and_merge"}
+ce <- ce[,ce$RNA != 0]
+```
+
+
+By RT primer quantity
+---------------------
+
+```{r qc_rt_primer_quantity, dependson = "remove_noRNA_ctls"}
+ggpubr::ggarrange(
+  plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
+           , title = "sequence counts"
+           , facet="plateID") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = TRUE
+         , title = "normalised to 100 %"
+         , facet="plateID") +
+  facet_wrap(~facet, ncol = 1),
+  legend = "right",
+  common.legend = TRUE
+)
+```
+
+
+### Removal of the primer-negative controls
+
+To ease data handling (for instance when working with primer ratios), the
+negative controls with no primers are removed.
+
+```{r remove_noPrimers_ctls, dependson = "remove_noRNA_ctls"}
+ce <- ce[,ce$RT_PRIMERS != 0]
+```
+
+Lets tidy the primer ratios after the null primer concentrations were removed.
+
+```{r correct_primer_ratios, dependson = "remove_noPrimers_ctls"}
+ce$PRIMERS_RATIO %<>% factor
+levels(ce$PRIMERS_RATIO) %<>% as.numeric %>% signif(2) %>% as.character
+ce$PRIMERS_RATIO %<>% factor(levels = levels(ce$PRIMERS_RATIO) %>% gtools::mixedsort())
+```
+
+```{r qc_rt_primer_quantity_nozero, dependson = "remove_noRNA_ctls"}
+ggpubr::ggarrange(
+  plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
+           , title = "sequence counts"
+           , facet="plateID") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = TRUE
+         , title = "normalised to 100 %"
+         , facet="plateID") +
+  facet_wrap(~facet, ncol = 1),
+  legend = "right",
+  common.legend = TRUE
+)
+```
+
+
+By TSO concentration
+--------------------
+
+```{r TSO, dependson = "get_CTSS_data"}
+ggpubr::ggarrange(
+  plotAnnot( ce, scope = msScope_qcSI, group = "TSO", normalise = FALSE
+           , title = "sequence counts"
+           , facet="plateID") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_qcSI, group = "TSO", normalise = TRUE
+         , title = "normalised to 100 %"
+         , facet="plateID") +
+  facet_wrap(~facet, ncol = 1),
+  legend = "right",
+  common.legend = TRUE
+)
+```
+
 
 Create CTSS clusters
 --------------------
@@ -146,21 +260,25 @@ Create CTSS clusters
 
 Annotation with GENCODE
 -----------------------
-  
-Collect Gencode annotations and gene symbols via AnnotationHub.
 
-```{r expression-per-gene, message = F}
-ah <- AnnotationHub::AnnotationHub()
-ah["AH49556"]
+```{r annotate_CTSS, dependson = "get_CTSS_data"}
+annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
 ```
 
-Annotate the genomic ranges of the `tagCountMatrix` SummarizedExperiment.
 
-```{r annotate-CAGEexp, message = FALSE, warning = FALSE}
-annotateCTSS(ce, ah[["AH49556"]])
-#annotateConsensusClusters(ce, ah[["AH49556"]])
-#consensusClustersSE(ce)
-#consensusClustersGR(ce)
+```{r CTSS_annotation_plot_per_replicate, dependson = "annotate_CTSS"}
+ggpubr::ggarrange(
+  plotAnnot( ce, scope = msScope_counts, group = "TSO", normalise = FALSE
+           , title = "sequence counts"
+           , facet="RT_PRIMERS") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_counts, group = "TSO", normalise = TRUE
+         , title = "normalised to 100 %"
+         , facet="RT_PRIMERS") +
+  facet_wrap(~facet, ncol = 1),
+  legend = "right",
+  common.legend = TRUE
+)
 ```
 
 Make a gene expression table (not really required now).
@@ -168,10 +286,4 @@ Make a gene expression table (not really required now).
 ```{r CTSStoGenes-CAGEexp}
 CTSStoGenes(ce)
 #CTSScoordinatesGR(ce)
-```
-
-Save ce file.
-
-```{r save_ce_object}
-saveRDS(ce, "Labcyte-RT_Data_Analysis.Rds")
 ```
