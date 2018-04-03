@@ -144,6 +144,9 @@ ce$group %<>% factor(levels = c("100ng", "10ng", "1ng", "100pg", "10pg"))
 ce$repl <- ce$index
 levels(ce$repl) <- system("cut -f 6,8 -d , 180123_M00528_0325_000000000-B4PCK.SampleSheet.csv | grep g_ | sort | cut -f 2 -d _ | sed 's/\r//'", intern = TRUE)
 ce$repl %<>% factor(levels = 1:3)
+
+ce$plateID <- ce$repl
+levels(ce$plateID) <- c("B", "C", "D")
 ```
 
 
@@ -209,29 +212,103 @@ msScope_counts <- function(libs) {
 Negative controls with no RNA gave much less sequences than the regular
 samples with RNA.
 
-
-```r
-plotAnnot( ce, scope = msScope_qcSI, group = "RNA", normalise = FALSE
-         , title = "QC control, by ng of input RNA (sequence counts)")
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/qc_RNA_quantity_raw-1.png)<!-- -->
-
 The normalised QC profile is not much different, therefore
 the sequences might be _in silico_ or _in vitro_ contaminations.
 
 
 ```r
-plotAnnot( ce, scope = msScope_qcSI, group = "RNA", normalise = TRUE
-         , title = "QC control, by ng of input RNA (normalised to 100 %)")
+ggpubr::ggarrange(legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = msScope_qcSI, group = "RNA", normalise = FALSE
+           , title = NULL) + ylab("Number of read pairs") + xlab(NULL),
+  plotAnnot( ce, scope = msScope_qcSI, group = "RNA", normalise = TRUE
+         , title = NULL) + ylab("Normalised to 100 %") + xlab(NULL)) %>%
+  ggpubr::annotate_figure(top="QC control, by RNA amounts (ng)")
 ```
 
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/qc_RNA_quantity_norm-1.png)<!-- -->
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/qc_RNA_quantity-1.png)<!-- -->
 
 ### Removal of the RNA negative controls
 
-To ease data handling, the negative controls with no RNA are removed.
+To ease data handling, the negative controls with no RNA are removed.  By design
+all of these negative controls had 10 μM TSO.
 
+
+```r
+colData(ce[,ce$RNA == 0]) %>% data.frame %>% summary
+```
+
+```
+## harmonizing input:
+##   removing 926 sampleMap rows with 'colname' not in colnames of experiments
+##   removing 926 colData rownames not in sampleMap 'primary'
+```
+
+```
+##            samplename   group       barcode        index        total  
+##  GCTACG_ACTCGCTA: 1   100ng:14   GCTATA :14   ACTCGCTA: 7   Min.   :0  
+##  GCTACG_ATCTCAGG: 1   10ng :19   GCTCAG :14   ATCTCAGG: 7   1st Qu.:0  
+##  GCTACG_CCTAAGAC: 1   1ng  :20   GCTCTC :14   CCTAAGAC: 7   Median :0  
+##  GCTACG_CGATCAGT: 1   100pg:16   GCTCGT :13   TACGCTGC: 7   Mean   :0  
+##  GCTACG_CTCTCTAC: 1   10pg :16   GCTAGC :12   CGATCAGT: 6   3rd Qu.:0  
+##  GCTACG_TACGCTGC: 1              GCTGAT :12   CGGAGCCT: 6   Max.   :0  
+##  (Other)        :79              (Other): 6   (Other) :45              
+##    extracted         cleaned           tagdust             rdna       
+##  Min.   :   3.0   Min.   :   3.00   Min.   :   0.00   Min.   : 0.000  
+##  1st Qu.:  18.0   1st Qu.:  14.00   1st Qu.:   1.00   1st Qu.: 1.000  
+##  Median :  31.0   Median :  22.00   Median :   4.00   Median : 3.000  
+##  Mean   : 131.9   Mean   :  72.07   Mean   :  55.27   Mean   : 4.471  
+##  3rd Qu.:  87.0   3rd Qu.:  54.00   3rd Qu.:  26.00   3rd Qu.: 5.000  
+##  Max.   :2442.0   Max.   :1158.00   Max.   :1255.00   Max.   :28.000  
+##                                                                       
+##      spikes            mapped       properpairs         counts 
+##  Min.   :0.00000   Min.   : 1.00   Min.   : 1.000   Min.   :0  
+##  1st Qu.:0.00000   1st Qu.: 4.00   1st Qu.: 1.000   1st Qu.:0  
+##  Median :0.00000   Median : 8.00   Median : 3.000   Median :0  
+##  Mean   :0.09412   Mean   :10.64   Mean   : 3.988   Mean   :0  
+##  3rd Qu.:0.00000   3rd Qu.:12.00   3rd Qu.: 5.000   3rd Qu.:0  
+##  Max.   :3.00000   Max.   :74.00   Max.   :21.000   Max.   :0  
+##                                                                
+##   inputFiles        inputFilesType     sampleLabels       repl   plateID
+##  Length:85          Length:85          Length:85          1:29   B:29   
+##  Class :character   Class :character   Class :character   2:28   C:28   
+##  Mode  :character   Mode  :character   Mode  :character   3:28   D:28   
+##                                                                         
+##                                                                         
+##                                                                         
+##                                                                         
+##       well         row          col        MASTER_MIX_vol      TSO    
+##  J05    : 3   J      :53   Min.   : 1.00   Min.   :350    Min.   :10  
+##  J06    : 3   N      : 9   1st Qu.:11.00   1st Qu.:350    1st Qu.:10  
+##  J09    : 3   K      : 8   Median :18.00   Median :350    Median :10  
+##  J10    : 3   L      : 7   Mean   :16.16   Mean   :350    Mean   :10  
+##  J11    : 3   O      : 7   3rd Qu.:23.00   3rd Qu.:350    3rd Qu.:10  
+##  J12    : 3   M      : 1   Max.   :24.00   Max.   :350    Max.   :10  
+##  (Other):67   (Other): 0                                              
+##     TSO_vol      BARCODE_ID     BARCODE_SEQ   RT_PRIMERS   
+##  Min.   :100   Min.   :64.00   GCTATA :14   Min.   :0.000  
+##  1st Qu.:100   1st Qu.:66.00   GCTCAG :14   1st Qu.:0.250  
+##  Median :100   Median :67.00   GCTCTC :14   Median :0.500  
+##  Mean   :100   Mean   :67.25   GCTCGT :13   Mean   :1.188  
+##  3rd Qu.:100   3rd Qu.:69.00   GCTAGC :12   3rd Qu.:2.000  
+##  Max.   :100   Max.   :70.00   GCTGAT :12   Max.   :4.000  
+##                                (Other): 6                  
+##  RT_PRIMERS_vol       RNA       RNA_vol  RNA_group     H2O_vol     
+##  Min.   : 0.00   Min.   :0   Min.   :0   100ng:14   Min.   :25.00  
+##  1st Qu.:25.00   1st Qu.:0   1st Qu.:0   100pg:16   1st Qu.:25.00  
+##  Median :25.00   Median :0   Median :0   10ng :19   Median :25.00  
+##  Mean   :23.24   Mean   :0   Mean   :0   10pg :16   Mean   :26.76  
+##  3rd Qu.:25.00   3rd Qu.:0   3rd Qu.:0   1ng  :20   3rd Qu.:25.00  
+##  Max.   :25.00   Max.   :0   Max.   :0              Max.   :50.00  
+##                                                                    
+##   total_volume PRIMERS_RATIO  librarySizes    strandInvaders  
+##  Min.   :500   20     :14    Min.   : 0.000   Min.   :0.0000  
+##  1st Qu.:500   40     :14    1st Qu.: 1.000   1st Qu.:0.0000  
+##  Median :500   5      :14    Median : 2.000   Median :0.0000  
+##  Mean   :500   10     :13    Mean   : 3.329   Mean   :0.4118  
+##  3rd Qu.:500   2.5    :12    3rd Qu.: 4.000   3rd Qu.:1.0000  
+##  Max.   :500   80     :12    Max.   :16.000   Max.   :3.0000  
+##                (Other): 6
+```
 
 ```r
 ce <- ce[,ce$RNA != 0]
@@ -252,19 +329,15 @@ samples is a bit high for such an explanation.
 
 
 ```r
-plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
-         , title = "QC control, by amount of RT primers (in μM)")
+ggpubr::ggarrange(legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
+           , title = NULL) + ylab("Number of read pairs") + xlab(NULL),
+  plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = TRUE
+         , title = NULL) + ylab("Normalised to 100 %") + xlab(NULL)) %>%
+  ggpubr::annotate_figure(top="QC control, by amount of RT primers (in μM)")
 ```
 
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/qc_rt_primer_quantity_raw-1.png)<!-- -->
-
-
-```r
-plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = TRUE
-         , title = "QC control, by amount of RT primers (normalised to 100 %)")
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/qc_rt_primer_quantity_norm-1.png)<!-- -->
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/qc_rt_primer_quantity-1.png)<!-- -->
 
 ### Removal of the primer-negative controls
 
@@ -298,18 +371,19 @@ many sequence errors to be mapped.
 
 
 ```r
-plotAnnot(ce, scope = msScope_qcSI, group = "repl", facet="group") +
-  facet_wrap(~facet, nrow = 5)
+ggpubr::ggarrange(legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = msScope_qcSI, group = "plateID", facet="group"
+           , normalise = FALSE, title = NULL) +
+    ylab("Number of read pairs") + xlab(NULL) +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_qcSI, group = "plateID", facet="group"
+           , normalise = TRUE, title = NULL) +
+    ylab("Normalised to 100 %") + xlab(NULL) +
+    facet_wrap(~facet, ncol = 1)) %>%
+  ggpubr::annotate_figure(top="QC control, by plate ID and amount of RNA (ng)")
 ```
 
 ![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
-
-```r
-plotAnnot(ce, scope = msScope_qcSI, group = "repl", normalise = FALSE, facet="group") +
-  facet_wrap(~facet, nrow = 5)
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-4-2.png)<!-- -->
 
 ### By TSO concentration
 
@@ -342,6 +416,26 @@ plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = FALSE, facet = "R
 ```
 
 ![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-5-3.png)<!-- -->
+
+```r
+plotAnnot(ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE, facet = "TSO")
+```
+
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-5-4.png)<!-- -->
+
+```r
+plotAnnot(ce, scope = msScope_qcSI, group = "BARCODE_ID", normalise = FALSE, facet = "group")
+```
+
+```
+## Warning: Removed 16 rows containing missing values (geom_segment).
+```
+
+```
+## Warning: Removed 16 rows containing missing values (geom_point).
+```
+
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-5-5.png)<!-- -->
 
 Barcode "CTGTCT" gave large amounts of artefacts.  This is not the case for its
 nearest similar barcode "CTGCTC".
@@ -616,39 +710,41 @@ sessionInfo()
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] nlme_3.1-131                      bitops_1.0-6                     
-##  [3] rprojroot_1.2                     tools_3.4.3                      
-##  [5] backports_1.1.1                   R6_2.2.2                         
+##  [3] rprojroot_1.3-2                   tools_3.4.3                      
+##  [5] backports_1.1.2                   R6_2.2.2                         
 ##  [7] platetools_0.0.2                  KernSmooth_2.23-15               
 ##  [9] lazyeval_0.2.1                    mgcv_1.8-22                      
 ## [11] colorspace_1.3-2                  gridExtra_2.3                    
 ## [13] compiler_3.4.3                    VennDiagram_1.6.18               
 ## [15] rtracklayer_1.39.9                labeling_0.3                     
-## [17] scales_0.5.0                      stringr_1.2.0                    
-## [19] digest_0.6.12                     Rsamtools_1.31.3                 
-## [21] rmarkdown_1.8                     stringdist_0.9.4.6               
+## [17] scales_0.5.0                      stringr_1.3.0                    
+## [19] digest_0.6.15                     Rsamtools_1.31.3                 
+## [21] rmarkdown_1.9                     stringdist_0.9.4.6               
 ## [23] XVector_0.19.8                    pkgconfig_2.0.1                  
 ## [25] htmltools_0.3.6                   BSgenome_1.47.5                  
-## [27] rlang_0.1.4                       VGAM_1.0-4                       
+## [27] rlang_0.2.0                       VGAM_1.0-4                       
 ## [29] bindr_0.1                         BiocParallel_1.12.0              
 ## [31] gtools_3.5.0                      dplyr_0.7.4                      
 ## [33] RCurl_1.95-4.10                   GenomeInfoDbData_0.99.1          
 ## [35] futile.logger_1.4.3               smallCAGEqc_0.12.2.999999        
-## [37] Matrix_1.2-12                     Rcpp_0.12.14                     
+## [37] Matrix_1.2-12                     Rcpp_0.12.16                     
 ## [39] munsell_0.4.3                     viridis_0.4.0                    
-## [41] stringi_1.1.6                     yaml_2.1.15                      
+## [41] stringi_1.1.7                     yaml_2.1.18                      
 ## [43] MASS_7.3-47                       zlibbioc_1.24.0                  
 ## [45] plyr_1.8.4                        grid_3.4.3                       
 ## [47] gdata_2.18.0                      Biostrings_2.47.9                
-## [49] splines_3.4.3                     knitr_1.17                       
-## [51] beanplot_1.2                      reshape2_1.4.2                   
-## [53] codetools_0.2-15                  futile.options_1.0.0             
-## [55] XML_3.98-1.9                      glue_1.2.0                       
-## [57] evaluate_0.10.1                   lambda.r_1.2                     
-## [59] data.table_1.10.4-3               gtable_0.2.0                     
-## [61] BSgenome.Mmusculus.UCSC.mm9_1.4.0 purrr_0.2.4                      
-## [63] tidyr_0.7.2                       reshape_0.8.7                    
-## [65] assertthat_0.2.0                  viridisLite_0.2.0                
-## [67] tibble_1.3.4                      som_0.3-5.1                      
-## [69] GenomicAlignments_1.15.12         memoise_1.1.0                    
-## [71] bindrcpp_0.2                      cluster_2.0.6
+## [49] cowplot_0.9.2                     splines_3.4.3                    
+## [51] knitr_1.20                        beanplot_1.2                     
+## [53] pillar_1.2.1                      ggpubr_0.1.6                     
+## [55] reshape2_1.4.2                    codetools_0.2-15                 
+## [57] futile.options_1.0.0              XML_3.98-1.9                     
+## [59] glue_1.2.0                        evaluate_0.10.1                  
+## [61] lambda.r_1.2                      data.table_1.10.4-3              
+## [63] gtable_0.2.0                      BSgenome.Mmusculus.UCSC.mm9_1.4.0
+## [65] purrr_0.2.4                       tidyr_0.7.2                      
+## [67] reshape_0.8.7                     assertthat_0.2.0                 
+## [69] viridisLite_0.2.0                 tibble_1.4.2                     
+## [71] som_0.3-5.1                       GenomicAlignments_1.15.12        
+## [73] memoise_1.1.0                     bindrcpp_0.2                     
+## [75] cluster_2.0.6
 ```

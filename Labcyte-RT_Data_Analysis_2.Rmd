@@ -74,6 +74,9 @@ ce$group %<>% factor(levels = c("100ng", "10ng", "1ng", "100pg", "10pg"))
 ce$repl <- ce$index
 levels(ce$repl) <- system("cut -f 6,8 -d , 180123_M00528_0325_000000000-B4PCK.SampleSheet.csv | grep g_ | sort | cut -f 2 -d _ | sed 's/\r//'", intern = TRUE)
 ce$repl %<>% factor(levels = 1:3)
+
+ce$plateID <- ce$repl
+levels(ce$plateID) <- c("B", "C", "D")
 ```
 
 ```{r PLATE}
@@ -136,24 +139,25 @@ msScope_counts <- function(libs) {
 Negative controls with no RNA gave much less sequences than the regular
 samples with RNA.
 
-```{r qc_RNA_quantity_raw}
-plotAnnot( ce, scope = msScope_qcSI, group = "RNA", normalise = FALSE
-         , title = "QC control, by ng of input RNA (sequence counts)")
-```
-
 The normalised QC profile is not much different, therefore
 the sequences might be _in silico_ or _in vitro_ contaminations.
 
-```{r qc_RNA_quantity_norm}
-plotAnnot( ce, scope = msScope_qcSI, group = "RNA", normalise = TRUE
-         , title = "QC control, by ng of input RNA (normalised to 100 %)")
+```{r qc_RNA_quantity}
+ggpubr::ggarrange(legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = msScope_qcSI, group = "RNA", normalise = FALSE
+           , title = NULL) + ylab("Number of read pairs") + xlab(NULL),
+  plotAnnot( ce, scope = msScope_qcSI, group = "RNA", normalise = TRUE
+         , title = NULL) + ylab("Normalised to 100 %") + xlab(NULL)) %>%
+  ggpubr::annotate_figure(top="QC control, by RNA amounts (ng)")
 ```
 
 ### Removal of the RNA negative controls
 
-To ease data handling, the negative controls with no RNA are removed.
+To ease data handling, the negative controls with no RNA are removed.  By design
+all of these negative controls had 10 μM TSO.
 
 ```{r}
+colData(ce[,ce$RNA == 0]) %>% data.frame %>% summary
 ce <- ce[,ce$RNA != 0]
 ```
 
@@ -164,14 +168,13 @@ dramatically different from other libraries.  This might again be explained
 by contaminations, although the amount of sequences in the "no RT primer"
 samples is a bit high for such an explanation.
 
-```{r qc_rt_primer_quantity_raw}
-plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
-         , title = "QC control, by amount of RT primers (in μM)")
-```
-
-```{r qc_rt_primer_quantity_norm}
-plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = TRUE
-         , title = "QC control, by amount of RT primers (normalised to 100 %)")
+```{r qc_rt_primer_quantity}
+ggpubr::ggarrange(legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
+           , title = NULL) + ylab("Number of read pairs") + xlab(NULL),
+  plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = TRUE
+         , title = NULL) + ylab("Normalised to 100 %") + xlab(NULL)) %>%
+  ggpubr::annotate_figure(top="QC control, by amount of RT primers (in μM)")
 ```
 
 ### Removal of the primer-negative controls
@@ -195,10 +198,16 @@ sequence quality was so low that a large number of reads 1 in the pairs have too
 many sequence errors to be mapped.
 
 ```{r}
-plotAnnot(ce, scope = msScope_qcSI, group = "repl", facet="group") +
-  facet_wrap(~facet, nrow = 5)
-plotAnnot(ce, scope = msScope_qcSI, group = "repl", normalise = FALSE, facet="group") +
-  facet_wrap(~facet, nrow = 5)
+ggpubr::ggarrange(legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = msScope_qcSI, group = "plateID", facet="group"
+           , normalise = FALSE, title = NULL) +
+    ylab("Number of read pairs") + xlab(NULL) +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_qcSI, group = "plateID", facet="group"
+           , normalise = TRUE, title = NULL) +
+    ylab("Normalised to 100 %") + xlab(NULL) +
+    facet_wrap(~facet, ncol = 1)) %>%
+  ggpubr::annotate_figure(top="QC control, by plate ID and amount of RNA (ng)")
 ```
 
 ### By TSO concentration
@@ -218,6 +227,8 @@ Strand invation seems to depend more on RNA quantity than on TSO concentration ?
 plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = FALSE, facet = "group")
 plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = TRUE,  facet = "group")
 plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = FALSE, facet = "RT_PRIMERS")
+plotAnnot(ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE, facet = "TSO")
+plotAnnot(ce, scope = msScope_qcSI, group = "BARCODE_ID", normalise = FALSE, facet = "group")
 ```
 
 Barcode "CTGTCT" gave large amounts of artefacts.  This is not the case for its
