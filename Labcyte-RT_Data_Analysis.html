@@ -126,9 +126,10 @@ $(document).ready(function () {
 <li><a href="#data-load-and-qc-in-r"><span class="toc-section-number">1</span> Data load and QC in R</a></li>
 <li><a href="#load-cage-libraries"><span class="toc-section-number">2</span> Load CAGE libraries</a><ul>
 <li><a href="#load-summary-statistics-from-moirai-and-polish-the-names"><span class="toc-section-number">2.1</span> Load summary statistics from MOIRAI and polish the names</a></li>
-<li><a href="#create-a-cageexp-object-and-load-expression-data"><span class="toc-section-number">2.2</span> Create a CAGEexp object and load expression data</a></li>
-<li><a href="#save-the-cageexp-file"><span class="toc-section-number">2.3</span> Save the CAGEexp file</a></li>
-<li><a href="#number-of-sequencing-reads-extracted-per-sample"><span class="toc-section-number">2.4</span> Number of sequencing reads extracted per sample</a></li>
+<li><a href="#control-on-barcode-extraction"><span class="toc-section-number">2.2</span> Control on barcode extraction</a></li>
+<li><a href="#create-a-cageexp-object-and-load-expression-data"><span class="toc-section-number">2.3</span> Create a CAGEexp object and load expression data</a></li>
+<li><a href="#save-the-cageexp-file"><span class="toc-section-number">2.4</span> Save the CAGEexp file</a></li>
+<li><a href="#number-of-sequencing-reads-extracted-per-sample"><span class="toc-section-number">2.5</span> Number of sequencing reads extracted per sample</a></li>
 </ul></li>
 <li><a href="#quality-controls"><span class="toc-section-number">3</span> Quality controls</a><ul>
 <li><a href="#by-rna-input"><span class="toc-section-number">3.1</span> By RNA input</a><ul>
@@ -146,137 +147,59 @@ $(document).ready(function () {
 
 <div id="data-load-and-qc-in-r" class="section level1">
 <h1><span class="header-section-number">1</span> Data load and QC in R</h1>
-<pre class="r"><code>BS_GENOME    &lt;- &quot;BSgenome.Mmusculus.UCSC.mm9&quot; 
-library(BS_GENOME, character.only = T)</code></pre>
-<pre><code>## Loading required package: BSgenome</code></pre>
-<pre><code>## Loading required package: BiocGenerics</code></pre>
-<pre><code>## Loading required package: parallel</code></pre>
-<pre><code>## 
-## Attaching package: 'BiocGenerics'</code></pre>
-<pre><code>## The following objects are masked from 'package:parallel':
-## 
-##     clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
-##     clusterExport, clusterMap, parApply, parCapply, parLapply,
-##     parLapplyLB, parRapply, parSapply, parSapplyLB</code></pre>
-<pre><code>## The following objects are masked from 'package:stats':
-## 
-##     IQR, mad, sd, var, xtabs</code></pre>
-<pre><code>## The following objects are masked from 'package:base':
-## 
-##     anyDuplicated, append, as.data.frame, basename, cbind,
-##     colMeans, colnames, colSums, dirname, do.call, duplicated,
-##     eval, evalq, Filter, Find, get, grep, grepl, intersect,
-##     is.unsorted, lapply, lengths, Map, mapply, match, mget, order,
-##     paste, pmax, pmax.int, pmin, pmin.int, Position, rank, rbind,
-##     Reduce, rowMeans, rownames, rowSums, sapply, setdiff, sort,
-##     table, tapply, union, unique, unsplit, which, which.max,
-##     which.min</code></pre>
-<pre><code>## Loading required package: S4Vectors</code></pre>
-<pre><code>## Loading required package: stats4</code></pre>
-<pre><code>## 
-## Attaching package: 'S4Vectors'</code></pre>
-<pre><code>## The following object is masked from 'package:base':
-## 
-##     expand.grid</code></pre>
-<pre><code>## Loading required package: IRanges</code></pre>
-<pre><code>## Loading required package: GenomeInfoDb</code></pre>
-<pre><code>## Loading required package: GenomicRanges</code></pre>
-<pre><code>## Loading required package: Biostrings</code></pre>
-<pre><code>## Loading required package: XVector</code></pre>
-<pre><code>## 
-## Attaching package: 'Biostrings'</code></pre>
-<pre><code>## The following object is masked from 'package:base':
-## 
-##     strsplit</code></pre>
-<pre><code>## Loading required package: rtracklayer</code></pre>
 <pre class="r"><code>library(CAGEr)
-library(data.table)</code></pre>
+library(data.table)
+library(dplyr)</code></pre>
 <pre><code>## 
-## Attaching package: 'data.table'</code></pre>
-<pre><code>## The following object is masked from 'package:GenomicRanges':
-## 
-##     shift</code></pre>
-<pre><code>## The following object is masked from 'package:IRanges':
-## 
-##     shift</code></pre>
-<pre><code>## The following objects are masked from 'package:S4Vectors':
-## 
-##     first, second</code></pre>
-<pre class="r"><code>library(ggplot2)
-library(gplots)</code></pre>
-<pre><code>## 
-## Attaching package: 'gplots'</code></pre>
-<pre><code>## The following object is masked from 'package:rtracklayer':
-## 
-##     space</code></pre>
-<pre><code>## The following object is masked from 'package:IRanges':
-## 
-##     space</code></pre>
-<pre><code>## The following object is masked from 'package:S4Vectors':
-## 
-##     space</code></pre>
-<pre><code>## The following object is masked from 'package:stats':
-## 
-##     lowess</code></pre>
-<pre class="r"><code>library('RColorBrewer')
-library(magrittr)
-library(plyr)</code></pre>
-<pre><code>## 
-## Attaching package: 'plyr'</code></pre>
-<pre><code>## The following object is masked from 'package:XVector':
-## 
-##     compact</code></pre>
-<pre><code>## The following object is masked from 'package:IRanges':
-## 
-##     desc</code></pre>
-<pre><code>## The following object is masked from 'package:S4Vectors':
+## Attaching package: 'dplyr'</code></pre>
+<pre><code>## The following object is masked from 'package:reshape':
 ## 
 ##     rename</code></pre>
-<pre class="r"><code>library(MultiAssayExperiment)
-library(SummarizedExperiment)</code></pre>
-<pre><code>## Loading required package: Biobase</code></pre>
-<pre><code>## Welcome to Bioconductor
-## 
-##     Vignettes contain introductory material; view with
-##     'browseVignettes()'. To cite Bioconductor, see
-##     'citation(&quot;Biobase&quot;)', and for packages 'citation(&quot;pkgname&quot;)'.</code></pre>
-<pre><code>## Loading required package: DelayedArray</code></pre>
-<pre><code>## Loading required package: matrixStats</code></pre>
-<pre><code>## 
-## Attaching package: 'matrixStats'</code></pre>
-<pre><code>## The following objects are masked from 'package:Biobase':
-## 
-##     anyMissing, rowMedians</code></pre>
-<pre><code>## The following object is masked from 'package:plyr':
+<pre><code>## The following object is masked from 'package:matrixStats':
 ## 
 ##     count</code></pre>
-<pre><code>## 
-## Attaching package: 'DelayedArray'</code></pre>
-<pre><code>## The following objects are masked from 'package:matrixStats':
+<pre><code>## The following object is masked from 'package:Biobase':
 ## 
-##     colMaxs, colMins, colRanges, rowMaxs, rowMins, rowRanges</code></pre>
-<pre><code>## The following object is masked from 'package:Biostrings':
+##     combine</code></pre>
+<pre><code>## The following objects are masked from 'package:GenomicRanges':
 ## 
-##     type</code></pre>
-<pre><code>## The following object is masked from 'package:base':
+##     intersect, setdiff, union</code></pre>
+<pre><code>## The following object is masked from 'package:GenomeInfoDb':
 ## 
-##     apply</code></pre>
-<pre class="r"><code>library(reshape)</code></pre>
-<pre><code>## 
-## Attaching package: 'reshape'</code></pre>
-<pre><code>## The following objects are masked from 'package:plyr':
+##     intersect</code></pre>
+<pre><code>## The following objects are masked from 'package:IRanges':
 ## 
-##     rename, round_any</code></pre>
-<pre><code>## The following object is masked from 'package:data.table':
-## 
-##     melt</code></pre>
+##     collapse, desc, intersect, setdiff, slice, union</code></pre>
 <pre><code>## The following objects are masked from 'package:S4Vectors':
 ## 
-##     expand, rename</code></pre>
-<pre class="r"><code>library(vegan)</code></pre>
-<pre><code>## Loading required package: permute</code></pre>
-<pre><code>## Loading required package: lattice</code></pre>
-<pre><code>## This is vegan 2.4-5</code></pre>
+##     first, intersect, rename, setdiff, setequal, union</code></pre>
+<pre><code>## The following objects are masked from 'package:BiocGenerics':
+## 
+##     combine, intersect, setdiff, union</code></pre>
+<pre><code>## The following objects are masked from 'package:plyr':
+## 
+##     arrange, count, desc, failwith, id, mutate, rename, summarise,
+##     summarize</code></pre>
+<pre><code>## The following objects are masked from 'package:data.table':
+## 
+##     between, first, last</code></pre>
+<pre><code>## The following objects are masked from 'package:stats':
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>library(ggplot2)
+library(gplots)
+library('RColorBrewer')
+library(magrittr)
+library(plyr)
+library(MultiAssayExperiment)
+library(SummarizedExperiment)
+library(tibble)
+library(reshape)
+library(vegan)
+data(&quot;nanoCAGE2017barcodes&quot;, package = &quot;smallCAGEqc&quot;)</code></pre>
 <p>MOIRAI shortcuts</p>
 <pre class="r"><code>WORKFLOW       &lt;- &quot;OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1&quot;
 MOIRAI_PROJ    &lt;- &quot;project/Labcyte&quot; 
@@ -294,7 +217,8 @@ MOIRAI_RESULTS &lt;- file.path(MOIRAI_BASE, MOIRAI_PROJ)</code></pre>
   pipeline  = &quot;OP-WORKFLOW-CAGEscan-short-reads-v2.0&quot;,
   multiplex = file.path( MOIRAI_BASE, &quot;input/171227_M00528_0321_000000000-B4GLP.multiplex.txt&quot;),
   summary   = file.path( MOIRAI_RESULTS,&quot;171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/text/summary.txt&quot;))
-libs$barcode_ID &lt;- c(1:70)
+libs$barcode_ID &lt;- libs$barcode
+levels(libs$barcode_ID) %&lt;&gt;% match(nanoCAGE2017barcodes$barcodes)
 libs$inputFiles &lt;- list.files(path = &quot;/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments&quot;)
 libs$inputFiles &lt;- paste0(&quot;/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments/&quot;, libs$inputFiles)
 libs$inputFilesType &lt;- c(&quot;bed&quot;)
@@ -588,6 +512,7 @@ libs</code></pre>
 plate_10ng &lt;- subset(plate, plate$RNA == 10)
 plate_10ng_no_RNA &lt;- plate[224:230,]
 plate_10ng_all &lt;- rbind(plate_10ng, plate_10ng_no_RNA)
+rm(plate) ; rm(plate_10ng) ; rm(plate_10ng_no_RNA)
 plate_10ng_all</code></pre>
 <pre><code>##     well row col MASTER_MIX_vol     TSO TSO_vol BARCODE_ID BARCODE_SEQ
 ## 8    A08   A   8            350 80.0000     100          1      ACACAG
@@ -660,151 +585,149 @@ plate_10ng_all</code></pre>
 ## 228  J12   J  12            350 10.0000     100         68      GCTCGT
 ## 229  J13   J  13            350 10.0000     100         69      GCTCTC
 ## 230  J14   J  14            350 10.0000     100         70      GCTGAT
-##     RT_PRIMERS RT_PRIMERS_vol RNA RNA_vol RNA_group H2O_vol total_volume
-## 8        0.000              0  10      25      10ng      25          500
-## 9        0.125             25  10      25      10ng       0          500
-## 10       0.250             25  10      25      10ng       0          500
-## 11       0.500             25  10      25      10ng       0          500
-## 12       1.000             25  10      25      10ng       0          500
-## 13       2.000             25  10      25      10ng       0          500
-## 14       4.000             25  10      25      10ng       0          500
-## 32       0.000              0  10      25      10ng      75          500
-## 33       0.125             25  10      25      10ng      50          500
-## 34       0.250             25  10      25      10ng      50          500
-## 35       0.500             25  10      25      10ng      50          500
-## 36       1.000             25  10      25      10ng      50          500
-## 37       2.000             25  10      25      10ng      50          500
-## 38       4.000             25  10      25      10ng      50          500
-## 56       0.000              0  10      25      10ng     100          500
-## 57       0.125             25  10      25      10ng      75          500
-## 58       0.250             25  10      25      10ng      75          500
-## 59       0.500             25  10      25      10ng      75          500
-## 60       1.000             25  10      25      10ng      75          500
-## 61       2.000             25  10      25      10ng      75          500
-## 62       4.000             25  10      25      10ng      75          500
-## 80       0.000              0  10      25      10ng      25          500
-## 81       0.125             25  10      25      10ng       0          500
-## 82       0.250             25  10      25      10ng       0          500
-## 83       0.500             25  10      25      10ng       0          500
-## 84       1.000             25  10      25      10ng       0          500
-## 85       2.000             25  10      25      10ng       0          500
-## 86       4.000             25  10      25      10ng       0          500
-## 104      0.000              0  10      25      10ng      75          500
-## 105      0.125             25  10      25      10ng      50          500
-## 106      0.250             25  10      25      10ng      50          500
-## 107      0.500             25  10      25      10ng      50          500
-## 108      1.000             25  10      25      10ng      50          500
-## 109      2.000             25  10      25      10ng      50          500
-## 110      4.000             25  10      25      10ng      50          500
-## 128      0.000              0  10      25      10ng     100          500
-## 129      0.125             25  10      25      10ng      75          500
-## 130      0.250             25  10      25      10ng      75          500
-## 131      0.500             25  10      25      10ng      75          500
-## 132      1.000             25  10      25      10ng      75          500
-## 133      2.000             25  10      25      10ng      75          500
-## 134      4.000             25  10      25      10ng      75          500
-## 152      0.000              0  10      25      10ng      25          500
-## 153      0.125             25  10      25      10ng       0          500
-## 154      0.250             25  10      25      10ng       0          500
-## 155      0.500             25  10      25      10ng       0          500
-## 156      1.000             25  10      25      10ng       0          500
-## 157      2.000             25  10      25      10ng       0          500
-## 158      4.000             25  10      25      10ng       0          500
-## 176      0.000              0  10      25      10ng      75          500
-## 177      0.125             25  10      25      10ng      50          500
-## 178      0.250             25  10      25      10ng      50          500
-## 179      0.500             25  10      25      10ng      50          500
-## 180      1.000             25  10      25      10ng      50          500
-## 181      2.000             25  10      25      10ng      50          500
-## 182      4.000             25  10      25      10ng      50          500
-## 200      0.000              0  10      25      10ng     100          500
-## 201      0.125             25  10      25      10ng      75          500
-## 202      0.250             25  10      25      10ng      75          500
-## 203      0.500             25  10      25      10ng      75          500
-## 204      1.000             25  10      25      10ng      75          500
-## 205      2.000             25  10      25      10ng      75          500
-## 206      4.000             25  10      25      10ng      75          500
-## 224      0.000              0   0       0      10ng      50          500
-## 225      0.125             25   0       0      10ng      25          500
-## 226      0.250             25   0       0      10ng      25          500
-## 227      0.500             25   0       0      10ng      25          500
-## 228      1.000             25   0       0      10ng      25          500
-## 229      2.000             25   0       0      10ng      25          500
-## 230      4.000             25   0       0      10ng      25          500
-##     PRIMERS_RATIO
-## 8   no_RT_PRIMERS
-## 9             640
-## 10            320
-## 11            160
-## 12             80
-## 13             40
-## 14             20
-## 32  no_RT_PRIMERS
-## 33            320
-## 34            160
-## 35             80
-## 36             40
-## 37             20
-## 38             10
-## 56  no_RT_PRIMERS
-## 57            160
-## 58             80
-## 59             40
-## 60             20
-## 61             10
-## 62              5
-## 80  no_RT_PRIMERS
-## 81             80
-## 82             40
-## 83             20
-## 84             10
-## 85              5
-## 86            2.5
-## 104 no_RT_PRIMERS
-## 105            40
-## 106            20
-## 107            10
-## 108             5
-## 109           2.5
-## 110          1.25
-## 128 no_RT_PRIMERS
-## 129            20
-## 130            10
-## 131             5
-## 132           2.5
-## 133          1.25
-## 134         0.625
-## 152 no_RT_PRIMERS
-## 153            10
-## 154             5
-## 155           2.5
-## 156          1.25
-## 157         0.625
-## 158        0.3125
-## 176 no_RT_PRIMERS
-## 177             5
-## 178           2.5
-## 179          1.25
-## 180         0.625
-## 181        0.3125
-## 182       0.15625
-## 200 no_RT_PRIMERS
-## 201           2.5
-## 202          1.25
-## 203         0.625
-## 204        0.3125
-## 205       0.15625
-## 206      0.078125
-## 224 no_RT_PRIMERS
-## 225            80
-## 226            40
-## 227            20
-## 228            10
-## 229             5
-## 230           2.5</code></pre>
-<pre class="r"><code>libs &lt;- cbind(libs, plate_10ng_all)
-libs[,24] &lt;- NULL
-#rownames(libs) &lt;- NULL
+##     BARCODE_Source_Row BARCODE_Source_Col RT_PRIMERS RT_PRIMERS_vol RNA
+## 8                    A                  1      0.000              0  10
+## 9                    A                  2      0.125             25  10
+## 10                   A                  3      0.250             25  10
+## 11                   A                  4      0.500             25  10
+## 12                   A                  5      1.000             25  10
+## 13                   A                  6      2.000             25  10
+## 14                   A                  7      4.000             25  10
+## 32                   B                  1      0.000              0  10
+## 33                   B                  2      0.125             25  10
+## 34                   B                  3      0.250             25  10
+## 35                   B                  4      0.500             25  10
+## 36                   B                  5      1.000             25  10
+## 37                   B                  6      2.000             25  10
+## 38                   B                  7      4.000             25  10
+## 56                   C                  1      0.000              0  10
+## 57                   C                  2      0.125             25  10
+## 58                   C                  3      0.250             25  10
+## 59                   C                  4      0.500             25  10
+## 60                   C                  5      1.000             25  10
+## 61                   C                  6      2.000             25  10
+## 62                   C                  7      4.000             25  10
+## 80                   D                  1      0.000              0  10
+## 81                   D                  2      0.125             25  10
+## 82                   D                  3      0.250             25  10
+## 83                   D                  4      0.500             25  10
+## 84                   D                  5      1.000             25  10
+## 85                   D                  6      2.000             25  10
+## 86                   D                  7      4.000             25  10
+## 104                  E                  1      0.000              0  10
+## 105                  E                  2      0.125             25  10
+## 106                  E                  3      0.250             25  10
+## 107                  E                  4      0.500             25  10
+## 108                  E                  5      1.000             25  10
+## 109                  E                  6      2.000             25  10
+## 110                  E                  7      4.000             25  10
+## 128                  F                  1      0.000              0  10
+## 129                  F                  2      0.125             25  10
+## 130                  F                  3      0.250             25  10
+## 131                  F                  4      0.500             25  10
+## 132                  F                  5      1.000             25  10
+## 133                  F                  6      2.000             25  10
+## 134                  F                  7      4.000             25  10
+## 152                  G                  1      0.000              0  10
+## 153                  G                  2      0.125             25  10
+## 154                  G                  3      0.250             25  10
+## 155                  G                  4      0.500             25  10
+## 156                  G                  5      1.000             25  10
+## 157                  G                  6      2.000             25  10
+## 158                  G                  7      4.000             25  10
+## 176                  H                  1      0.000              0  10
+## 177                  H                  2      0.125             25  10
+## 178                  H                  3      0.250             25  10
+## 179                  H                  4      0.500             25  10
+## 180                  H                  5      1.000             25  10
+## 181                  H                  6      2.000             25  10
+## 182                  H                  7      4.000             25  10
+## 200                  I                  1      0.000              0  10
+## 201                  I                  2      0.125             25  10
+## 202                  I                  3      0.250             25  10
+## 203                  I                  4      0.500             25  10
+## 204                  I                  5      1.000             25  10
+## 205                  I                  6      2.000             25  10
+## 206                  I                  7      4.000             25  10
+## 224                  J                  1      0.000              0   0
+## 225                  J                  2      0.125             25   0
+## 226                  J                  3      0.250             25   0
+## 227                  J                  4      0.500             25   0
+## 228                  J                  5      1.000             25   0
+## 229                  J                  6      2.000             25   0
+## 230                  J                  7      4.000             25   0
+##     RNA_vol RNA_group H2O_vol total_volume PRIMERS_RATIO
+## 8        25      10ng      25          500 no_RT_PRIMERS
+## 9        25      10ng       0          500           640
+## 10       25      10ng       0          500           320
+## 11       25      10ng       0          500           160
+## 12       25      10ng       0          500            80
+## 13       25      10ng       0          500            40
+## 14       25      10ng       0          500            20
+## 32       25      10ng      75          500 no_RT_PRIMERS
+## 33       25      10ng      50          500           320
+## 34       25      10ng      50          500           160
+## 35       25      10ng      50          500            80
+## 36       25      10ng      50          500            40
+## 37       25      10ng      50          500            20
+## 38       25      10ng      50          500            10
+## 56       25      10ng     100          500 no_RT_PRIMERS
+## 57       25      10ng      75          500           160
+## 58       25      10ng      75          500            80
+## 59       25      10ng      75          500            40
+## 60       25      10ng      75          500            20
+## 61       25      10ng      75          500            10
+## 62       25      10ng      75          500             5
+## 80       25      10ng      25          500 no_RT_PRIMERS
+## 81       25      10ng       0          500            80
+## 82       25      10ng       0          500            40
+## 83       25      10ng       0          500            20
+## 84       25      10ng       0          500            10
+## 85       25      10ng       0          500             5
+## 86       25      10ng       0          500           2.5
+## 104      25      10ng      75          500 no_RT_PRIMERS
+## 105      25      10ng      50          500            40
+## 106      25      10ng      50          500            20
+## 107      25      10ng      50          500            10
+## 108      25      10ng      50          500             5
+## 109      25      10ng      50          500           2.5
+## 110      25      10ng      50          500          1.25
+## 128      25      10ng     100          500 no_RT_PRIMERS
+## 129      25      10ng      75          500            20
+## 130      25      10ng      75          500            10
+## 131      25      10ng      75          500             5
+## 132      25      10ng      75          500           2.5
+## 133      25      10ng      75          500          1.25
+## 134      25      10ng      75          500         0.625
+## 152      25      10ng      25          500 no_RT_PRIMERS
+## 153      25      10ng       0          500            10
+## 154      25      10ng       0          500             5
+## 155      25      10ng       0          500           2.5
+## 156      25      10ng       0          500          1.25
+## 157      25      10ng       0          500         0.625
+## 158      25      10ng       0          500        0.3125
+## 176      25      10ng      75          500 no_RT_PRIMERS
+## 177      25      10ng      50          500             5
+## 178      25      10ng      50          500           2.5
+## 179      25      10ng      50          500          1.25
+## 180      25      10ng      50          500         0.625
+## 181      25      10ng      50          500        0.3125
+## 182      25      10ng      50          500       0.15625
+## 200      25      10ng     100          500 no_RT_PRIMERS
+## 201      25      10ng      75          500           2.5
+## 202      25      10ng      75          500          1.25
+## 203      25      10ng      75          500         0.625
+## 204      25      10ng      75          500        0.3125
+## 205      25      10ng      75          500       0.15625
+## 206      25      10ng      75          500      0.078125
+## 224       0      10ng      50          500 no_RT_PRIMERS
+## 225       0      10ng      25          500            80
+## 226       0      10ng      25          500            40
+## 227       0      10ng      25          500            20
+## 228       0      10ng      25          500            10
+## 229       0      10ng      25          500             5
+## 230       0      10ng      25          500           2.5</code></pre>
+<pre class="r"><code>libs &lt;- cbind(libs, plate_10ng_all[match(libs$barcode, plate_10ng_all$BARCODE_SEQ),])
 libs$PRIMERS_RATIO &lt;- sub(&quot;no_RT_PRIMERS&quot;, &quot;NA&quot;, libs$PRIMERS_RATIO)
 libs$PRIMERS_RATIO &lt;- as.numeric(libs$PRIMERS_RATIO)</code></pre>
 <pre><code>## Warning: NAs introduced by coercion</code></pre>
@@ -814,10 +737,171 @@ libs &lt;- libs[order(-libs$RNA),]
 libs$PRIMERS_RATIO[is.na(libs$PRIMERS_RATIO)] &lt;- &quot;no_RT_PRIMERS&quot;
 libs$plateID &lt;- &quot;A&quot;</code></pre>
 </div>
+<div id="control-on-barcode-extraction" class="section level2">
+<h2><span class="header-section-number">2.2</span> Control on barcode extraction</h2>
+<pre class="r"><code>found_bc &lt;- system(&quot;zcat /sequencedata/MiSeq/171227_M00528_0321_000000000-B4GLP/Data/Intensities/BaseCalls/1_S1_L001_R1_001.fastq.gz | sed -n 2~4p | cut -c1-6 | sort | uniq -c&quot;, intern = TRUE)
+found_bc &lt;- read.table(text=found_bc)
+colnames(found_bc) &lt;- c(&quot;n&quot;, &quot;bc&quot;)
+found_bc %&lt;&gt;% as.tibble %&gt;% arrange(dplyr::desc(n))</code></pre>
+<pre class="r"><code>libs$bc_extract_qc &lt;- found_bc$n[match(libs$barcode, found_bc$bc)]
+
+plot( libs$extracted
+    , libs$bc_extract_qc
+    , log = &quot;xy&quot;
+    , xlab = &quot;Extracted with TagDust 2&quot;
+    , ylab = &quot;Counted directly from FASTQ file&quot;
+    , main = &quot;QC of barcode extraction&quot;)
+with(libs[libs$extracted / libs$bc_extract_qc &gt; 2,], text(extracted * 2.5, bc_extract_qc, paste(barcode, barcode_ID)))</code></pre>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAqAAAAHgCAMAAABNUi8GAAADAFBMVEUAAAABAQECAgIDAwMEBAQFBQUGBgYHBwcICAgJCQkKCgoLCwsMDAwNDQ0ODg4PDw8QEBARERESEhITExMUFBQVFRUWFhYXFxcYGBgZGRkaGhobGxscHBwdHR0eHh4fHx8gICAhISEiIiIjIyMkJCQlJSUmJiYnJycoKCgpKSkqKiorKyssLCwtLS0uLi4vLy8wMDAxMTEyMjIzMzM0NDQ1NTU2NjY3Nzc4ODg5OTk6Ojo7Ozs8PDw9PT0+Pj4/Pz9AQEBBQUFCQkJDQ0NERERFRUVGRkZHR0dISEhJSUlKSkpLS0tMTExNTU1OTk5PT09QUFBRUVFSUlJTU1NUVFRVVVVWVlZXV1dYWFhZWVlaWlpbW1tcXFxdXV1eXl5fX19gYGBhYWFiYmJjY2NkZGRlZWVmZmZnZ2doaGhpaWlqampra2tsbGxtbW1ubm5vb29wcHBxcXFycnJzc3N0dHR1dXV2dnZ3d3d4eHh5eXl6enp7e3t8fHx9fX1+fn5/f3+AgICBgYGCgoKDg4OEhISFhYWGhoaHh4eIiIiJiYmKioqLi4uMjIyNjY2Ojo6Pj4+QkJCRkZGSkpKTk5OUlJSVlZWWlpaXl5eYmJiZmZmampqbm5ucnJydnZ2enp6fn5+goKChoaGioqKjo6OkpKSlpaWmpqanp6eoqKipqamqqqqrq6usrKytra2urq6vr6+wsLCxsbGysrKzs7O0tLS1tbW2tra3t7e4uLi5ubm6urq7u7u8vLy9vb2+vr6/v7/AwMDBwcHCwsLDw8PExMTFxcXGxsbHx8fIyMjJycnKysrLy8vMzMzNzc3Ozs7Pz8/Q0NDR0dHS0tLT09PU1NTV1dXW1tbX19fY2NjZ2dna2trb29vc3Nzd3d3e3t7f39/g4ODh4eHi4uLj4+Pk5OTl5eXm5ubn5+fo6Ojp6enq6urr6+vs7Ozt7e3u7u7v7+/w8PDx8fHy8vLz8/P09PT19fX29vb39/f4+Pj5+fn6+vr7+/v8/Pz9/f3+/v7////isF19AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAgAElEQVR4nO2dd0AT1x/AXwCVPWWjqCCoIA6qOBBH68Q9qtZaB+6FrVXrah1t3aNaBfeqo6JFWxWVKnVSK1Z/ddRRd+tegAqIyfvdSMIlXJK7JJc7yPfzx+Xu3ffuveDH3Hr3vggDgIRBYjcAAPQBggKSBgQFJA0ICkgaEBSQNCAoIGlAUEDSgKCApAFBAUkDggKSBgQFJA0ICkgaEBSQNCAoIGlAUEDSgKCApAFBAUkDggKSBgQFJA0ICkgaEBSQNCAoIGlAUEDSgKCApAFBAUkDggKSBgQFJA0ICkgaEBSQNCAoIGlAUEDSWKOgitTOfmV822x+Ry++WdjQwzFqwFX24A2VbCvTc8GolrE1HkdotrHb6qQTsoZ/PGv4jlpkt0U0DR6Si/9UpZdsl7AF37dDyJeetZCgSQilcQoBQUsn71oiZN95UndXhGrnYfyqGkKefaZ1sUGyAyzRRxAa8ZKelZqgs+LjjW1PCcL6BN2IUMW/iM8bEZQ1CxGqeY9YTEGorSrkzbQGLhXbUL6mIZSkLCUEzWrh9t5sOTGv2NbYxz50xF1iNhoFZn/s8gA/HRblGDb8sdb2+NaHflVGHaYFvdS9ilvTFQp1U9TLuxAKK8T7Eaqap7RPuVdGPYwK6JDWqJxmXb1rtXzcJ6h8p3+E/QNaFusTNA6hVGomE6EQjBsgdIRabBtSs5COeBJGH/S/wPh9aoYuDkbl3cil3oRR8+mIqjmUSh0QevCPH1US8FRje3yxPDkXSgm6z54q/lBlaNGyIh6hjYr6CKXTNcao9sqop6gCZQglKLOuaOReg5yvnGfRP6iwWJ2gCnfkpTSkFkI5Cg/krdAKGYpQ9yNb/ZHsTzycUKtCNF0cjJBX8qYqCB3ChU6o2paMrgjtJbWwKdt3/MvuCE09OR2hYRrbY+J8d+BPCYgUNL8yCj11i1i5m94fc/mmAwrZjdBHGA+vQPjcT7nXp4x6iipQhlCCMuuKJoqT1warKygVWJ2g/xIXR8rZnghlPkaovlbEaxtUU06dNw7UOsSjgxhflaF4fK9bN0KZgwgtobQg5p8i1IWwPwJV0dj+OkLtCP/bk4L+gtAOjAt9URy9P43l2Qg5I7cHGKsP8eReGfUwKmAc4jXaSmxzA+NtCM23yF/SMlijoA2Vs30R+uNRka8q/ofQTPLTD8VqCepO/tbWQ8HEtPD4on6+CC0mtXAgin9H6Hui+PH16wrm9nsQ2oSp897Z1NluTEyMM/Kh96exXEAenFeQxSpBHagfdnU9jAoYgmq0NZra02mEZgnylxMHqxNUdYh/koobk4d4d+SvFbEXodXkZ11UQUvQcPKjI7KR4x88CZ9clYIGYOoaawvL9t+Tp5UYHyIFHYdU5FJxmssrEHLJJ4tVgpJ7ZdTDqIAhqEZbifNWYvYMCFqyIS6S9mD8Mgp9IUNhGMcgdJoq7xxcOYeaOa/8Fw4gf1uL/4LWR374ii0K+e78SaWgpBbHEFqqjGNuv5PWajMp6GKELjAborH8hji3pQ/N6qt4Yp5RD6MChqAabQVBSwWbEKp0CcvHkz9dP2A8D6FGL4jiU7aoNh3wSoZqEyYSWvTXPgclfg3/sUFN8Urq9HEZQ9D7CHUgfp57RzRXMLe/gFAnYm1nUtCf6cP9pcwz9P40licj5IMcb2FNQRn1MCpgCKrRVhC0VPCuFUIOPb78qCxCnsQxNZe4Tq/06cIEe4TWKSOIi+7ex3cEINkf2oL6rNsWRv4mriNsOfmDF0NQQhc05eQEhBI0tlfEIjR873DqKj6vIgo9fW+zPekSCXP5oh2KOopQPCFbMkKrVHtl1sOogA6hruKZbQVBSwfZ7dQnfx3ziMvySsqFz1UBj0LpgslYS1BnO7K4pRzfdiRnIhCarhb0oge1TcUnmtufdiXnPKn7oLuozVHYv8odFi3LG5PnHcT/nBSMDxBFrZV7ZdbDqIAOoQRl1gWClhIUqZ38ygS02LoABT0lFnNnv+fiGNn7z6KA15PrOQe1OUTOMgRtGdH1cKxL5Jfk7fzD9R0jZxbUi2haoBIU3x9Q3SE88anW9vhSF98KA3+LiCCvZbLaBzlWn/pEXY96eRVC9RTkhbr/Sywf7WXTVLVXRj2MCugQ+kkSoy4QtJShGHNc7CYAhrBmQYESAAgKSBoQFJA0ICggaUBQQNKAoICkAUEBSQOCApIGBAUkDQgKSBoQFJA0ICggaUBQQNKAoICkAUEBSQOCApIGBAUkDQgKSBoQFJA0ICggaUBQQNKAoICkAUEBSQOCApIGBAUkDQgKSBoQFJA0ICggaUBQQNIYI+irvwvM3g4AYIWfoPJFXXDeMBkq97VcoPYAgAb8BJ2NPsNTHWenTSuzij3gs2gA4EDsQ0EErTge4ypk1skvo9gDGqzPAgDDVP2fIIK678LYbS8xs99Jh6CZvPYHWCtRwgjaqo8Ct5pOzEytyx4AggKcEEjQ046tt//ouSBjRplk9gAQFOCEQILi051syKQnFZbpWA+CApwQSlCMX/x1IONaoa61ICjACeEExYWP3upeCYIC2rxhu6MklKDnEnxlSOY74LyO9SAooMm5OCcfv+XFnusIJOgx+/CJSVuTpkTZn2QPAEEBDS76bpLjyw0na5cLJGhsF/rsUz4ojj0ABAU06P0dOX3i/lyrXCBBXXYpZ064sgeAoIAGoVepj2ZHtMoFErS2KiPwPLhRD3Ah/DL1EXtUq1wgQdei3juzrp3dnSDbwB4AggIaDPyanN71zNUqF+oqflMklZ08crOO9SCo1fM8/ec7RUs3/eY+f3u4xkLtKMHugyruZO7LvKPQtRoEtXaW+XzQwXfwG/XyrV4eDnV3FQsT8EY9xhm6O9SDoFbOloibGOf2SmCWsT13FFRQ9EDnKhDUyolJJ6c5bi8MxIGggCi402a+d8ZAnHCCnjlzBqURE2bZG3VH6Won+O4PKFVU/If6qHTNQJxwggYHB6MgYsIsy3xP9aqJbbHLNcCqGP4ZOd1XzVCcWId459VG7A8oPTyp3vvA0ak+Bg+kICggDnnzWseN/c9gmKCCeul+ZRQEBTghqKB6AEEBTggpaN51rPNJEggKcEI4QVcEIYR7zNehKAgKcEIwQdeiwdsQXmSzgn01CApwQjBBq4/CT4htpkWwrwZBAU4IJqjDPkrQAw7sq0FQgBOCCVp7GiXo3Ej21SAowAnBBF1jN+MUupvstIB9NQgKcEK4DsuLPRBCZSfoGMAWBAU4IeB90Nzftx9+pGslCFoqebjnh4vm3SM8SQLMx0Kfjn2Cu7805y5BUMBsbI28h3H+sG7m3KdRgup7hskRELQU0jiNnOZ76e7Exh8jBNX/DJNmXBHsASBoKcSPNrPJcTPuk7+gBp5h0iQ6oKAQGvYAELQUUo2WKcyc10n8BTXwDFPJXnRB73oQtBQycSA53Rtm6vkfE/6CGniGqUTuCIJaHdn12u5IG+ejY8RN4+AvqIFnmCp2aY+jpwkIWgp4MaVFi0nPGAWFq3q0maLz3rdR8BfUwDNMjoCgJZ9rQaMPH04M+FvQSvgLauAZJkdA0BLO+bkTay0hZ5JaClqPMfdB9T7D5AgIWqJRfBo0/hvbUPJyvcDpjcFwE4AnSYARbKyXg1+6bYwgD6Pej4WsiaegSQxMqhcELdF88AvxK+p/peYZjG/4CJpxnaegXgxMqhcELdHUuERM5jRpm4ofNfta0JrgEA8YwQdkJmv5l3YN2npPEfQHlLegeWaqFwQt0ayPeUVMf6ialmbeu57F4Sso+iskRO9Ddo6AoCUaxeiKkxZ1rvKX8DXxFbTfj7NVmFQvCFrCyfrm0w3mOpzqg6egdwrwrXfmqBcEBTjBU9ByJ/SNqcgDEBTgBE9B6wS+j2LfpzGpXhC0JPB8wcCJZu2bxB+egt4cPxT1HUpjUr0gqOR5m5vhN3jtt1WGmbN7J2/43wdt/UxfGFdAUIlztpmjs92XxMybelvEbAfcqAfYyPLd/PZgnRpLidmUjmI2BAQF2Ihfh/Gmvjc8CzA+XV/MhoCgABvlH2H8Wz0cdR7jDR+K2RAQFGDyX+qOm+Sn90OMC8PXR57H/4UeELNBvAWVbx4YU7ffqkK8NMOUekFQKaKY5tO5h/9Q4rjecRWxeCm0zBcJPqa922MqfAW9EoMqtu5QFdX9Bk03pV4QVIosin2McU6XRIzP+azJe3ckbNjXq+4Y3kxIeAr6pkblveRtsWNh6BuT6gVBJcaL74Z/mVXlPDn72C0f479aOznVTBW7VbwF/dKJfofvWRXZJJPqBUGlRUbAwBVfVbCh78mH3CCn7yzRF8QgPAWNG0Yv7W83MNzwNi+u6exYAoJKitcBR4hpju0GcuGdu1mexZgHnoK6rlIuKtboHVkkIYM4UnRAyHU55EkqCeyje1Y0rkFO18SJ2hZNeAoaoj7znF9Fb3QSxp09F6dNLbODPQAElRRrqVGV8G6Hj/akDQ+4JHJrmPAUtEcT5S+iok0XvdFJ+Bn6mZiZpOMxBAgqBS62CWmwhpw5FEstr/twfsc201+I2iYteAp6RPY1begatE9vdBLOQrnEzD4n9gAQVGzeHN402DZi4Ad2tYl/0fzK5JHuQehBsVtVDL73QSehJtvP/53aFQ3SH52En9qRF/xzAtgDQFCRORQU4IHc/sD4X/vJxOKfoe1mDveZJ3arisNXUMWuiojAY5X+l02RT8uRYa0xTg8cyB4AgorK35PtnaZ+4tHU7jpxQVuJLMnfNm35DbGbxQL/Z/HvrqVu/6vAQPTOOYOaBdljXC76IXsACComX/nXd2pQuXUNHNoU4wUeYjdHHzwFnXWZx77ziF9QXTdCQVAR2VPjWTsPvMvDHY9xxPjDMLHbow+egqIU7rsufPRW90oQVByyx0f4vt9kM+7uh3GM7Zj+dvi43XKxG6UPoQQ9l+ArQzLfAed1rAdBReGUe4UuW3fZj8Eptvdwv2FlZI4hNqJ29zSIQIIesw+fmLQ1aUqUvY6XAkFQMUh2bnBgdY2BbZ2f4UiXZVHDfJwi+p0Ru1H64Stoo55q9EXHdimkPuWDdDw2A0FF4J539DHi0qD2RJcd+G33Mja+XqaNoWkJ+AoaFKFGX7TLLuXMCVf2ABBUBNZ8Ep1FfKwcEOY1aWnvgKUncsVukWEEOsTX/lw5M68uewAIKgLzPx84n/jY3cH/l29GrywBdmLBBF2Leu/MunZ2d4JsA3sACCoCqR9c8v0J4/FhfcRuCXeEuorfFEk+cEKRm3WsB0FFIC9k9ak6gaGyBEHTHpgXnoJ2O8V1x4o7mfsy7+gcNQUEFYPL79UZEOv3k9jN4IOgrx1n6H4iCoKKgvz4uoOvxG4EL/gKWvDTLxi/TKjS8ncu2+geqREEBTjBU9Dn9dFwjDs79a9TVn+yWHobELQ0ofgxzs2t/mY5caaHlMzC+GS8l0Pk54+ZZeyBxsFT0C+8z2B8HS3Hbxt8ZGCDM2fOoDRiwiyTP1fhBIJKlyfs78KPQh2XJndFUzA+lZKSEtSImFzGC2zrz1g/zt3/LqOMNZBkJyVrAnEMHhnsWHsrl7bwFLT6t8RkKfnLuCTUwAbBwcEoiJgwy37z8lAim8uxXoA3hUNcbZx6G32lfqhG+Yq+q4qXZ6BF5MdEdJVajKAeJR5H48kOa7f8WheVsQZSzPEhM8BlYNzdZ2VaAtrLoTU8BXUg99mhDjHZZs9hGzjEi0GIy+w/Frr7FRq3dXpQOsYX6xYf8CauFnVP5nG1tdQi7V1MTbpD5Zq4HHUZayDFIGXi2adoPXHGEMHldixPQQN+wPi1y3hibkEFDtuAoCKwvOxLYvrKcZpxmzeh7kLd8tS+A/PWVvOgR3mXg5YWK2MNpGk28tnZ58TnzX63iGnTvhyaw1PQjk0KcBIi/osp3os3vI2Xju70GAQVkGb0G5odahu3uRP9CLSadtf0a1oPaSjvstAhYnoxleCeqow1kCYovAxCXajksw+Pz3A+wqE5PAX9s2yN3o6h7woPdkLHOW7IDggqGDFtqI8+1Y3b3I0eVqTyda3y82iPxjLl3TFESjaRvPTZpipjDaTIs291OXu3JzVi82z78n253JHlex80q1PV9lfwE+TF4Zln3nUMT5Isz/Dy1Eew3v6QuulAdcH7o4L2W5G5aDE9s5Ues57y7glaSRfm2agFZQ1ksBjRL97Le3EZW9y4J0lvbxjO/LAiCCHcYz4MfWNpnpVtkY3zutjdN27zCz4LH2VvD9xZbEU1etCOty4jqEXau8qN6X/g40W/oOyBRexH1/Z9TEasRhxywhn9qLMwXX/8WjR4G8KLbFawrwZBheOkj42Tjdevxm7+T08ft/dZXoTYTv9azkf06A60dzvQHNK17LoMQVkDSdLLkdJMdX13CJ0lZob6c2iNcYLKj47wNvBwvvoo4vcf42k6+jWDoAKiOJ981vzJjeQJqOv36/qh/vQi7Z1iBGr67eYv/Qf7FQnKGkjyrm7g3P2TyyzHBVEhGw+Mt1nGoVYjBFVkjg1AZePX6o932EcJekDHIHggaAlkS7y/W71VyuOyyrvd8QHebbbjrzIYZayBBA/6+znV+5H4v3O3t79jnY1c/hPxHlnk7ISKyB59nW0ovvY0StC5keyrQVCAEzwFnRKKHLpuy0UZBuPX2M04he4mO+kYgh8ENZWnP8xOKUEdj42Fb496p+/J+7gcBFUs9kAIlZ2gYwwnENREtvv2nBhf6ZjYzRAcvkOAy2zjt77iIijGub9vP/xI10oQ1HheZ+y4eMn3IjF3yE9SY3kKAd9z0HsL3kPOnyCj72GoAEGN5qeguB5VqnxKzffU8U5i6cGIq/jrM2sgxx4/mvbWKghqLGf8szAujAylLoGnfyVyawTHqPugiv99UQlx6G6nBxCUP4UrP+o+J3fAd+R8om8m+ZGg4zlI6YGnoOmq/kmKzDH6oscVwR4AgvLmae32W1IGBtU9QS6ccP6emF7x/lfkRgmOMe/FcxgkNNEBBYXQsAeAoLwZQp12rvag+wqFec3cPN7nB1FbZAmMEZTL6A17kf6X6kBQ3vj8m/0OY7lTc/LO3WXv45M+niFyHk1LIJSgckcQ1Exc+j6+WlDrdLlNBVfHTtdxtdi4lBPz/Ur/byeNUILiXc/1rgZBOVLY16Vceb+2m0PjHHbgvCX+F91yNnZrPJTPUOwlGsEENQAIyo2nVZCdXQPv+gnnZJOaPMN4cniC2E2yLCCopMkLk+1ovr1PbIDTTr+dE/w+SvD3LFkj15gMX0Gdvby8qImXl0n1gqCGOTx7weSaNvcanlREf+K+KvAHfHPLmm3RYrfKwvAUNJGBSfWCoIZ4/kGtL8Y52sn8HLviLzuXuWRD3f+covf2cylE0NHt9ACCGuKj0XL8q6O355if7fpPDan0SVhMliJ3bkCpvzOvBQgqUV65EiebTUY1sqnWapiNDXIalb0m1NG1xy2x22VpQFCJ8g/5CM7pWV2ZX/1IG9svyYFl8Gvzv2gkeUBQiZLtmk8OonDZwausi9NvYrdGPEBQCfE8Zckv6vSR7Wdh3CE5YQx+cyZIf2rpUo0Rgr65+jeJaWfrIGhxUvyqu8jKtNt5l1r6t2br78eXCb2VsyPIDPedSyz8Bd1iT4+ZG2VSvSBoMS74Nuh+dZmLrYfvEOpluMJNIz5d0aO8S3PTRsEq4fAXtELfwxdILppULwiqSUqHmqHN68m3RNxsX21Tz0FiN0c68BfUy8iBUTUBQTXoF73rr/quDXH9dDwpPjHHvdS/C8cZ/oK2+8Mc9YKgTNIj8vCTjjEef7i9xJ/0GoXfk3gKYgvCX9B/q32zkxywNNWkekFQGsUPLaq02DxuTvYgz0g7uwEVblzzbr4ZV7omdrskA39Bl6kyi5hULwhK07dB2o20BlWT2w3OxWNtbWIaeLeqVbCvmtjNkg78Ba00499CCpPqBUEpjtTIJ6b5fo0qkX/ORu42Nrbtfpnqc0LsdkkHI67izXLXGASlmDST+phiH6PA8u8rZ8TcnNM6bux/IrdKSvAXdPh+c9Rr5YJmjur4GXmfbiw9WvZ3Td2rtqscd/VQc3GbJUH4C7oxeMCc+SQm1Wvdgk6qtHjPN/7LMF7TlVruvtgrfd9VjHvPEblh0oO/oMEqTKrXqgU9HkJmMrrnex2/qrLoHX63uMqrZZU2Xz/Vs46Vvc/BAegsIgKfzaY+RhLH9xut/Jv4t/wH4xOdQhvOzhO5YRLEKEHzb5s8cqpVC9qPHpPu68nk9O6xe6I2RuIYIehPUTKEInZx2SgVxgdlYwY9YFXPdSK3oyTAX9BU1H7joc0dtdKJ6dhIZ64aKxP0VcauK0VLt7zJLC97/OGJu2H4C/oePXLAoPr6ovvQoBZ9dGS0tS5Bfwxo2jUgpFHb+cqTzLQKbUbFhZ0Wt1ElA/6COtFZvtOc9UU3QhVjCFC1mBj2AKsS9FjQefybd4O6+3vWeEqX5P687KB2OmGADf6ChtP36ubrzVX6dpw7mdUZDvEE51bUnYIVoQffVb6AE0eL3ZqSBn9Bp5db9lD+aLn9dP3xu93HFoCgGOd39YxyCmjzQxWMu6fga5XFbk9Jg7+ghUNtkAzZDDHUWeRmdP3bVi7ozQ3LjrUuN2KJp42Du+3kgmaH8DNPsdtU0uAtaP6tN7f3JO2+bXiL/BEe1i3oV779RlVF+/Axt2gvZ7e2H/q+xgcaid2okgZvQS+jTZx3vjPxiq5VpVvQe9tXZeH10U8wHmfbCrdf2yTIqXmUbD3+p/oOsZtW0uAtqKJFW47jWxQ+eqt7ZakWdJZ77eZV2tU/RMz2K+dzp+Ltd51sYqqVif3AZ7nYTStxGPHacXj05IWLCfSGn0vwlSGZ74DzOtaXZkG/tW/wWW+f+jaB1YY/nBJVISP8Eo6uhXHNuelwZ543/AUNVKEv+ph9+MSkrUlTouxPsgeUYkEL7CcQ02Rbmw1/Two46FO2UbO2cbZ/4v/5wo1PI+Ap6J0CfOsdh+jYLvRFvnxQHHtAKRb0YNkHxBcPnODcTIFnfzzCrnl0mbIL76wL2CZ2w0okPAUtdwKjBxyiXVR9SU64sgeUYkFXefyJ8aWw3xwaxSQvdwzYv/SzhSOiKnaCN4mNgqegdQLfR7Hv0+iLrv25cmZeXfaA0iro2/v4p9A+GP9Z51NX+c4hXR1eit2iEg5PQW+OH4r6DqXRF70W9d6Zde3s7gSZjnS8pU7QG1vWXsB3ezj6u40vX6fZhq1l7cheybvgJSMT4X+R1PoZl/BNkdS785GbdawvZYLKx/l/NDC4a8Vv8vB/3WN82jSp6eB3hzjBqXBI7JaVdAR75UNxJ3Nf5h2dt0xLjaD5537PwXhu8xcY59WmBlworLp3Ru9PM771qBVSmUunWUAfgr6TlKH7xkppEXRTQO36TlUbOk2/Tiy0c3xNlo1aRq0qOPePFQ88ay4EFVTPBX8pEXRn2P9eNfgg3AuVLf/BTdw1gHq0OwyeF5kPENQk6h3Cs3o/9HH0POQ7JyxvftknRFleMNe/KWAY/oLO4ZgD+syZMyiNmLCvLSWCOrzBDY99Ozyy22exGa12fOc45j/5+eYDxG5VaYK/oK6oSfJTDhsEBwejIK3xHTJkqqHx0FwejZQuXg9xxMW+mypmRfl99mHtCqdH+ZaruswsI/wCNPwFzUvt5WjXfhuXMTBK/yG+1xzcdf3wUWH4jUeHqvG5RImeHlyAERh1Dvrqxy7lnD7eb/DfovQLeivw8zX+ne0O5I2MfxF0QezWlEaMu0i6OrcmckaBvxjYhjgA6qKUCIqfjq0T4Ojh6dl2dbUvxG5LqYS/oIozk2sgnyEH394cJOPSb4Sd0iIoyaujnzaL6HxA7GaUTozoD4oqJB6lutzloAy9m+Rdx6X/SRIgLPwF/eIPlXWF1/Wdha4IQgj3mK9DURAU4IRgN+rXosHbEF5ks4J9NQgKcIKnoEkM9MdXH4WfENtMi2BfDYICnOApqBcD/fEO+yhBDziwrwZBAU7wP8S/oLvoFBroKl57GiXo3Ej21SVQ0LczKpWrOsvkoXsBXvAXVHn3/Q8X/fFr7GacQneTnRawry55gl7wKlfdrUunOC7vDAJmg6+gnTqh1p1IqhsYBkux2AMhVHaCji6RJU7Q+56Bb/Gr0bFx28VuiXXBV9A+fVBXamza/hmGtsj9ffvh0jME+LQG04ipovboEWK3xLrgf4iP4dKVySAlQFDN1wE6dZ9Ffoz9cLAojbFajLgPen91Dr4/h8PwdvqQuqC3PnQuE7hQgR8Oqez1fgZR0HNsE7J8UJ1V4jbM2uAvaKa70xN8x9fld5Pqlbigt/yigwa2K1PvZuDUm09TgtdivLJNvdE5+IFzZbiMtyj8BY1tRXZ7LOjRVF/0uCLYAyQu6JAGPQkRr5epSY0jfaV8Hi5o1L6LQ4BNdUj0almMTqJwSO9tpkQHFBRCwx4gcUEjXKjLu0Y2f1OL9TMxzp8T7VsfLuEtDX9BQ+mn68k6zFOyF+nvvitxQcO8qY8PZBepz7ijYjbGquEv6BT3nYX43c+eOo7dSuSOJVrQvmXJjEZP3W2pS6Jn7s9Fbo/1YkQShQEyW98yqIuBxKe79P+bSlzQq+W6FeKLDRu18fsF49vNPze8BSAMxnS3+3vDrNV/mlivxAXFhxxtXT2iIh4cjfIN85gDjzdFw6j+oPq6ynNE6oLivCVdP04mO2Q/vAp6iogRgurvKs8RyQsKSAP+ghroKs8REBTgBH9BDXSV5wgICnCCv6AGuspzBAQFOMFfUANd5TkCggKc4C+oga7yHAFBAU4YMbKI/q7yHAFBAU4Yk+1Yb1d5joCgACcEzXasB5EFfXjoFJfxIwHRETDbsV5EFTR/TPmWDf3WUfO/fDFhlzm+ECAMQmU7NoRIgj49TlRNe9sAABr9SURBVD64HNrtBXEoqPoTxtkt6s2eG9vgiSiNATggULZjg4giaPYQj9iq1X974ZZNLu1rjPGwIcSvp2JcbxEaA3BC0CwfehBF0PYJuRin+W5/j1p67oEVbtTFXq6Lgb6DgGhYk6AXgqn0BvO7hVKLNyriV070msB/Ld8agBN8Be23bLEKk+oVQ9BtPamP0/WrHCY/Jw7D2OM+OZftmm/51gCc4Cso6lYyz0Hl6z/u1OsDaja92a8+3549OjCUOLyP+YT4UZWP6G/ZxgDc4StorpleC7ewoLmN39+cOkQW4erf53afb/HNIXWbziBvhL5qHzl1et0WLyzaGIAHVnIOOrkvMdnoYrvy1HD7ahq36I/MnA7pDySM8QPYtjOpXgsLWuMcxm99LlZoXiWmXQ+L1gyYBv8hwBc7BY9bNCEk6LhJ9VpYUL8HGP8vAjc5ivG//hatGTAN/of4oc3JYd8KWw8xqV4LC9qYOIxn1S3w/g/jx+UtWjNgGvwFDUihPlK5/BDpfh/SwoL+EPUffuU2sDMxu6W1APtX/Bjn5lZ/s7ILYhyaqqcUn4z3coj8/HHxCKA4/AX1X0J9fFdBb/gvffoeedUR+S+TSJ6kOT7dB3p6nMF4r/8J0/aUc+r33GKFo1DHpcld0RRq4Z7MKVShu3SBbf0Z68e5+9/VjsA4/+twh+pziSPUmylVXWLTTWto6YC/oANd9yqwYq+b3kP8DygizuXjXquH2PzAHmDxG/X3U9aeW1a+cvmoDJN2o5hTvmF9H+2HFBloEfkxEV0lPxbYLkNndZYeR+PJA8stv9baEcRMuW/Svio7Giu6ei3bO9D2N5OaWjrgL2h2E+QR4YGa5uiLrjVYgb8qTxy5xkWzBwgh6NtFLWr00DtsqeKmqf2W5jUifvhuRC/XLI2rRf02Pq62lvx4Lz7XYYLO0pia9InPmrgcrQj8zn4SMZ1h9+YcSiVmOrY1sbGlASPugyrSZyfOy9Dfh9KBuCj5jXzvc78Te4AAgr6J6Xz40poKpr2vbwC57zXy43wljdK3tnMZS9fRVtw1WKGjNAct1bEdxnfDyVsjm9DtzYjME73QHjqqCnWjvgLh38PZxMw6HU9EBRB0QXdyesvLLGPo6+CRD/3prHEaeg2lMJZmOr3C21CmjtIsdIhYuphKcE8zQsnrJiHvjlJBvdEzc7e/5CGQoCN8NtwiPhRZVfqwBwggaMv91Ed7IQeZzXWmOkTl2Wuk0T2P9hQtKGr0JeLsx+ooPYaOYPKsk2CbRoSSs9HOJ3FhvaC1+0fYIxjOWShBX3ZH/YiPj1HUXfYAAQRteJKYXGprV7b6NrPvW01j6qJvpeatqlykvGraugXj/yGKADl76RO0ki7Ns9mmEUHxtL+s8y3i83F///Ifz7eBYcuEexb/9CYx2Z+uK2G3AIImLCAOnb7JoVknI017Z18ff/p89efZSX6XNEurNaHOFt+6jMD4C8dfMzIyvkZHdZRWbkyfWR5H2zQiSK76R5wu2usEA7nSrAIBO4sUPtKTTl4AQf/yPYx7LBr1AcZ3PF6bfe8q/h1ep+7oh1qF2+mfxfnoIFZUop71Z5cdoaN0B5pDWpldlxCUEUEir9Ga7iz2uj5xWZ9X4UvBvkXJQajOIucSfGVI5jvgvI71QtxmSg+NsvfqQ15Y1DctRw5v5Amo6/fr+qH+GGeiH6mieO9C9lLFCNT0281f+g/228bcjuQ4Grua5DXu5b5gZ7PA+5b9FpJEoM4ix+zDJyZtTZoSZX+SPUCQG/WF573/oGbIrByWZUu8v1u9VcQ5Y6I9fYG/FqXrKt0dH+DdZjv+KoO5HUkyfaKKHuCcYT6+3XScvlsXAnUWie1CXe1i+aA49gCBniR1/56c3hXwEA9YFoE6i7jsUs6ccGUPEEjQCz5rCnBm1HxBdg6IgECdRWqr8mLMq8seINSz+L9aOTqH6Xj+D5RABOosshb13pl17ezuBNkG9gDhOou8Ld7XCCi5CNRZBG+KpE73IzfrWA+j2wGcEKizCBF1J3Nf5h2dUSAowAlB8yRlFOhcBYICnBA0TxJ6oHMVCApwQtA8SSAoYCrC5Uk6c+YMSiMm7GtBUIATwuVJCg4ORkHEhFl2PKSKEpt5PBsKWCeC5kkqdogvvKHCicMvqPwGpGm3egTNk2TSOWjhbPcqHjGnDYUBpRtB8yR5afebLMKwoKNa3sX4R98LHNsnURiDNHAYukFV3k3ZrQnNEqXRUoK/oC/kVJ6kwpcm1WtQ0Aee1EDyS3S80yQ5bv18JLt4KXOQBsNDN6jLT6WkpAQ1IiaXqb3spGRNsMrxHPgLqjxu/+FicBN99/MNCnqgFfVxuTqz8K8x7YeZODCIMOT28+/Q3LfYd2IO0mB46AbN6Iie6t3M8UkiyLDK8Rz4CtqpE2rdiaS6oRdm9N/PNyjo4abUx7majLLvAub8srTyeA6ttTQ9B77G+Eqo9kuazEEaDA/doBnNEHRQS/rTGsdz4Ctonz6oax+S/hn64w3czzcoaLbHHfLji9FFRdd9yddws0OPcmqwJbnvRaUJSW2hWcwcpMHw0A2a0UxBm418dpa8oWGN4znwP8THcBsYwcD9fMMXSYvDZk2f3L8C472cxfS7j/PGcmqAJfmNfm/gvwDNYuYgDYaHbtCMZgoaFF4GoS6PsTWO5yDYW50G7ucbFvRZlFMZV9eujP4m02ZSH5v68myK8PxJ3xT+q7pmMXOQBsNDN2hEMwXNs291OXu3Z0erHM+Bv6BPhjWMIRmuP97A/XzDgvb8VI5xfuepRSXrqbFt8OczODTXsryrSJ12DNM6PWYO0mB46AaNaI1fUIrF6IU1jufAX9AuvkPHkUzTH2/gfr5BQXNcqRffrjHeLHkZQL7pdNz7Npf2WpZDPjOPp3WL0s4WwhykwfDQDczy4oLuR9foGesaz4G/oC5XOcUbuJ9vUNBrVend2DF2cKZ67PCWFSWZlOP2yNi2i4p1f2UM0sBh6AZmOVPQ9HLkrc+pru+scTwH/oLW4JqVjbqfr2ulQUFfuFH/3Hf8mIVv01fsL0l53hmDNHAYuoFZzhT0Xd3Aufsnl1mOrXE8B/6CzlyqL4wrhs9B48nHfPJ+n5qjNvFQD9LAaegGZjnjEP+gv59TvR+JX1crHM+Bv6Bbo9//yhK5Ov+t2Xrp/Hrvwzua1o2E88UXbh71efHxMwHrQqD7oOOKYA+AHvUAJwQSNNEBBYXQsAcIIGhRxzVmbzXo2Vay4S9ovBL9fTb2Iv0dOU0SNOc82+PWoo5rjN5qRvdsw+vqusaZlu4RMAP8Be1H8Ekbt7C1esPljoIJ+nSAay2v969oF2vlHKIvgo3u2YY3o093dbY/Z3QrAfNg7CH+ZfOV+uN36X+fyHhB5Q0SX2H58kDtjEdaOYdo6Yzu2aao2Yu4TAsfZGwrATNh9DnokZqsYVwxXtAD9aiPod9qFmvnHIroSZxyuqLgolNO5Ff06gVayjz5jPBWJ9d0L+sakUxscgftJJYnajwmAETAaEH36sjQxRHjBZ1Ln/z++KGq4OrKBb8qsHbOoYiexCnneBRLnHJeTE3tb1N7DOqgfvXCAR0kTlQXjfeqNj6ZOPkMQ+rkmg4+tgiFP8aZiHyhP0n2phH5zsnLkcGOtbca22LABPgLupliSYWmJtVrvKBLRlIf65Wd7hQT/YeMq9v4vnbOoYjmxCnnMXSEOOWkerBtIQLUr16MpZ6Aq3u2+clUyTXnkT3buqIWeB/VNWMrGo5IQbv7rExLQHuNbTJgPPwFLUfh0OCySfUaL+j/KpBP4xUtlQOPro55QSx91UI751CEN3HK+QStpE85I+mebdQp59Yq8bcRnegoojvVs80hQDO5pg96kUkZmyxzr0gI+hStJ+qIKCnv75UqBExDoxcTruJH1Pv1SVaXWHoQfNzwMDl9539LK+dQDRl5Tkr3YMtBYxk925zQVuxUjjo1jXif/AW9jhpqJtfcj67dQbuJmZGyn2IILW/2u0UsNJVeR2krwChB82+/MbVeEwRVbGlYvs4cVZ+qALp7ebMMrZxDValzUroHWxYKJURcgIaTL1PMR/avcCIaQdpa3YMUdKZNN1VyTXXPNkUE+ZavQwSOoX83Hx6f4XzE6CYDRmOEoD9FyRCK2KUnlgNme5JUix57JOSyVs6hEOqclO7B1h/F+23DE8hTzqH9kDvxS5hjS/Vss6viR76L4d5TlVyzqGfbJtmCkzVszqgEnW1fvm9J6uhXauAvaCpqv/HQ5o4seVD5YDZBv+lE3tHcEoW1cg5VV56T7q7j4d0CraR7trVFjvW+pG8uebYL8G4T1JMo10iuSfVsG0NmYVhf28GO+F8YozrzlPfqaKYmAzzgL+h7CdTHoPom1Ws2QfPb1/lufd8Kxb+Grpcpil69UN6hZ0+uSZCovFGauu9jsnw1sqZ3gaQCf0Gd6Lstac4m1WvGziI/j+6/hOXoq+NlCsarF7Sg7Mk1Sa6kE1Rrkf7oEHVJP1RvZihAGPgLGj6H+phfXWcoF4TvbqfjZQrGqxe0oOzJNdWQh/iCqJCNB8bbLBO6yUBx+As6vdyyh/JHy+2nm1SvJfqDsr5MofHqBSkoe3JNNdQ56N3e/o51NlrTgB6Sgb+ghUNtkAzZDCk0qV7osAxwwpj7oLf3JO029d10EBTgRAl8kgRYE7wFvbKGmGwZecjEekFQgBM8BZVPRtWIj63OqD+HIcD1AIICnOAp6EY0kerJ/nY+WmNSvSAowAmegr7XTbXcN8akekFQgBM8BXVVv4m01sOkekFQgBM8BXVRP01ZGqAzlAsgKMAJnoLGdlItd+pgUr0gKMAJnoJuQ4upB36KldTLPMYDggKc4CmoYgSqNTdlz+JYZOiN8Te3qSfar3VkQwRBAU7wvlF/JM4GIVT9R/09JwpG26LQU5jsRMkeAIICnDDiUWfB1fMGX36YU3bGpibOt0BQwEQEehYfPoM4ukd3BkEBExFIUHsy00GW7DQICpiGQIJWpUZO6hf5BgQFTEIgQWeVm3wc46d+bcaCoIApCCRo/kT7cOLjSg0EggKmIFiH5XfUQHLyY8nsq0FQgBMC9qgvfPRW90oQFOCEUIKeS/CVIZnvgPM61oOgACcEEvSYffjEpK1JU6LsT7IHgKAAJwQSNLYL/VayfFAcewAICnBCIEFdVIPfnXBlDwBBAU4IJGjtz5Uz8+qyB4CgACcEEnQt6r0z69rZ3QmyDewBICjACaGu4jdFUiMXRm7WsR4EBTgh2H1QxZ3MfZl3dPYaBUEBTgg69E1Ggc5VICjACUEFRTre98AgKMAREBSQNMIJeubMGZRGTNjX8hKUkfOdTLQ5VVcpM/e7Ogwo0QgnaHBwMAoiJsyyrA9U2C0stoH8nyz2d52YOd/xPZkyryZLKSP3uzqMRJUEPl2VFYHvdwFEw7KH+Jx0FSFHtYMPVA2Jdv8iX7tYO7f7Als6ryZ7qTq1dlEBLkoCf4/8SBrgctOI7wKIg1jnoA0ytQpOBmRg/Kjj4OKhmrnd34un82qyl6oFLSrARUngKbIrmzbkBGBRBBXU66HOVcUE7bSOnOZ6FtskBy1lLF1HW6m8muylWCUoo4Cg2chnZ5+rYvt9zOs7AOIi1hDgxQSt8g/18f6v2pFZiBzN+WJqKploE890ekXl1WQvxSpBGQUEQeFlEOpCX0797njPvN8EEBQhBc27jnU+SSomaATdkJgT2pHHEJnEVZnbXVGjL6byarKXYqWgzAKiHWQS+N2eVCZDRePJ/L8IIB7CCboiCCHcY74ORYsJOobq/3TRJ0878glSjkmaZ7OtKK8meylWCsosULEYvSCmGba6z4sBCSKYoGvR4G0IL7JZwb66mKCPKo86f2dDIEvnEvZEmxzTbxaxH10jpt278PwegLgIJmj1UcRvH8bTIthXFxMUv/g8qmLH0yyh7Ik2OabfJFEngcf4sa2JacQBCyOYoA77KEEPOLCvLi6oTtgTbXJMv0l+FCWBx5vQU57fAxAXwQStPY0SdG4k+2oegupKtMkx/SYBlQSeGjCyl47mAFJFMEHX2M04he4mOy1gX81LUMB6Ea7D8mIP4jq67AQd+b5AUIATAt4Hzf19++FHulaCoAAnJPMkCQDYEE3QL1Zy5ZMeH1uOXi15hfdpLlA7WGnbjVd4p44CtYMVnn+JD5K4/esHiiTo6iGc8QmqbjkqOfAKD7MVphnsuAXwCvcuL1A72Ai34Rdfpje3f/0x2YIIOq4I/vJq0W2nybvgzqmGvMIfewvUDlb66RhkQAczpwnUDjbe6LjhrYvAf83cAH6CJjqgoBAak2sGQVWAoHrgeYjfiy6Yq2YQVAUIqgeegsodQVCzA4Lqge9F0q7nhmO4AYKqAEH1YOareB6AoCpAUD2AoGyAoCpAUMsAghqJFQvac48FK/ujCa/w5/4CtYOVhC28wmfPEKgdbOS78YsP1v3Gr3GIJ+jLQgtWpnjGL96i/Z+z9eT1YeHNa4HawQrPv4TZ/3DiCQoAHABBAUkDggKSBgQFJA0ICkgaEBSQNCAoIGlAUEDSgKCApAFBAUkDggKSBgQFJA0ICkgaSwmaqOs95XV1XeOOE58vRwY71t5qjqpU6ZMsUxs/uLSN4G2jPhZslAoujdMXIwiWEVS+31GHoJvRp7s625/DuLvPyrQEtNcMlanSJ1mmNn5waRvBOCSGoFwapydGGCwi6E/OCNGCrqvrGLGOsUZRsxfGheGD8FO0nliKMMe/S1H6JEvUZva2Eex2ryiGoFwap5GbyhJYRNDnFy4EUYIusZuydySix7cPJtN93kHkix8T/fDNfreImaZ9zVCbOn2SRWoze9swvun+U4wYgnJpnEZuKktgqXPQEFLQXA/ybYXBQVQJ9c0zETlNkpG96x8en+F8xAxVqdInWaY287ctP3osFkVQLo1j5qayCBYV9Hd08smTJ9sQlZOG+ub7qBwdWxE54Ohs+/J92dPO8kKdPskitQnQthH1C0QRlEvjmLmpLINFBd2uTEt8DXvRMxmZVGrYZFkBFSTvZbZvvhi9sGBt5mzbTo/bWJxfUA6NU8dYrD0WFfQwUuUrfPjgQVDagwcFd9BuYmmKL973MZkMYTV6Z6b69qNrFqzNnG1LFDe5uP7GqWMs1h6LCvqoTDIxXdyDytVFHTsUEQnET1nUAHyI+j861Ayv+6rTJ1mkNvO37QqZ1rxai3Sdw6yL2ThGbioLYVFB8Xjn+Qe/sp1HlVDfHG+SLTg52P48LogK2XhgvM0y02sqSp9kidrM3zYKMQ7xXBrHyE1lISwrqHx+DYdqy+lkh/Q3x+truzQ5SXze7e3vWGejziy1PFCnT7JIbeZvG4ko56BcGleUm8pCwLN4QNKAoICkAUEBSQOCApIGBAUkDQgKSBoQFJA0ICggaUBQQNKAoICkAUEBSQOCApIGBAUkDQgKSBoQFJA0ICggaUBQQNKAoICkAUEBSQOCApIGBAUkDQgKSBoQFJA0ICggaUBQQNKAoICkAUEZqAaWm2Lc5kleutcFLi6a76asBs0qFjaSLK7Y7aJxDSiNgKAMEp1TKC4UFfXppCu4+BoWQXNRPzqSKegpooqgRsTkcrH4kW4pKdumhzkd0ldj/tfhDtXnFuj8GqUKEJRBYnHDaCkUf+frWMOERdA33ZYVF5QkoidrC0ZSQ3BmNwhnG99QVePEct+kfVV2NOsOSh0gKIMiQQ+hIxin2J2PIY64LwK3tEC3Xg72L1t5pgLjwqlhznG/Y2qNOh1GzqDAwGGL6c0bdMb4KBqA8W50jhST3sfCqZVduz1VV0UJqt5nfmLFwBELa6kEJarfg3G5zcRcv3iMz7d29+xyV1kjxu/sJxHTGXZvLPeHEREQlAHjF7RveH52wBT8tGvrB/LA8DYb3nziPXfPZ2gbxgPcvt/byv0+tUaVDkPRxHXhjmZO9ObTPOV4NqqK8efeclJQeh++fTLmMX71KEHV++zhsWJnw7JFgr6z+6ZI0Ne+Tbck+bai90MU3Q0nM2ptQrct94cRERCUgeoiKQ3jx14zEsPzlIfnusSPXOeNREDUeHxFlkKcWjquJteo02Gko1+In8GKtKDH0F+4QzP0gBrkkzy0U/uoReyjd5y6KkpQ1T7/IjfPdi0SFAcPKhL0DDqJ8Y5RmicVr5uEiDN+uaUBQRmoLpIeEPMby9qRP1SUXJOptYq7G8qMwxts3xLzT3LINep0GLM9yCFdx9GCvnX+XuGVar/ztd1GhqDkYTmxsboq5Tkovc9kB/KXsStD0EoMQR/ZR++gkhYwBD0b7XwSWwUgKAPmRVKBZzXSGkquhcTMn63Ku7XyGYdnqTIJEGvU6TASI8iSRcrN2/e4ip43SzyC7jMEXYSLC6ra55RKZNHIIkHlZb5VCvoJcQ6a0RDJmqQxBH3aX9b5llB/BIkBgjJgCvq1X5m1uOgK/IV9z1NyXG8cXl2G9PbOfXKNOh3GPE/yF3SCcvPvfNZF4C+jZ0ZhhqDkVbyWoOp9LnMkN/+wSNDD6oukNvHk8sMtjWyvqwW96h9xWsC/grQAQRkwBP277K4pno+L5DpEupjjOg7/SZ4vFvjOIdeo02FkoH3E5X2IcvPLqMlg/KtNg8+xfkHV+/ydPOt97akWNLcReZvJYQlxne8Wj1MiszH+B+1VCSqv0do6LuApQFAGic6pFBlYHttO8brSJxj3r3GmkJTrhs3wk780cGr0N+7itSq9h8stao0qHYYizm3Z7jZBSkEVgWgDfmWHyLvt5LaqfWgLWrTPduXX/NysSjR5oz41dec31R0PEiENKuzPaFE1Hl+27ZiyPd7tMbUfovw4Grua5LUIfyHLA4IyUF3FR+Pl9jcx3ouO4COVnF9Scm0KcYz56Uj0Ypz3aWXnuExMrVGnw8gZFOg3+Hg75X76k4muGtiTv3Pktup9aJ+Dqvf5apBP6Pw58cpHnRW6UI+yLsc5RiavHY/xzloOnq3+oPdDlCcrW/nAwn8dcQBBJcCz1Bxi2nO42O2QIiCoBMh2HvrPyzU2f4jdDikCgkqBjBoIlV8ldiskCQgqDbKfi90CiQKCApIGBAUkDQgKSBoQFJA0ICggaUBQQNKAoICkAUEBSQOCApIGBAUkDQgKSBoQFJA0ICggaUBQQNKAoICkAUEBSQOCApIGBAUkDQgKSBoQFJA0ICggaf4PeU9rYF8LGGIAAAAASUVORK5CYII=" /><!-- --></p>
+<pre class="r"><code>libs[libs$extracted / libs$bc_extract_qc &gt; 2,]</code></pre>
+<pre><code>##        samplename  group barcode    index total extracted cleaned tagdust
+## CTGTCT     CTGTCT CTGTCT  CTGTCT TAGGCATG     0    231518   60117  145048
+## GAGCGT     GAGCGT GAGCGT  GAGCGT TAGGCATG     0     11654    1146     245
+## CACAGC     CACAGC CACAGC  CACAGC TAGGCATG     0      8329    6011     604
+## CGATAC     CGATAC CGATAC  CGATAC TAGGCATG     0      1633    1032     117
+## CTGCGT     CTGCGT CTGCGT  CTGCGT TAGGCATG     0      1318     973      67
+## GAGATA     GAGATA GAGATA  GAGATA TAGGCATG     0       717     435      54
+##         rdna spikes mapped properpairs counts barcode_ID
+## CTGTCT 26325     28  42593       30380   7757         53
+## GAGCGT 10262      1    787         519    202         59
+## CACAGC  1710      4   4673        3616   1346         29
+## CGATAC   483      1    581         339    166         43
+## CTGCGT   278      0    640         396    170         50
+## GAGATA   228      0    276         200    108         57
+##                                                                                                                                                                             inputFiles
+## CTGTCT /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments/CTGTCT.bed
+## GAGCGT /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments/GAGCGT.bed
+## CACAGC /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments/CACAGC.bed
+## CGATAC /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments/CGATAC.bed
+## CTGCGT /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments/CTGCGT.bed
+## GAGATA /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments/GAGATA.bed
+##        inputFilesType sampleLabels well row col MASTER_MIX_vol    TSO
+## CTGTCT            bed       CTGTCT  H11   H  11            350 0.6250
+## GAGCGT            bed       GAGCGT  I10   I  10            350 0.3125
+## CACAGC            bed       CACAGC  E08   E   8            350 5.0000
+## CGATAC            bed       CGATAC  G08   G   8            350 1.2500
+## CTGCGT            bed       CTGCGT  H08   H   8            350 0.6250
+## GAGATA            bed       GAGATA  I08   I   8            350 0.3125
+##        TSO_vol BARCODE_ID BARCODE_SEQ BARCODE_Source_Row
+## CTGTCT      50         53      CTGTCT                  H
+## GAGCGT      25         59      GAGCGT                  I
+## CACAGC      50         29      CACAGC                  E
+## CGATAC     100         43      CGATAC                  G
+## CTGCGT      50         50      CTGCGT                  H
+## GAGATA      25         57      GAGATA                  I
+##        BARCODE_Source_Col RT_PRIMERS RT_PRIMERS_vol RNA RNA_vol RNA_group
+## CTGTCT                  4       0.50             25  10      25      10ng
+## GAGCGT                  3       0.25             25  10      25      10ng
+## CACAGC                  1       0.00              0  10      25      10ng
+## CGATAC                  1       0.00              0  10      25      10ng
+## CTGCGT                  1       0.00              0  10      25      10ng
+## GAGATA                  1       0.00              0  10      25      10ng
+##        H2O_vol total_volume PRIMERS_RATIO plateID bc_extract_qc
+## CTGTCT      50          500          1.25       A         88635
+## GAGCGT      75          500          1.25       A           758
+## CACAGC      75          500 no_RT_PRIMERS       A          1783
+## CGATAC      25          500 no_RT_PRIMERS       A           397
+## CTGCGT      75          500 no_RT_PRIMERS       A           451
+## GAGATA     100          500 no_RT_PRIMERS       A            87</code></pre>
+<pre class="r"><code>found_bc$in_libs &lt;- found_bc$bc %in% libs$barcode
+found_bc$known   &lt;- found_bc$bc %in% nanoCAGE2017barcodes$barcodes
+
+hist(log10(found_bc$n), breaks = &quot;fd&quot;)
+rug(log10(libs$bc_extract_qc))
+abline(v=log10(2e3), col = &quot;grey&quot;)</code></pre>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>True nanoCAGE barcodes that were not used in this experiment are very rare in the sequence files.</p>
+<pre class="r"><code>found_bc %&gt;% filter(known, !in_libs) %&gt;% as.data.frame()</code></pre>
+<pre><code>##      n     bc in_libs known
+## 1  333 GCTGCA   FALSE  TRUE
+## 2  118 GTAGCA   FALSE  TRUE
+## 3   81 TATCAG   FALSE  TRUE
+## 4   74 TCGACG   FALSE  TRUE
+## 5   69 GTAGAT   FALSE  TRUE
+## 6   67 TATAGC   FALSE  TRUE
+## 7   67 TATGCA   FALSE  TRUE
+## 8   44 GTAGTG   FALSE  TRUE
+## 9   40 TCGAGC   FALSE  TRUE
+## 10  30 TATGAT   FALSE  TRUE
+## 11  30 TCGCAG   FALSE  TRUE
+## 12  26 GTACGT   FALSE  TRUE
+## 13  25 TATACG   FALSE  TRUE
+## 14  24 GCTGTG   FALSE  TRUE
+## 15  22 GTACAG   FALSE  TRUE
+## 16  17 TCGATA   FALSE  TRUE
+## 17  15 TATCTC   FALSE  TRUE
+## 18  14 TATGTG   FALSE  TRUE
+## 19  14 TCGCGT   FALSE  TRUE
+## 20   8 TATCGT   FALSE  TRUE
+## 21   7 GTATCT   FALSE  TRUE
+## 22   5 TCGCTC   FALSE  TRUE
+## 23   4 GTACTC   FALSE  TRUE
+## 24   2 GTATAC   FALSE  TRUE
+## 25   2 TATATA   FALSE  TRUE</code></pre>
+<p>Conversely, barcodes that are highly abundant but not used in the experiment are not true nanoCAGE barcodes. They may be related to higly abundant true barcodes.</p>
+<pre class="r"><code>found_bc %&gt;% filter(!in_libs, n &gt; 2e3) %&gt;% as.data.frame</code></pre>
+<pre><code>##        n     bc in_libs known
+## 1  94905 TGGGCA   FALSE FALSE
+## 2  64818 CCTGTC   FALSE FALSE
+## 3  33512 CACACA   FALSE FALSE
+## 4  20717 CACCTG   FALSE FALSE
+## 5  16126 ACTGTC   FALSE FALSE
+## 6  10444 CGAGCG   FALSE FALSE
+## 7   6097 ATCCTG   FALSE FALSE
+## 8   4887 GGCGCG   FALSE FALSE
+## 9   4886 CACATG   FALSE FALSE
+## 10  4571 CACTCC   FALSE FALSE
+## 11  4138 CACACC   FALSE FALSE
+## 12  4122 GCTGTC   FALSE FALSE
+## 13  4081 ACCTGT   FALSE FALSE
+## 14  4040 CACACT   FALSE FALSE
+## 15  3902 ACAGGG   FALSE FALSE
+## 16  3891 CATACG   FALSE FALSE
+## 17  3750 ACAGCT   FALSE FALSE
+## 18  3531 TAGAGC   FALSE FALSE
+## 19  3312 GCCTGT   FALSE FALSE
+## 20  3112 ACACCT   FALSE FALSE
+## 21  2980 ATCTGC   FALSE FALSE
+## 22  2930 CACTGT   FALSE FALSE
+## 23  2848 TACACG   FALSE FALSE
+## 24  2437 AACTGC   FALSE FALSE
+## 25  2399 CAAGCA   FALSE FALSE
+## 26  2311 AGGGCA   FALSE FALSE
+## 27  2085 AACACG   FALSE FALSE</code></pre>
+<pre class="r"><code>found_bc[found_bc$bc %in% nanoCAGE2017barcodes$barcodes[agrep(&quot;TGGGCA&quot;, nanoCAGE2017barcodes$barcodes, max = 2)],]</code></pre>
+<pre><code>## # A tibble: 11 x 4
+##         n bc     in_libs known
+##     &lt;int&gt; &lt;fct&gt;  &lt;lgl&gt;   &lt;lgl&gt;
+##  1 424209 AGTGCA TRUE    TRUE 
+##  2 131898 CGAGCA TRUE    TRUE 
+##  3  88101 CTGCAG TRUE    TRUE 
+##  4  43584 ATCGCA TRUE    TRUE 
+##  5  30915 CTGAGC TRUE    TRUE 
+##  6  28267 CTGTGA TRUE    TRUE 
+##  7   9915 GAGCAG TRUE    TRUE 
+##  8    333 GCTGCA FALSE   TRUE 
+##  9    118 GTAGCA FALSE   TRUE 
+## 10     67 TATGCA FALSE   TRUE 
+## 11     30 TCGCAG FALSE   TRUE</code></pre>
+<pre class="r"><code>found_bc[found_bc$bc %in% nanoCAGE2017barcodes$barcodes[agrep(&quot;CCTGTC&quot;, nanoCAGE2017barcodes$barcodes, max = 1)],]</code></pre>
+<pre><code>## # A tibble: 1 x 4
+##       n bc     in_libs known
+##   &lt;int&gt; &lt;fct&gt;  &lt;lgl&gt;   &lt;lgl&gt;
+## 1 88635 CTGTCT TRUE    TRUE</code></pre>
+<pre class="r"><code>found_bc[found_bc$bc %in% nanoCAGE2017barcodes$barcodes[agrep(&quot;CACACA&quot;, nanoCAGE2017barcodes$barcodes, max = 1)],]</code></pre>
+<pre><code>## # A tibble: 4 x 4
+##         n bc     in_libs known
+##     &lt;int&gt; &lt;fct&gt;  &lt;lgl&gt;   &lt;lgl&gt;
+## 1 1330195 CACACG TRUE    TRUE 
+## 2  166687 CACGCA TRUE    TRUE 
+## 3   44520 CACATA TRUE    TRUE 
+## 4   37589 ACACAG TRUE    TRUE</code></pre>
+<p>It might be possible that the HMM of TagDust has autocorrected some of the errors, which would explain why some barcodes were detcted in larger amounts with TagDust2.</p>
+</div>
 <div id="create-a-cageexp-object-and-load-expression-data" class="section level2">
-<h2><span class="header-section-number">2.2</span> Create a CAGEexp object and load expression data</h2>
+<h2><span class="header-section-number">2.3</span> Create a CAGEexp object and load expression data</h2>
 <pre class="r"><code>ce &lt;- CAGEexp(colData = DataFrame(libs)
-                     , metadata = list( genomeName = BS_GENOME
+                     , metadata = list( genomeName = &quot;BSgenome.Mmusculus.UCSC.mm9&quot;
                                         , inputFilesType = &quot;bed&quot;))
 
 getCTSS(ce, useMulticore = TRUE)
@@ -825,11 +909,11 @@ removeStrandInvaders(ce)
 normalizeTagCount(ce, method = &quot;simpleTpm&quot;)</code></pre>
 </div>
 <div id="save-the-cageexp-file" class="section level2">
-<h2><span class="header-section-number">2.3</span> Save the CAGEexp file</h2>
+<h2><span class="header-section-number">2.4</span> Save the CAGEexp file</h2>
 <pre class="r"><code>saveRDS(ce, &quot;Labcyte-RT_Data_Analysis.Rds&quot;)</code></pre>
 </div>
 <div id="number-of-sequencing-reads-extracted-per-sample" class="section level2">
-<h2><span class="header-section-number">2.4</span> Number of sequencing reads extracted per sample</h2>
+<h2><span class="header-section-number">2.5</span> Number of sequencing reads extracted per sample</h2>
 <pre class="r"><code>data.frame(colData(ce)[,&quot;extracted&quot;,drop=F])</code></pre>
 <pre><code>##        extracted
 ## ACACGT     39556

@@ -19,10 +19,9 @@ Data load and QC in R
 =====================
 
 ```{r load_R_libraries}
-BS_GENOME    <- "BSgenome.Mmusculus.UCSC.mm9" 
-library(BS_GENOME, character.only = T)
 library(CAGEr)
 library(data.table)
+library(dplyr)
 library(ggplot2)
 library(gplots)
 library('RColorBrewer')
@@ -30,8 +29,10 @@ library(magrittr)
 library(plyr)
 library(MultiAssayExperiment)
 library(SummarizedExperiment)
+library(tibble)
 library(reshape)
 library(vegan)
+data("nanoCAGE2017barcodes", package = "smallCAGEqc")
 ```
 
 MOIRAI shortcuts
@@ -57,7 +58,8 @@ libs <- smallCAGEqc::loadMoiraiStats(
   pipeline  = "OP-WORKFLOW-CAGEscan-short-reads-v2.0",
   multiplex = file.path( MOIRAI_BASE, "input/171227_M00528_0321_000000000-B4GLP.multiplex.txt"),
   summary   = file.path( MOIRAI_RESULTS,"171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/text/summary.txt"))
-libs$barcode_ID <- c(1:70)
+libs$barcode_ID <- libs$barcode
+levels(libs$barcode_ID) %<>% match(nanoCAGE2017barcodes$barcodes)
 libs$inputFiles <- list.files(path = "/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments")
 libs$inputFiles <- paste0("/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments/", libs$inputFiles)
 libs$inputFilesType <- c("bed")
@@ -71,13 +73,12 @@ plate <- read.table("plate.txt", sep = "\t", header = TRUE)
 plate_10ng <- subset(plate, plate$RNA == 10)
 plate_10ng_no_RNA <- plate[224:230,]
 plate_10ng_all <- rbind(plate_10ng, plate_10ng_no_RNA)
+rm(plate) ; rm(plate_10ng) ; rm(plate_10ng_no_RNA)
 plate_10ng_all
 ```
 
 ```{r LIBS}
-libs <- cbind(libs, plate_10ng_all)
-libs[,24] <- NULL
-#rownames(libs) <- NULL
+libs <- cbind(libs, plate_10ng_all[match(libs$barcode, plate_10ng_all$BARCODE_SEQ),])
 libs$PRIMERS_RATIO <- sub("no_RT_PRIMERS", "NA", libs$PRIMERS_RATIO)
 libs$PRIMERS_RATIO <- as.numeric(libs$PRIMERS_RATIO)
 libs$RNA <- as.numeric(libs$RNA)
@@ -87,12 +88,69 @@ libs$PRIMERS_RATIO[is.na(libs$PRIMERS_RATIO)] <- "no_RT_PRIMERS"
 libs$plateID <- "A"
 ```
 
+Control on barcode extraction
+-----------------------------
+
+```{r found_bc}
+found_bc <- system("zcat /sequencedata/MiSeq/171227_M00528_0321_000000000-B4GLP/Data/Intensities/BaseCalls/1_S1_L001_R1_001.fastq.gz | sed -n 2~4p | cut -c1-6 | sort | uniq -c", intern = TRUE)
+found_bc <- read.table(text=found_bc)
+colnames(found_bc) <- c("n", "bc")
+found_bc %<>% as.tibble %>% arrange(dplyr::desc(n))
+```
+
+```{r found_known_bcs}
+libs$bc_extract_qc <- found_bc$n[match(libs$barcode, found_bc$bc)]
+
+plot( libs$extracted
+    , libs$bc_extract_qc
+    , log = "xy"
+    , xlab = "Extracted with TagDust 2"
+    , ylab = "Counted directly from FASTQ file"
+    , main = "QC of barcode extraction")
+with(libs[libs$extracted / libs$bc_extract_qc > 2,], text(extracted * 2.5, bc_extract_qc, paste(barcode, barcode_ID)))
+libs[libs$extracted / libs$bc_extract_qc > 2,]
+```
+
+```{r found_unknown_bcs}
+found_bc$in_libs <- found_bc$bc %in% libs$barcode
+found_bc$known   <- found_bc$bc %in% nanoCAGE2017barcodes$barcodes
+
+hist(log10(found_bc$n), breaks = "fd")
+rug(log10(libs$bc_extract_qc))
+abline(v=log10(2e3), col = "grey")
+```
+
+True nanoCAGE barcodes that were not used in this experiment are very rare
+in the sequence files.
+
+```{r}
+found_bc %>% filter(known, !in_libs) %>% as.data.frame()
+```
+
+Conversely, barcodes that are highly abundant but not used in the experiment
+are not true nanoCAGE barcodes.  They may be related to higly abundant true
+barcodes.
+
+```{r}
+found_bc %>% filter(!in_libs, n > 2e3) %>% as.data.frame
+
+found_bc[found_bc$bc %in% nanoCAGE2017barcodes$barcodes[agrep("TGGGCA", nanoCAGE2017barcodes$barcodes, max = 2)],]
+
+found_bc[found_bc$bc %in% nanoCAGE2017barcodes$barcodes[agrep("CCTGTC", nanoCAGE2017barcodes$barcodes, max = 1)],]
+
+found_bc[found_bc$bc %in% nanoCAGE2017barcodes$barcodes[agrep("CACACA", nanoCAGE2017barcodes$barcodes, max = 1)],]
+```
+
+It might be possible that the HMM of TagDust has autocorrected some of the
+errors, which would explain why some barcodes were detcted in larger amounts
+with TagDust2.
+
 Create a CAGEexp object and load expression data
 ------------------------------------------------
 
 ```{r new_CAGEexp, message = F, echo = TRUE}
 ce <- CAGEexp(colData = DataFrame(libs)
-                     , metadata = list( genomeName = BS_GENOME
+                     , metadata = list( genomeName = "BSgenome.Mmusculus.UCSC.mm9"
                                         , inputFilesType = "bed"))
 
 getCTSS(ce, useMulticore = TRUE)

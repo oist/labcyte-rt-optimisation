@@ -16,305 +16,101 @@ Data load and QC in R
 
 
 ```r
-BS_GENOME    <- "BSgenome.Mmusculus.UCSC.mm9" 
-library(BS_GENOME, character.only = T)
-```
-
-```
-## Loading required package: BSgenome
-```
-
-```
-## Loading required package: BiocGenerics
-```
-
-```
-## Loading required package: parallel
-```
-
-```
-## 
-## Attaching package: 'BiocGenerics'
-```
-
-```
-## The following objects are masked from 'package:parallel':
-## 
-##     clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
-##     clusterExport, clusterMap, parApply, parCapply, parLapply,
-##     parLapplyLB, parRapply, parSapply, parSapplyLB
-```
-
-```
-## The following objects are masked from 'package:stats':
-## 
-##     IQR, mad, sd, var, xtabs
-```
-
-```
-## The following objects are masked from 'package:base':
-## 
-##     anyDuplicated, append, as.data.frame, basename, cbind,
-##     colMeans, colnames, colSums, dirname, do.call, duplicated,
-##     eval, evalq, Filter, Find, get, grep, grepl, intersect,
-##     is.unsorted, lapply, lengths, Map, mapply, match, mget, order,
-##     paste, pmax, pmax.int, pmin, pmin.int, Position, rank, rbind,
-##     Reduce, rowMeans, rownames, rowSums, sapply, setdiff, sort,
-##     table, tapply, union, unique, unsplit, which, which.max,
-##     which.min
-```
-
-```
-## Loading required package: S4Vectors
-```
-
-```
-## Loading required package: stats4
-```
-
-```
-## 
-## Attaching package: 'S4Vectors'
-```
-
-```
-## The following object is masked from 'package:base':
-## 
-##     expand.grid
-```
-
-```
-## Loading required package: IRanges
-```
-
-```
-## Loading required package: GenomeInfoDb
-```
-
-```
-## Loading required package: GenomicRanges
-```
-
-```
-## Loading required package: Biostrings
-```
-
-```
-## Loading required package: XVector
-```
-
-```
-## 
-## Attaching package: 'Biostrings'
-```
-
-```
-## The following object is masked from 'package:base':
-## 
-##     strsplit
-```
-
-```
-## Loading required package: rtracklayer
-```
-
-```r
 library(CAGEr)
 library(data.table)
+library(dplyr)
 ```
 
 ```
 ## 
-## Attaching package: 'data.table'
+## Attaching package: 'dplyr'
 ```
 
 ```
-## The following object is masked from 'package:GenomicRanges':
-## 
-##     shift
-```
-
-```
-## The following object is masked from 'package:IRanges':
-## 
-##     shift
-```
-
-```
-## The following objects are masked from 'package:S4Vectors':
-## 
-##     first, second
-```
-
-```r
-library(ggplot2)
-library(gplots)
-```
-
-```
-## 
-## Attaching package: 'gplots'
-```
-
-```
-## The following object is masked from 'package:rtracklayer':
-## 
-##     space
-```
-
-```
-## The following object is masked from 'package:IRanges':
-## 
-##     space
-```
-
-```
-## The following object is masked from 'package:S4Vectors':
-## 
-##     space
-```
-
-```
-## The following object is masked from 'package:stats':
-## 
-##     lowess
-```
-
-```r
-library('RColorBrewer')
-library(magrittr)
-library(plyr)
-```
-
-```
-## 
-## Attaching package: 'plyr'
-```
-
-```
-## The following object is masked from 'package:XVector':
-## 
-##     compact
-```
-
-```
-## The following object is masked from 'package:IRanges':
-## 
-##     desc
-```
-
-```
-## The following object is masked from 'package:S4Vectors':
+## The following object is masked from 'package:reshape':
 ## 
 ##     rename
 ```
 
-```r
-library(MultiAssayExperiment)
-library(SummarizedExperiment)
 ```
-
-```
-## Loading required package: Biobase
-```
-
-```
-## Welcome to Bioconductor
-## 
-##     Vignettes contain introductory material; view with
-##     'browseVignettes()'. To cite Bioconductor, see
-##     'citation("Biobase")', and for packages 'citation("pkgname")'.
-```
-
-```
-## Loading required package: DelayedArray
-```
-
-```
-## Loading required package: matrixStats
-```
-
-```
-## 
-## Attaching package: 'matrixStats'
-```
-
-```
-## The following objects are masked from 'package:Biobase':
-## 
-##     anyMissing, rowMedians
-```
-
-```
-## The following object is masked from 'package:plyr':
+## The following object is masked from 'package:matrixStats':
 ## 
 ##     count
 ```
 
 ```
+## The following object is masked from 'package:Biobase':
 ## 
-## Attaching package: 'DelayedArray'
+##     combine
 ```
 
 ```
-## The following objects are masked from 'package:matrixStats':
+## The following objects are masked from 'package:GenomicRanges':
 ## 
-##     colMaxs, colMins, colRanges, rowMaxs, rowMins, rowRanges
+##     intersect, setdiff, union
 ```
 
 ```
-## The following object is masked from 'package:Biostrings':
+## The following object is masked from 'package:GenomeInfoDb':
 ## 
-##     type
+##     intersect
 ```
 
 ```
-## The following object is masked from 'package:base':
+## The following objects are masked from 'package:IRanges':
 ## 
-##     apply
-```
-
-```r
-library(reshape)
-```
-
-```
-## 
-## Attaching package: 'reshape'
-```
-
-```
-## The following objects are masked from 'package:plyr':
-## 
-##     rename, round_any
-```
-
-```
-## The following object is masked from 'package:data.table':
-## 
-##     melt
+##     collapse, desc, intersect, setdiff, slice, union
 ```
 
 ```
 ## The following objects are masked from 'package:S4Vectors':
 ## 
-##     expand, rename
+##     first, intersect, rename, setdiff, setequal, union
+```
+
+```
+## The following objects are masked from 'package:BiocGenerics':
+## 
+##     combine, intersect, setdiff, union
+```
+
+```
+## The following objects are masked from 'package:plyr':
+## 
+##     arrange, count, desc, failwith, id, mutate, rename, summarise,
+##     summarize
+```
+
+```
+## The following objects are masked from 'package:data.table':
+## 
+##     between, first, last
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
 ```
 
 ```r
+library(ggplot2)
+library(gplots)
+library('RColorBrewer')
+library(magrittr)
+library(plyr)
+library(MultiAssayExperiment)
+library(SummarizedExperiment)
+library(tibble)
+library(reshape)
 library(vegan)
-```
-
-```
-## Loading required package: permute
-```
-
-```
-## Loading required package: lattice
-```
-
-```
-## This is vegan 2.4-5
+data("nanoCAGE2017barcodes", package = "smallCAGEqc")
 ```
 
 MOIRAI shortcuts
@@ -342,7 +138,8 @@ libs <- smallCAGEqc::loadMoiraiStats(
   pipeline  = "OP-WORKFLOW-CAGEscan-short-reads-v2.0",
   multiplex = file.path( MOIRAI_BASE, "input/171227_M00528_0321_000000000-B4GLP.multiplex.txt"),
   summary   = file.path( MOIRAI_RESULTS,"171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/text/summary.txt"))
-libs$barcode_ID <- c(1:70)
+libs$barcode_ID <- libs$barcode
+levels(libs$barcode_ID) %<>% match(nanoCAGE2017barcodes$barcodes)
 libs$inputFiles <- list.files(path = "/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments")
 libs$inputFiles <- paste0("/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments/", libs$inputFiles)
 libs$inputFilesType <- c("bed")
@@ -644,6 +441,7 @@ plate <- read.table("plate.txt", sep = "\t", header = TRUE)
 plate_10ng <- subset(plate, plate$RNA == 10)
 plate_10ng_no_RNA <- plate[224:230,]
 plate_10ng_all <- rbind(plate_10ng, plate_10ng_no_RNA)
+rm(plate) ; rm(plate_10ng) ; rm(plate_10ng_no_RNA)
 plate_10ng_all
 ```
 
@@ -719,155 +517,153 @@ plate_10ng_all
 ## 228  J12   J  12            350 10.0000     100         68      GCTCGT
 ## 229  J13   J  13            350 10.0000     100         69      GCTCTC
 ## 230  J14   J  14            350 10.0000     100         70      GCTGAT
-##     RT_PRIMERS RT_PRIMERS_vol RNA RNA_vol RNA_group H2O_vol total_volume
-## 8        0.000              0  10      25      10ng      25          500
-## 9        0.125             25  10      25      10ng       0          500
-## 10       0.250             25  10      25      10ng       0          500
-## 11       0.500             25  10      25      10ng       0          500
-## 12       1.000             25  10      25      10ng       0          500
-## 13       2.000             25  10      25      10ng       0          500
-## 14       4.000             25  10      25      10ng       0          500
-## 32       0.000              0  10      25      10ng      75          500
-## 33       0.125             25  10      25      10ng      50          500
-## 34       0.250             25  10      25      10ng      50          500
-## 35       0.500             25  10      25      10ng      50          500
-## 36       1.000             25  10      25      10ng      50          500
-## 37       2.000             25  10      25      10ng      50          500
-## 38       4.000             25  10      25      10ng      50          500
-## 56       0.000              0  10      25      10ng     100          500
-## 57       0.125             25  10      25      10ng      75          500
-## 58       0.250             25  10      25      10ng      75          500
-## 59       0.500             25  10      25      10ng      75          500
-## 60       1.000             25  10      25      10ng      75          500
-## 61       2.000             25  10      25      10ng      75          500
-## 62       4.000             25  10      25      10ng      75          500
-## 80       0.000              0  10      25      10ng      25          500
-## 81       0.125             25  10      25      10ng       0          500
-## 82       0.250             25  10      25      10ng       0          500
-## 83       0.500             25  10      25      10ng       0          500
-## 84       1.000             25  10      25      10ng       0          500
-## 85       2.000             25  10      25      10ng       0          500
-## 86       4.000             25  10      25      10ng       0          500
-## 104      0.000              0  10      25      10ng      75          500
-## 105      0.125             25  10      25      10ng      50          500
-## 106      0.250             25  10      25      10ng      50          500
-## 107      0.500             25  10      25      10ng      50          500
-## 108      1.000             25  10      25      10ng      50          500
-## 109      2.000             25  10      25      10ng      50          500
-## 110      4.000             25  10      25      10ng      50          500
-## 128      0.000              0  10      25      10ng     100          500
-## 129      0.125             25  10      25      10ng      75          500
-## 130      0.250             25  10      25      10ng      75          500
-## 131      0.500             25  10      25      10ng      75          500
-## 132      1.000             25  10      25      10ng      75          500
-## 133      2.000             25  10      25      10ng      75          500
-## 134      4.000             25  10      25      10ng      75          500
-## 152      0.000              0  10      25      10ng      25          500
-## 153      0.125             25  10      25      10ng       0          500
-## 154      0.250             25  10      25      10ng       0          500
-## 155      0.500             25  10      25      10ng       0          500
-## 156      1.000             25  10      25      10ng       0          500
-## 157      2.000             25  10      25      10ng       0          500
-## 158      4.000             25  10      25      10ng       0          500
-## 176      0.000              0  10      25      10ng      75          500
-## 177      0.125             25  10      25      10ng      50          500
-## 178      0.250             25  10      25      10ng      50          500
-## 179      0.500             25  10      25      10ng      50          500
-## 180      1.000             25  10      25      10ng      50          500
-## 181      2.000             25  10      25      10ng      50          500
-## 182      4.000             25  10      25      10ng      50          500
-## 200      0.000              0  10      25      10ng     100          500
-## 201      0.125             25  10      25      10ng      75          500
-## 202      0.250             25  10      25      10ng      75          500
-## 203      0.500             25  10      25      10ng      75          500
-## 204      1.000             25  10      25      10ng      75          500
-## 205      2.000             25  10      25      10ng      75          500
-## 206      4.000             25  10      25      10ng      75          500
-## 224      0.000              0   0       0      10ng      50          500
-## 225      0.125             25   0       0      10ng      25          500
-## 226      0.250             25   0       0      10ng      25          500
-## 227      0.500             25   0       0      10ng      25          500
-## 228      1.000             25   0       0      10ng      25          500
-## 229      2.000             25   0       0      10ng      25          500
-## 230      4.000             25   0       0      10ng      25          500
-##     PRIMERS_RATIO
-## 8   no_RT_PRIMERS
-## 9             640
-## 10            320
-## 11            160
-## 12             80
-## 13             40
-## 14             20
-## 32  no_RT_PRIMERS
-## 33            320
-## 34            160
-## 35             80
-## 36             40
-## 37             20
-## 38             10
-## 56  no_RT_PRIMERS
-## 57            160
-## 58             80
-## 59             40
-## 60             20
-## 61             10
-## 62              5
-## 80  no_RT_PRIMERS
-## 81             80
-## 82             40
-## 83             20
-## 84             10
-## 85              5
-## 86            2.5
-## 104 no_RT_PRIMERS
-## 105            40
-## 106            20
-## 107            10
-## 108             5
-## 109           2.5
-## 110          1.25
-## 128 no_RT_PRIMERS
-## 129            20
-## 130            10
-## 131             5
-## 132           2.5
-## 133          1.25
-## 134         0.625
-## 152 no_RT_PRIMERS
-## 153            10
-## 154             5
-## 155           2.5
-## 156          1.25
-## 157         0.625
-## 158        0.3125
-## 176 no_RT_PRIMERS
-## 177             5
-## 178           2.5
-## 179          1.25
-## 180         0.625
-## 181        0.3125
-## 182       0.15625
-## 200 no_RT_PRIMERS
-## 201           2.5
-## 202          1.25
-## 203         0.625
-## 204        0.3125
-## 205       0.15625
-## 206      0.078125
-## 224 no_RT_PRIMERS
-## 225            80
-## 226            40
-## 227            20
-## 228            10
-## 229             5
-## 230           2.5
+##     BARCODE_Source_Row BARCODE_Source_Col RT_PRIMERS RT_PRIMERS_vol RNA
+## 8                    A                  1      0.000              0  10
+## 9                    A                  2      0.125             25  10
+## 10                   A                  3      0.250             25  10
+## 11                   A                  4      0.500             25  10
+## 12                   A                  5      1.000             25  10
+## 13                   A                  6      2.000             25  10
+## 14                   A                  7      4.000             25  10
+## 32                   B                  1      0.000              0  10
+## 33                   B                  2      0.125             25  10
+## 34                   B                  3      0.250             25  10
+## 35                   B                  4      0.500             25  10
+## 36                   B                  5      1.000             25  10
+## 37                   B                  6      2.000             25  10
+## 38                   B                  7      4.000             25  10
+## 56                   C                  1      0.000              0  10
+## 57                   C                  2      0.125             25  10
+## 58                   C                  3      0.250             25  10
+## 59                   C                  4      0.500             25  10
+## 60                   C                  5      1.000             25  10
+## 61                   C                  6      2.000             25  10
+## 62                   C                  7      4.000             25  10
+## 80                   D                  1      0.000              0  10
+## 81                   D                  2      0.125             25  10
+## 82                   D                  3      0.250             25  10
+## 83                   D                  4      0.500             25  10
+## 84                   D                  5      1.000             25  10
+## 85                   D                  6      2.000             25  10
+## 86                   D                  7      4.000             25  10
+## 104                  E                  1      0.000              0  10
+## 105                  E                  2      0.125             25  10
+## 106                  E                  3      0.250             25  10
+## 107                  E                  4      0.500             25  10
+## 108                  E                  5      1.000             25  10
+## 109                  E                  6      2.000             25  10
+## 110                  E                  7      4.000             25  10
+## 128                  F                  1      0.000              0  10
+## 129                  F                  2      0.125             25  10
+## 130                  F                  3      0.250             25  10
+## 131                  F                  4      0.500             25  10
+## 132                  F                  5      1.000             25  10
+## 133                  F                  6      2.000             25  10
+## 134                  F                  7      4.000             25  10
+## 152                  G                  1      0.000              0  10
+## 153                  G                  2      0.125             25  10
+## 154                  G                  3      0.250             25  10
+## 155                  G                  4      0.500             25  10
+## 156                  G                  5      1.000             25  10
+## 157                  G                  6      2.000             25  10
+## 158                  G                  7      4.000             25  10
+## 176                  H                  1      0.000              0  10
+## 177                  H                  2      0.125             25  10
+## 178                  H                  3      0.250             25  10
+## 179                  H                  4      0.500             25  10
+## 180                  H                  5      1.000             25  10
+## 181                  H                  6      2.000             25  10
+## 182                  H                  7      4.000             25  10
+## 200                  I                  1      0.000              0  10
+## 201                  I                  2      0.125             25  10
+## 202                  I                  3      0.250             25  10
+## 203                  I                  4      0.500             25  10
+## 204                  I                  5      1.000             25  10
+## 205                  I                  6      2.000             25  10
+## 206                  I                  7      4.000             25  10
+## 224                  J                  1      0.000              0   0
+## 225                  J                  2      0.125             25   0
+## 226                  J                  3      0.250             25   0
+## 227                  J                  4      0.500             25   0
+## 228                  J                  5      1.000             25   0
+## 229                  J                  6      2.000             25   0
+## 230                  J                  7      4.000             25   0
+##     RNA_vol RNA_group H2O_vol total_volume PRIMERS_RATIO
+## 8        25      10ng      25          500 no_RT_PRIMERS
+## 9        25      10ng       0          500           640
+## 10       25      10ng       0          500           320
+## 11       25      10ng       0          500           160
+## 12       25      10ng       0          500            80
+## 13       25      10ng       0          500            40
+## 14       25      10ng       0          500            20
+## 32       25      10ng      75          500 no_RT_PRIMERS
+## 33       25      10ng      50          500           320
+## 34       25      10ng      50          500           160
+## 35       25      10ng      50          500            80
+## 36       25      10ng      50          500            40
+## 37       25      10ng      50          500            20
+## 38       25      10ng      50          500            10
+## 56       25      10ng     100          500 no_RT_PRIMERS
+## 57       25      10ng      75          500           160
+## 58       25      10ng      75          500            80
+## 59       25      10ng      75          500            40
+## 60       25      10ng      75          500            20
+## 61       25      10ng      75          500            10
+## 62       25      10ng      75          500             5
+## 80       25      10ng      25          500 no_RT_PRIMERS
+## 81       25      10ng       0          500            80
+## 82       25      10ng       0          500            40
+## 83       25      10ng       0          500            20
+## 84       25      10ng       0          500            10
+## 85       25      10ng       0          500             5
+## 86       25      10ng       0          500           2.5
+## 104      25      10ng      75          500 no_RT_PRIMERS
+## 105      25      10ng      50          500            40
+## 106      25      10ng      50          500            20
+## 107      25      10ng      50          500            10
+## 108      25      10ng      50          500             5
+## 109      25      10ng      50          500           2.5
+## 110      25      10ng      50          500          1.25
+## 128      25      10ng     100          500 no_RT_PRIMERS
+## 129      25      10ng      75          500            20
+## 130      25      10ng      75          500            10
+## 131      25      10ng      75          500             5
+## 132      25      10ng      75          500           2.5
+## 133      25      10ng      75          500          1.25
+## 134      25      10ng      75          500         0.625
+## 152      25      10ng      25          500 no_RT_PRIMERS
+## 153      25      10ng       0          500            10
+## 154      25      10ng       0          500             5
+## 155      25      10ng       0          500           2.5
+## 156      25      10ng       0          500          1.25
+## 157      25      10ng       0          500         0.625
+## 158      25      10ng       0          500        0.3125
+## 176      25      10ng      75          500 no_RT_PRIMERS
+## 177      25      10ng      50          500             5
+## 178      25      10ng      50          500           2.5
+## 179      25      10ng      50          500          1.25
+## 180      25      10ng      50          500         0.625
+## 181      25      10ng      50          500        0.3125
+## 182      25      10ng      50          500       0.15625
+## 200      25      10ng     100          500 no_RT_PRIMERS
+## 201      25      10ng      75          500           2.5
+## 202      25      10ng      75          500          1.25
+## 203      25      10ng      75          500         0.625
+## 204      25      10ng      75          500        0.3125
+## 205      25      10ng      75          500       0.15625
+## 206      25      10ng      75          500      0.078125
+## 224       0      10ng      50          500 no_RT_PRIMERS
+## 225       0      10ng      25          500            80
+## 226       0      10ng      25          500            40
+## 227       0      10ng      25          500            20
+## 228       0      10ng      25          500            10
+## 229       0      10ng      25          500             5
+## 230       0      10ng      25          500           2.5
 ```
 
 
 ```r
-libs <- cbind(libs, plate_10ng_all)
-libs[,24] <- NULL
-#rownames(libs) <- NULL
+libs <- cbind(libs, plate_10ng_all[match(libs$barcode, plate_10ng_all$BARCODE_SEQ),])
 libs$PRIMERS_RATIO <- sub("no_RT_PRIMERS", "NA", libs$PRIMERS_RATIO)
 libs$PRIMERS_RATIO <- as.numeric(libs$PRIMERS_RATIO)
 ```
@@ -884,13 +680,234 @@ libs$PRIMERS_RATIO[is.na(libs$PRIMERS_RATIO)] <- "no_RT_PRIMERS"
 libs$plateID <- "A"
 ```
 
+Control on barcode extraction
+-----------------------------
+
+
+```r
+found_bc <- system("zcat /sequencedata/MiSeq/171227_M00528_0321_000000000-B4GLP/Data/Intensities/BaseCalls/1_S1_L001_R1_001.fastq.gz | sed -n 2~4p | cut -c1-6 | sort | uniq -c", intern = TRUE)
+found_bc <- read.table(text=found_bc)
+colnames(found_bc) <- c("n", "bc")
+found_bc %<>% as.tibble %>% arrange(dplyr::desc(n))
+```
+
+
+```r
+libs$bc_extract_qc <- found_bc$n[match(libs$barcode, found_bc$bc)]
+
+plot( libs$extracted
+    , libs$bc_extract_qc
+    , log = "xy"
+    , xlab = "Extracted with TagDust 2"
+    , ylab = "Counted directly from FASTQ file"
+    , main = "QC of barcode extraction")
+with(libs[libs$extracted / libs$bc_extract_qc > 2,], text(extracted * 2.5, bc_extract_qc, paste(barcode, barcode_ID)))
+```
+
+![](Labcyte-RT_Data_Analysis_files/figure-html/found_known_bcs-1.png)<!-- -->
+
+```r
+libs[libs$extracted / libs$bc_extract_qc > 2,]
+```
+
+```
+##        samplename  group barcode    index total extracted cleaned tagdust
+## CTGTCT     CTGTCT CTGTCT  CTGTCT TAGGCATG     0    231518   60117  145048
+## GAGCGT     GAGCGT GAGCGT  GAGCGT TAGGCATG     0     11654    1146     245
+## CACAGC     CACAGC CACAGC  CACAGC TAGGCATG     0      8329    6011     604
+## CGATAC     CGATAC CGATAC  CGATAC TAGGCATG     0      1633    1032     117
+## CTGCGT     CTGCGT CTGCGT  CTGCGT TAGGCATG     0      1318     973      67
+## GAGATA     GAGATA GAGATA  GAGATA TAGGCATG     0       717     435      54
+##         rdna spikes mapped properpairs counts barcode_ID
+## CTGTCT 26325     28  42593       30380   7757         53
+## GAGCGT 10262      1    787         519    202         59
+## CACAGC  1710      4   4673        3616   1346         29
+## CGATAC   483      1    581         339    166         43
+## CTGCGT   278      0    640         396    170         50
+## GAGATA   228      0    276         200    108         57
+##                                                                                                                                                                             inputFiles
+## CTGTCT /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments/CTGTCT.bed
+## GAGCGT /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments/GAGCGT.bed
+## CACAGC /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments/CACAGC.bed
+## CGATAC /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments/CGATAC.bed
+## CTGCGT /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments/CTGCGT.bed
+## GAGATA /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments/GAGATA.bed
+##        inputFilesType sampleLabels well row col MASTER_MIX_vol    TSO
+## CTGTCT            bed       CTGTCT  H11   H  11            350 0.6250
+## GAGCGT            bed       GAGCGT  I10   I  10            350 0.3125
+## CACAGC            bed       CACAGC  E08   E   8            350 5.0000
+## CGATAC            bed       CGATAC  G08   G   8            350 1.2500
+## CTGCGT            bed       CTGCGT  H08   H   8            350 0.6250
+## GAGATA            bed       GAGATA  I08   I   8            350 0.3125
+##        TSO_vol BARCODE_ID BARCODE_SEQ BARCODE_Source_Row
+## CTGTCT      50         53      CTGTCT                  H
+## GAGCGT      25         59      GAGCGT                  I
+## CACAGC      50         29      CACAGC                  E
+## CGATAC     100         43      CGATAC                  G
+## CTGCGT      50         50      CTGCGT                  H
+## GAGATA      25         57      GAGATA                  I
+##        BARCODE_Source_Col RT_PRIMERS RT_PRIMERS_vol RNA RNA_vol RNA_group
+## CTGTCT                  4       0.50             25  10      25      10ng
+## GAGCGT                  3       0.25             25  10      25      10ng
+## CACAGC                  1       0.00              0  10      25      10ng
+## CGATAC                  1       0.00              0  10      25      10ng
+## CTGCGT                  1       0.00              0  10      25      10ng
+## GAGATA                  1       0.00              0  10      25      10ng
+##        H2O_vol total_volume PRIMERS_RATIO plateID bc_extract_qc
+## CTGTCT      50          500          1.25       A         88635
+## GAGCGT      75          500          1.25       A           758
+## CACAGC      75          500 no_RT_PRIMERS       A          1783
+## CGATAC      25          500 no_RT_PRIMERS       A           397
+## CTGCGT      75          500 no_RT_PRIMERS       A           451
+## GAGATA     100          500 no_RT_PRIMERS       A            87
+```
+
+
+```r
+found_bc$in_libs <- found_bc$bc %in% libs$barcode
+found_bc$known   <- found_bc$bc %in% nanoCAGE2017barcodes$barcodes
+
+hist(log10(found_bc$n), breaks = "fd")
+rug(log10(libs$bc_extract_qc))
+abline(v=log10(2e3), col = "grey")
+```
+
+![](Labcyte-RT_Data_Analysis_files/figure-html/found_unknown_bcs-1.png)<!-- -->
+
+True nanoCAGE barcodes that were not used in this experiment are very rare
+in the sequence files.
+
+
+```r
+found_bc %>% filter(known, !in_libs) %>% as.data.frame()
+```
+
+```
+##      n     bc in_libs known
+## 1  333 GCTGCA   FALSE  TRUE
+## 2  118 GTAGCA   FALSE  TRUE
+## 3   81 TATCAG   FALSE  TRUE
+## 4   74 TCGACG   FALSE  TRUE
+## 5   69 GTAGAT   FALSE  TRUE
+## 6   67 TATAGC   FALSE  TRUE
+## 7   67 TATGCA   FALSE  TRUE
+## 8   44 GTAGTG   FALSE  TRUE
+## 9   40 TCGAGC   FALSE  TRUE
+## 10  30 TATGAT   FALSE  TRUE
+## 11  30 TCGCAG   FALSE  TRUE
+## 12  26 GTACGT   FALSE  TRUE
+## 13  25 TATACG   FALSE  TRUE
+## 14  24 GCTGTG   FALSE  TRUE
+## 15  22 GTACAG   FALSE  TRUE
+## 16  17 TCGATA   FALSE  TRUE
+## 17  15 TATCTC   FALSE  TRUE
+## 18  14 TATGTG   FALSE  TRUE
+## 19  14 TCGCGT   FALSE  TRUE
+## 20   8 TATCGT   FALSE  TRUE
+## 21   7 GTATCT   FALSE  TRUE
+## 22   5 TCGCTC   FALSE  TRUE
+## 23   4 GTACTC   FALSE  TRUE
+## 24   2 GTATAC   FALSE  TRUE
+## 25   2 TATATA   FALSE  TRUE
+```
+
+Conversely, barcodes that are highly abundant but not used in the experiment
+are not true nanoCAGE barcodes.  They may be related to higly abundant true
+barcodes.
+
+
+```r
+found_bc %>% filter(!in_libs, n > 2e3) %>% as.data.frame
+```
+
+```
+##        n     bc in_libs known
+## 1  94905 TGGGCA   FALSE FALSE
+## 2  64818 CCTGTC   FALSE FALSE
+## 3  33512 CACACA   FALSE FALSE
+## 4  20717 CACCTG   FALSE FALSE
+## 5  16126 ACTGTC   FALSE FALSE
+## 6  10444 CGAGCG   FALSE FALSE
+## 7   6097 ATCCTG   FALSE FALSE
+## 8   4887 GGCGCG   FALSE FALSE
+## 9   4886 CACATG   FALSE FALSE
+## 10  4571 CACTCC   FALSE FALSE
+## 11  4138 CACACC   FALSE FALSE
+## 12  4122 GCTGTC   FALSE FALSE
+## 13  4081 ACCTGT   FALSE FALSE
+## 14  4040 CACACT   FALSE FALSE
+## 15  3902 ACAGGG   FALSE FALSE
+## 16  3891 CATACG   FALSE FALSE
+## 17  3750 ACAGCT   FALSE FALSE
+## 18  3531 TAGAGC   FALSE FALSE
+## 19  3312 GCCTGT   FALSE FALSE
+## 20  3112 ACACCT   FALSE FALSE
+## 21  2980 ATCTGC   FALSE FALSE
+## 22  2930 CACTGT   FALSE FALSE
+## 23  2848 TACACG   FALSE FALSE
+## 24  2437 AACTGC   FALSE FALSE
+## 25  2399 CAAGCA   FALSE FALSE
+## 26  2311 AGGGCA   FALSE FALSE
+## 27  2085 AACACG   FALSE FALSE
+```
+
+```r
+found_bc[found_bc$bc %in% nanoCAGE2017barcodes$barcodes[agrep("TGGGCA", nanoCAGE2017barcodes$barcodes, max = 2)],]
+```
+
+```
+## # A tibble: 11 x 4
+##         n bc     in_libs known
+##     <int> <fct>  <lgl>   <lgl>
+##  1 424209 AGTGCA TRUE    TRUE 
+##  2 131898 CGAGCA TRUE    TRUE 
+##  3  88101 CTGCAG TRUE    TRUE 
+##  4  43584 ATCGCA TRUE    TRUE 
+##  5  30915 CTGAGC TRUE    TRUE 
+##  6  28267 CTGTGA TRUE    TRUE 
+##  7   9915 GAGCAG TRUE    TRUE 
+##  8    333 GCTGCA FALSE   TRUE 
+##  9    118 GTAGCA FALSE   TRUE 
+## 10     67 TATGCA FALSE   TRUE 
+## 11     30 TCGCAG FALSE   TRUE
+```
+
+```r
+found_bc[found_bc$bc %in% nanoCAGE2017barcodes$barcodes[agrep("CCTGTC", nanoCAGE2017barcodes$barcodes, max = 1)],]
+```
+
+```
+## # A tibble: 1 x 4
+##       n bc     in_libs known
+##   <int> <fct>  <lgl>   <lgl>
+## 1 88635 CTGTCT TRUE    TRUE
+```
+
+```r
+found_bc[found_bc$bc %in% nanoCAGE2017barcodes$barcodes[agrep("CACACA", nanoCAGE2017barcodes$barcodes, max = 1)],]
+```
+
+```
+## # A tibble: 4 x 4
+##         n bc     in_libs known
+##     <int> <fct>  <lgl>   <lgl>
+## 1 1330195 CACACG TRUE    TRUE 
+## 2  166687 CACGCA TRUE    TRUE 
+## 3   44520 CACATA TRUE    TRUE 
+## 4   37589 ACACAG TRUE    TRUE
+```
+
+It might be possible that the HMM of TagDust has autocorrected some of the
+errors, which would explain why some barcodes were detcted in larger amounts
+with TagDust2.
+
 Create a CAGEexp object and load expression data
 ------------------------------------------------
 
 
 ```r
 ce <- CAGEexp(colData = DataFrame(libs)
-                     , metadata = list( genomeName = BS_GENOME
+                     , metadata = list( genomeName = "BSgenome.Mmusculus.UCSC.mm9"
                                         , inputFilesType = "bed"))
 
 getCTSS(ce, useMulticore = TRUE)
