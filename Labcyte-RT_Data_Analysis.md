@@ -27,61 +27,6 @@ library(dplyr)
 ```
 
 ```
-## The following object is masked from 'package:reshape':
-## 
-##     rename
-```
-
-```
-## The following object is masked from 'package:matrixStats':
-## 
-##     count
-```
-
-```
-## The following object is masked from 'package:Biobase':
-## 
-##     combine
-```
-
-```
-## The following objects are masked from 'package:GenomicRanges':
-## 
-##     intersect, setdiff, union
-```
-
-```
-## The following object is masked from 'package:GenomeInfoDb':
-## 
-##     intersect
-```
-
-```
-## The following objects are masked from 'package:IRanges':
-## 
-##     collapse, desc, intersect, setdiff, slice, union
-```
-
-```
-## The following objects are masked from 'package:S4Vectors':
-## 
-##     first, intersect, rename, setdiff, setequal, union
-```
-
-```
-## The following objects are masked from 'package:BiocGenerics':
-## 
-##     combine, intersect, setdiff, union
-```
-
-```
-## The following objects are masked from 'package:plyr':
-## 
-##     arrange, count, desc, failwith, id, mutate, rename, summarise,
-##     summarize
-```
-
-```
 ## The following objects are masked from 'package:data.table':
 ## 
 ##     between, first, last
@@ -102,14 +47,291 @@ library(dplyr)
 ```r
 library(ggplot2)
 library(gplots)
+```
+
+```
+## 
+## Attaching package: 'gplots'
+```
+
+```
+## The following object is masked from 'package:stats':
+## 
+##     lowess
+```
+
+```r
 library('RColorBrewer')
 library(magrittr)
 library(plyr)
+```
+
+```
+## -------------------------------------------------------------------------
+```
+
+```
+## You have loaded plyr after dplyr - this is likely to cause problems.
+## If you need functions from both plyr and dplyr, please load plyr first, then dplyr:
+## library(plyr); library(dplyr)
+```
+
+```
+## -------------------------------------------------------------------------
+```
+
+```
+## 
+## Attaching package: 'plyr'
+```
+
+```
+## The following objects are masked from 'package:dplyr':
+## 
+##     arrange, count, desc, failwith, id, mutate, rename, summarise,
+##     summarize
+```
+
+```r
 library(MultiAssayExperiment)
 library(SummarizedExperiment)
+```
+
+```
+## Loading required package: GenomicRanges
+```
+
+```
+## Loading required package: stats4
+```
+
+```
+## Loading required package: BiocGenerics
+```
+
+```
+## Loading required package: parallel
+```
+
+```
+## 
+## Attaching package: 'BiocGenerics'
+```
+
+```
+## The following objects are masked from 'package:parallel':
+## 
+##     clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
+##     clusterExport, clusterMap, parApply, parCapply, parLapply,
+##     parLapplyLB, parRapply, parSapply, parSapplyLB
+```
+
+```
+## The following objects are masked from 'package:dplyr':
+## 
+##     combine, intersect, setdiff, union
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     IQR, mad, sd, var, xtabs
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     anyDuplicated, append, as.data.frame, basename, cbind,
+##     colMeans, colnames, colSums, dirname, do.call, duplicated,
+##     eval, evalq, Filter, Find, get, grep, grepl, intersect,
+##     is.unsorted, lapply, lengths, Map, mapply, match, mget, order,
+##     paste, pmax, pmax.int, pmin, pmin.int, Position, rank, rbind,
+##     Reduce, rowMeans, rownames, rowSums, sapply, setdiff, sort,
+##     table, tapply, union, unique, unsplit, which, which.max,
+##     which.min
+```
+
+```
+## Loading required package: S4Vectors
+```
+
+```
+## 
+## Attaching package: 'S4Vectors'
+```
+
+```
+## The following object is masked from 'package:plyr':
+## 
+##     rename
+```
+
+```
+## The following object is masked from 'package:gplots':
+## 
+##     space
+```
+
+```
+## The following objects are masked from 'package:dplyr':
+## 
+##     first, rename
+```
+
+```
+## The following objects are masked from 'package:data.table':
+## 
+##     first, second
+```
+
+```
+## The following object is masked from 'package:base':
+## 
+##     expand.grid
+```
+
+```
+## Loading required package: IRanges
+```
+
+```
+## 
+## Attaching package: 'IRanges'
+```
+
+```
+## The following object is masked from 'package:plyr':
+## 
+##     desc
+```
+
+```
+## The following objects are masked from 'package:dplyr':
+## 
+##     collapse, desc, slice
+```
+
+```
+## The following object is masked from 'package:data.table':
+## 
+##     shift
+```
+
+```
+## Loading required package: GenomeInfoDb
+```
+
+```
+## Loading required package: Biobase
+```
+
+```
+## Welcome to Bioconductor
+## 
+##     Vignettes contain introductory material; view with
+##     'browseVignettes()'. To cite Bioconductor, see
+##     'citation("Biobase")', and for packages 'citation("pkgname")'.
+```
+
+```
+## Loading required package: DelayedArray
+```
+
+```
+## Loading required package: matrixStats
+```
+
+```
+## 
+## Attaching package: 'matrixStats'
+```
+
+```
+## The following objects are masked from 'package:Biobase':
+## 
+##     anyMissing, rowMedians
+```
+
+```
+## The following object is masked from 'package:plyr':
+## 
+##     count
+```
+
+```
+## The following object is masked from 'package:dplyr':
+## 
+##     count
+```
+
+```
+## 
+## Attaching package: 'DelayedArray'
+```
+
+```
+## The following objects are masked from 'package:matrixStats':
+## 
+##     colMaxs, colMins, colRanges, rowMaxs, rowMins, rowRanges
+```
+
+```
+## The following object is masked from 'package:base':
+## 
+##     apply
+```
+
+```r
 library(tibble)
 library(reshape)
+```
+
+```
+## 
+## Attaching package: 'reshape'
+```
+
+```
+## The following objects are masked from 'package:S4Vectors':
+## 
+##     expand, rename
+```
+
+```
+## The following objects are masked from 'package:plyr':
+## 
+##     rename, round_any
+```
+
+```
+## The following object is masked from 'package:dplyr':
+## 
+##     rename
+```
+
+```
+## The following object is masked from 'package:data.table':
+## 
+##     melt
+```
+
+```r
 library(vegan)
+```
+
+```
+## Loading required package: permute
+```
+
+```
+## Loading required package: lattice
+```
+
+```
+## This is vegan 2.4-5
+```
+
+```r
 data("nanoCAGE2017barcodes", package = "smallCAGEqc")
 ```
 
@@ -674,8 +896,6 @@ libs$PRIMERS_RATIO <- as.numeric(libs$PRIMERS_RATIO)
 
 ```r
 libs$RNA <- as.numeric(libs$RNA)
-libs <- libs[order(-libs$PRIMERS_RATIO),]
-libs <- libs[order(-libs$RNA),]
 libs$PRIMERS_RATIO[is.na(libs$PRIMERS_RATIO)] <- "no_RT_PRIMERS"
 libs$plateID <- "A"
 ```
@@ -712,54 +932,54 @@ libs[libs$extracted / libs$bc_extract_qc > 2,]
 
 ```
 ##        samplename  group barcode    index total extracted cleaned tagdust
-## CTGTCT     CTGTCT CTGTCT  CTGTCT TAGGCATG     0    231518   60117  145048
-## GAGCGT     GAGCGT GAGCGT  GAGCGT TAGGCATG     0     11654    1146     245
 ## CACAGC     CACAGC CACAGC  CACAGC TAGGCATG     0      8329    6011     604
 ## CGATAC     CGATAC CGATAC  CGATAC TAGGCATG     0      1633    1032     117
 ## CTGCGT     CTGCGT CTGCGT  CTGCGT TAGGCATG     0      1318     973      67
+## CTGTCT     CTGTCT CTGTCT  CTGTCT TAGGCATG     0    231518   60117  145048
 ## GAGATA     GAGATA GAGATA  GAGATA TAGGCATG     0       717     435      54
+## GAGCGT     GAGCGT GAGCGT  GAGCGT TAGGCATG     0     11654    1146     245
 ##         rdna spikes mapped properpairs counts barcode_ID
-## CTGTCT 26325     28  42593       30380   7757         53
-## GAGCGT 10262      1    787         519    202         59
 ## CACAGC  1710      4   4673        3616   1346         29
 ## CGATAC   483      1    581         339    166         43
 ## CTGCGT   278      0    640         396    170         50
+## CTGTCT 26325     28  42593       30380   7757         53
 ## GAGATA   228      0    276         200    108         57
+## GAGCGT 10262      1    787         519    202         59
 ##                                                                                                                                                                             inputFiles
-## CTGTCT /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments/CTGTCT.bed
-## GAGCGT /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments/GAGCGT.bed
 ## CACAGC /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments/CACAGC.bed
 ## CGATAC /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments/CGATAC.bed
 ## CTGCGT /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments/CTGCGT.bed
+## CTGTCT /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments/CTGTCT.bed
 ## GAGATA /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments/GAGATA.bed
+## GAGCGT /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/CAGEscan_fragments/GAGCGT.bed
 ##        inputFilesType sampleLabels well row col MASTER_MIX_vol    TSO
-## CTGTCT            bed       CTGTCT  H11   H  11            350 0.6250
-## GAGCGT            bed       GAGCGT  I10   I  10            350 0.3125
 ## CACAGC            bed       CACAGC  E08   E   8            350 5.0000
 ## CGATAC            bed       CGATAC  G08   G   8            350 1.2500
 ## CTGCGT            bed       CTGCGT  H08   H   8            350 0.6250
+## CTGTCT            bed       CTGTCT  H11   H  11            350 0.6250
 ## GAGATA            bed       GAGATA  I08   I   8            350 0.3125
+## GAGCGT            bed       GAGCGT  I10   I  10            350 0.3125
 ##        TSO_vol BARCODE_ID BARCODE_SEQ BARCODE_Source_Row
-## CTGTCT      50         53      CTGTCT                  H
-## GAGCGT      25         59      GAGCGT                  I
 ## CACAGC      50         29      CACAGC                  E
 ## CGATAC     100         43      CGATAC                  G
 ## CTGCGT      50         50      CTGCGT                  H
+## CTGTCT      50         53      CTGTCT                  H
 ## GAGATA      25         57      GAGATA                  I
+## GAGCGT      25         59      GAGCGT                  I
 ##        BARCODE_Source_Col RT_PRIMERS RT_PRIMERS_vol RNA RNA_vol RNA_group
-## CTGTCT                  4       0.50             25  10      25      10ng
-## GAGCGT                  3       0.25             25  10      25      10ng
 ## CACAGC                  1       0.00              0  10      25      10ng
 ## CGATAC                  1       0.00              0  10      25      10ng
 ## CTGCGT                  1       0.00              0  10      25      10ng
+## CTGTCT                  4       0.50             25  10      25      10ng
 ## GAGATA                  1       0.00              0  10      25      10ng
+## GAGCGT                  3       0.25             25  10      25      10ng
 ##        H2O_vol total_volume PRIMERS_RATIO plateID bc_extract_qc
-## CTGTCT      50          500          1.25       A         88635
-## GAGCGT      75          500          1.25       A           758
 ## CACAGC      75          500 no_RT_PRIMERS       A          1783
 ## CGATAC      25          500 no_RT_PRIMERS       A           397
 ## CTGCGT      75          500 no_RT_PRIMERS       A           451
+## CTGTCT      50          500          1.25       A         88635
 ## GAGATA     100          500 no_RT_PRIMERS       A            87
+## GAGCGT      75          500          1.25       A           758
 ```
 
 
@@ -901,6 +1121,7 @@ It might be possible that the HMM of TagDust has autocorrected some of the
 errors, which would explain why some barcodes were detcted in larger amounts
 with TagDust2.
 
+
 Create a CAGEexp object and load expression data
 ------------------------------------------------
 
@@ -915,6 +1136,7 @@ removeStrandInvaders(ce)
 normalizeTagCount(ce, method = "simpleTpm")
 ```
 
+
 Save the CAGEexp file
 ---------------------
 
@@ -923,88 +1145,14 @@ Save the CAGEexp file
 saveRDS(ce, "Labcyte-RT_Data_Analysis.Rds")
 ```
 
-Number of sequencing reads extracted per sample
------------------------------------------------
+
+Annotation with GENCODE
+-----------------------
 
 
 ```r
-data.frame(colData(ce)[,"extracted",drop=F])
+annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
 ```
-
-```
-##        extracted
-## ACACGT     39556
-## ACACTC    159844
-## ACATGA     32474
-## ACAGAT    138710
-## AGTACG     14180
-## AGTGAT    168934
-## ACAGCA    158662
-## AGTAGC     56598
-## AGTGCA    428768
-## ATCGCA     43925
-## ACAGTG    218169
-## AGTATA     15195
-## AGTGTG     16988
-## ATCGTG      5852
-## CACATA     49911
-## ACATAC    252993
-## AGTCAG     18231
-## ATCACG     11697
-## ATCTAC     61931
-## CACGAT     14078
-## CGACAG      5787
-## AGTCGT     42894
-## ATCAGC   1053249
-## ATCTCT      7558
-## CACGCA    168925
-## CGACGT     50902
-## CGATCT     26817
-## ATCATA     17945
-## ATCTGA    198657
-## CACGTG     30261
-## CGACTC    151581
-## CGATGA      3492
-## CTGCTC     12831
-## CACACG   1333918
-## CACTAC    551765
-## CGAGAT    270601
-## CTGACG     15719
-## CTGTAC      7689
-## GAGCAG     11251
-## CACTCT    399697
-## CGAGCA    135396
-## CTGAGC     31942
-## CTGTCT    231518
-## GAGCGT     11654
-## CGAGTG     43603
-## CTGATA     45389
-## CTGTGA     29711
-## GAGCTC     19222
-## CTGCAG     92305
-## GAGACG     10894
-## GAGTAC       917
-## GAGAGC     92220
-## GAGTCT      2006
-## GAGTGA     17132
-## ACACAG     42054
-## ACATCT     33745
-## AGTCTC      3059
-## ATCGAT     10403
-## CACAGC      8329
-## CACTGA      6506
-## CGATAC      1633
-## CTGCGT      1318
-## GAGATA       717
-## GCTAGC      1895
-## GCTATA      1206
-## GCTCAG      2855
-## GCTCGT      3098
-## GCTCTC      4055
-## GCTGAT     23130
-## GCTACG       915
-```
-
 
 Quality controls
 ================
@@ -1099,6 +1247,97 @@ ggpubr::ggarrange(
 
 ![](Labcyte-RT_Data_Analysis_files/figure-html/qc_rt_primer_quantity-1.png)<!-- -->
 
+% invaders increases when [RT primers] decreases, reaching a maximum at 0.  This
+suggests that demultiplexing is consistent.  But why do we see a high promoter
+rate in the RT primer-negative controls ?  If the only primers available are the
+TSOs, then some spurious intergenic counts should be found.  If RNAs self-primed,
+then how could they be amplified during the cDNA PCR ?
+
+
+```r
+ggpubr::ggarrange(
+  plotAnnot( ce, scope = msScope_counts, group = "RT_PRIMERS", normalise = FALSE
+           , title = "sequence counts"
+           , facet="plateID") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_counts, group = "RT_PRIMERS", normalise = TRUE
+         , title = "normalised to 100 %"
+         , facet="plateID") +
+  facet_wrap(~facet, ncol = 1),
+  legend = "right",
+  common.legend = TRUE
+)
+```
+
+![](Labcyte-RT_Data_Analysis_files/figure-html/qc_rt_primer_quantity_annot-1.png)<!-- -->
+
+
+```r
+plotAnnot( ce
+         , scope = msScope_qcSI
+         , group = "TSO", facet = "RT_PRIMERS")
+```
+
+```
+## Warning: Removed 504 rows containing missing values (geom_segment).
+```
+
+```
+## Warning: Removed 504 rows containing missing values (geom_point).
+```
+
+![](Labcyte-RT_Data_Analysis_files/figure-html/qc_rt_primer_tso-1.png)<!-- -->
+
+
+```r
+plotAnnot( ce
+         , scope = msScope_counts
+         , group = "TSO", facet = "RT_PRIMERS")
+```
+
+```
+## Warning: Removed 315 rows containing missing values (geom_segment).
+```
+
+```
+## Warning: Removed 315 rows containing missing values (geom_point).
+```
+
+![](Labcyte-RT_Data_Analysis_files/figure-html/qc_rt_primer_tso_annot-1.png)<!-- -->
+
+
+```r
+plotAnnot( ce
+         , scope = msScope_qcSI
+         , group = "RT_PRIMERS", facet = "TSO")
+```
+
+```
+## Warning: Removed 504 rows containing missing values (geom_segment).
+```
+
+```
+## Warning: Removed 504 rows containing missing values (geom_point).
+```
+
+![](Labcyte-RT_Data_Analysis_files/figure-html/qc_tso_rt_primer-1.png)<!-- -->
+
+
+```r
+plotAnnot( ce
+         , scope = msScope_counts
+         , group = "RT_PRIMERS", facet = "TSO")
+```
+
+```
+## Warning: Removed 315 rows containing missing values (geom_segment).
+```
+
+```
+## Warning: Removed 315 rows containing missing values (geom_point).
+```
+
+![](Labcyte-RT_Data_Analysis_files/figure-html/qc_tso_rt_primer_annot-1.png)<!-- -->
 
 ### Removal of the primer-negative controls
 
@@ -1180,12 +1419,6 @@ Create CTSS clusters
 
 Annotation with GENCODE
 -----------------------
-
-
-```r
-annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
-```
-
 
 
 ```r

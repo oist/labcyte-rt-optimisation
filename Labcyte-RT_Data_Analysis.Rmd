@@ -82,8 +82,6 @@ libs <- cbind(libs, plate_10ng_all[match(libs$barcode, plate_10ng_all$BARCODE_SE
 libs$PRIMERS_RATIO <- sub("no_RT_PRIMERS", "NA", libs$PRIMERS_RATIO)
 libs$PRIMERS_RATIO <- as.numeric(libs$PRIMERS_RATIO)
 libs$RNA <- as.numeric(libs$RNA)
-libs <- libs[order(-libs$PRIMERS_RATIO),]
-libs <- libs[order(-libs$RNA),]
 libs$PRIMERS_RATIO[is.na(libs$PRIMERS_RATIO)] <- "no_RT_PRIMERS"
 libs$plateID <- "A"
 ```
@@ -145,6 +143,7 @@ It might be possible that the HMM of TagDust has autocorrected some of the
 errors, which would explain why some barcodes were detcted in larger amounts
 with TagDust2.
 
+
 Create a CAGEexp object and load expression data
 ------------------------------------------------
 
@@ -158,6 +157,7 @@ removeStrandInvaders(ce)
 normalizeTagCount(ce, method = "simpleTpm")
 ```
 
+
 Save the CAGEexp file
 ---------------------
 
@@ -165,13 +165,13 @@ Save the CAGEexp file
 saveRDS(ce, "Labcyte-RT_Data_Analysis.Rds")
 ```
 
-Number of sequencing reads extracted per sample
------------------------------------------------
 
-```{r sample stats}
-data.frame(colData(ce)[,"extracted",drop=F])
+Annotation with GENCODE
+-----------------------
+
+```{r annotate_CTSS, dependson = "get_CTSS_data"}
+annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
 ```
-
 
 Quality controls
 ================
@@ -252,6 +252,50 @@ ggpubr::ggarrange(
 )
 ```
 
+% invaders increases when [RT primers] decreases, reaching a maximum at 0.  This
+suggests that demultiplexing is consistent.  But why do we see a high promoter
+rate in the RT primer-negative controls ?  If the only primers available are the
+TSOs, then some spurious intergenic counts should be found.  If RNAs self-primed,
+then how could they be amplified during the cDNA PCR ?
+
+```{r qc_rt_primer_quantity_annot, dependson = "remove_noRNA_ctls"}
+ggpubr::ggarrange(
+  plotAnnot( ce, scope = msScope_counts, group = "RT_PRIMERS", normalise = FALSE
+           , title = "sequence counts"
+           , facet="plateID") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_counts, group = "RT_PRIMERS", normalise = TRUE
+         , title = "normalised to 100 %"
+         , facet="plateID") +
+  facet_wrap(~facet, ncol = 1),
+  legend = "right",
+  common.legend = TRUE
+)
+```
+
+```{r qc_rt_primer_tso, dependson = "remove_noRNA_ctls"}
+plotAnnot( ce
+         , scope = msScope_qcSI
+         , group = "TSO", facet = "RT_PRIMERS")
+```
+
+```{r qc_rt_primer_tso_annot, dependson = "remove_noRNA_ctls"}
+plotAnnot( ce
+         , scope = msScope_counts
+         , group = "TSO", facet = "RT_PRIMERS")
+```
+
+```{r qc_tso_rt_primer, dependson = "remove_noRNA_ctls"}
+plotAnnot( ce
+         , scope = msScope_qcSI
+         , group = "RT_PRIMERS", facet = "TSO")
+```
+
+```{r qc_tso_rt_primer_annot, dependson = "remove_noRNA_ctls"}
+plotAnnot( ce
+         , scope = msScope_counts
+         , group = "RT_PRIMERS", facet = "TSO")
+```
 
 ### Removal of the primer-negative controls
 
@@ -318,11 +362,6 @@ Create CTSS clusters
 
 Annotation with GENCODE
 -----------------------
-
-```{r annotate_CTSS, dependson = "get_CTSS_data"}
-annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
-```
-
 
 ```{r CTSS_annotation_plot_per_replicate, dependson = "annotate_CTSS"}
 ggpubr::ggarrange(
