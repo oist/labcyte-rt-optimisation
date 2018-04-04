@@ -189,6 +189,16 @@ plate %<>%
 plate$BARCODE_SEQ <- nanoCAGE2017barcodes[plate$BARCODE_ID,1]
 ```
 
+```{r BARCODE_Source_Row}
+plate$BARCODE_Source_Row <- plate$BARCODE_ID %>% factor
+levels(plate$BARCODE_Source_Row) <- lapply(LETTERS[1:10], rep, 7) %>% unlist
+```
+
+```{r BARCODE_Source_Col}
+plate$BARCODE_Source_Col <- plate$BARCODE_ID %>% factor
+levels(plate$BARCODE_Source_Col) <- rep(1:7, 10)
+```
+
 RT_PRIMERS
 ===========
 
@@ -490,12 +500,7 @@ Summary
 =======
 
 ```{r plate_summary}
-plate 
 summary(plate)
-length(which(plate$total_volume != "NA")) 
-sum(is.na(plate$total_volume))
-count(plate$BARCODE_ID)
-plate$PRIMERS_RATIO
 write.table(plate, "plate.txt", sep = "\t", quote = FALSE, row.names = FALSE)
 ```
 
@@ -529,6 +534,16 @@ TSO
 
 ```{r plot_barcode_IDs}
 (plot_BARCODES <- plateMap("BARCODE_ID", "Barcode ID"))
+```
+
+```{r plot_TSO_source_Row}
+(plot_RNA_group <- platetools::raw_map(plate[["BARCODE_Source_Row"]], well=plate$well, plate="384") +
+  ggtitle("Barcode source row"))
+```
+
+```{r plot_TSO_source_Col}
+(plot_RNA_group <- platetools::raw_map(plate[["BARCODE_Source_Col"]], well=plate$well, plate="384") +
+  ggtitle("Barcode source col"))
 ```
 
 ![](images/destination_TSO_2.JPG)
