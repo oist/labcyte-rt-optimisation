@@ -296,7 +296,7 @@ Transfer file for TSOs
 ## Source plate layout
 
 ```{r sourcePlate}
-nanoCAGE2017barcodes$well <- unlist(lapply(LETTERS[1:8 * 2 -1], function(x) paste(x, sprintf("%02d", 1:12), sep = "")))
+nanoCAGE2017barcodes$well <- unlist(lapply(LETTERS[1:8], function(x) paste(x, sprintf("%02d", 1:12), sep = "")))
 
 source <- tibble(well = platetools::num_to_well(1:384, plate = "384"))
 
