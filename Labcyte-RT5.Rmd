@@ -340,10 +340,12 @@ echo
 transfers <- as.data.frame(echo %>% showLogs)
 transfers <- transfers[order(transfers$from),]
 
+colnames(transfers) <- c("Source well", "Destination well", "Transfer volume", "what")
+
 transfers
 
-write.table( transfers[,1:3], file = "Exp5_plate2_csv"
-           , quote = FALSE, row.names = FALSE, col.names = FALSE, sep = ",")
+write.table( transfers[,1:3], file = "Exp5_plate2.csv"
+           , quote = FALSE, row.names = FALSE, col.names = TRUE, sep = ",")
 ```
 
 ## Session information
