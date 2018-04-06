@@ -40,9 +40,9 @@ MOIRAI shortcuts
 
 
 ```r
-MISEQ_RUN      <- "180215_M00528_0330_000000000-B4GPD_p456"
+MISEQ_RUN      <- "180403_M00528_0348_000000000-B4GP8_p456"
 WORKFLOW       <- "OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1"
-MOIRAI_STAMP   <- "20180219140315"
+MOIRAI_STAMP   <- "20180404163455"
 MOIRAI_PROJ    <- "project/Labcyte" 
 MOIRAI_USER    <- "nanoCAGE2" 
 ASSEMBLY       <- "mm9"
@@ -97,7 +97,7 @@ ce
 ```
 
 ```
-## DataFrame with 1005 rows and 18 columns
+## DataFrame with 1044 rows and 18 columns
 ##                        samplename    group  barcode    index     total
 ##                          <factor> <factor> <factor> <factor> <numeric>
 ## ACACAG_TAAGGCGA_H ACACAG_TAAGGCGA    100ng   ACACAG TAAGGCGA         0
@@ -113,43 +113,43 @@ ce
 ## GCTGAT_TGCAGCTA_J GCTGAT_TGCAGCTA     10pg   GCTGAT TGCAGCTA         0
 ##                   extracted   cleaned   tagdust      rdna    spikes
 ##                   <numeric> <numeric> <numeric> <numeric> <numeric>
-## ACACAG_TAAGGCGA_H       666       540         0       103        23
-## ACACGT_TAAGGCGA_H       514       410         0        83        21
-## ACACTC_TAAGGCGA_H      1690      1401         3       225        61
-## ACAGAT_TAAGGCGA_H      1132       896         1       179        56
-## ACAGCA_TAAGGCGA_H      1551      1243         8       254        46
+## ACACAG_TAAGGCGA_H      3113      2530       341       176        66
+## ACACGT_TAAGGCGA_H      2993      2250       319       369        55
+## ACACTC_TAAGGCGA_H      8037      6154       895       819       169
+## ACAGAT_TAAGGCGA_H      6365      4804       726       700       135
+## ACAGCA_TAAGGCGA_H      6944      4854       777      1160       153
 ## ...                     ...       ...       ...       ...       ...
-## GCTATA_TGCAGCTA_J        11         5         4         2         0
-## GCTCAG_TGCAGCTA_J        79        60        10         7         2
-## GCTCGT_TGCAGCTA_J        92        62        16        11         3
-## GCTCTC_TGCAGCTA_J       117        84        21        10         2
-## GCTGAT_TGCAGCTA_J       579       417        84        53        25
+## GCTATA_TGCAGCTA_J       110        32        76         1         1
+## GCTCAG_TGCAGCTA_J       680       155       500        21         4
+## GCTCGT_TGCAGCTA_J      1046       241       785        15         5
+## GCTCTC_TGCAGCTA_J      1007       257       732        12         6
+## GCTGAT_TGCAGCTA_J      7768      1737      5952        43        36
 ##                      mapped properpairs    counts
 ##                   <numeric>   <numeric> <numeric>
-## ACACAG_TAAGGCGA_H       540         151       150
-## ACACGT_TAAGGCGA_H       410         100       100
-## ACACTC_TAAGGCGA_H      1401         349       349
-## ACAGAT_TAAGGCGA_H       896         251       250
-## ACAGCA_TAAGGCGA_H      1243         319       317
+## ACACAG_TAAGGCGA_H      2530         995         0
+## ACACGT_TAAGGCGA_H      2250        1290         0
+## ACACTC_TAAGGCGA_H      6154        2677         0
+## ACAGAT_TAAGGCGA_H      4804        2966         0
+## ACAGCA_TAAGGCGA_H      4854        2793         0
 ## ...                     ...         ...       ...
-## GCTATA_TGCAGCTA_J         5           1         1
-## GCTCAG_TGCAGCTA_J        60          12        12
-## GCTCGT_TGCAGCTA_J        62           7         7
-## GCTCTC_TGCAGCTA_J        84          19        19
-## GCTGAT_TGCAGCTA_J       417          57        57
+## GCTATA_TGCAGCTA_J        32           5         0
+## GCTCAG_TGCAGCTA_J       155          29         0
+## GCTCGT_TGCAGCTA_J       241          42         0
+## GCTCTC_TGCAGCTA_J       257          37         0
+## GCTGAT_TGCAGCTA_J      1737         244         0
 ##                                                                                                                                                                                                      inputFiles
 ##                                                                                                                                                                                                     <character>
-## ACACAG_TAAGGCGA_H /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140315/CAGEscan_fragments/ACACAG_TAAGGCGA.bed
-## ACACGT_TAAGGCGA_H /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140315/CAGEscan_fragments/ACACGT_TAAGGCGA.bed
-## ACACTC_TAAGGCGA_H /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140315/CAGEscan_fragments/ACACTC_TAAGGCGA.bed
-## ACAGAT_TAAGGCGA_H /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140315/CAGEscan_fragments/ACAGAT_TAAGGCGA.bed
-## ACAGCA_TAAGGCGA_H /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140315/CAGEscan_fragments/ACAGCA_TAAGGCGA.bed
+## ACACAG_TAAGGCGA_H /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180403_M00528_0348_000000000-B4GP8_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180404163455/CAGEscan_fragments/ACACAG_TAAGGCGA.bed
+## ACACGT_TAAGGCGA_H /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180403_M00528_0348_000000000-B4GP8_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180404163455/CAGEscan_fragments/ACACGT_TAAGGCGA.bed
+## ACACTC_TAAGGCGA_H /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180403_M00528_0348_000000000-B4GP8_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180404163455/CAGEscan_fragments/ACACTC_TAAGGCGA.bed
+## ACAGAT_TAAGGCGA_H /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180403_M00528_0348_000000000-B4GP8_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180404163455/CAGEscan_fragments/ACAGAT_TAAGGCGA.bed
+## ACAGCA_TAAGGCGA_H /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180403_M00528_0348_000000000-B4GP8_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180404163455/CAGEscan_fragments/ACAGCA_TAAGGCGA.bed
 ## ...                                                                                                                                                                                                         ...
-## GCTATA_TGCAGCTA_J /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140315/CAGEscan_fragments/GCTATA_TGCAGCTA.bed
-## GCTCAG_TGCAGCTA_J /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140315/CAGEscan_fragments/GCTCAG_TGCAGCTA.bed
-## GCTCGT_TGCAGCTA_J /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140315/CAGEscan_fragments/GCTCGT_TGCAGCTA.bed
-## GCTCTC_TGCAGCTA_J /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140315/CAGEscan_fragments/GCTCTC_TGCAGCTA.bed
-## GCTGAT_TGCAGCTA_J /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140315/CAGEscan_fragments/GCTGAT_TGCAGCTA.bed
+## GCTATA_TGCAGCTA_J /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180403_M00528_0348_000000000-B4GP8_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180404163455/CAGEscan_fragments/GCTATA_TGCAGCTA.bed
+## GCTCAG_TGCAGCTA_J /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180403_M00528_0348_000000000-B4GP8_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180404163455/CAGEscan_fragments/GCTCAG_TGCAGCTA.bed
+## GCTCGT_TGCAGCTA_J /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180403_M00528_0348_000000000-B4GP8_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180404163455/CAGEscan_fragments/GCTCGT_TGCAGCTA.bed
+## GCTCTC_TGCAGCTA_J /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180403_M00528_0348_000000000-B4GP8_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180404163455/CAGEscan_fragments/GCTCTC_TGCAGCTA.bed
+## GCTGAT_TGCAGCTA_J /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180403_M00528_0348_000000000-B4GP8_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180404163455/CAGEscan_fragments/GCTGAT_TGCAGCTA.bed
 ##                   inputFilesType      sampleLabels     repl  plateID
 ##                      <character>       <character> <factor> <factor>
 ## ACACAG_TAAGGCGA_H            bed ACACAG_TAAGGCGA_H        1        H
@@ -207,6 +207,37 @@ saveRDS(ce, "Labcyte-RT_Data_Analysis_3b.Rds")
 Quality controls
 ================
 
+Custom _scopes_ displaying _strand invasion_ artefacts.
+
+
+```r
+msScope_qcSI <- function(libs) {
+  libs$Tag_dust     <- libs$extracted   - libs$rdna - libs$spikes - libs$cleaned
+  libs$rDNA         <- libs$rdna
+  libs$Spikes       <- libs$spikes
+  libs$Unmapped     <- libs$cleaned     - libs$mapped
+  libs$Non_proper   <- libs$mapped      - libs$properpairs
+  libs$Duplicates   <- libs$properpairs - libs$librarySizes - libs$strandInvaders
+  libs$Invaders     <- libs$strandInvaders
+  libs$Counts       <- libs$librarySizes
+  list( libs    = libs
+      , columns = c( "Tag_dust", "rDNA", "Spikes", "Unmapped"
+                   , "Non_proper", "Duplicates", "Invaders", "Counts")
+      , total   = libs$extracted)
+}
+
+msScope_counts <- function(libs) {
+  libs$Promoter   <- libs$promoter
+  libs$Exon       <- libs$exon
+  libs$Intron     <- libs$intron
+  libs$Intergenic <- libs$librarySizes - libs$promoter - libs$intron - libs$exon
+  libs$Invaders   <- libs$strandInvaders
+  list( libs    = libs
+      , columns = c("Promoter", "Exon", "Intron", "Intergenic", "Invaders")
+      , total   = libs$librarySizes + libs$strandInvaders)
+}
+```
+
 By RNA input
 ------------
 
@@ -215,40 +246,22 @@ samples with RNA.
 
 
 ```r
-plotAnnot( ce, scope = "qc", group = "repl", normalise = FALSE
-         , title = "QC control, by ng of input RNA (sequence counts)"
+ggpubr::ggarrange( legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = msScope_qcSI, group = "plateID", normalise = FALSE
+           , title = "sequence counts"
+           , facet="RNA") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_qcSI, group = "plateID", normalise = TRUE
+         , title = "normalised to 100 %"
          , facet="RNA") +
-  facet_wrap(~facet, nrow = 5)
+  facet_wrap(~facet, ncol = 1)
+) %>% ggpubr::annotate_figure(top="QC of processing, by ng of input RNA")
 ```
 
-![](Labcyte-RT_Data_Analysis_3b_files/figure-html/qc_RNA_quantity_raw-1.png)<!-- -->
+![](Labcyte-RT_Data_Analysis_3b_files/figure-html/qc_RNA_quantity-1.png)<!-- -->
 
 The normalised QC profile is not much different, therefore
 the sequences might be _in silico_ or _in vitro_ contaminations.
-
-
-```r
-plotAnnot( ce, scope = "qc", group = "repl", normalise = TRUE
-         , title = "QC control, by ng of input RNA (normalised to 100 %)"
-         , facet="RNA") +
-  facet_wrap(~facet, nrow = 5)
-```
-
-![](Labcyte-RT_Data_Analysis_3b_files/figure-html/qc_RNA_quantity_norm-1.png)<!-- -->
-
-
-By TSO concentration
---------------------
-
-Problem with TSO == 60 ??  Mabye the stock primer had a defect.
-
-
-
-```r
-plotAnnot(ce, scope = "qc", group = "TSO", normalise = FALSE, facet = "group")
-```
-
-![](Labcyte-RT_Data_Analysis_3b_files/figure-html/TSO-1.png)<!-- -->
 
 
 Annotation with GENCODE
@@ -267,22 +280,66 @@ annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/m
 
 
 ```r
-plotAnnot( ce, scope = "counts", group = "repl"
-         , title = "QC annotation, by ng of input RNA (sequence counts)"
-         , facet = "group") +
-  facet_wrap("facet", nrow = 5)
+ggpubr::ggarrange( legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = "counts", group = "repl"
+           , title = "Sequence counts"
+           , facet = "RNA", normalise = FALSE) +
+    facet_wrap("facet", ncol = 1),
+  plotAnnot( ce, scope = "counts", group = "repl"
+           , title = "Normalised to 100%"
+           , facet = "RNA", normalise = TRUE) +
+    facet_wrap("facet", ncol = 1)
+)  %>% ggpubr::annotate_figure(top="QC annotation, by ng of input RNA")
+```
+
+```
+## Warning: Removed 4 rows containing missing values (position_stack).
+```
+
+```
+## Warning: Removed 4 rows containing missing values (geom_segment).
+```
+
+```
+## Warning: Removed 4 rows containing missing values (geom_point).
 ```
 
 ![](Labcyte-RT_Data_Analysis_3b_files/figure-html/CTSS_annotation_plot_per_replicate-1.png)<!-- -->
 
+
+By TSO concentration
+--------------------
+
+Problem with TSO == 60 ??  Mabye the stock primer had a defect.
+
+
 ```r
-plotAnnot( ce, scope = "counts", group = "repl"
-         , title = "QC annotation, by ng of input RNA (normalised to 100%)"
-         , facet = "group", norm = F) +
-  facet_wrap("facet", nrow = 5)
+plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = FALSE, facet = "RNA", title = "QC, sequence counts, by RNA quantity")
 ```
 
-![](Labcyte-RT_Data_Analysis_3b_files/figure-html/CTSS_annotation_plot_per_replicate-2.png)<!-- -->
+![](Labcyte-RT_Data_Analysis_3b_files/figure-html/TSO_qc_raw-1.png)<!-- -->
+
+
+```r
+plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = TRUE, facet = "RNA", title = "QC, normalised to 100 %, by RNA quantity")
+```
+
+![](Labcyte-RT_Data_Analysis_3b_files/figure-html/TSO_qc_norm-1.png)<!-- -->
+
+
+```r
+plotAnnot(ce, scope = msScope_counts, group = "TSO", normalise = FALSE, facet = "RNA", title = "QC annotation, normalised to 100 %, by RNA quantity")
+```
+
+![](Labcyte-RT_Data_Analysis_3b_files/figure-html/TSO_annot_raw-1.png)<!-- -->
+
+
+```r
+plotAnnot(ce, scope = msScope_counts, group = "TSO", normalise = TRUE, facet = "RNA", title = "QC annotation, normalised to 100 %, by RNA quantity")
+```
+
+![](Labcyte-RT_Data_Analysis_3b_files/figure-html/TSO_annot_norm-1.png)<!-- -->
+
 
 Session information
 ===================
@@ -323,41 +380,43 @@ sessionInfo()
 ## [13] CAGEr_1.21.5.1             
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] tidyr_0.7.2                       VGAM_1.0-4                       
-##  [3] splines_3.4.3                     gtools_3.5.0                     
-##  [5] assertthat_0.2.0                  BSgenome_1.47.5                  
-##  [7] GenomeInfoDbData_0.99.1           Rsamtools_1.31.3                 
-##  [9] yaml_2.1.15                       backports_1.1.1                  
-## [11] lattice_0.20-35                   glue_1.2.0                       
-## [13] digest_0.6.12                     RColorBrewer_1.1-2               
-## [15] XVector_0.19.8                    platetools_0.0.2                 
-## [17] colorspace_1.3-2                  htmltools_0.3.6                  
-## [19] Matrix_1.2-12                     plyr_1.8.4                       
-## [21] pkgconfig_2.0.1                   XML_3.98-1.9                     
-## [23] smallCAGEqc_0.12.2.999999         zlibbioc_1.24.0                  
-## [25] purrr_0.2.4                       scales_0.5.0                     
-## [27] gdata_2.18.0                      stringdist_0.9.4.6               
-## [29] VennDiagram_1.6.18                BiocParallel_1.12.0              
-## [31] tibble_1.3.4                      beanplot_1.2                     
-## [33] mgcv_1.8-22                       lazyeval_0.2.1                   
-## [35] memoise_1.1.0                     evaluate_0.10.1                  
-## [37] BSgenome.Mmusculus.UCSC.mm9_1.4.0 nlme_3.1-131                     
-## [39] MASS_7.3-47                       vegan_2.4-5                      
-## [41] tools_3.4.3                       data.table_1.10.4-3              
-## [43] stringr_1.2.0                     munsell_0.4.3                    
-## [45] cluster_2.0.6                     bindrcpp_0.2                     
-## [47] lambda.r_1.2                      Biostrings_2.47.9                
-## [49] som_0.3-5.1                       compiler_3.4.3                   
-## [51] rlang_0.1.4                       futile.logger_1.4.3              
-## [53] grid_3.4.3                        RCurl_1.95-4.10                  
-## [55] labeling_0.3                      bitops_1.0-6                     
-## [57] rmarkdown_1.8                     gtable_0.2.0                     
-## [59] codetools_0.2-15                  reshape_0.8.7                    
-## [61] R6_2.2.2                          reshape2_1.4.2                   
-## [63] GenomicAlignments_1.15.12         dplyr_0.7.4                      
-## [65] knitr_1.17                        rtracklayer_1.39.9               
-## [67] bindr_0.1                         rprojroot_1.2                    
-## [69] futile.options_1.0.0              KernSmooth_2.23-15               
-## [71] permute_0.9-4                     stringi_1.1.6                    
-## [73] Rcpp_0.12.14
+##  [1] nlme_3.1-131                      bitops_1.0-6                     
+##  [3] RColorBrewer_1.1-2                rprojroot_1.3-2                  
+##  [5] tools_3.4.3                       backports_1.1.2                  
+##  [7] R6_2.2.2                          vegan_2.4-5                      
+##  [9] platetools_0.0.2                  KernSmooth_2.23-15               
+## [11] lazyeval_0.2.1                    mgcv_1.8-22                      
+## [13] colorspace_1.3-2                  permute_0.9-4                    
+## [15] gridExtra_2.3                     compiler_3.4.3                   
+## [17] VennDiagram_1.6.18                rtracklayer_1.39.9               
+## [19] labeling_0.3                      scales_0.5.0                     
+## [21] stringr_1.3.0                     digest_0.6.15                    
+## [23] Rsamtools_1.31.3                  rmarkdown_1.9                    
+## [25] stringdist_0.9.4.6                XVector_0.19.8                   
+## [27] pkgconfig_2.0.1                   htmltools_0.3.6                  
+## [29] BSgenome_1.47.5                   rlang_0.2.0                      
+## [31] VGAM_1.0-4                        bindr_0.1                        
+## [33] BiocParallel_1.12.0               gtools_3.5.0                     
+## [35] dplyr_0.7.4                       RCurl_1.95-4.10                  
+## [37] GenomeInfoDbData_0.99.1           futile.logger_1.4.3              
+## [39] smallCAGEqc_0.12.2.999999         Matrix_1.2-12                    
+## [41] Rcpp_0.12.16                      munsell_0.4.3                    
+## [43] stringi_1.1.7                     yaml_2.1.18                      
+## [45] MASS_7.3-47                       zlibbioc_1.24.0                  
+## [47] plyr_1.8.4                        grid_3.4.3                       
+## [49] gdata_2.18.0                      lattice_0.20-35                  
+## [51] Biostrings_2.47.9                 cowplot_0.9.2                    
+## [53] splines_3.4.3                     knitr_1.20                       
+## [55] beanplot_1.2                      pillar_1.2.1                     
+## [57] ggpubr_0.1.6                      reshape2_1.4.2                   
+## [59] codetools_0.2-15                  futile.options_1.0.0             
+## [61] XML_3.98-1.9                      glue_1.2.0                       
+## [63] evaluate_0.10.1                   lambda.r_1.2                     
+## [65] data.table_1.10.4-3               gtable_0.2.0                     
+## [67] BSgenome.Mmusculus.UCSC.mm9_1.4.0 purrr_0.2.4                      
+## [69] tidyr_0.7.2                       reshape_0.8.7                    
+## [71] assertthat_0.2.0                  tibble_1.4.2                     
+## [73] som_0.3-5.1                       GenomicAlignments_1.15.12        
+## [75] memoise_1.1.0                     bindrcpp_0.2                     
+## [77] cluster_2.0.6
 ```

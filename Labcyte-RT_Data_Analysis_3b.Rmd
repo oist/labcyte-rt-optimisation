@@ -42,9 +42,9 @@ library("SummarizedExperiment")
 MOIRAI shortcuts
 
 ```{r moirai_shortcuts, dependson = "load_R_libraries"}
-MISEQ_RUN      <- "180215_M00528_0330_000000000-B4GPD_p456"
+MISEQ_RUN      <- "180403_M00528_0348_000000000-B4GP8_p456"
 WORKFLOW       <- "OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1"
-MOIRAI_STAMP   <- "20180219140315"
+MOIRAI_STAMP   <- "20180404163455"
 MOIRAI_PROJ    <- "project/Labcyte" 
 MOIRAI_USER    <- "nanoCAGE2" 
 ASSEMBLY       <- "mm9"
@@ -135,39 +135,57 @@ saveRDS(ce, "Labcyte-RT_Data_Analysis_3b.Rds")
 Quality controls
 ================
 
+Custom _scopes_ displaying _strand invasion_ artefacts.
+
+```{r custom_plotAnnot_scopes}
+msScope_qcSI <- function(libs) {
+  libs$Tag_dust     <- libs$extracted   - libs$rdna - libs$spikes - libs$cleaned
+  libs$rDNA         <- libs$rdna
+  libs$Spikes       <- libs$spikes
+  libs$Unmapped     <- libs$cleaned     - libs$mapped
+  libs$Non_proper   <- libs$mapped      - libs$properpairs
+  libs$Duplicates   <- libs$properpairs - libs$librarySizes - libs$strandInvaders
+  libs$Invaders     <- libs$strandInvaders
+  libs$Counts       <- libs$librarySizes
+  list( libs    = libs
+      , columns = c( "Tag_dust", "rDNA", "Spikes", "Unmapped"
+                   , "Non_proper", "Duplicates", "Invaders", "Counts")
+      , total   = libs$extracted)
+}
+
+msScope_counts <- function(libs) {
+  libs$Promoter   <- libs$promoter
+  libs$Exon       <- libs$exon
+  libs$Intron     <- libs$intron
+  libs$Intergenic <- libs$librarySizes - libs$promoter - libs$intron - libs$exon
+  libs$Invaders   <- libs$strandInvaders
+  list( libs    = libs
+      , columns = c("Promoter", "Exon", "Intron", "Intergenic", "Invaders")
+      , total   = libs$librarySizes + libs$strandInvaders)
+}
+```
+
 By RNA input
 ------------
 
 Negative controls with no RNA gave much less sequences than the regular
 samples with RNA.
 
-```{r qc_RNA_quantity_raw, dependson = "get_CTSS_data"}
-plotAnnot( ce, scope = "qc", group = "repl", normalise = FALSE
-         , title = "QC control, by ng of input RNA (sequence counts)"
+```{r qc_RNA_quantity, dependson = "get_CTSS_data"}
+ggpubr::ggarrange( legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = msScope_qcSI, group = "plateID", normalise = FALSE
+           , title = "sequence counts"
+           , facet="RNA") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_qcSI, group = "plateID", normalise = TRUE
+         , title = "normalised to 100 %"
          , facet="RNA") +
-  facet_wrap(~facet, nrow = 5)
+  facet_wrap(~facet, ncol = 1)
+) %>% ggpubr::annotate_figure(top="QC of processing, by ng of input RNA")
 ```
 
 The normalised QC profile is not much different, therefore
 the sequences might be _in silico_ or _in vitro_ contaminations.
-
-```{r qc_RNA_quantity_norm, dependson = "get_CTSS_data"}
-plotAnnot( ce, scope = "qc", group = "repl", normalise = TRUE
-         , title = "QC control, by ng of input RNA (normalised to 100 %)"
-         , facet="RNA") +
-  facet_wrap(~facet, nrow = 5)
-```
-
-
-By TSO concentration
---------------------
-
-Problem with TSO == 60 ??  Mabye the stock primer had a defect.
-
-
-```{r TSO, dependson = "get_CTSS_data"}
-plotAnnot(ce, scope = "qc", group = "TSO", normalise = FALSE, facet = "group")
-```
 
 
 Annotation with GENCODE
@@ -184,15 +202,40 @@ annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/m
 ```
 
 ```{r CTSS_annotation_plot_per_replicate, dependson = "annotate_CTSS"}
-plotAnnot( ce, scope = "counts", group = "repl"
-         , title = "QC annotation, by ng of input RNA (sequence counts)"
-         , facet = "group") +
-  facet_wrap("facet", nrow = 5)
-plotAnnot( ce, scope = "counts", group = "repl"
-         , title = "QC annotation, by ng of input RNA (normalised to 100%)"
-         , facet = "group", norm = F) +
-  facet_wrap("facet", nrow = 5)
+ggpubr::ggarrange( legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = "counts", group = "repl"
+           , title = "Sequence counts"
+           , facet = "RNA", normalise = FALSE) +
+    facet_wrap("facet", ncol = 1),
+  plotAnnot( ce, scope = "counts", group = "repl"
+           , title = "Normalised to 100%"
+           , facet = "RNA", normalise = TRUE) +
+    facet_wrap("facet", ncol = 1)
+)  %>% ggpubr::annotate_figure(top="QC annotation, by ng of input RNA")
 ```
+
+
+By TSO concentration
+--------------------
+
+Problem with TSO == 60 ??  Mabye the stock primer had a defect.
+
+```{r TSO_qc_raw, dependson = "get_CTSS_data"}
+plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = FALSE, facet = "RNA", title = "QC, sequence counts, by RNA quantity")
+```
+
+```{r TSO_qc_norm, dependson = "get_CTSS_data"}
+plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = TRUE, facet = "RNA", title = "QC, normalised to 100 %, by RNA quantity")
+```
+
+```{r TSO_annot_raw, dependson = "get_CTSS_data"}
+plotAnnot(ce, scope = msScope_counts, group = "TSO", normalise = FALSE, facet = "RNA", title = "QC annotation, normalised to 100 %, by RNA quantity")
+```
+
+```{r TSO_annot_norm, dependson = "get_CTSS_data"}
+plotAnnot(ce, scope = msScope_counts, group = "TSO", normalise = TRUE, facet = "RNA", title = "QC annotation, normalised to 100 %, by RNA quantity")
+```
+
 
 Session information
 ===================
