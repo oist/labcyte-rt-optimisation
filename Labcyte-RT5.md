@@ -214,6 +214,14 @@ plate$PRIMERS_RATIO <- c(plate$TSO/plate$RT_PRIMERS)
 plate$PRIMERS_RATIO <- sub("Inf", "no_RT_PRIMERS", plate$PRIMERS_RATIO)
 ```
 
+Assign index sequences
+======================
+
+
+```r
+levels(plate$INDEX) <- c("GGACTCCT", "TAGGCATG", "CTCTCTAC", "CGAGGCTG")
+```
+
 Summary
 =======
 
@@ -224,18 +232,18 @@ plate
 
 ```
 ## # A tibble: 384 x 18
-##    well  row   col   MASTER_MIX_vol   TSO TSO_vol BARCODE_ID_norandom INDEX  BARCODE_ID BARCODE_SEQ
-##    <chr> <fct> <fct>          <dbl> <dbl>   <dbl>               <int> <fct>       <int> <fct>      
-##  1 A01   A     1               350.  100.    100.                   1 indexE         18 AGTGTG     
-##  2 A02   A     2               350.  100.    100.                   2 indexE         67 GCTCAG     
-##  3 A03   A     3               350.  100.    100.                   3 indexE         54 CTGTGA     
-##  4 A04   A     4               350.  100.    100.                   4 indexE         16 AGTGAT     
-##  5 A05   A     5               350.  100.      0.                   5 indexE         87 TATCTC     
-##  6 A06   A     6               350.  100.    100.                   6 indexE         86 TATCGT     
-##  7 A07   A     7               350.  100.    100.                   7 indexE         12 AGTATA     
-##  8 A08   A     8               350.  100.    100.                   8 indexE         75 GTACTC     
-##  9 A09   A     9               350.  100.    100.                   9 indexE         42 CGAGTG     
-## 10 A10   A     10              350.  100.    100.                  10 indexE         48 CTGATA     
+##    well  row   col   MASTER_MIX_vol   TSO TSO_vol BARCODE_ID_norand… INDEX   BARCODE_ID BARCODE_SEQ
+##    <chr> <fct> <fct>          <dbl> <dbl>   <dbl>              <int> <fct>        <int> <fct>      
+##  1 A01   A     1               350.  100.    100.                  1 GGACTC…         18 AGTGTG     
+##  2 A02   A     2               350.  100.    100.                  2 GGACTC…         67 GCTCAG     
+##  3 A03   A     3               350.  100.    100.                  3 GGACTC…         54 CTGTGA     
+##  4 A04   A     4               350.  100.    100.                  4 GGACTC…         16 AGTGAT     
+##  5 A05   A     5               350.  100.      0.                  5 GGACTC…         87 TATCTC     
+##  6 A06   A     6               350.  100.    100.                  6 GGACTC…         86 TATCGT     
+##  7 A07   A     7               350.  100.    100.                  7 GGACTC…         12 AGTATA     
+##  8 A08   A     8               350.  100.    100.                  8 GGACTC…         75 GTACTC     
+##  9 A09   A     9               350.  100.    100.                  9 GGACTC…         42 CGAGTG     
+## 10 A10   A     10              350.  100.    100.                 10 GGACTC…         48 CTGATA     
 ## # ... with 374 more rows, and 8 more variables: H2O_vol <dbl>, RT_PRIMERS <dbl>,
 ## #   RT_PRIMERS_vol <dbl>, RNA <dbl>, RNA_vol <dbl>, RNA_group <chr>, total_volume <dbl>,
 ## #   PRIMERS_RATIO <chr>
@@ -254,14 +262,14 @@ summary(plate)
 ##                     E      : 24   5      : 16   3rd Qu.:350    3rd Qu.:100   3rd Qu.:100.0  
 ##                     F      : 24   6      : 16   Max.   :350    Max.   :100   Max.   :100.0  
 ##                     (Other):240   (Other):288                                               
-##  BARCODE_ID_norandom    INDEX      BARCODE_ID     BARCODE_SEQ     H2O_vol        RT_PRIMERS
-##  Min.   : 1.00       indexE:96   Min.   : 1.00   ACACAG :  4   Min.   :  0.0   Min.   :4   
-##  1st Qu.:24.75       indexF:96   1st Qu.:24.75   ACACGT :  4   1st Qu.:  0.0   1st Qu.:4   
-##  Median :48.50       indexG:96   Median :48.50   ACACTC :  4   Median :  0.0   Median :4   
-##  Mean   :48.50       indexH:96   Mean   :48.50   ACAGAT :  4   Mean   : 12.5   Mean   :4   
-##  3rd Qu.:72.25                   3rd Qu.:72.25   ACAGCA :  4   3rd Qu.:  0.0   3rd Qu.:4   
-##  Max.   :96.00                   Max.   :96.00   ACAGTG :  4   Max.   :100.0   Max.   :4   
-##                                                  (Other):360                               
+##  BARCODE_ID_norandom      INDEX      BARCODE_ID     BARCODE_SEQ     H2O_vol        RT_PRIMERS
+##  Min.   : 1.00       GGACTCCT:96   Min.   : 1.00   ACACAG :  4   Min.   :  0.0   Min.   :4   
+##  1st Qu.:24.75       TAGGCATG:96   1st Qu.:24.75   ACACGT :  4   1st Qu.:  0.0   1st Qu.:4   
+##  Median :48.50       CTCTCTAC:96   Median :48.50   ACACTC :  4   Median :  0.0   Median :4   
+##  Mean   :48.50       CGAGGCTG:96   Mean   :48.50   ACAGAT :  4   Mean   : 12.5   Mean   :4   
+##  3rd Qu.:72.25                     3rd Qu.:72.25   ACAGCA :  4   3rd Qu.:  0.0   3rd Qu.:4   
+##  Max.   :96.00                     Max.   :96.00   ACAGTG :  4   Max.   :100.0   Max.   :4   
+##                                                    (Other):360                               
 ##  RT_PRIMERS_vol      RNA       RNA_vol    RNA_group          total_volume PRIMERS_RATIO     
 ##  Min.   :25     Min.   :1   Min.   :25   Length:384         Min.   :500   Length:384        
 ##  1st Qu.:25     1st Qu.:1   1st Qu.:25   Class :character   1st Qu.:500   Class :character  
