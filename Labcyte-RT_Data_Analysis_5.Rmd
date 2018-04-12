@@ -1,0 +1,499 @@
+---
+title: "Labcyte-RT Data Analysis (4th experiment)"
+output:
+  html_document:
+    keep_md: yes
+    number_sections: yes
+    toc: yes
+---
+
+```{r echo = FALSE}
+knitr::opts_chunk$set(cache  = TRUE)
+knitr::opts_knit$set(verbose = TRUE)
+ggplot2::theme_set(ggplot2::theme_bw())
+```
+
+Experiment 5
+============
+
+Here, we randomised TSO positions 8 times, to see if there was a TSO-specific
+bias on the reaction yields.  The bias could be caused either by the barcode
+sequence or by the synthesis reaction (we have only one synthesis batch, hence
+these two factors are conflated).
+
+The reverse-transcriptase was SuperScript III.
+
+Load R packages
+===============
+
+```{r load_R_libraries, message = FALSE}
+library("CAGEr")
+library("ggplot2")
+library("magrittr")
+library("MultiAssayExperiment")
+library("SummarizedExperiment")
+```
+
+MOIRAI shortcuts
+
+```{r moirai_shortcuts, dependson = "load_R_libraries"}
+MISEQ_RUN      <- "180411_M00528_0351_000000000-BN3BL"
+WORKFLOW       <- "OP-WORKFLOW-CAGEscan-short-reads-v2.1.1"
+MOIRAI_STAMP   <- "20180412055135"
+MOIRAI_PROJ    <- "project/Labcyte" 
+MOIRAI_USER    <- "nanoCAGE2" 
+ASSEMBLY       <- "mm9"
+BASEDIR        <- "/osc-fs_home/scratch/moirai"
+MOIRAI_BASE    <- file.path(BASEDIR, MOIRAI_USER)
+MOIRAI_RESULTS <- file.path(MOIRAI_BASE, MOIRAI_PROJ, paste(MISEQ_RUN, WORKFLOW, MOIRAI_STAMP, sep = "."))
+```
+
+Load CAGE libraries
+===================
+
+Load summary statistics from MOIRAI and polish the names
+--------------------------------------------------------
+
+```{r MOIRAI, dependson = "moirai_shortcuts"}
+ce <- smallCAGEqc::loadMoiraiStats(
+  pipeline  = WORKFLOW,
+  multiplex = file.path( MOIRAI_BASE, "input", paste0(MISEQ_RUN, ".multiplex.txt")),
+  summary   = file.path( MOIRAI_RESULTS, "text", "summary.txt")) %>% DataFrame
+
+ce$inputFiles <- paste0(MOIRAI_RESULTS, "/CAGEscan_fragments/", ce$samplename, ".bed")
+
+# Discard lines for which input files do not exist.
+ce <- ce[sapply(ce$inputFiles, file.exists),]
+
+# Discard lines for which input files are empty.
+ce <- ce[file.info(ce$inputFiles)$size != 0,]
+
+ce$inputFilesType <- c("bed")
+ce$sampleLabels <- as.character(ce$samplename)
+
+# Replace indexes in group names by RNA amounts extracted from sample sheet.
+levels(ce$group) <- system("cut -f 6,8 -d , 180411_M00528_0351_000000000-BN3BL.SampleSheet.csv | grep y_ | sort | cut -f2 -d,", intern = TRUE)
+
+ce$repl <- ce$index
+levels(ce$repl) <- system("cut -f 6,8 -d , 180411_M00528_0351_000000000-BN3BL.SampleSheet.csv | grep y_ | sort | cut -f2 -d, | cut -f2 -d_", intern = TRUE)
+ce$repl %<>% factor(levels = 1:8)
+
+# Define plate IDs
+ce$plateID <- ce$repl
+levels(ce$plateID) <- c(rep("M", 4), rep("N", 4))
+
+rownames(ce) %<>% paste(ce$plateID, sep = "_")
+ce$sampleLabels <- rownames(ce)
+
+ce
+```
+
+
+Load plate design
+-----------------
+
+Using plate 4 and 5 design, see [Labcyte-RT4.md](Labcyte-RT4.md) and 
+[Labcyte-RT5.md](Labcyte-RT5.md).
+
+```{r PLATE, dependson = "MOIRAI"}
+plate4 <- read.table("plate4.txt", sep = "\t", header = TRUE)
+plate5 <- read.table("plate5.txt", sep = "\t", header = TRUE)
+plate  <- rbind(plate4, plate5)
+plate  <- plate[!duplicated(plate),]
+
+ce %<>% cbind(plate[match( paste(ce$barcode, ce$group)
+                         , paste(plate$BARCODE_SEQ, plate$RNA_group)), ])
+rm(plate, plate4, plate5)
+```
+
+
+Create a CAGEexp object and load expression data
+------------------------------------------------
+
+```{r new_CAGEexp, message = F, echo = FALSE, dependson = "PLATE"}
+ce <- CAGEexp( colData    = ce
+             , genomeName = "BSgenome.Mmusculus.UCSC.mm9")
+```
+
+```{r get_CTSS_data, dependson = "new_CAGEexp"}
+getCTSS(ce, useMulticore = TRUE)
+removeStrandInvaders(ce)
+```
+
+
+Save the CAGEexp file
+---------------------
+
+```{r save_myCAGEexp_object, dependson = "get_CTSS_data"}
+saveRDS(ce, "Labcyte-RT_Data_Analysis_4.Rds")
+```
+
+
+Quality controls
+================
+
+Custom _scopes_ displaying _strand invasion_ artefacts.
+
+```{r custom_plotAnnot_scopes}
+msScope_qcSI <- function(libs) {
+  libs$Tag_dust     <- libs$extracted   - libs$rdna - libs$spikes - libs$cleaned
+  libs$rDNA         <- libs$rdna
+  libs$Spikes       <- libs$spikes
+  libs$Unmapped     <- libs$cleaned     - libs$mapped
+  libs$Non_proper   <- libs$mapped      - libs$properpairs
+  libs$Duplicates   <- libs$properpairs - libs$librarySizes - libs$strandInvaders
+  libs$Invaders     <- libs$strandInvaders
+  libs$Counts       <- libs$librarySizes
+  list( libs    = libs
+      , columns = c( "Tag_dust", "rDNA", "Spikes", "Unmapped"
+                   , "Non_proper", "Duplicates", "Invaders", "Counts")
+      , total   = libs$extracted)
+}
+
+msScope_counts <- function(libs) {
+  libs$Promoter   <- libs$promoter
+  libs$Exon       <- libs$exon
+  libs$Intron     <- libs$intron
+  libs$Intergenic <- libs$librarySizes - libs$promoter - libs$intron - libs$exon
+  libs$Invaders   <- libs$strandInvaders
+  list( libs    = libs
+      , columns = c("Promoter", "Exon", "Intron", "Intergenic", "Invaders")
+      , total   = libs$librarySizes + libs$strandInvaders)
+}
+```
+
+By RNA input
+------------
+
+ * Negative controls with no RNA gave much less sequences than the regula
+   samples with RNA.
+   
+ * The fraction of unmapped reads is larger in RNA negative controls. This might
+   suggest that they originate from low-quality sequences that are erroneously
+   demultiplexed.
+   
+ * The amount of oligonucleotide artefacts ("tag dust") is much larger in
+   plate _K_.
+   
+ * The fraction of PCR duplicates increases as the number of counts decreases.
+   This is expected and is utilised in CAGEscan assembly.
+   
+ * The number of non-proper alignments is still quite large.
+
+```{r qc_RNA_quantity, dependson = "get_CTSS_data"}
+ggpubr::ggarrange(
+  plotAnnot( ce, scope = msScope_qcSI, group = "plateID", normalise = FALSE
+           , title = "sequence counts"
+           , facet="RNA") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_qcSI, group = "plateID", normalise = TRUE
+         , title = "normalised to 100 %"
+         , facet="RNA") +
+  facet_wrap(~facet, ncol = 1),
+  legend = "right",
+  common.legend = TRUE
+)
+```
+
+
+### Removal of the RNA negative controls
+
+To ease data handling, the negative controls with no RNA are removed.
+
+```{r remove_noRNA_ctls, dependson = "load_and_merge"}
+ce <- ce[,ce$RNA != 0]
+```
+
+```{r qc_RNA_quantity_raw, dependson = "get_CTSS_data"}
+plotAnnot( ce, scope = msScope_qcSI, group = "plateID", normalise = FALSE
+         , title = "QC control, by ng of input RNA (sequence counts)"
+         , facet="RNA") +
+  facet_wrap(~facet, ncol = 1)
+```
+
+
+By RT primer quantity
+---------------------
+
+Strangely, libraries made with no RT primers have a QC profile that is in
+continuation with the other libraries.  While presence of reads in negative
+controls might again be explained contaminations, the amount of sequences in
+the "no RT primer" samples is a bit high for such an explanation.
+
+```{r qc_rt_primer_quantity, dependson = "remove_noRNA_ctls"}
+ggpubr::ggarrange(
+  plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
+           , title = "sequence counts"
+           , facet="plateID") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = TRUE
+         , title = "normalised to 100 %"
+         , facet="plateID") +
+  facet_wrap(~facet, ncol = 1),
+  legend = "right",
+  common.legend = TRUE
+)
+```
+
+Larger amounts of TSO coincides with larger amount of reads in the RT primer
+negative control
+
+```{r}
+ plotAnnot( ce[,ce$RT_PRIMERS == 0], scope = msScope_qcSI, group = "TSO", normalise = FALSE
+           , title = "sequence counts in RT primer negative controls."
+           , facet="plateID") 
+```
+
+
+### Removal of the primer-negative controls
+
+To ease data handling (for instance when working with primer ratios), the
+negative controls with no primers are removed.
+
+```{r remove_noPrimers_ctls, dependson = "remove_noRNA_ctls"}
+ce <- ce[,ce$RT_PRIMERS != 0]
+
+```
+
+Lets tidy the primer ratios after the null primer concentrations were removed.
+
+```{r correct_primer_ratios, dependson = "remove_noPrimers_ctls"}
+ce$PRIMERS_RATIO %<>% droplevels
+levels(ce$PRIMERS_RATIO) %<>% as.numeric %>% signif(2) %>% as.character
+ce$PRIMERS_RATIO %<>% factor(levels = levels(ce$PRIMERS_RATIO) %>% gtools::mixedsort())
+```
+
+
+```{r qc_rt_primer_quantity_clean, dependson = "remove_noRNA_ctls"}
+ggpubr::ggarrange(
+  plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
+           , title = "sequence counts"
+           , facet="plateID") +
+    facet_wrap(~facet, nrow = 1),
+  plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = TRUE
+         , title = "normalised to 100 %"
+         , facet="plateID") +
+  facet_wrap(~facet, nrow = 1),
+  legend = "right",
+  common.legend = TRUE
+)
+```
+
+rRNA is reduced and non-proper alignments increase as the concentration of
+RT primers is lowered.
+
+
+By TSO concentration
+--------------------
+
+Replacing the TSOs in the "B" row (plate _L_) solved the problem of low yield,
+compared with just moving them to a different row (plate _K_).
+
+```{r TSO, dependson = "get_CTSS_data"}
+ggpubr::ggarrange(
+  plotAnnot( ce, scope = msScope_qcSI, group = "TSO", normalise = FALSE
+           , title = "sequence counts"
+           , facet="plateID") +
+    facet_wrap(~facet, nrow = 1),
+  plotAnnot( ce, scope = msScope_qcSI, group = "TSO", normalise = TRUE
+         , title = "normalised to 100 %"
+         , facet="plateID") +
+  facet_wrap(~facet, nrow = 1),
+  legend = "right",
+  common.legend = TRUE
+)
+```
+
+
+Annotation with GENCODE
+-----------------------
+
+Collect Gencode annotations and gene symbols via a local GENCODE file
+(mm9 gencode not available in AnnotationHub)
+
+Most pairs align in intergenic regions.  Is it because of the sequence error
+combined with very short read 1s ?
+
+```{r annotate_CTSS, dependson = "get_CTSS_data"}
+annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
+```
+
+```{r CTSS_annotation_plot_per_replicate, dependson = "annotate_CTSS"}
+ggpubr::ggarrange(
+  plotAnnot( ce, scope = msScope_counts, group = "plateID", normalise = FALSE
+           , title = "sequence counts"
+           , facet="group") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_counts, group = "plateID", normalise = TRUE
+         , title = "normalised to 100 %"
+         , facet="group") +
+  facet_wrap(~facet, ncol = 1),
+  legend = "right",
+  common.legend = TRUE
+)
+```
+
+
+Other analyses
+==============
+
+RT_PRIMER concentration, facetted by RNA mass
+---------------------------------------------
+
+```{r rt_primer_quantity, fig.height = 10}
+ggpubr::ggarrange(
+  plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
+           , title = "sequence counts"
+           , facet="RNA") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = TRUE
+         , title = "normalised to 100 %"
+         , facet="RNA") +
+  facet_wrap(~facet, ncol = 1),
+  legend = "right",
+  common.legend = TRUE
+)
+```
+
+TSO concentration, facetted by RNA mass
+---------------------------------------------
+
+### Plate K
+
+```{r TSO_quantity_K, fig.height = 10}
+ggpubr::ggarrange(
+  plotAnnot( ce[,ce$plateID == "K"], scope = msScope_qcSI, group = "TSO", normalise = FALSE
+           , title = "sequence counts"
+           , facet="RNA") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce[,ce$plateID == "K"], scope = msScope_qcSI, group = "TSO", normalise = TRUE
+         , title = "normalised to 100 %"
+         , facet="RNA") +
+  facet_wrap(~facet, ncol = 1),
+  legend = "right",
+  common.legend = TRUE
+)
+```
+
+### Plate L
+
+```{r TSO_quantity_L, fig.height = 10}
+ggpubr::ggarrange(
+  plotAnnot( ce[,ce$plateID == "L"], scope = msScope_qcSI, group = "TSO", normalise = FALSE
+           , title = "sequence counts"
+           , facet="RNA") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce[,ce$plateID == "L"], scope = msScope_qcSI, group = "TSO", normalise = TRUE
+         , title = "normalised to 100 %"
+         , facet="RNA") +
+  facet_wrap(~facet, ncol = 1),
+  legend = "right",
+  common.legend = TRUE
+)
+```
+
+
+
+```{r exploration, fig.height=20, fig.width=20}
+ceK <- ce[,ce$plateID == "K"]
+
+ceL <- ce[,ce$plateID == "L"]
+
+ggpubr::ggarrange( legend = "right", common.legend = TRUE,
+  plotAnnot( ceL[,], scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
+           , title = "sequence counts, plate L"
+           , facet="TSO") +
+    facet_wrap(~facet, ncol = 1),
+plotAnnot( ceK[,], scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
+           , title = "sequence counts, plate K"
+           , facet="TSO") +
+    facet_wrap(~facet, ncol = 1)
+)
+
+ggpubr::ggarrange( legend = "right", common.legend = TRUE,
+  plotAnnot( ceL[,ceL$RNA == .01], scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
+           , title = "plate L, .01 ng RNA"
+           , facet="TSO") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ceL[,ceL$RNA == .1], scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
+           , title = "plate L, .1 ng RNA"
+           , facet="TSO") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ceL[,ceL$RNA == 1], scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
+           , title = "plate L, 1 ng RNA"
+           , facet="TSO") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ceL[,ceL$RNA == 10], scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
+           , title = "plate L, 10 ng RNA"
+           , facet="TSO") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ceL[,ceL$RNA == 100], scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
+           , title = "plate L, 100 ng RNA"
+           , facet="TSO") +
+    facet_wrap(~facet, ncol = 1))
+
+
+ggpubr::ggarrange( legend = "right", common.legend = TRUE,
+  plotAnnot( ceL[,ceK$RNA == .01], scope = msScope_qcSI, group = "TSO", normalise = FALSE
+           , title = "plate K, .01 ng RNA"
+           , facet="RT_PRIMERS") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ceL[,ceK$RNA == .1], scope = msScope_qcSI, group = "TSO", normalise = FALSE
+           , title = "plate K, .1 ng RNA"
+           , facet="RT_PRIMERS") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ceL[,ceK$RNA == 1], scope = msScope_qcSI, group = "TSO", normalise = FALSE
+           , title = "plate K, 1 ng RNA"
+           , facet="RT_PRIMERS") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ceL[,ceK$RNA == 10], scope = msScope_qcSI, group = "TSO", normalise = FALSE
+           , title = "plate K, 10 ng RNA"
+           , facet="RT_PRIMERS") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ceL[,ceK$RNA == 100], scope = msScope_qcSI, group = "TSO", normalise = FALSE
+           , title = "plate K, 100 ng RNA"
+           , facet="RT_PRIMERS") +
+    facet_wrap(~facet, ncol = 1))
+
+ce1ng <- ce[,ce$RNA == 1]
+
+ggpubr::ggarrange( legend = "right", common.legend = TRUE,
+  plotAnnot( ce1ng[,ce1ng$plateID == "L"], scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
+           , title = "sequence counts, plate L"
+           , facet="TSO") +
+    facet_wrap(~facet, ncol = 1),
+plotAnnot( ce1ng[,ce1ng$plateID == "K"], scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
+           , title = "sequence counts, plate K"
+           , facet="TSO") +
+    facet_wrap(~facet, ncol = 1)
+)
+
+```
+
+Optima at 20 μM TSO
+-------------------
+
+Best RT primer concentration is 4 μM at 20 μM TSO, for any RNA amount.
+
+```{r ce20}
+ce20 <- ce[,ce$TSO == 20]
+ggpubr::ggarrange(
+  plotAnnot( ce20[,ce20$plateID == "K"], scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
+           , title = "sequence counts, plate K"
+           , facet="RNA") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce20[,ce20$plateID == "L"], scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
+           , title = "sequence counts, plate L"
+           , facet="RNA") +
+    facet_wrap(~facet, ncol = 1),
+  legend = "right",
+  common.legend = TRUE
+)
+```
+
+Session information
+===================
+
+```{r}
+sessionInfo()
+```
