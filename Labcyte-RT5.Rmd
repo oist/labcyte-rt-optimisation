@@ -212,7 +212,7 @@ length(which(plate$total_volume != "NA"))
 sum(is.na(plate$total_volume))
 count(plate$BARCODE_ID)
 plate$PRIMERS_RATIO
-write.table(plate, "plate4.txt", sep = "\t", quote = FALSE, row.names = FALSE)
+write.table(plate, "plate5.txt", sep = "\t", quote = FALSE, row.names = FALSE)
 ```
 
 Plate maps

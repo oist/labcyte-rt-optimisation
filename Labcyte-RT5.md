@@ -421,7 +421,7 @@ plate$PRIMERS_RATIO
 ```
 
 ```r
-write.table(plate, "plate4.txt", sep = "\t", quote = FALSE, row.names = FALSE)
+write.table(plate, "plate5.txt", sep = "\t", quote = FALSE, row.names = FALSE)
 ```
 
 Plate maps
