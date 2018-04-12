@@ -20,11 +20,14 @@ of principle on qPCR optimisation.
    [[SSIII QC](Labcyte-RT_Data_Analysis_3a.md)]
    [[SSIV QC](Labcyte-RT_Data_Analysis_3b.md)]]
    (same plate model, different concentrations, three replicates, two enzymes).
-   MiSeq ID: `180215_M00528_0330_000000000-B4GPD`.
-   MOIRAI [[QC]( http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD.paired_raw_quality_control2.20180216100318/180215_M00528_0330_000000000-B4GPD.paired_raw_quality_control2.20180216100318.html)]
-     [[Workflow plates 1~3]](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140254/180215_M00528_0330_000000000-B4GPD_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140254.html)
-     [[Workflow plates 4~6]](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180215_M00528_0330_000000000-B4GPD_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140315/180215_M00528_0330_000000000-B4GPD_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180219140315.html)
+   MiSeq ID: `180403_M00528_0348_000000000-B4GP8`.
+   MOIRAI [[QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180403_M00528_0348_000000000-B4GP8.paired_raw_quality_control2.20180404155647/180403_M00528_0348_000000000-B4GP8.paired_raw_quality_control2.20180404155647.html)]
+     [[Workflow plates 1~3]](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180403_M00528_0348_000000000-B4GP8_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180409105009/180403_M00528_0348_000000000-B4GP8_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180409105009.html)
+     [[Workflow plates 4~6]](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180403_M00528_0348_000000000-B4GP8_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180411094125/180403_M00528_0348_000000000-B4GP8_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180411094125.html)
  - [Experiment four](Labcyte-RT_Data_Analysis_4.md) (change of position or contents of "row B" TSOs). MiSeq ID: `180326_M00528_0346_000000000-B4GJR`. MOIRAI
      [[QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180326_M00528_0346_000000000-B4GJR.paired_raw_quality_control2.20180403111017/180326_M00528_0346_000000000-B4GJR.paired_raw_quality_control2.20180403111017.html)]
      [[MOIRAI](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180326_M00528_0346_000000000-B4GJR.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180329132046/180326_M00528_0346_000000000-B4GJR.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180329132046.html)]
- 
+ - [Experiment five](Labcyte-RT_Data_Analysis_5.md) (Randomisation of TSO position). MiSeq ID: `180411_M00528_0351_000000000-BN3BL`. MOIRAI
+     [[QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.paired_raw_quality_control2.20180412055341/180411_M00528_0351_000000000-BN3BL.paired_raw_quality_control2.20180412055341.html)]
+     [[MOIRAI](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412055135/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412055135.html)]
+ - [Xmas project](Xmas.md)
