@@ -10,6 +10,7 @@ of principle on qPCR optimisation.
 
  - Model destination plates: [1](Labcyte-RT.md), [2](Labcyte-RT2.md)
    and [3](Labcyte-RT3.md).
+ - [Concentration checks](TSO_concentration_check.md) in source plates 1 and 2.
  - [Experiment one](Labcyte-RT_Data_Analysis.md) (a single plate). MiSeq ID: `171227_M00528_0321_000000000-B4GLP`. MOIRAI
      [[QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.paired_raw_quality_control2.20171228143720/171227_M00528_0321_000000000-B4GLP.paired_raw_quality_control2.20171228143720.html)]
      [[Workflow](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850.html)]
