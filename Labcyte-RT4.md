@@ -217,7 +217,7 @@ Assign index sequences
 
 
 ```r
-levels(plate$INDEX) <- c("TAAGGCGA", "CGTACTAG", "AGGCAGAA", "TCCTGAGC")
+levels(plate$INDEX) <- c("TAAGGCGA", "AGGCAGAA", "CGTACTAG", "TCCTGAGC")
 ```
 
 Summary
@@ -262,8 +262,8 @@ summary(plate)
 ##                     (Other):240   (Other):288                                               
 ##  BARCODE_ID_norandom      INDEX      BARCODE_ID     BARCODE_SEQ     H2O_vol        RT_PRIMERS
 ##  Min.   : 1.00       TAAGGCGA:96   Min.   : 1.00   ACACAG :  4   Min.   :  0.0   Min.   :4   
-##  1st Qu.:24.75       CGTACTAG:96   1st Qu.:24.75   ACACGT :  4   1st Qu.:  0.0   1st Qu.:4   
-##  Median :48.50       AGGCAGAA:96   Median :48.50   ACACTC :  4   Median :  0.0   Median :4   
+##  1st Qu.:24.75       AGGCAGAA:96   1st Qu.:24.75   ACACGT :  4   1st Qu.:  0.0   1st Qu.:4   
+##  Median :48.50       CGTACTAG:96   Median :48.50   ACACTC :  4   Median :  0.0   Median :4   
 ##  Mean   :48.50       TCCTGAGC:96   Mean   :48.50   ACAGAT :  4   Mean   : 12.5   Mean   :4   
 ##  3rd Qu.:72.25                     3rd Qu.:72.25   ACAGCA :  4   3rd Qu.:  0.0   3rd Qu.:4   
 ##  Max.   :96.00                     Max.   :96.00   ACAGTG :  4   Max.   :100.0   Max.   :4   

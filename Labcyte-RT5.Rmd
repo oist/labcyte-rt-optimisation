@@ -206,7 +206,7 @@ Assign index sequences
 ======================
 
 ```{r INDEX_sequences}
-levels(plate$INDEX) <- c("GGACTCCT", "TAGGCATG", "CTCTCTAC", "CGAGGCTG")
+levels(plate$INDEX) <- c("GGACTCCT", "CTCTCTAC", "TAGGCATG", "CGAGGCTG")
 ```
 
 Summary
