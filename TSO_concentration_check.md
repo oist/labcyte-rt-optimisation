@@ -189,13 +189,23 @@ everywhere,  the yield varied dramatically from TSO to TSO.  Normalisation
 factors were calculated and saved for possible corrections.
 
 Here, we verify whether these normalisation factors correlate with measured
-concentrations.
+concentrations.  Focusing on TSOs that were dilluted at 50 µM, because their
+measured concentrations have the best accuracy (not out of dynamic range).
 
 
 
 ```r
 bcNormFactors <- dget("bcNormFactors.R")
+
+conc$bcNormFactor <- bcNormFactors[conc$ID]
+
+ggplot(conc[conc$exp == 50,], aes(obs / exp,  bcNormFactor, colour = plate)) +
+  geom_point() +
+  ggtitle("Concentration and yield: no correlation")
 ```
+
+![](TSO_concentration_check_files/figure-html/bcNormFactors-1.png)<!-- -->
+
 
 Session information
 ===================
