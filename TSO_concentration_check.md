@@ -11,166 +11,94 @@ output:
 
 
 
-Load scripts and libraries
-==========================
+Load R packages
+===============
 
 
 ```r
 library("magrittr")
 library("ggplot2")
-# Do not load the whole smallCAGEqc package, just get the barcode data.
-data("nanoCAGE2017barcodes", package = "smallCAGEqc")
 ```
 
 
-Concentration checks
-====================
+Load data
+=========
 
-Data load
----------
-
-Concentrations of the actual TSO solutions in the source plage, measured with
+Concentrations of the actual TSO solutions in source plates, measured with
 the NanoDrop instrument for 8-strip tubes (NanoDrop 8000 ?).
 
 Concentration factor was _27.8_ (_A260 × 27.8 = concentration_ in ng/μL).
 
-Original file name `180221_KATO.xlsx`.  This file has two sheets.  The first for
-source plate 1, where the TSOs at 600 μM were too concentrated for the
-measurement (out of dynamic range).  The second is for source plate 1, (first
-140 rows), and then for plate 2's TSOs at 600 μM, which were dilluted 5 times
-before being measured again.
+Original file name `180221_KATO.xlsx`.  This file has two sheets containing
+raw data.  The first (`original data_180221`) is for
+[source plate 2](Labcyte-RT2.md).  In this measurement, the TSOs at 600 μM were
+too concentrated (out of dynamic range).
 
 
 ```r
-conc1 <- gdata::read.xls( "Labcyte-RT2.quantification.xlsx"
+plate2 <- gdata::read.xls( "Labcyte-RT2.quantification.xlsx"
                         , nrow = 140, stringsAsFactors = FALSE)
-summary(conc1)
 ```
 
-```
-##  Plate.ID          Well.            Sample.ID           User.ID             Date.          
-##  Mode:logical   Length:140         Length:140         Length:140         Length:140        
-##  NA's:140       Class :character   Class :character   Class :character   Class :character  
-##                 Mode  :character   Mode  :character   Mode  :character   Mode  :character  
-##                                                                                            
-##                                                                                            
-##                                                                                            
-##     Time.               Conc..          Units.              A260.            A280.        
-##  Length:140         Min.   : 411.0   Length:140         Min.   : 14.78   Min.   :  9.151  
-##  Class :character   1st Qu.: 623.2   Class :character   1st Qu.: 22.42   1st Qu.: 13.425  
-##  Mode  :character   Median : 982.2   Mode  :character   Median : 35.33   Median : 80.181  
-##                     Mean   :1345.9                      Mean   : 48.41   Mean   : 57.038  
-##                     3rd Qu.:2316.2                      3rd Qu.: 83.30   3rd Qu.: 87.474  
-##                     Max.   :3044.0                      Max.   :109.48   Max.   :124.622  
-##    X260.280.        X260.230.      Conc..Factor..ng.ul.  Cursor.Pos.   Cursor.abs.    
-##  Min.   :0.3000   Min.   :0.2600   Min.   :27.8         Min.   :260   Min.   : 14.78  
-##  1st Qu.:0.5275   1st Qu.:0.5475   1st Qu.:27.8         1st Qu.:260   1st Qu.: 22.42  
-##  Median :1.1350   Median :1.3800   Median :27.8         Median :260   Median : 35.33  
-##  Mean   :1.1400   Mean   :1.5060   Mean   :27.8         Mean   :260   Mean   : 48.41  
-##  3rd Qu.:1.6600   3rd Qu.:2.4025   3rd Qu.:27.8         3rd Qu.:260   3rd Qu.: 83.30  
-##  Max.   :1.8400   Max.   :2.5300   Max.   :27.8         Max.   :260   Max.   :109.48  
-##     X340.raw          NA.Type             X          
-##  Min.   :-0.02700   Length:140         Mode:logical  
-##  1st Qu.: 0.01475   Class :character   NA's:140      
-##  Median : 0.03750   Mode  :character                 
-##  Mean   : 0.03551                                    
-##  3rd Qu.: 0.05850                                    
-##  Max.   : 0.10900
-```
+The second sheet (`original data_180222`) is for [source plate 1](Labcyte-RT.md),
+(first 140 rows), and then for plate 2's TSOs at 600 μM, which were dilluted 5
+times before being measured again.
+
 
 ```r
-conc2 <- gdata::read.xls( "Labcyte-RT2.quantification.xlsx"
+plate1 <- gdata::read.xls( "Labcyte-RT2.quantification.xlsx"
                         , nrow = 182, sheet = 2, stringsAsFactors = FALSE)
-summary(conc2)
+
+plate2[1:42,] <- plate1[141:182,]
+plate1 <- plate1[-(141:182),]
+plate1$X <- NA  # For column compatibility with plate2
 ```
 
-```
-##    Plate.ID            Well.             Sample.ID       User.ID             Date.          
-##  Length:182         Length:182         Min.   : 1.00   Length:182         Length:182        
-##  Class :character   Class :character   1st Qu.:12.00   Class :character   Class :character  
-##  Mode  :character   Mode  :character   Median :25.00   Mode  :character   Mode  :character  
-##                                        Mean   :29.85                                        
-##                                        3rd Qu.:47.75                                        
-##                                        Max.   :70.00                                        
-##     Time.               Conc..            Units.              A260.             A280.        
-##  Length:182         Min.   :   89.03   Length:182         Min.   :  3.202   Min.   : -1.258  
-##  Class :character   1st Qu.:  746.67   Class :character   1st Qu.: 26.857   1st Qu.: 15.950  
-##  Mode  :character   Median :  913.75   Mode  :character   Median : 32.867   Median : 20.631  
-##                     Mean   : 1244.54                      Mean   : 44.770   Mean   : 41.119  
-##                     3rd Qu.: 1670.50                      3rd Qu.: 60.090   3rd Qu.: 49.461  
-##                     Max.   :20900.00                      Max.   :752.966   Max.   :571.996  
-##    X260.280.         X260.230.     Conc..Factor..ng.ul.  Cursor.Pos.   Cursor.abs.     
-##  Min.   :-38.740   Min.   :0.080   Min.   :27.8         Min.   :260   Min.   :  3.202  
-##  1st Qu.:  1.170   1st Qu.:1.425   1st Qu.:27.8         1st Qu.:260   1st Qu.: 26.857  
-##  Median :  1.620   Median :2.370   Median :27.8         Median :260   Median : 32.867  
-##  Mean   :  1.208   Mean   :1.992   Mean   :27.8         Mean   :260   Mean   : 44.770  
-##  3rd Qu.:  1.680   3rd Qu.:2.417   3rd Qu.:27.8         3rd Qu.:260   3rd Qu.: 60.090  
-##  Max.   :  1.980   Max.   :2.550   Max.   :27.8         Max.   :260   Max.   :752.966  
-##     X340.raw          NA.Type         
-##  Min.   :-45.7610   Length:182        
-##  1st Qu.: -0.0650   Class :character  
-##  Median : -0.0410   Mode  :character  
-##  Mean   : -0.9559                     
-##  3rd Qu.:  0.0075                     
-##  Max.   :  0.2320
-```
-
-```r
-conc1[1:42,] <- conc2[141:182,]
-conc2 <- conc2[-(141:182),]
-conc2$X <- NA  # For column compatibility with conc1
-
-conc1$exp <- 50
-conc1[grep("[1-3]$", conc1$Well), "exp"] <- 600
-conc1[grep("[4-6]$", conc1$Well), "exp"] <- 400
-
-conc2$exp <- 50
-conc2[grep("[1-3]$", conc2$Well), "exp"] <- 400
-conc2[grep("[7-9]$", conc2$Well), "exp"] <- 6.25
-
-conc1$plate <- 2
-conc2$plate <- 1
-conc <- rbind(conc1, conc2)
-rm(conc1); rm(conc2)
-```
+Sheet 2 indicates the barcode ID for each TSO; Sheet 1 has the same layout.
 
 
 ```r
-conc <- data.frame( Well  = conc$Well
-                  , plate = conc$plate
-                  , exp   = conc$exp
+plate2$Sample.ID <- plate1$Sample.ID
+```
+
+Merge the tables.
+
+
+```r
+plate2$plate <- 2
+plate1$plate <- 1
+conc <- rbind(plate2, plate1)
+rm(plate2); rm(plate1)
+
+conc <- data.frame( Well  = conc$Well      
+                  , ID    = conc$Sample.ID %>% factor
+                  , plate = conc$plate     %>% factor
                   , obs   = conc$Conc..
                   , A260  = conc$A260.
                   , A280  = conc$A280.)
 
-summary(conc)
+conc$Well %<>% factor(levels = levels(conc$Well) %>% gtools::mixedsort())
 ```
 
-```
-##       Well         plate          exp              obs                A260        
-##  A1     :  4   Min.   :1.0   Min.   :  6.25   Min.   :   89.03   Min.   :  3.202  
-##  A10    :  4   1st Qu.:1.0   1st Qu.: 50.00   1st Qu.:  604.67   1st Qu.: 21.750  
-##  A2     :  4   Median :1.5   Median : 50.00   Median :  876.40   Median : 31.522  
-##  A3     :  4   Mean   :1.5   Mean   :230.94   Mean   : 1311.15   Mean   : 47.164  
-##  A4     :  4   3rd Qu.:2.0   3rd Qu.:400.00   3rd Qu.: 1915.75   3rd Qu.: 68.912  
-##  A5     :  4   Max.   :2.0   Max.   :600.00   Max.   :20900.00   Max.   :752.966  
-##  (Other):256                                                                      
-##       A280        
-##  Min.   : -1.258  
-##  1st Qu.: 13.127  
-##  Median : 19.111  
-##  Mean   : 41.977  
-##  3rd Qu.: 80.299  
-##  Max.   :571.996  
-## 
-```
+Average replicates.
+
 
 ```r
-conc <- aggregate(conc[,-1], list(conc$Well, conc$plate, conc$exp), mean)
-colnames(conc) <- c("Well", "discard1", "discard2", "plate", "exp", "obs", "A260", "A280")
-conc <- conc[,c("Well", "discard1", "discard2", "plate", "exp", "obs", "A260", "A280")]
+conc <- aggregate( conc[,c("obs", "A260", "A280")]
+                 , list(Well = conc$Well, ID = conc$ID, plate = conc$plate)
+                 , mean)
+```
 
-conc$Well %<>% factor(levels = levels(conc$Well) %>% gtools::mixedsort())
+
+
+```r
+conc$exp <- 50
+
+conc[conc$plate == 1 & conc$ID %in% 01:21, "exp"] <- 400
+conc[conc$plate == 1 & conc$ID %in% 43:63, "exp"] <- 6.25
+
+conc[conc$plate == 2 & conc$ID %in% 01:21, "exp"] <- 600
+conc[conc$plate == 2 & conc$ID %in% 22:42, "exp"] <- 400
 ```
 
 Samples at expected 600 μM were diluted 5 times to stay in the instrument's
@@ -179,10 +107,31 @@ dynamic range.  Correcting values.
 
 ```r
 conc[conc$exp == 600, c("obs", "A260", "A280")] %<>% multiply_by(5)
+summary(conc)
 ```
 
+```
+##       Well           ID      plate       obs                A260             A280         
+##  A1     :  2   1      :  2   1:70   Min.   :   89.81   Min.   :  3.23   Min.   :  0.5205  
+##  A2     :  2   2      :  2   2:70   1st Qu.:  617.99   1st Qu.: 22.23   1st Qu.: 13.5344  
+##  A3     :  2   3      :  2          Median :  878.38   Median : 31.59   Median : 19.8855  
+##  A4     :  2   4      :  2          Mean   : 2272.31   Mean   : 81.73   Mean   : 62.6056  
+##  A5     :  2   5      :  2          3rd Qu.: 2505.25   3rd Qu.: 90.11   3rd Qu.: 90.0127  
+##  A6     :  2   6      :  2          Max.   :10503.00   Max.   :378.39   Max.   :287.1365  
+##  (Other):128   (Other):128                                                                
+##       exp        
+##  Min.   :  6.25  
+##  1st Qu.: 50.00  
+##  Median : 50.00  
+##  Mean   :230.94  
+##  3rd Qu.:400.00  
+##  Max.   :600.00  
+## 
+```
+
+
 Histograms
-----------
+==========
 
 
 ```r
@@ -204,8 +153,9 @@ ggpubr::ggarrange( ncol = 1, nrow = 3, hist_obs, hist_a260, hist_a280)
 
 ![](TSO_concentration_check_files/figure-html/concentration_QC_histograms-1.png)<!-- -->
 
+
 Absorbances
------------
+===========
 
 
 ```r
@@ -216,8 +166,9 @@ ggplot(conc, aes(A280, A260, colour = exp)) + geom_point() +
 
 ![](TSO_concentration_check_files/figure-html/concentration_QC_abs_ratio-1.png)<!-- -->
 
+
 Concentrations
---------------
+==============
 
 
 ```r
@@ -227,6 +178,24 @@ ggplot(conc, aes(exp,  obs, colour = exp))  + geom_point() +
 ```
 
 ![](TSO_concentration_check_files/figure-html/concentration_QC_obs_exp-1.png)<!-- -->
+
+
+Comparison with normalisation factors
+=====================================
+
+In [experiment 5](Labcyte-RT_Data_Analysis_5.md), each available TSO was used
+7 times in random positions.  While the reaction mixture was the same
+everywhere,  the yield varied dramatically from TSO to TSO.  Normalisation
+factors were calculated and saved for possible corrections.
+
+Here, we verify whether these normalisation factors correlate with measured
+concentrations.
+
+
+
+```r
+bcNormFactors <- dget("bcNormFactors.R")
+```
 
 Session information
 ===================

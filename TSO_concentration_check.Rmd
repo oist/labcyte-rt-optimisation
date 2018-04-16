@@ -13,87 +13,102 @@ options(width = 100)
 ```
 
 
-Load scripts and libraries
-==========================
+Load R packages
+===============
 
 ```{r load_libraries}
 library("magrittr")
 library("ggplot2")
-# Do not load the whole smallCAGEqc package, just get the barcode data.
-data("nanoCAGE2017barcodes", package = "smallCAGEqc")
 ```
 
 
-Concentration checks
-====================
+Load data
+=========
 
-Data load
----------
-
-Concentrations of the actual TSO solutions in the source plage, measured with
+Concentrations of the actual TSO solutions in source plates, measured with
 the NanoDrop instrument for 8-strip tubes (NanoDrop 8000 ?).
 
 Concentration factor was _27.8_ (_A260 × 27.8 = concentration_ in ng/μL).
 
-Original file name `180221_KATO.xlsx`.  This file has two sheets.  The first for
-source plate 1, where the TSOs at 600 μM were too concentrated for the
-measurement (out of dynamic range).  The second is for source plate 1, (first
-140 rows), and then for plate 2's TSOs at 600 μM, which were dilluted 5 times
-before being measured again.
+Original file name `180221_KATO.xlsx`.  This file has two sheets containing
+raw data.  The first (`original data_180221`) is for
+[source plate 2](Labcyte-RT2.md).  In this measurement, the TSOs at 600 μM were
+too concentrated (out of dynamic range).
 
-```{r concentration_QC_load}
-conc1 <- gdata::read.xls( "Labcyte-RT2.quantification.xlsx"
+```{r concentration_QC_load_1}
+plate2 <- gdata::read.xls( "Labcyte-RT2.quantification.xlsx"
                         , nrow = 140, stringsAsFactors = FALSE)
-summary(conc1)
-conc2 <- gdata::read.xls( "Labcyte-RT2.quantification.xlsx"
-                        , nrow = 182, sheet = 2, stringsAsFactors = FALSE)
-summary(conc2)
-conc1[1:42,] <- conc2[141:182,]
-conc2 <- conc2[-(141:182),]
-conc2$X <- NA  # For column compatibility with conc1
-
-conc1$exp <- 50
-conc1[grep("[1-3]$", conc1$Well), "exp"] <- 600
-conc1[grep("[4-6]$", conc1$Well), "exp"] <- 400
-
-conc2$exp <- 50
-conc2[grep("[1-3]$", conc2$Well), "exp"] <- 400
-conc2[grep("[7-9]$", conc2$Well), "exp"] <- 6.25
-
-conc1$plate <- 2
-conc2$plate <- 1
-conc <- rbind(conc1, conc2)
-rm(conc1); rm(conc2)
 ```
 
-```{r concentration_QC_prepare}
-conc <- data.frame( Well  = conc$Well
-                  , plate = conc$plate
-                  , exp   = conc$exp
+The second sheet (`original data_180222`) is for [source plate 1](Labcyte-RT.md),
+(first 140 rows), and then for plate 2's TSOs at 600 μM, which were dilluted 5
+times before being measured again.
+
+```{r concentration_QC_load_2, dependson = "concentration_QC_load_1"}
+plate1 <- gdata::read.xls( "Labcyte-RT2.quantification.xlsx"
+                        , nrow = 182, sheet = 2, stringsAsFactors = FALSE)
+
+plate2[1:42,] <- plate1[141:182,]
+plate1 <- plate1[-(141:182),]
+plate1$X <- NA  # For column compatibility with plate2
+```
+
+Sheet 2 indicates the barcode ID for each TSO; Sheet 1 has the same layout.
+
+```{r concentration_QC_load_IDs, dependson = "concentration_QC_load_2"}
+plate2$Sample.ID <- plate1$Sample.ID
+```
+
+Merge the tables.
+
+```{r concentration_QC_merge, dependson = "concentration_QC_load_IDs"}
+plate2$plate <- 2
+plate1$plate <- 1
+conc <- rbind(plate2, plate1)
+rm(plate2); rm(plate1)
+
+conc <- data.frame( Well  = conc$Well      
+                  , ID    = conc$Sample.ID %>% factor
+                  , plate = conc$plate     %>% factor
                   , obs   = conc$Conc..
                   , A260  = conc$A260.
                   , A280  = conc$A280.)
 
-summary(conc)
-
-conc <- aggregate(conc[,-1], list(conc$Well, conc$plate, conc$exp), mean)
-colnames(conc) <- c("Well", "discard1", "discard2", "plate", "exp", "obs", "A260", "A280")
-conc <- conc[,c("Well", "discard1", "discard2", "plate", "exp", "obs", "A260", "A280")]
-
 conc$Well %<>% factor(levels = levels(conc$Well) %>% gtools::mixedsort())
+```
+
+Average replicates.
+
+```{r concentration_QC_average_replicates, dependson = "concentration_QC_merge"}
+conc <- aggregate( conc[,c("obs", "A260", "A280")]
+                 , list(Well = conc$Well, ID = conc$ID, plate = conc$plate)
+                 , mean)
+```
+
+
+```{r concentration_QC_load_molarity, dependson = "concentration_QC_average_replicates"}
+conc$exp <- 50
+
+conc[conc$plate == 1 & conc$ID %in% 01:21, "exp"] <- 400
+conc[conc$plate == 1 & conc$ID %in% 43:63, "exp"] <- 6.25
+
+conc[conc$plate == 2 & conc$ID %in% 01:21, "exp"] <- 600
+conc[conc$plate == 2 & conc$ID %in% 22:42, "exp"] <- 400
 ```
 
 Samples at expected 600 μM were diluted 5 times to stay in the instrument's
 dynamic range.  Correcting values.
 
-```{r concentration_QC_dil_fact}
+```{r concentration_QC_dil_fact, dependson = "concentration_QC_load_molarity"}
 conc[conc$exp == 600, c("obs", "A260", "A280")] %<>% multiply_by(5)
+summary(conc)
 ```
 
-Histograms
-----------
 
-```{r concentration_QC_histograms, warning = FALSE}
+Histograms
+==========
+
+```{r concentration_QC_histograms, warning = FALSE, dependson = "load_libraries"}
 hist_obs  <- ggplot(conc, aes(obs,  fill = exp)) + geom_histogram() +
   facet_wrap(~exp, nrow = 1) + ggtitle("Observed concentrations (ng/μL)")
 hist_a260 <- ggplot(conc, aes(A260, fill = exp)) + geom_histogram() +
@@ -104,8 +119,9 @@ hist_a280 <- ggplot(conc, aes(A280, fill = exp)) + geom_histogram() +
 ggpubr::ggarrange( ncol = 1, nrow = 3, hist_obs, hist_a260, hist_a280)
 ```
 
+
 Absorbances
------------
+===========
 
 ```{r concentration_QC_abs_ratio}
 ggplot(conc, aes(A280, A260, colour = exp)) + geom_point() +
@@ -113,13 +129,31 @@ ggplot(conc, aes(A280, A260, colour = exp)) + geom_point() +
   ggtitle("Relation between absorbances at 260 and 280 nm")
 ```
 
+
 Concentrations
---------------
+==============
 
 ```{r concentration_QC_obs_exp}
 ggplot(conc, aes(exp,  obs, colour = exp))  + geom_point() +
   scale_x_log10() + scale_y_log10() +
   ggtitle("Observed concentration and expected molarity")
+```
+
+
+Comparison with normalisation factors
+=====================================
+
+In [experiment 5](Labcyte-RT_Data_Analysis_5.md), each available TSO was used
+7 times in random positions.  While the reaction mixture was the same
+everywhere,  the yield varied dramatically from TSO to TSO.  Normalisation
+factors were calculated and saved for possible corrections.
+
+Here, we verify whether these normalisation factors correlate with measured
+concentrations.
+
+
+```{r bcNormFactors}
+bcNormFactors <- dget("bcNormFactors.R")
 ```
 
 Session information
