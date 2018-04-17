@@ -1,0 +1,480 @@
+---
+title: "Labcyte-RT Data Analysis (3nd experiment)"
+output:
+  html_document:
+    keep_md: yes
+    number_sections: yes
+    toc: yes
+---
+
+```{r echo = FALSE}
+knitr::opts_chunk$set(cache  = TRUE)
+knitr::opts_knit$set(verbose = TRUE)
+ggplot2::theme_set(ggplot2::theme_bw())
+```
+
+Load R packages
+===============
+
+```{r load_R_libraries, message = FALSE}
+library("CAGEr")
+library("ggplot2")
+library("lattice")
+library("magrittr")
+library("MultiAssayExperiment")
+library("RColorBrewer")
+library("SummarizedExperiment")
+library("vegan")
+```
+
+
+Load CAGE data
+========================
+
+Data from plates 1~3 and 4~6 were first loaded in separate CAGEexp objects
+because our MOIRAI pipeline does not support dual indexing (see
+[Labcyte-RT_Data_Analysis_3a.md](Labcyte-RT_Data_Analysis_3a.md) and
+[Labcyte-RT_Data_Analysis_3b.md](Labcyte-RT_Data_Analysis_3b.md)).  They were
+then merged in a small dedicated workflow [Labcyte-RT_Data_Analysis_3merge.md](Labcyte-RT_Data_Analysis_3merge.md).
+This analysis start by loading the merged object.
+
+
+```{r load_and_merge, dependson = "load_R_libraries"}
+ce <- readRDS("Labcyte-RT_Data_Analysis_3.Rds")
+```
+
+Barcode QC
+----------
+
+Barcode 1 (`ACACAG`) is found in raw data but not in aligned sequences, which
+makes sense because it is a negative control with no RNA.
+
+Barcode 28 (`CACACG`) is found in largest amounts, which also makes sense given
+it encodes high TSO and high RT_PRIMERS.
+
+```{r barcode_qc}
+system("zgrep -h TATAGGG /sequencedata/MiSeq/180215_M00528_0330_000000000-B4GPD/Data/Intensities/BaseCalls/*_L001_R1_001.fastq.gz | cut -c1-6 | sort | uniq -c | sort -n > bctroubleshoot.txt")
+bc <- read.table("bctroubleshoot.txt", col.names = c("n", "bc"))
+nc <- smallCAGEqc::nanoCAGE2017barcodes
+bc$bcid <- rownames(nc)[match(bc$bc, nc$barcodes)]
+bc$bcid <- rownames(nc)[match(bc$bc, nc$barcodes)]
+bcFound <- unique(colData(ce)[,c("BARCODE_ID", "BARCODE_SEQ")]) %>% data.frame()
+bc$foundID <- bcFound$BARCODE_ID[match(bc$bc, bcFound$BARCODE_SEQ)]
+gtools::mixedsort(unique(bc$bcid))
+gtools::mixedsort(unique(bc$foundID))
+
+colData(ce)$BARCODE_ID %>% factor() %>% levels
+colData(ce)[ce$BARCODE_ID %in% 8:14,]
+
+ce$enzyme <- ce$plateID
+levels(ce$enzyme) <- c(rep("SS III", 3), rep("SS  IV", 4))
+```
+
+
+Annotation with GENCODE
+-----------------------
+
+Collect Gencode annotations and gene symbols via a local GENCODE file
+(mm9 gencode not available in AnnotationHub)
+
+Most pairs align in intergenic regions.  Is it because of the sequence error
+combined with very short read 1s ?
+
+```{r annotate_CTSS, dependson = "get_CTSS_data"}
+annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
+```
+
+
+Quality controls
+----------------
+
+### Barcode normalisation factors
+
+```{r bcNormFactors}
+bcNormFactors <- structure(c(0.809118291811093, 0.921979956553516, 1.28531215836344, 
+0.825859986356391, 1.00700397413688, 0.938719633250481, 0.681175395119992, 
+0.918615035033151, 0.484866434332997, 0.355968348618312, 0.3548917747175, 
+0.138579512369052, 0.110111580327963, 0.162414019513917, 0.238345570187361, 
+3.4880347713721, 4.92294445253222, 0.344239194937513, 0.175183243096261, 
+3.04924091789366, 0.0981138749290282, 0.972104174729293, 1.08919552205823, 
+0.10727396193921, 1.22115726162363, 0.214274127942346, 0.948828398563349, 
+3.17756236972294, 0.193981928012546, 1.3729416592414, 0.289572786553094, 
+2.65454032162109, 0.391377489411261, 2.82901793549149, 1.26529277432018, 
+1.32177171180144, 0.335618479322294, 0.849194969606244, 1.3867150786494, 
+4.73877048405918, 0.815487349973281, 0.219231228142107, 0.281714283293747, 
+1.82703622160332, 0.160177981834252, 0.596800660278776, 0.645025416211574, 
+0.73531910172467, 0.809727344142811, 0.324439014423688, 1.62026784915362, 
+0.284042847468391, 3.54890136155889, 2.05820836078464, 0.323647670876182, 
+3.36364575406585, 0.139749737408783, 3.87573265221467, 0.151973965464145, 
+3.20310394429206, 0.0828741303865386, 0.119903015346453, 1.59131283341867, 
+0.172980390619809, 0.414267319370146, 0.161363676311816, 0.435225196519177, 
+0.490253598337581, 0.236294478587002, 1.86159451602523, 1.40386765746668, 
+3.01736859198023, 4.05113175791664, 1.01739438814641, 0.196927670777647, 
+0.0767075924021711, 0.13047949015839, 1.05709835543086, 0.0937688998183246, 
+0.259122131174918, 0.765448595984551, 0.1035224898481, 0.0696801582538245, 
+0.0272947565310441, 0.0607398161671866, 0.12666155627812, 0.0917027350756094, 
+0.0691711594196187, 0.130796172883205, 1.1085324864002, 0.987008176241326, 
+0.106404053076388, 0.307410708333436, 1.1708140855908, 1.46777671884331, 
+0.882958335841687), .Dim = 96L, .Dimnames = list(c("ACACAG", 
+"ACACGT", "ACACTC", "ACAGAT", "ACAGCA", "ACAGTG", "ACATAC", "ACATCT", 
+"ACATGA", "AGTACG", "AGTAGC", "AGTATA", "AGTCAG", "AGTCGT", "AGTCTC", 
+"AGTGAT", "AGTGCA", "AGTGTG", "ATCACG", "ATCAGC", "ATCATA", "ATCGAT", 
+"ATCGCA", "ATCGTG", "ATCTAC", "ATCTCT", "ATCTGA", "CACACG", "CACAGC", 
+"CACATA", "CACGAT", "CACGCA", "CACGTG", "CACTAC", "CACTCT", "CACTGA", 
+"CGACAG", "CGACGT", "CGACTC", "CGAGAT", "CGAGCA", "CGAGTG", "CGATAC", 
+"CGATCT", "CGATGA", "CTGACG", "CTGAGC", "CTGATA", "CTGCAG", "CTGCGT", 
+"CTGCTC", "CTGTAC", "CTGTCT", "CTGTGA", "GAGACG", "GAGAGC", "GAGATA", 
+"GAGCAG", "GAGCGT", "GAGCTC", "GAGTAC", "GAGTCT", "GAGTGA", "GCTACG", 
+"GCTAGC", "GCTATA", "GCTCAG", "GCTCGT", "GCTCTC", "GCTGAT", "GCTGCA", 
+"GCTGTG", "GTACAG", "GTACGT", "GTACTC", "GTAGAT", "GTAGCA", "GTAGTG", 
+"GTATAC", "GTATCT", "GTATGA", "TATACG", "TATAGC", "TATATA", "TATCAG", 
+"TATCGT", "TATCTC", "TATGAT", "TATGCA", "TATGTG", "TCGACG", "TCGAGC", 
+"TCGATA", "TCGCAG", "TCGCGT", "TCGCTC")))
+```
+
+
+### Custom _scopes_ displaying _strand invasion_ artefacts.
+
+```{r custom_plotAnnot_scopes, dependson = "bcNormFactors"}
+msScope_qcSI <- function(libs) {
+  libs$Tag_dust     <- libs$extracted   - libs$rdna - libs$spikes - libs$cleaned
+  libs$rDNA         <- libs$rdna
+  libs$Spikes       <- libs$spikes
+  libs$Unmapped     <- libs$cleaned     - libs$mapped
+  libs$Non_proper   <- libs$mapped      - libs$properpairs
+  libs$Duplicates   <- libs$properpairs - libs$librarySizes - libs$strandInvaders
+  libs$Invaders     <- libs$strandInvaders
+  libs$Counts       <- libs$librarySizes
+  list( libs    = libs
+      , columns = c( "Tag_dust", "rDNA", "Spikes", "Unmapped"
+                   , "Non_proper", "Duplicates", "Invaders", "Counts")
+      , total   = libs$extracted)
+}
+
+msScope_counts <- function(libs) {
+  libs$Promoter   <- libs$promoter
+  libs$Exon       <- libs$exon
+  libs$Intron     <- libs$intron
+  libs$Intergenic <- libs$librarySizes - libs$promoter - libs$intron - libs$exon
+  libs$Invaders   <- libs$strandInvaders
+  list( libs    = libs
+      , columns = c("Promoter", "Exon", "Intron", "Intergenic", "Invaders")
+      , total   = libs$librarySizes + libs$strandInvaders)
+}
+
+msScope_libSizeNormByIndex <- function(libs) {
+  libs$Yield   <- libs$libSizeNormByIndex
+  list( libs    = libs
+      , columns = c("Yield")
+      , total   = libs$Yield)
+}
+
+msScope_libSize <- function(libs) {
+  libs$Yield   <- libs$librarySizes
+  list( libs    = libs
+      , columns = c("Yield")
+      , total   = libs$Yield)
+}
+```
+
+
+### By RNA input
+
+Negative controls with no RNA gave much less sequences than the regular samples
+with RNA.
+
+```{r qc_RNA_quantity, dependson = "get_CTSS_data"}
+ggpubr::ggarrange( legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = msScope_qcSI, group = "plateID", normalise = FALSE
+           , title = "sequence counts"
+           , facet="RNA") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_qcSI, group = "plateID", normalise = TRUE
+         , title = "normalised to 100 %"
+         , facet="RNA") +
+  facet_wrap(~facet, ncol = 1)
+) %>% ggpubr::annotate_figure(top="QC of processing, by ng of input RNA")
+```
+
+```{r CTSS_annotation_plot_per_replicate, dependson = "annotate_CTSS"}
+ggpubr::ggarrange( legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = "counts", group = "plateID"
+           , title = "Sequence counts"
+           , facet = "RNA", normalise = FALSE) +
+    facet_wrap("facet", ncol = 1),
+  plotAnnot( ce, scope = "counts", group = "plateID"
+           , title = "Normalised to 100%"
+           , facet = "RNA", normalise = TRUE) +
+    facet_wrap("facet", ncol = 1)
+)  %>% ggpubr::annotate_figure(top="QC annotation, by ng of input RNA")
+```
+
+The normalised QC profile is not much different, therefore the sequences in the
+no RNa controls might be minor _in silico_ or _in vitro_ contaminations.
+
+
+### Removal of the RNA negative controls
+
+To ease data handling, the negative controls with no RNA are removed.
+But a backup (`ceWithNC` is kept).
+
+```{r remove_noRNA_ctls, dependson = "load_and_merge"}
+ceWithNC <- ce
+ce <- ce[,ce$RNA != 0]
+```
+
+
+### By RT primer quantity
+
+```{r qc_rt_primer_quantity, dependson = "remove_noRNA_ctls"}
+ggpubr::ggarrange( legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = msScope_qcSI, group = "plateID", normalise = FALSE
+           , title = "sequence counts"
+           , facet="RT_PRIMERS") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_qcSI, group = "plateID", normalise = TRUE
+         , title = "normalised to 100 %"
+         , facet="RT_PRIMERS") +
+  facet_wrap(~facet, ncol = 1)
+) %>% ggpubr::annotate_figure(top="QC annotation, RT primer quantity")
+```
+
+
+### Removal of the primer-negative controls
+
+To ease data handling (for instance when working with primer ratios), the
+negative controls with no primers are removed.
+
+```{r remove_noPrimers_ctls, dependson = "remove_noRNA_ctls"}
+ce <- ce[,ce$RT_PRIMERS != 0]
+```
+
+Lets tidy the primer ratios after the null primer concentrations were removed.
+
+```{r correct_primer_ratios, dependson = "remove_noPrimers_ctls"}
+ce$PRIMERS_RATIO %<>% droplevels
+levels(ce$PRIMERS_RATIO) %<>% as.numeric %>% signif(2) %>% as.character
+ce$PRIMERS_RATIO %<>% factor(levels = levels(ce$PRIMERS_RATIO) %>% gtools::mixedsort())
+```
+
+
+### By TSO concentration
+
+There is a trend decreasing sequence yield with decreasing TSO amounts.
+Interestingly, the optimum seems to be lower when RNA quantity is lower.
+
+A realignment with a mapping quality threshold of 20 is ongoing.
+
+There is a clear defect for TSO == 60.
+
+rRNA rate seems to increase when TSO concentration is reduced.
+
+```{r TSO, dependson = "get_CTSS_data"}
+ggpubr::ggarrange( legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = msScope_qcSI, group = "plateID", normalise = FALSE
+           , title = "sequence counts"
+           , facet="TSO") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_qcSI, group = "plateID", normalise = TRUE
+         , title = "normalised to 100 %"
+         , facet="TSO") +
+  facet_wrap(~facet, ncol = 1)
+) %>% ggpubr::annotate_figure(top="QC annotation, by TSO quantity")
+```
+
+#### Normalised version
+
+```{r}
+ce$libSizeNormByIndex <- mapply(function(n, bc) n / bcNormFactors[bc], n = ce$librarySizes, bc = ce$BARCODE_SEQ)
+ggpubr::ggarrange( legend = "right",
+  plotAnnot( ce, scope = msScope_libSizeNormByIndex, group = "enzyme", normalise = FALSE
+           , title = "Yield"
+           , facet="TSO") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_qcSI, group = "enzyme", normalise = TRUE
+         , title = "normalised to 100 %"
+         , facet="TSO") +
+  facet_wrap(~facet, ncol = 1)
+) %>% ggpubr::annotate_figure(top="QC annotation, by TSO quantity")
+```
+
+Barcode "CTGTCT" gave large amounts of artefacts.  This is not the case for its
+nearest similar barcode "CTGCTC".
+
+Barcodes "ATCAGC" and "CACACG" yielded a large amount of extracted reads.
+
+
+```{r ggplot_wrapper}
+# 
+# meanUnique <- function(x) {
+#   if (is.numeric(x)) return(mean (x))
+#   x <- as.character(x)
+#   x <- unique(x)
+#   if (length(x) == 1) return(x)
+#   NA
+# }
+# 
+# r <- aggregate(colData(ce) %>% data.frame, by = list(ce$TSO, ce$RT_PRIMERS, ce$RNA), meanUnique)
+# 
+# x <- aggregate(colData(ce) %>% data.frame, by = list(ce$TSO, ce$RT_PRIMERS), meanUnique)
+# 
+# filled.contour(x$TSO, x$RT_PRIMERS, x$counts)
+# 
+# 
+# levelplot(data=x, counts ~ TSO * RT_PRIMERS, scales = list(log=10))
+# 
+# plotly::plot_ly(x, x=~TSO, y=~RT_PRIMERS, z=~counts, type = "contour")
+# 
+# y <- x[x$TSO != 60,]
+# 
+# levelplot(data=y, counts ~ TSO * RT_PRIMERS, scales = list(log=10))
+# 
+# plot_ly(y, x=~TSO, y=~RT_PRIMERS, z=~counts, type = "contour")
+# 
+# 
+# ggplot(x, aes(TSO, RT_PRIMERS, z=counts)) + scale_y_log10()+ scale_x_log10() + geom_contour()
+# 
+# ggplot.CAGEexp <- function(data, ...)
+#   ggplot(as.data.frame(colData(data)), ...)
+# 
+# # ? https://stackoverflow.com/questions/35866379/geom-raster-interpolation-with-log-scale
+# 
+# ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = librarySizes)) + facet_wrap(~repl + group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("molecules")
+# 
+# ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = extracted)) + facet_wrap(~repl + group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("extracted")
+# 
+# ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = tagdust / extracted * 100)) + facet_wrap(~repl + group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("%tagdust")
+```
+
+Reactions that received multiple droplets of TSOs did not fail (here we are averaging
+very different TSO concentrations, to the point is just to show that for volumes
+of 100 and 50, we have roughly the same amount of data.)
+
+```{r}
+plotAnnot(ce, scope = msScope_qcSI, group = "TSO_vol", normalise = FALSE)
+```
+
+### By primer ratio
+
+```{r}
+plotAnnot(ce, scope = msScope_qcSI, group = "PRIMERS_RATIO", normalise = FALSE, facet = "group")
+plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = FALSE, facet = "RT_PRIMERS")
+plotAnnot(ce, scope = msScope_libSizeNormByIndex, group = "TSO", normalise = FALSE, facet = "RT_PRIMERS")
+plotAnnot(ce[,ce$enzyme == "SS III"], scope = msScope_qcSI, group = "TSO", normalise = TRUE, facet = "RT_PRIMERS")
+plotAnnot(ce[,ce$enzyme == "SS  IV"], scope = msScope_qcSI, group = "TSO", normalise = TRUE, facet = "RT_PRIMERS")
+
+
+plotAnnot(ce, scope = msScope_libSizeNormByIndex, group = "RT_PRIMERS", normalise = FALSE, facet = "TSO")
+plotAnnot(ce[,ce$enzyme == "SS III"], scope = msScope_qcSI, group = "RT_PRIMERS", normalise = TRUE, facet = "TSO")
+plotAnnot(ce[,ce$enzyme == "SS  IV"], scope = msScope_qcSI, group = "RT_PRIMERS", normalise = TRUE, facet = "TSO")
+```
+
+
+Annotation with GENCODE
+-----------------------
+
+Collect Gencode annotations and gene symbols via a local GENCODE file
+(mm9 gencode not available in AnnotationHub)
+
+```{r annotate_CTSS}
+annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
+```
+
+```{r CTSS_annotation_plot_per_replicate}
+plotAnnot(ce, scope = msScope_counts, group = "repl", facet = "group") +
+  facet_wrap("facet", nrow = 5)
+plotAnnot(ce, scope = msScope_counts, group = "repl", facet = "group", norm = F) +
+  facet_wrap("facet", nrow = 5)
+```
+
+```{r CTSS_annotation_plot_per_group}
+plotAnnot(ce, scope = msScope_counts, group = "TSO", normalise = FALSE, facet = "group") +
+  facet_wrap("facet", ncol = 5)
+plotAnnot(ce, scope = msScope_counts, group = "TSO", normalise = TRUE,  facet = "group") +
+  facet_wrap("facet", ncol = 5)
+```
+
+```{r CTSS_annotation_heatmaps_all}
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = promoter / librarySizes * 100)) + facet_wrap(~repl + group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("promoter rate")
+
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = (properpairs - librarySizes) / librarySizes)) + facet_wrap(~repl + group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("PCR duplicates %")
+```
+
+```{r CTSS_annotation_heatmaps_per_group, fig.height=4, fig.width=15}
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = promoter / librarySizes * 100)) + facet_wrap(~group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("promoter rate")
+
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = (properpairs - librarySizes) / librarySizes)) + facet_wrap(~group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("PCR duplicates %")
+```
+
+CTSS ANALYSIS
+=============
+
+Number of nanoCAGE tags mapping at CTSS positions in each sample
+----------------------------------------------------------------
+  
+```{r ctss-analysis}
+ce$l1 <- sapply(CTSStagCountDF(ce), function(x) sum(decode(x) > 0))
+```
+
+Gene expression analysis
+========================
+
+Make a gene expression table (not really required now).
+
+```{r CTSStoGenes-CAGEexp}
+CTSStoGenes(ce)
+```
+
+```{r CTSS_ngenes_heatmaps_all}
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = genes)) + facet_wrap(~repl + group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("Gene discovery")
+```
+
+```{r CTSS_ngenes_heatmaps_per_group, fig.height=4, fig.width=15}
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = genes)) + facet_wrap(~group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("Gene discovery")
+```
+
+Rarefaction
+------------
+
+```{r, message = FALSE, fig.height=4, fig.width=15}
+ce$r100l1 <- rarefy(t(CTSStagCountDA(ce)),10)
+ce$r100l1[librarySizes(ce) < 10] <- NA
+
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = r100l1)) + facet_wrap(~group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("Richness (on a scale of 10)")
+```
+
+
+```{r precompute_hanabi_objs}
+rar1 <- hanabi(CTSStagCountDF(ce), from = 0)
+#rarc <- hanabi(assay(consensusClustersSE(myCAGEexp)) %>% as.data.frame, from = 0)
+rarg <- hanabi(assay(GeneExpSE(ce)), from = 0)
+#save(rar1, rarg, file="rar.Rda") 
+```
+
+### Plot TSS discovery
+
+```{r hanabi-TSS_byrep, dev=c('png')}
+hanabiPlot(rar1, ylab='number of TSS detected', xlab='number of unique molecule counts', main=paste("TSS discovery"), group=ce$TSO, legend.pos = "bottomright")
+```
+
+### Plot Cluster discovery
+
+```{r hanabi-CTSS_clusters_byrep, dev=c('png')}
+#hanabiPlot(rarc, ylab='number of CTSS clusters detected', xlab='number of unique molecule counts', main=paste("Cluster discovery"), #group=myCAGEexp$group, legend.pos = "bottomright")
+```
+
+### Plot Gene discovery
+
+```{r hanabi-gene_byrep, dev=c('png')}
+hanabiPlot(rarg, ylab='number of genes detected', xlab='number of unique molecule counts', main=paste("Gene discovery"), group=ce$TSO, legend.pos = "bottomright")
+```
+
+Save the CAGEexp file.
+
+```{r save_myCAGEexp_object}
+saveRDS(ce, "Labcyte-RT_Data_Analysis_2.Rds")
+```
+
+```{r}
+sessionInfo()
+```
