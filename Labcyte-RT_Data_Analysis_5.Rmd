@@ -1,10 +1,12 @@
 ---
-title: "Labcyte-RT Data Analysis (4th experiment)"
+title: "Labcyte-RT Data Analysis (5th experiment)"
 output:
   html_document:
     keep_md: yes
     number_sections: yes
     toc: yes
+    pandoc_args:
+     - "--lua-filter=links-to-markdown.lua"
 ---
 
 ```{r echo = FALSE}
@@ -23,6 +25,7 @@ these two factors are conflated).
 
 The reverse-transcriptase was SuperScript III.
 
+
 Load R packages
 ===============
 
@@ -39,7 +42,7 @@ MOIRAI shortcuts
 ```{r moirai_shortcuts, dependson = "load_R_libraries"}
 MISEQ_RUN      <- "180411_M00528_0351_000000000-BN3BL"
 WORKFLOW       <- "OP-WORKFLOW-CAGEscan-short-reads-v2.1.1"
-MOIRAI_STAMP   <- "20180412055135"
+MOIRAI_STAMP   <- "20180412203518"
 MOIRAI_PROJ    <- "project/Labcyte" 
 MOIRAI_USER    <- "nanoCAGE2" 
 ASSEMBLY       <- "mm9"
@@ -92,8 +95,8 @@ ce
 Load plate design
 -----------------
 
-Using plate 4 and 5 design, see [Labcyte-RT4.md](Labcyte-RT4.md) and 
-[Labcyte-RT5.md](Labcyte-RT5.md).
+Using plate 4 and 5 design, see [Labcyte-RT4](Labcyte-RT4.md) and 
+[Labcyte-RT5](Labcyte-RT5.md).
 
 ```{r PLATE, dependson = "MOIRAI"}
 plate4 <- read.table("plate4.txt", sep = "\t", header = TRUE, stringsAsFactors = FALSE)
@@ -129,6 +132,19 @@ saveRDS(ce, "Labcyte-RT_Data_Analysis_4.Rds")
 ```
 
 
+Annotation with GENCODE
+-----------------------
+
+Collect Gencode annotations and gene symbols via a local GENCODE file
+(mm9 gencode not available in AnnotationHub)
+
+Most pairs align in intergenic regions.  Is it because of the sequence error
+combined with very short read 1s ?
+
+```{r annotate_CTSS, dependson = "get_CTSS_data"}
+annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
+```
+
 Quality controls
 ================
 
@@ -160,72 +176,80 @@ msScope_counts <- function(libs) {
       , columns = c("Promoter", "Exon", "Intron", "Intergenic", "Invaders")
       , total   = libs$librarySizes + libs$strandInvaders)
 }
+
+msScope_libSizeNormByBarcode <- function(libs) {
+  libs$Yield   <- libs$libSizeNormByBarcode
+  list( libs    = libs
+      , columns = c("Yield")
+      , total   = libs$Yield)
+}
+
+msScope_libSizeNormByIndex <- function(libs) {
+  libs$Yield   <- libs$libSizeNormByIndex
+  list( libs    = libs
+      , columns = c("Yield")
+      , total   = libs$Yield)
+}
+
+msScope_libSize <- function(libs) {
+  libs$Yield   <- libs$librarySizes
+  list( libs    = libs
+      , columns = c("Yield")
+      , total   = libs$Yield)
+}
 ```
 
 
-By RNA input
+By replicate
 ------------
 
 ```{r qc_RNA_quantity, dependson = "get_CTSS_data"}
 ggpubr::ggarrange( legend = "right", common.legend = TRUE,
-  plotAnnot( ce, scope = msScope_qcSI, group = "repl", normalise = FALSE
-           , title = "sequence counts"),
-  plotAnnot( ce, scope = msScope_qcSI, group = "repl", normalise = TRUE
-         , title = "normalised to 100 %")
-) %>% ggpubr::annotate_figure(top="QC of processing, by ng of input RNA")
+  plotAnnot( ce, scope = msScope_qcSI, group = "repl", normalise = FALSE, title = NULL) +
+    ylab("sequence counts") + xlab("Replicate number"),
+  plotAnnot( ce, scope = msScope_qcSI, group = "repl", normalise = TRUE,  title = NULL) +
+    ylab("Normalised to 100%") + xlab("Replicate number")
+) %>% ggpubr::annotate_figure(top="QC of processing, by indexed library")
 ```
 
-
-Annotation with GENCODE
------------------------
-
-Collect Gencode annotations and gene symbols via a local GENCODE file
-(mm9 gencode not available in AnnotationHub)
-
-Most pairs align in intergenic regions.  Is it because of the sequence error
-combined with very short read 1s ?
-
-```{r annotate_CTSS, dependson = "get_CTSS_data"}
-annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
-```
 
 ```{r CTSS_annotation_plot_per_replicate, dependson = "annotate_CTSS"}
 ggpubr::ggarrange( legend = "right", common.legend = TRUE,
-  plotAnnot( ce, scope = msScope_counts, group = "repl", normalise = FALSE
-           , title = "sequence counts"),
-  plotAnnot( ce, scope = msScope_counts, group = "repl", normalise = TRUE
-         , title = "normalised to 100 %")
-) %>% ggpubr::annotate_figure(top="QC annotation, by ng of input RNA")
+  plotAnnot( ce, scope = msScope_counts, group = "repl", normalise = FALSE, title = NULL) +
+    ylab("sequence counts") + xlab("Replicate number"),
+  plotAnnot( ce, scope = msScope_counts, group = "repl", normalise = TRUE,  title = NULL) +
+    ylab("Normalised to 100%") + xlab("Replicate number")
+) %>% ggpubr::annotate_figure(top="QC annotation, by indexed library")
 ```
 
 
 Negative controls
 -----------------
 
-```{r neg_ctls, dependson = "annotate_CTSS"}
+```{r neg_ctls, fig.height=8, dependson="annotate_CTSS"}
 ce$NC <- ce$TSO_vol == 0
 
 ggpubr::ggarrange( legend = "right", common.legend = TRUE,
   plotAnnot( ce, scope = msScope_qcSI, group = "NC"
-           , title = "Sequence counts"
-           , facet = "repl", normalise = FALSE) +
-    facet_wrap("facet", ncol = 1),
+           , title = NULL, facet = "repl", normalise = FALSE) +
+    facet_wrap("facet", ncol = 1) +
+    ylab("sequence counts") + xlab("Negative control ?"),
   plotAnnot( ce, scope = msScope_qcSI, group = "NC"
-           , title = "Normalised to 100%"
-           , facet = "repl", normalise = TRUE) +
-    facet_wrap("facet", ncol = 1)
-)  %>% ggpubr::annotate_figure(top="QC report, by index and TSO input")
+           , title = NULL, facet = "repl", normalise = TRUE) +
+    facet_wrap("facet", ncol = 1) +
+    ylab("Normalised to 100%") + xlab("Negative control ?")
+)  %>% ggpubr::annotate_figure(top="QC report, by replicate set")
 
 ggpubr::ggarrange( legend = "right", common.legend = TRUE,
   plotAnnot( ce, scope = msScope_counts, group = "NC"
-           , title = "Sequence counts"
-           , facet = "repl", normalise = FALSE) +
-    facet_wrap("facet", ncol = 1),
+           , title = NULL, facet = "repl", normalise = FALSE) +
+    facet_wrap("facet", ncol = 1) +
+    ylab("sequence counts") + xlab("Negative control ?"),
   plotAnnot( ce, scope = msScope_counts, group = "NC"
-           , title = "Normalised to 100%"
-           , facet = "repl", normalise = TRUE) +
-    facet_wrap("facet", ncol = 1)
-)  %>% ggpubr::annotate_figure(top="QC annotation, by index and TSO input")
+           , title = NULL, facet = "repl", normalise = TRUE) +
+    facet_wrap("facet", ncol = 1) +
+    ylab("Normalised to 100%") + xlab("Negative control ?")
+)  %>% ggpubr::annotate_figure(top="QC annotation, by replicate set")
 ```
 
 
@@ -244,9 +268,42 @@ plotAnnot( ce, scope = msScope_qcSI, group = "repl"
            , facet = "BARCODE_ID", normalise = FALSE)
 ```
 
-```{r barcodes_by_id_pooled, fig.height=15, dependson="neg_ctls"}
-plotAnnot( ce[,!ce$NC], scope = msScope_qcSI, group = "BARCODE_ID"
-           , title = "Sequence counts", normalise = FALSE)
+
+Normalisation
+=============
+
+Let's derive a normalisation factor for each barcode sequence, hoping that it
+can correct values from previous experiments.
+
+Not sure if the distribution of library sizes is consistent across replicates.
+Maybe using the median would be more appropriate ?
+
+```{r libSizeHistograms, dependson = "get_CTSS_data"}
+ggplot(colData(ce) %>% data.frame, aes(librarySizes, col = repl)) +
+  geom_histogram() +
+  facet_wrap(~repl, ncol = 2)
+```
+
+```{r bcNormFactors, dependson = "get_CTSS_data"}
+tapply(ce$librarySizes, ce$repl, sum)
+indexMean <- tapply(ce$librarySizes, ce$index, mean)
+ce$libSizeNormByIndex <- mapply(function(n, index) n / indexMean[index], n = ce$librarySizes, index = ce$index)
+bcNormFactors <- tapply(ce$libSizeNormByIndex[!ce$NC], ce$BARCODE_SEQ[!ce$NC], mean)
+bcNormFactors <- bcNormFactors / mean(bcNormFactors)
+bcNormFactors
+dput(bcNormFactors, file = "bcNormFactors.R")
+```
+
+```{r seqCountsAfterNormalisation, fig.height=8, dependson=bcNormFactors}
+ce$libSizeNormByBarcode <- mapply(function(n, bc) n / bcNormFactors[bc], n = ce$librarySizes, bc = ce$BARCODE_SEQ)
+ggpubr::ggarrange( legend = "right", common.legend = TRUE,
+  plotAnnot( ce[,!ce$NC], scope = msScope_libSize, group = "BARCODE_ID"
+             , title = NULL, normalise = FALSE) +
+    ylab("Sequence counts") + xlab("Barcode ID"),
+  plotAnnot( ce[,!ce$NC], scope = msScope_libSizeNormByBarcode, group = "BARCODE_ID"
+             , title = NULL, normalise = FALSE) +
+    ylab("Normalised sequence counts") + xlab("Barcode ID")
+)  %>% ggpubr::annotate_figure(top="Sequence counts, before and after normalisation")
 ```
 
 Session information

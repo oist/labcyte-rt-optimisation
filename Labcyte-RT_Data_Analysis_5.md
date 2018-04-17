@@ -1,10 +1,12 @@
 ---
-title: "Labcyte-RT Data Analysis (4th experiment)"
+title: "Labcyte-RT Data Analysis (5th experiment)"
 output:
   html_document:
     keep_md: yes
     number_sections: yes
     toc: yes
+    pandoc_args:
+     - "--lua-filter=links-to-markdown.lua"
 ---
 
 
@@ -18,6 +20,7 @@ sequence or by the synthesis reaction (we have only one synthesis batch, hence
 these two factors are conflated).
 
 The reverse-transcriptase was SuperScript III.
+
 
 Load R packages
 ===============
@@ -37,7 +40,7 @@ MOIRAI shortcuts
 ```r
 MISEQ_RUN      <- "180411_M00528_0351_000000000-BN3BL"
 WORKFLOW       <- "OP-WORKFLOW-CAGEscan-short-reads-v2.1.1"
-MOIRAI_STAMP   <- "20180412055135"
+MOIRAI_STAMP   <- "20180412203518"
 MOIRAI_PROJ    <- "project/Labcyte" 
 MOIRAI_USER    <- "nanoCAGE2" 
 ASSEMBLY       <- "mm9"
@@ -88,7 +91,7 @@ ce
 ```
 
 ```
-## DataFrame with 758 rows and 18 columns
+## DataFrame with 766 rows and 18 columns
 ##                        samplename     group  barcode    index     total
 ##                          <factor>  <factor> <factor> <factor> <numeric>
 ## ACACAG_TAAGGCGA_M ACACAG_TAAGGCGA library_1   ACACAG TAAGGCGA         0
@@ -104,43 +107,43 @@ ce
 ## TCGCTC_CGAGGCTG_N TCGCTC_CGAGGCTG library_8   TCGCTC CGAGGCTG         0
 ##                   extracted   cleaned   tagdust      rdna    spikes
 ##                   <numeric> <numeric> <numeric> <numeric> <numeric>
-## ACACAG_TAAGGCGA_M      6081      4646       154      1281         0
+## ACACAG_TAAGGCGA_M      6084      4645       155      1284         0
 ## ACACGT_TAAGGCGA_M      6607      4811       121      1673         2
-## ACACTC_TAAGGCGA_M      7562      5706       184      1667         5
+## ACACTC_TAAGGCGA_M      7575      5719       184      1667         5
 ## ACAGAT_TAAGGCGA_M      6939      5202       157      1578         2
-## ACAGCA_TAAGGCGA_M      7232      5656       163      1411         2
+## ACAGCA_TAAGGCGA_M      7230      5651       163      1414         2
 ## ...                     ...       ...       ...       ...       ...
-## TCGAGC_CGAGGCTG_N      3572      2523        92       955         2
-## TCGATA_CGAGGCTG_N      3204      2108        89      1005         2
-## TCGCAG_CGAGGCTG_N     13124      8248       386      4487         3
-## TCGCGT_CGAGGCTG_N     15949     10916       376      4652         5
-## TCGCTC_CGAGGCTG_N      7924      5241       203      2478         2
+## TCGAGC_CGAGGCTG_N      3556      2509        92       953         2
+## TCGATA_CGAGGCTG_N      3202      2106        89      1005         2
+## TCGCAG_CGAGGCTG_N     13118      8249       386      4480         3
+## TCGCGT_CGAGGCTG_N     15962     10927       376      4654         5
+## TCGCTC_CGAGGCTG_N      7922      5240       203      2477         2
 ##                      mapped properpairs    counts
 ##                   <numeric>   <numeric> <numeric>
-## ACACAG_TAAGGCGA_M      4448         483       424
+## ACACAG_TAAGGCGA_M      4447         483       424
 ## ACACGT_TAAGGCGA_M      4676         576       492
-## ACACTC_TAAGGCGA_M      5409         619       560
+## ACACTC_TAAGGCGA_M      5416         619       560
 ## ACAGAT_TAAGGCGA_M      4956         588       509
-## ACAGCA_TAAGGCGA_M      5445         604       532
+## ACAGCA_TAAGGCGA_M      5440         603       531
 ## ...                     ...         ...       ...
-## TCGAGC_CGAGGCTG_N      2406         250       206
+## TCGAGC_CGAGGCTG_N      2393         248       205
 ## TCGATA_CGAGGCTG_N      1943         227       182
-## TCGCAG_CGAGGCTG_N      7727         866       701
-## TCGCGT_CGAGGCTG_N     10405        1172       937
-## TCGCTC_CGAGGCTG_N      4927         524       432
+## TCGCAG_CGAGGCTG_N      7728         867       702
+## TCGCGT_CGAGGCTG_N     10415        1171       935
+## TCGCTC_CGAGGCTG_N      4926         524       432
 ##                                                                                                                                                                                               inputFiles
 ##                                                                                                                                                                                              <character>
-## ACACAG_TAAGGCGA_M /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412055135/CAGEscan_fragments/ACACAG_TAAGGCGA.bed
-## ACACGT_TAAGGCGA_M /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412055135/CAGEscan_fragments/ACACGT_TAAGGCGA.bed
-## ACACTC_TAAGGCGA_M /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412055135/CAGEscan_fragments/ACACTC_TAAGGCGA.bed
-## ACAGAT_TAAGGCGA_M /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412055135/CAGEscan_fragments/ACAGAT_TAAGGCGA.bed
-## ACAGCA_TAAGGCGA_M /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412055135/CAGEscan_fragments/ACAGCA_TAAGGCGA.bed
+## ACACAG_TAAGGCGA_M /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412203518/CAGEscan_fragments/ACACAG_TAAGGCGA.bed
+## ACACGT_TAAGGCGA_M /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412203518/CAGEscan_fragments/ACACGT_TAAGGCGA.bed
+## ACACTC_TAAGGCGA_M /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412203518/CAGEscan_fragments/ACACTC_TAAGGCGA.bed
+## ACAGAT_TAAGGCGA_M /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412203518/CAGEscan_fragments/ACAGAT_TAAGGCGA.bed
+## ACAGCA_TAAGGCGA_M /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412203518/CAGEscan_fragments/ACAGCA_TAAGGCGA.bed
 ## ...                                                                                                                                                                                                  ...
-## TCGAGC_CGAGGCTG_N /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412055135/CAGEscan_fragments/TCGAGC_CGAGGCTG.bed
-## TCGATA_CGAGGCTG_N /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412055135/CAGEscan_fragments/TCGATA_CGAGGCTG.bed
-## TCGCAG_CGAGGCTG_N /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412055135/CAGEscan_fragments/TCGCAG_CGAGGCTG.bed
-## TCGCGT_CGAGGCTG_N /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412055135/CAGEscan_fragments/TCGCGT_CGAGGCTG.bed
-## TCGCTC_CGAGGCTG_N /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412055135/CAGEscan_fragments/TCGCTC_CGAGGCTG.bed
+## TCGAGC_CGAGGCTG_N /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412203518/CAGEscan_fragments/TCGAGC_CGAGGCTG.bed
+## TCGATA_CGAGGCTG_N /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412203518/CAGEscan_fragments/TCGATA_CGAGGCTG.bed
+## TCGCAG_CGAGGCTG_N /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412203518/CAGEscan_fragments/TCGCAG_CGAGGCTG.bed
+## TCGCGT_CGAGGCTG_N /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412203518/CAGEscan_fragments/TCGCGT_CGAGGCTG.bed
+## TCGCTC_CGAGGCTG_N /osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412203518/CAGEscan_fragments/TCGCTC_CGAGGCTG.bed
 ##                   inputFilesType      sampleLabels     repl  plateID
 ##                      <character>       <character> <factor> <factor>
 ## ACACAG_TAAGGCGA_M            bed ACACAG_TAAGGCGA_M        1        M
@@ -160,8 +163,8 @@ ce
 Load plate design
 -----------------
 
-Using plate 4 and 5 design, see [Labcyte-RT4.md](Labcyte-RT4.md) and 
-[Labcyte-RT5.md](Labcyte-RT5.md).
+Using plate 4 and 5 design, see [Labcyte-RT4](Labcyte-RT4.md) and 
+[Labcyte-RT5](Labcyte-RT5.md).
 
 
 ```r
@@ -201,6 +204,20 @@ saveRDS(ce, "Labcyte-RT_Data_Analysis_4.Rds")
 ```
 
 
+Annotation with GENCODE
+-----------------------
+
+Collect Gencode annotations and gene symbols via a local GENCODE file
+(mm9 gencode not available in AnnotationHub)
+
+Most pairs align in intergenic regions.  Is it because of the sequence error
+combined with very short read 1s ?
+
+
+```r
+annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
+```
+
 Quality controls
 ================
 
@@ -233,47 +250,54 @@ msScope_counts <- function(libs) {
       , columns = c("Promoter", "Exon", "Intron", "Intergenic", "Invaders")
       , total   = libs$librarySizes + libs$strandInvaders)
 }
+
+msScope_libSizeNormByBarcode <- function(libs) {
+  libs$Yield   <- libs$libSizeNormByBarcode
+  list( libs    = libs
+      , columns = c("Yield")
+      , total   = libs$Yield)
+}
+
+msScope_libSizeNormByIndex <- function(libs) {
+  libs$Yield   <- libs$libSizeNormByIndex
+  list( libs    = libs
+      , columns = c("Yield")
+      , total   = libs$Yield)
+}
+
+msScope_libSize <- function(libs) {
+  libs$Yield   <- libs$librarySizes
+  list( libs    = libs
+      , columns = c("Yield")
+      , total   = libs$Yield)
+}
 ```
 
 
-By RNA input
+By replicate
 ------------
 
 
 ```r
 ggpubr::ggarrange( legend = "right", common.legend = TRUE,
-  plotAnnot( ce, scope = msScope_qcSI, group = "repl", normalise = FALSE
-           , title = "sequence counts"),
-  plotAnnot( ce, scope = msScope_qcSI, group = "repl", normalise = TRUE
-         , title = "normalised to 100 %")
-) %>% ggpubr::annotate_figure(top="QC of processing, by ng of input RNA")
+  plotAnnot( ce, scope = msScope_qcSI, group = "repl", normalise = FALSE, title = NULL) +
+    ylab("sequence counts") + xlab("Replicate number"),
+  plotAnnot( ce, scope = msScope_qcSI, group = "repl", normalise = TRUE,  title = NULL) +
+    ylab("Normalised to 100%") + xlab("Replicate number")
+) %>% ggpubr::annotate_figure(top="QC of processing, by indexed library")
 ```
 
 ![](Labcyte-RT_Data_Analysis_5_files/figure-html/qc_RNA_quantity-1.png)<!-- -->
 
 
-Annotation with GENCODE
------------------------
-
-Collect Gencode annotations and gene symbols via a local GENCODE file
-(mm9 gencode not available in AnnotationHub)
-
-Most pairs align in intergenic regions.  Is it because of the sequence error
-combined with very short read 1s ?
-
-
-```r
-annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
-```
-
 
 ```r
 ggpubr::ggarrange( legend = "right", common.legend = TRUE,
-  plotAnnot( ce, scope = msScope_counts, group = "repl", normalise = FALSE
-           , title = "sequence counts"),
-  plotAnnot( ce, scope = msScope_counts, group = "repl", normalise = TRUE
-         , title = "normalised to 100 %")
-) %>% ggpubr::annotate_figure(top="QC annotation, by ng of input RNA")
+  plotAnnot( ce, scope = msScope_counts, group = "repl", normalise = FALSE, title = NULL) +
+    ylab("sequence counts") + xlab("Replicate number"),
+  plotAnnot( ce, scope = msScope_counts, group = "repl", normalise = TRUE,  title = NULL) +
+    ylab("Normalised to 100%") + xlab("Replicate number")
+) %>% ggpubr::annotate_figure(top="QC annotation, by indexed library")
 ```
 
 ![](Labcyte-RT_Data_Analysis_5_files/figure-html/CTSS_annotation_plot_per_replicate-1.png)<!-- -->
@@ -288,14 +312,14 @@ ce$NC <- ce$TSO_vol == 0
 
 ggpubr::ggarrange( legend = "right", common.legend = TRUE,
   plotAnnot( ce, scope = msScope_qcSI, group = "NC"
-           , title = "Sequence counts"
-           , facet = "repl", normalise = FALSE) +
-    facet_wrap("facet", ncol = 1),
+           , title = NULL, facet = "repl", normalise = FALSE) +
+    facet_wrap("facet", ncol = 1) +
+    ylab("sequence counts") + xlab("Negative control ?"),
   plotAnnot( ce, scope = msScope_qcSI, group = "NC"
-           , title = "Normalised to 100%"
-           , facet = "repl", normalise = TRUE) +
-    facet_wrap("facet", ncol = 1)
-)  %>% ggpubr::annotate_figure(top="QC report, by index and TSO input")
+           , title = NULL, facet = "repl", normalise = TRUE) +
+    facet_wrap("facet", ncol = 1) +
+    ylab("Normalised to 100%") + xlab("Negative control ?")
+)  %>% ggpubr::annotate_figure(top="QC report, by replicate set")
 ```
 
 ![](Labcyte-RT_Data_Analysis_5_files/figure-html/neg_ctls-1.png)<!-- -->
@@ -303,14 +327,14 @@ ggpubr::ggarrange( legend = "right", common.legend = TRUE,
 ```r
 ggpubr::ggarrange( legend = "right", common.legend = TRUE,
   plotAnnot( ce, scope = msScope_counts, group = "NC"
-           , title = "Sequence counts"
-           , facet = "repl", normalise = FALSE) +
-    facet_wrap("facet", ncol = 1),
+           , title = NULL, facet = "repl", normalise = FALSE) +
+    facet_wrap("facet", ncol = 1) +
+    ylab("sequence counts") + xlab("Negative control ?"),
   plotAnnot( ce, scope = msScope_counts, group = "NC"
-           , title = "Normalised to 100%"
-           , facet = "repl", normalise = TRUE) +
-    facet_wrap("facet", ncol = 1)
-)  %>% ggpubr::annotate_figure(top="QC annotation, by index and TSO input")
+           , title = NULL, facet = "repl", normalise = TRUE) +
+    facet_wrap("facet", ncol = 1) +
+    ylab("Normalised to 100%") + xlab("Negative control ?")
+)  %>% ggpubr::annotate_figure(top="QC annotation, by replicate set")
 ```
 
 ![](Labcyte-RT_Data_Analysis_5_files/figure-html/neg_ctls-2.png)<!-- -->
@@ -327,11 +351,11 @@ plotAnnot( ce, scope = msScope_qcSI, group = "repl"
 ```
 
 ```
-## Warning: Removed 6064 rows containing missing values (geom_segment).
+## Warning: Removed 6128 rows containing missing values (geom_segment).
 ```
 
 ```
-## Warning: Removed 6064 rows containing missing values (geom_point).
+## Warning: Removed 6128 rows containing missing values (geom_point).
 ```
 
 ![](Labcyte-RT_Data_Analysis_5_files/figure-html/barcodes_by_seq-1.png)<!-- -->
@@ -344,28 +368,118 @@ plotAnnot( ce, scope = msScope_qcSI, group = "repl"
 ```
 
 ```
-## Warning: Removed 6064 rows containing missing values (geom_segment).
+## Warning: Removed 6128 rows containing missing values (geom_segment).
 ```
 
 ```
-## Warning: Removed 6064 rows containing missing values (geom_point).
+## Warning: Removed 6128 rows containing missing values (geom_point).
 ```
 
 ![](Labcyte-RT_Data_Analysis_5_files/figure-html/barcodes_by_id-1.png)<!-- -->
 
 
+Normalisation
+=============
+
+Let's derive a normalisation factor for each barcode sequence, hoping that it
+can correct values from previous experiments.
+
+Not sure if the distribution of library sizes is consistent across replicates.
+Maybe using the median would be more appropriate ?
+
+
 ```r
-plotAnnot( ce[,!ce$NC], scope = msScope_qcSI, group = "BARCODE_ID"
-           , title = "Sequence counts", normalise = FALSE)
+ggplot(colData(ce) %>% data.frame, aes(librarySizes, col = repl)) +
+  geom_histogram() +
+  facet_wrap(~repl, ncol = 2)
+```
+
+```
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+```
+
+![](Labcyte-RT_Data_Analysis_5_files/figure-html/libSizeHistograms-1.png)<!-- -->
+
+
+```r
+tapply(ce$librarySizes, ce$repl, sum)
+```
+
+```
+##      1      2      3      4      5      6      7      8 
+##  55417  28941  18055 169086  62645  77836 177747  66986
+```
+
+```r
+indexMean <- tapply(ce$librarySizes, ce$index, mean)
+ce$libSizeNormByIndex <- mapply(function(n, index) n / indexMean[index], n = ce$librarySizes, index = ce$index)
+bcNormFactors <- tapply(ce$libSizeNormByIndex[!ce$NC], ce$BARCODE_SEQ[!ce$NC], mean)
+bcNormFactors <- bcNormFactors / mean(bcNormFactors)
+bcNormFactors
+```
+
+```
+##     ACACAG     ACACGT     ACACTC     ACAGAT     ACAGCA     ACAGTG 
+## 0.80911829 0.92197996 1.28531216 0.82585999 1.00700397 0.93871963 
+##     ACATAC     ACATCT     ACATGA     AGTACG     AGTAGC     AGTATA 
+## 0.68117540 0.91861504 0.48486643 0.35596835 0.35489177 0.13857951 
+##     AGTCAG     AGTCGT     AGTCTC     AGTGAT     AGTGCA     AGTGTG 
+## 0.11011158 0.16241402 0.23834557 3.48803477 4.92294445 0.34423919 
+##     ATCACG     ATCAGC     ATCATA     ATCGAT     ATCGCA     ATCGTG 
+## 0.17518324 3.04924092 0.09811387 0.97210417 1.08919552 0.10727396 
+##     ATCTAC     ATCTCT     ATCTGA     CACACG     CACAGC     CACATA 
+## 1.22115726 0.21427413 0.94882840 3.17756237 0.19398193 1.37294166 
+##     CACGAT     CACGCA     CACGTG     CACTAC     CACTCT     CACTGA 
+## 0.28957279 2.65454032 0.39137749 2.82901794 1.26529277 1.32177171 
+##     CGACAG     CGACGT     CGACTC     CGAGAT     CGAGCA     CGAGTG 
+## 0.33561848 0.84919497 1.38671508 4.73877048 0.81548735 0.21923123 
+##     CGATAC     CGATCT     CGATGA     CTGACG     CTGAGC     CTGATA 
+## 0.28171428 1.82703622 0.16017798 0.59680066 0.64502542 0.73531910 
+##     CTGCAG     CTGCGT     CTGCTC     CTGTAC     CTGTCT     CTGTGA 
+## 0.80972734 0.32443901 1.62026785 0.28404285 3.54890136 2.05820836 
+##     GAGACG     GAGAGC     GAGATA     GAGCAG     GAGCGT     GAGCTC 
+## 0.32364767 3.36364575 0.13974974 3.87573265 0.15197397 3.20310394 
+##     GAGTAC     GAGTCT     GAGTGA     GCTACG     GCTAGC     GCTATA 
+## 0.08287413 0.11990302 1.59131283 0.17298039 0.41426732 0.16136368 
+##     GCTCAG     GCTCGT     GCTCTC     GCTGAT     GCTGCA     GCTGTG 
+## 0.43522520 0.49025360 0.23629448 1.86159452 1.40386766 3.01736859 
+##     GTACAG     GTACGT     GTACTC     GTAGAT     GTAGCA     GTAGTG 
+## 4.05113176 1.01739439 0.19692767 0.07670759 0.13047949 1.05709836 
+##     GTATAC     GTATCT     GTATGA     TATACG     TATAGC     TATATA 
+## 0.09376890 0.25912213 0.76544860 0.10352249 0.06968016 0.02729476 
+##     TATCAG     TATCGT     TATCTC     TATGAT     TATGCA     TATGTG 
+## 0.06073982 0.12666156 0.09170274 0.06917116 0.13079617 1.10853249 
+##     TCGACG     TCGAGC     TCGATA     TCGCAG     TCGCGT     TCGCTC 
+## 0.98700818 0.10640405 0.30741071 1.17081409 1.46777672 0.88295834
+```
+
+```r
+dput(bcNormFactors, file = "bcNormFactors.R")
+```
+
+
+```r
+ce$libSizeNormByBarcode <- mapply(function(n, bc) n / bcNormFactors[bc], n = ce$librarySizes, bc = ce$BARCODE_SEQ)
+ggpubr::ggarrange( legend = "right", common.legend = TRUE,
+  plotAnnot( ce[,!ce$NC], scope = msScope_libSize, group = "BARCODE_ID"
+             , title = NULL, normalise = FALSE) +
+    ylab("Sequence counts") + xlab("Barcode ID"),
+  plotAnnot( ce[,!ce$NC], scope = msScope_libSizeNormByBarcode, group = "BARCODE_ID"
+             , title = NULL, normalise = FALSE) +
+    ylab("Normalised sequence counts") + xlab("Barcode ID")
+)  %>% ggpubr::annotate_figure(top="Sequence counts, before and after normalisation")
 ```
 
 ```
 ## harmonizing input:
-##   removing 93 sampleMap rows with 'colname' not in colnames of experiments
-##   removing 93 colData rownames not in sampleMap 'primary'
+##   removing 94 sampleMap rows with 'colname' not in colnames of experiments
+##   removing 94 colData rownames not in sampleMap 'primary'
+## harmonizing input:
+##   removing 94 sampleMap rows with 'colname' not in colnames of experiments
+##   removing 94 colData rownames not in sampleMap 'primary'
 ```
 
-![](Labcyte-RT_Data_Analysis_5_files/figure-html/barcodes_by_id_pooled-1.png)<!-- -->
+![](Labcyte-RT_Data_Analysis_5_files/figure-html/seqCountsAfterNormalisation-1.png)<!-- -->
 
 Session information
 ===================
