@@ -1,0 +1,148 @@
+---
+title: "Concentration control of the TSOs in the source plates"
+output: 
+  html_document: 
+    fig_height: 5.25
+    fig_width: 5.25
+    keep_md: yes
+    toc: yes
+---
+
+```{r set-options, echo=FALSE, cache=FALSE}
+options(width = 100)
+```
+
+
+Load R packages
+===============
+
+```{r load_libraries}
+library("magrittr")
+library("ggplot2")
+```
+
+
+Load data
+=========
+
+Concentrations of the actual TSO solutions in source plates, measured with
+the NanoDrop instrument for 8-strip tubes (NanoDrop 8000 ?).
+
+Concentration factor was _50_ (_A260 × 50 = concentration_ in ng/μL).
+Concentration factor to apply for nanoCAGE TSOs (based on their sequences) = _27.8_ (_A260 × 27.8 = concentration_ in ng/μL).
+
+Original file name `20180419_TSOs_stf.txt`.  This file has one sheet containing
+raw data of old TSOs (first IDT plate ordered) diluted 10x from the original source plate (all TSOs resuspended at 1 mM) and thus at an expected concentration of 100 μM.
+
+```{r concentration_QC_load_1}
+plate1 <- gdata::read.xls( "20180419_TSOs_stf2.xlsx"
+                        , stringsAsFactors = FALSE)
+```
+
+Adjust calculated concentrations based on TSOs concentration factor (_27.8_).
+
+```{r concentration_QC, dependson = "concentration_QC_load_IDs"}
+plate1$plate <- 1
+plate1$Conc..2 <- plate1$A260. * 27.8
+conc <- plate1
+rm(plate1)
+
+conc <- data.frame( Well  = conc$Well      
+                  , ID    = conc$Sample.ID %>% factor
+                  , plate = conc$plate     %>% factor
+                  , A260  = conc$A260.
+                  , A280  = conc$A280.
+                  , obs_concentration   = conc$Conc..2)
+
+conc$Well %<>% factor(levels = levels(conc$Well) %>% gtools::mixedsort())
+```
+
+Average replicates.
+
+```{r concentration_QC_average_replicates, dependson = "concentration_QC_merge"}
+conc <- aggregate( conc[,c("obs_concentration", "A260", "A280")]
+                 , list(Well = conc$Well, ID = conc$ID, plate = conc$plate)
+                 , mean)
+```
+
+The expected molarity of TSOs in this measure is 100 μM.
+The average molecular weight of nanoCAGE TSOs = 14,000 g/mol, according to IDT plate report.
+Therefore the expected concentration of TSOs at 100 μM (100 μmol/L) should be:
+100 μmol/L * 14000 g/mol = 1.4 g/L = 1400 ng/μL.
+
+```{r concentration_QC_load_molarity_and expected_cocnetration, dependson = "concentration_QC_average_replicates"}
+conc$exp_molarity <- 100
+conc$exp_concentration <-1400
+conc$obs_molarity <- (conc$obs_concentration*1000) / 14000
+conc <- conc[, c(1:3,5,6,8,4,7,9)]
+summary(conc)
+```
+
+```{r TSOs to discard}
+out_of_range_up <- subset(conc, conc$obs_concentration > 2000)
+out_of_range_down <- subset(conc, conc$obs_concentration < 500)
+out_of_range_down
+nrow(out_of_range_down)
+out_of_range_up
+nrow(out_of_range_up)
+
+conc$delta_molarity <- conc$exp_molarity - conc$obs_molarity
+in_range <- subset(conc, abs(conc$delta) < 500)
+in_range
+nrow(in_range)
+```
+
+Histograms
+==========
+
+```{r concentration_QC_histograms, warning = FALSE, dependson = "load_libraries", fig.height = 6.5, fig.width = 6.5}
+hist_obs_concentration <- ggplot(conc, aes(obs_concentration,  fill = exp_concentration)) + geom_histogram() +
+  facet_wrap(~exp_concentration, nrow = 1) + ggtitle("Observed concentrations (ng/μL)")
+hist_obs_molarity  <- ggplot(conc, aes(obs_molarity,  fill = exp_molarity)) + geom_histogram() +
+  facet_wrap(~exp_molarity, nrow = 1) + ggtitle("Observed molarity (uM)")
+hist_a260 <- ggplot(conc, aes(A260, fill = exp_molarity)) + geom_histogram() +
+  facet_wrap(~exp_molarity, nrow = 1) + ggtitle("Absorbance at 260 nm")
+hist_a280 <- ggplot(conc, aes(A280, fill = exp_molarity)) + geom_histogram() +
+  facet_wrap(~exp_molarity, nrow = 1) + ggtitle("Absorbance at 280 nm")
+
+ggpubr::ggarrange( ncol = 1, nrow = 4, hist_obs_molarity, hist_obs_concentration, hist_a260, hist_a280)
+```
+
+Absorbances
+===========
+
+```{r concentration_QC_abs_ratio}
+ggplot(conc, aes(A280, A260, colour = exp_molarity)) + geom_point() +
+    scale_x_log10() + scale_y_log10() +
+  ggtitle("Relation between absorbances at 260 and 280 nm")
+```
+
+Concentrations
+==============
+
+```{r concentration_QC_obs_exp}
+ggplot(conc, aes(exp_molarity,  obs_molarity, colour = exp_molarity))  + geom_point() +
+  scale_x_log10() + scale_y_log10() +
+  ggtitle("Observed concentration and expected molarity")
+```
+
+```{r concentrations_in_source_plate_and_dilution_factor, dependson = "concentration_QC_average_replicates"}
+conc$source_obs_molarity <- conc$obs_molarity * 10
+conc$dilution_factor_for_100uM <- conc$source_obs_molarity / 100
+do_not_use <- subset(conc, conc$dilution_factor_for_100uM < 2) 
+conc
+do_not_use
+nrow(do_not_use)
+```
+
+```{r save_file}
+write.table(conc, "old_TSOs_check.txt", row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
+```
+
+Session information
+===================
+
+```{r sesion_info}
+sessionInfo()
+```
+
