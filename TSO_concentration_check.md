@@ -25,9 +25,12 @@ Load data
 =========
 
 Concentrations of the actual TSO solutions in source plates, measured with
-the NanoDrop instrument for 8-strip tubes (NanoDrop 8000 ?).
+a NanoDrop 8000, that has a dynamic range of 2.5–3,700 ng/μL for dsDNA according
+to the manufacturer's [website](https://www.thermofisher.com/jp/en/home/industrial/spectroscopy-elemental-isotope-analysis/molecular-spectroscopy/ultraviolet-visible-visible-spectrophotometry-uv-vis-vis/uv-vis-vis-instruments/nanodrop-microvolume-spectrophotometers/nanodrop-products-guide.html).
 
-Concentration factor was _27.8_ (_A260 × 27.8 = concentration_ in ng/μL).
+Concentration factor in the output file was _27.8_ (_A260 × 27.8 =
+concentration_ in ng/μL).  It will be corrected later in this analysis to take
+count of the fact that the measured molecules are oligonucleotides.
 
 Original file name `180221_KATO.xlsx`.  This file has two sheets containing
 raw data.  The first (`original data_180221`) is for
@@ -127,6 +130,24 @@ summary(conc)
 ##  3rd Qu.:400.00  
 ##  Max.   :600.00  
 ## 
+```
+
+Load maker's information.
+
+
+```r
+idt <- read.csv("TSO_master_plate_PO_0209.csv")
+idt <- idt[,c("Well.Position", "ug.OD", "nmoles")]
+idt$Well <- idt$Well.Position %>% sub(pat = "0(.)", rep = "\\1")
+conc$concFact <- idt[match(conc$Well, idt$Well), "ug.OD"]
+conc$stock <- idt[match(conc$Well, idt$Well), "nmoles"]
+```
+
+Correct concentrations.
+
+
+```r
+conc$obs <- conc$obs / 27.8 * conc$concFact
 ```
 
 
