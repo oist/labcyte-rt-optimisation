@@ -1,0 +1,6 @@
+serve_html:
+  script:
+    - mkdir -p /osc-fs_home/plessy/public_html/Labcyte-RT-optimisation
+    - cp *html /osc-fs_home/plessy/public_html/Labcyte-RT-optimisation/
+    - mkdir -p /osc-fs_home/plessy/public_html/Labcyte-RT-optimisation/old_TSOs_conc
+    - cp old_TSOs_conc/*html /osc-fs_home/plessy/public_html/Labcyte-RT-optimisation/old_TSOs_conc/
