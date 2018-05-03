@@ -1,0 +1,293 @@
+---
+title: "Labcyte-RT Data Analysis (6th experiment)"
+output:
+  html_document:
+    keep_md: yes
+    number_sections: yes
+    toc: yes
+    pandoc_args:
+     - "--lua-filter=links-to-markdown.lua"
+---
+
+```{r echo = FALSE}
+knitr::opts_chunk$set(cache  = TRUE)
+knitr::opts_knit$set(verbose = TRUE)
+ggplot2::theme_set(ggplot2::theme_bw())
+```
+
+Experiment 6
+============
+
+Here, we performed the same transfers as in [experiment 5](Labcyte-RT_Data_Analysis_5.md),
+but with an older master plate for the TSOs, in order to test if the problem
+is related to the barcode sequence or to the batch of synthesis.
+
+Load R packages
+===============
+
+```{r load_R_libraries, message = FALSE}
+library("CAGEr")
+library("ggplot2")
+library("magrittr")
+library("MultiAssayExperiment")
+library("SummarizedExperiment")
+```
+
+MOIRAI shortcuts
+
+```{r moirai_shortcuts, dependson = "load_R_libraries"}
+MISEQ_RUN      <- "180501_M00528_0359_000000000-B4PJY"
+WORKFLOW       <- "OP-WORKFLOW-CAGEscan-short-reads-v2.1.2"
+MOIRAI_STAMP   <- "20180502081812"
+MOIRAI_PROJ    <- "project/Labcyte" 
+MOIRAI_USER    <- "nanoCAGE2" 
+ASSEMBLY       <- "mm9"
+BASEDIR        <- "/osc-fs_home/scratch/moirai"
+MOIRAI_BASE    <- file.path(BASEDIR, MOIRAI_USER)
+MOIRAI_RESULTS <- file.path(MOIRAI_BASE, MOIRAI_PROJ, paste(MISEQ_RUN, WORKFLOW, MOIRAI_STAMP, sep = "."))
+```
+
+Load CAGE libraries
+===================
+
+Load summary statistics from MOIRAI and polish the names
+--------------------------------------------------------
+
+```{r MOIRAI, dependson = "moirai_shortcuts"}
+ce <- smallCAGEqc::loadMoiraiStats(
+  pipeline  = WORKFLOW,
+  multiplex = file.path( MOIRAI_BASE, "input", paste0(MISEQ_RUN, ".multiplex.txt")),
+  summary   = file.path( MOIRAI_RESULTS, "text", "summary.txt")) %>% DataFrame
+
+ce$inputFiles <- paste0(MOIRAI_RESULTS, "/CAGEscan_fragments/", ce$samplename, ".bed")
+
+# Discard lines for which input files do not exist.
+ce <- ce[sapply(ce$inputFiles, file.exists),]
+
+# Discard lines for which input files are empty.
+ce <- ce[file.info(ce$inputFiles)$size != 0,]
+
+ce$inputFilesType <- c("bed")
+ce$sampleLabels <- as.character(ce$samplename)
+
+# Replace indexes in group names by RNA amounts extracted from sample sheet.
+levels(ce$group) <- system("cut -f 6,8 -d , 180501_M00528_0359_000000000-B4PJY.SampleSheet.csv | grep y_ | sort | cut -f2 -d, | sed -E 's/\r//'", intern = TRUE)
+
+ce$repl <- ce$index
+levels(ce$repl) <- system("cut -f 6,8 -d , 180501_M00528_0359_000000000-B4PJY.SampleSheet.csv | grep y_ | sort | cut -f2 -d, | cut -f2 -d_ | sed -E 's/\r//'", intern = TRUE)
+ce$repl %<>% factor(levels = 1:8)
+
+# Define plate IDs
+ce$plateID <- ce$repl
+levels(ce$plateID) <- c(rep("O", 4), rep("P", 4))
+
+rownames(ce) %<>% paste(ce$plateID, sep = "_")
+ce$sampleLabels <- rownames(ce)
+
+ce
+```
+
+
+Load plate design
+-----------------
+
+Using plate 4 and 5 design, see [Labcyte-RT4](Labcyte-RT4.md) and 
+[Labcyte-RT5](Labcyte-RT5.md).
+
+```{r PLATE, dependson = "MOIRAI"}
+plate4 <- read.table("plate4.txt", sep = "\t", header = TRUE, stringsAsFactors = FALSE)
+plate5 <- read.table("plate5.txt", sep = "\t", header = TRUE, stringsAsFactors = FALSE)
+plate  <- rbind(plate4, plate5)
+plate  <- plate[!duplicated(plate),]
+
+ce %<>% cbind(plate[match( paste(ce$barcode, ce$index)
+                         , paste(plate$BARCODE_SEQ, plate$INDEX)), ])
+rm(plate, plate4, plate5)
+```
+
+
+Create a CAGEexp object and load expression data
+------------------------------------------------
+
+```{r new_CAGEexp, message = F, echo = FALSE, dependson = "PLATE"}
+ce <- CAGEexp( colData    = ce
+             , genomeName = "BSgenome.Mmusculus.UCSC.mm9")
+```
+
+```{r get_CTSS_data, dependson = "new_CAGEexp"}
+getCTSS(ce, useMulticore = TRUE)
+removeStrandInvaders(ce)
+```
+
+
+Save the CAGEexp file
+---------------------
+
+```{r save_myCAGEexp_object, dependson = "get_CTSS_data"}
+saveRDS(ce, "Labcyte-RT_Data_Analysis_6.Rds")
+```
+
+
+Annotation with GENCODE
+-----------------------
+
+Collect annotations and gene symbols via a local GENCODE file
+(mm9 GENCODE not available in AnnotationHub)
+
+
+```{r annotate_CTSS, dependson = "get_CTSS_data"}
+annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
+```
+
+Quality controls
+================
+
+Custom _scopes_ displaying _strand invasion_ artefacts.
+
+```{r custom_plotAnnot_scopes}
+source("customScopes.R", echo = TRUE)
+```
+
+
+By replicate
+------------
+
+Replicates 1, 2 and 3 are outliers by their higher amount of rDNA and lower
+amount of strand-invasion artefacts.
+
+```{r qc_RNA_quantity, dependson = "get_CTSS_data"}
+ggpubr::ggarrange( legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = msScope_qcSI, group = "repl", normalise = FALSE, title = NULL) +
+    ylab("sequence counts") + xlab("Replicate number"),
+  plotAnnot( ce, scope = msScope_qcSI, group = "repl", normalise = TRUE,  title = NULL) +
+    ylab("Normalised to 100%") + xlab("Replicate number")
+) %>% ggpubr::annotate_figure(top="QC of processing, by indexed library")
+```
+
+
+```{r CTSS_annotation_plot_per_replicate, dependson = "annotate_CTSS"}
+ggpubr::ggarrange( legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = msScope_counts, group = "repl", normalise = FALSE, title = NULL) +
+    ylab("sequence counts") + xlab("Replicate number"),
+  plotAnnot( ce, scope = msScope_counts, group = "repl", normalise = TRUE,  title = NULL) +
+    ylab("Normalised to 100%") + xlab("Replicate number")
+) %>% ggpubr::annotate_figure(top="QC annotation, by indexed library")
+```
+
+
+Negative controls
+-----------------
+
+```{r neg_ctls, fig.height=8, dependson="annotate_CTSS"}
+ce$NC <- ce$TSO_vol == 0
+
+ggpubr::ggarrange( legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = msScope_qcSI, group = "NC"
+           , title = NULL, facet = "repl", normalise = FALSE) +
+    facet_wrap("facet", ncol = 1) +
+    ylab("sequence counts") + xlab("Negative control ?"),
+  plotAnnot( ce, scope = msScope_qcSI, group = "NC"
+           , title = NULL, facet = "repl", normalise = TRUE) +
+    facet_wrap("facet", ncol = 1) +
+    ylab("Normalised to 100%") + xlab("Negative control ?")
+)  %>% ggpubr::annotate_figure(top="QC report, by replicate set")
+
+ggpubr::ggarrange( legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = msScope_counts, group = "NC"
+           , title = NULL, facet = "repl", normalise = FALSE) +
+    facet_wrap("facet", ncol = 1) +
+    ylab("sequence counts") + xlab("Negative control ?"),
+  plotAnnot( ce, scope = msScope_counts, group = "NC"
+           , title = NULL, facet = "repl", normalise = TRUE) +
+    facet_wrap("facet", ncol = 1) +
+    ylab("Normalised to 100%") + xlab("Negative control ?")
+)  %>% ggpubr::annotate_figure(top="QC annotation, by replicate set")
+```
+
+
+Barcodes
+========
+
+```{r barcodes_by_seq, fig.height=15, fig.width=15, dependson="neg_ctls"}
+plotAnnot( ce, scope = msScope_qcSI, group = "repl"
+           , title = "Sequence counts"
+           , facet = "BARCODE_SEQ", normalise = FALSE) +
+  facet_wrap(~facet, ncol=12)
+```
+
+```{r barcodes_by_id, fig.height=15, fig.width=15, dependson="neg_ctls"}
+plotAnnot( ce, scope = msScope_qcSI, group = "repl"
+           , title = "Sequence counts"
+           , facet = "BARCODE_ID", normalise = FALSE) +
+  facet_wrap(~facet, ncol=12)
+```
+
+
+Normalisation
+=============
+
+Let's derive a normalisation factor for each barcode sequence, to compare with
+the ones calculated in experiment 5.
+
+```{r libSizeHistograms, dependson = "get_CTSS_data"}
+ggplot(colData(ce) %>% data.frame, aes(librarySizes, col = repl)) +
+  geom_histogram() +
+  facet_wrap(~repl, ncol = 2)
+```
+
+```{r bcNormFactors, dependson = "get_CTSS_data"}
+tapply(ce$librarySizes, ce$repl, sum)
+indexMean <- tapply(ce$librarySizes, ce$index, mean)
+ce$libSizeNormByIndex <- mapply(function(n, index) n / indexMean[index], n = ce$librarySizes, index = ce$index)
+bcNormFactors <- tapply(ce$libSizeNormByIndex[!ce$NC], ce$BARCODE_SEQ[!ce$NC], mean)
+bcNormFactors <- bcNormFactors / mean(bcNormFactors)
+bcNormFactors
+```
+
+```{r seqCountsAfterNormalisation, fig.height=8, dependson=bcNormFactors}
+ce$libSizeNormByBarcode <- mapply(function(n, bc) n / bcNormFactors[bc], n = ce$librarySizes, bc = ce$BARCODE_SEQ)
+ggpubr::ggarrange( legend = "right", common.legend = TRUE,
+  plotAnnot( ce[,!ce$NC], scope = msScope_libSize, group = "BARCODE_ID"
+             , title = NULL, normalise = FALSE) +
+    ylab("Sequence counts") + xlab("Barcode ID"),
+  plotAnnot( ce[,!ce$NC], scope = msScope_libSizeNormByBarcode, group = "BARCODE_ID"
+             , title = NULL, normalise = FALSE) +
+    ylab("Normalised sequence counts") + xlab("Barcode ID")
+)  %>% ggpubr::annotate_figure(top="Sequence counts, before and after normalisation")
+```
+
+### Comparison with experiment 5
+
+TSOs for wich not enough stock remained gave erroneous normalisation factors,
+which are removed in the plot below.  There might be a very weak correlation,
+but basically the conclusion is that the old stock of primers is much less
+biased than the previous one, or even not biased.
+
+```{r compareWithExp5, dependson=bcNormFactors}
+bcNormFactors5 <- dget("bcNormFactors.R")
+plot( bcNormFactors[bcNormFactors > 0.1]
+    , bcNormFactors5[bcNormFactors > 0.1]
+    , log = ""
+    , xlab = "Experiment 6"
+    , ylab = "Experiment 5")
+```
+
+### Comparison with dilution factors
+
+This is just to double-check that the dilutions correctly adjusted the
+concentrations.  If not, they will correlate with the normalisation factors.
+
+```{r dilutionFactors, dependson=bcNormFactors}
+dil <- read.table("old_TSOs_conc/dilution_table2.txt", dec = ",", sep = "\t", header = TRUE)[,2, drop = T]
+plot( bcNormFactors[bcNormFactors > 0.1]
+    , dil[bcNormFactors > 0.1]
+    , xlab = "norm factors"
+    , ylab = "dilution factors")
+```
+
+Session information
+===================
+
+```{r}
+sessionInfo()
+```
