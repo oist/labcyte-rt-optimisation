@@ -294,7 +294,7 @@ bcNormFactors
 dput(bcNormFactors, file = "bcNormFactors.R")
 ```
 
-```{r seqCountsAfterNormalisation, fig.height=8, dependson=bcNormFactors}
+```{r seqCountsAfterNormalisation, fig.height = 8, dependson = "bcNormFactors"}
 ce$libSizeNormByBarcode <- mapply(function(n, bc) n / bcNormFactors[bc], n = ce$librarySizes, bc = ce$BARCODE_SEQ)
 ggpubr::ggarrange( legend = "right", common.legend = TRUE,
   plotAnnot( ce[,!ce$NC], scope = msScope_libSize, group = "BARCODE_ID"
@@ -304,6 +304,16 @@ ggpubr::ggarrange( legend = "right", common.legend = TRUE,
              , title = NULL, normalise = FALSE) +
     ylab("Normalised sequence counts") + xlab("Barcode ID")
 )  %>% ggpubr::annotate_figure(top="Sequence counts, before and after normalisation")
+```
+
+Perhaps the TSO plate can still be used by designing experiments in which
+replicates use alternatively TSOs from the lowest half and the highest half
+of normalisation values ?
+
+```{r histOfNormFactors, dependson = "bcNormFactors"}
+hist(log10(bcNormFactors), br=50, col = "black")
+rug(sort(log10(bcNormFactors))[1:48],      col = "red")
+rug(sort(log10(bcNormFactors))[1:48 + 48], col = "blue")
 ```
 
 Session information
