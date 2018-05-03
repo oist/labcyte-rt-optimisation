@@ -200,18 +200,15 @@ Save the CAGEexp file
 
 
 ```r
-saveRDS(ce, "Labcyte-RT_Data_Analysis_4.Rds")
+saveRDS(ce, "Labcyte-RT_Data_Analysis_5.Rds")
 ```
 
 
 Annotation with GENCODE
 -----------------------
 
-Collect Gencode annotations and gene symbols via a local GENCODE file
-(mm9 gencode not available in AnnotationHub)
-
-Most pairs align in intergenic regions.  Is it because of the sequence error
-combined with very short read 1s ?
+Collect annotations and gene symbols via a local GENCODE file
+(mm9 GENCODE not available in AnnotationHub)
 
 
 ```r
@@ -225,57 +222,43 @@ Custom _scopes_ displaying _strand invasion_ artefacts.
 
 
 ```r
-msScope_qcSI <- function(libs) {
-  libs$Tag_dust     <- libs$extracted   - libs$rdna - libs$spikes - libs$cleaned
-  libs$rDNA         <- libs$rdna
-  libs$Spikes       <- libs$spikes
-  libs$Unmapped     <- libs$cleaned     - libs$mapped
-  libs$Non_proper   <- libs$mapped      - libs$properpairs
-  libs$Duplicates   <- libs$properpairs - libs$librarySizes - libs$strandInvaders
-  libs$Invaders     <- libs$strandInvaders
-  libs$Counts       <- libs$librarySizes
-  list( libs    = libs
-      , columns = c( "Tag_dust", "rDNA", "Spikes", "Unmapped"
-                   , "Non_proper", "Duplicates", "Invaders", "Counts")
-      , total   = libs$extracted)
-}
+source("customScopes.R", echo = TRUE)
+```
 
-msScope_counts <- function(libs) {
-  libs$Promoter   <- libs$promoter
-  libs$Exon       <- libs$exon
-  libs$Intron     <- libs$intron
-  libs$Intergenic <- libs$librarySizes - libs$promoter - libs$intron - libs$exon
-  libs$Invaders   <- libs$strandInvaders
-  list( libs    = libs
-      , columns = c("Promoter", "Exon", "Intron", "Intergenic", "Invaders")
-      , total   = libs$librarySizes + libs$strandInvaders)
-}
-
-msScope_libSizeNormByBarcode <- function(libs) {
-  libs$Yield   <- libs$libSizeNormByBarcode
-  list( libs    = libs
-      , columns = c("Yield")
-      , total   = libs$Yield)
-}
-
-msScope_libSizeNormByIndex <- function(libs) {
-  libs$Yield   <- libs$libSizeNormByIndex
-  list( libs    = libs
-      , columns = c("Yield")
-      , total   = libs$Yield)
-}
-
-msScope_libSize <- function(libs) {
-  libs$Yield   <- libs$librarySizes
-  list( libs    = libs
-      , columns = c("Yield")
-      , total   = libs$Yield)
-}
+```
+## 
+## > msScope_qcSI <- function(libs) {
+## +     libs$Tag_dust <- libs$extracted - libs$rdna - libs$spikes - 
+## +         libs$cleaned
+## +     libs$rDNA <- libs$r .... [TRUNCATED] 
+## 
+## > msScope_counts <- function(libs) {
+## +     libs$Promoter <- libs$promoter
+## +     libs$Exon <- libs$exon
+## +     libs$Intron <- libs$intron
+## +     libs$Int .... [TRUNCATED] 
+## 
+## > msScope_libSizeNormByBarcode <- function(libs) {
+## +     libs$Yield <- libs$libSizeNormByBarcode
+## +     list(libs = libs, columns = c("Yield"), total = .... [TRUNCATED] 
+## 
+## > msScope_libSizeNormByIndex <- function(libs) {
+## +     libs$Yield <- libs$libSizeNormByIndex
+## +     list(libs = libs, columns = c("Yield"), total = lib .... [TRUNCATED] 
+## 
+## > msScope_libSize <- function(libs) {
+## +     libs$Yield <- libs$librarySizes
+## +     list(libs = libs, columns = c("Yield"), total = libs$Yield)
+## + }
 ```
 
 
 By replicate
 ------------
+
+Replicates 4 and 7 are outliers by their lower amount of non-properly paired
+reads.  (Anyway, sequencing quality of second reads was low, so there is
+not much to interpret.)
 
 
 ```r
@@ -347,7 +330,8 @@ Barcodes
 ```r
 plotAnnot( ce, scope = msScope_qcSI, group = "repl"
            , title = "Sequence counts"
-           , facet = "BARCODE_SEQ", normalise = FALSE)
+           , facet = "BARCODE_SEQ", normalise = FALSE) +
+  facet_wrap(~facet, ncol=12)
 ```
 
 ```
@@ -364,7 +348,8 @@ plotAnnot( ce, scope = msScope_qcSI, group = "repl"
 ```r
 plotAnnot( ce, scope = msScope_qcSI, group = "repl"
            , title = "Sequence counts"
-           , facet = "BARCODE_ID", normalise = FALSE)
+           , facet = "BARCODE_ID", normalise = FALSE) +
+  facet_wrap(~facet, ncol=12)
 ```
 
 ```
@@ -480,6 +465,19 @@ ggpubr::ggarrange( legend = "right", common.legend = TRUE,
 ```
 
 ![](Labcyte-RT_Data_Analysis_5_files/figure-html/seqCountsAfterNormalisation-1.png)<!-- -->
+
+Perhaps the TSO plate can still be used by designing experiments in which
+replicates use alternatively TSOs from the lowest half and the highest half
+of normalisation values ?
+
+
+```r
+hist(log10(bcNormFactors), br=50, col = "black")
+rug(sort(log10(bcNormFactors))[1:48],      col = "red")
+rug(sort(log10(bcNormFactors))[1:48 + 48], col = "blue")
+```
+
+![](Labcyte-RT_Data_Analysis_5_files/figure-html/histOfNormFactors-1.png)<!-- -->
 
 Session information
 ===================
