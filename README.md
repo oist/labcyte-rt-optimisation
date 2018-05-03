@@ -31,4 +31,7 @@ of principle on qPCR optimisation.
  - [Experiment five](Labcyte-RT_Data_Analysis_5.md) (Randomisation of TSO position). MiSeq ID: `180411_M00528_0351_000000000-BN3BL`. MOIRAI
      [[QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.paired_raw_quality_control2.20180412055341/180411_M00528_0351_000000000-BN3BL.paired_raw_quality_control2.20180412055341.html)]
      [[MOIRAI](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412203518/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412203518.html)]
+ - [Experiment six](Labcyte-RT_Data_Analysis_6.md) (Randomisation of TSO position, older TSO master plate). MiSeq ID: `180501_M00528_0359_000000000-B4PJY`. MOIRAI
+     [[QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180501_M00528_0359_000000000-B4PJY.paired_raw_quality_control2.20180502080443/180501_M00528_0359_000000000-B4PJY.paired_raw_quality_control2.20180502080443.html)]
+     [[MOIRAI](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180501_M00528_0359_000000000-B4PJY.OP-WORKFLOW-CAGEscan-short-reads-v2.1.2.20180502081812/180501_M00528_0359_000000000-B4PJY.OP-WORKFLOW-CAGEscan-short-reads-v2.1.2.20180502081812.html)]
  - [Xmas project](Xmas.md)
