@@ -6,6 +6,8 @@ output:
     fig_width: 5.25
     keep_md: yes
     toc: yes
+    pandoc_args:
+     - "--lua-filter=links-to-markdown.lua"
 ---
 
 
@@ -32,10 +34,10 @@ Concentration factor in the output file was _27.8_ (_A260 × 27.8 =
 concentration_ in ng/μL).  It will be corrected later in this analysis to take
 count of the fact that the measured molecules are oligonucleotides.
 
-Original file name `180221_KATO.xlsx`.  This file has two sheets containing
-raw data.  The first (`original data_180221`) is for
-[source plate 2](Labcyte-RT2.md).  In this measurement, the TSOs at 600 μM were
-too concentrated (out of dynamic range).
+Original file name `180221_KATO.xlsx`.  This file has two sheets containing raw
+data.  The first (`original data_180221`) is for [source plate 2](Labcyte-RT2.md).
+In this measurement, the TSOs at 600 μM were too concentrated (out of dynamic
+range).
 
 
 ```r
@@ -227,6 +229,11 @@ ggplot(conc[conc$exp == 50,], aes(obs / exp,  bcNormFactor, colour = plate)) +
 
 ![](TSO_concentration_check_files/figure-html/bcNormFactors-1.png)<!-- -->
 
+
+Comparison with master stock concentrations
+===========================================
+
+There is no correlation with master stock concentration reported by IDT.
 
 Session information
 ===================
