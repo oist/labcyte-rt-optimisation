@@ -36,12 +36,12 @@ Transfer plate design [1](Labcyte-RT.md) was used to compare [TSO] vs [RT] vs [R
 in a single 384-well plate.  RTs made on the same RNA amounts were multiplexed
 in libraries amplified separately.  Only one amplification was successful.  Analysis
 suggested that reaction efficiency reaches a maximum at 20 μM TSO.  It also
-showed an obvious artefact at 20 μM TSO, where reaction efficiency was abnormally low.
+showed an obvious artefact at 40 μM TSO, where reaction efficiency was abnormally low.
 
 Barcode extraction was assessed by comparing TagDust 2 with a simple match of
 barcode sequence (no HMMs nor correction).  For most of them, the concordance
 was very high.  For a few of them, TagDust 2 detected more, probably thanks
-to error correction.  These barcodes were not related to the artefact at 20 μM TSO.
+to error correction.  These barcodes were not related to the artefact at 40 μM TSO.
 
 Explanation for the artefact was found later, but this experiment was not re-analysed
 (superseded by Experiemnt 2 anyway).
@@ -50,7 +50,7 @@ Explanation for the artefact was found later, but this experiment was not re-ana
 ### Experiment 2
 
 [Experiment two](Labcyte-RT_Data_Analysis_2.md).
-MiSeq ID: `180123_M00528_0325_000000000-B4PCK`.
+MiSeq ID: `180123_M00528_0325_000000000-B4PCK` (bad quality, especially on read 1, leading to large numbers of unmapped reads). 
 MOIRAI
   [QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180123_M00528_0325_000000000-B4PCK.paired_raw_quality_control2.20180124101336/180123_M00528_0325_000000000-B4PCK.paired_raw_quality_control2.20180124101336.html),
   [Workflow](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180123_M00528_0325_000000000-B4PCK.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180124102551/180123_M00528_0325_000000000-B4PCK.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180124102551.html).
@@ -58,6 +58,10 @@ MOIRAI
 Same transfer design ([1](Labcyte-RT.md)) was used to repeat Experiment 1,
 this time in triplicates.  All observations, including the artefact, were
 confirmed.
+
+Later re-analysis with the correction factors calculated in Experiment 5 suggested
+that highest TSO concentrations give the highest yields and lowest amounts
+of rDNA and high promoter rates.
 
 
 ### Experiment 3
@@ -102,6 +106,9 @@ A new transfer design with randomised TSO positions ([4](Labcyte-RT5.md) and
 variation of reaction efficiencies, even when the only degree of freedom is the
 TSO.  Thus, the origin of the artefact is either the barcode sequence or the
 the batch of synthesis.
+
+From these results, normalisation factors were calculated, to correct for
+TSO-specific variations of reaction efficiency.
 
 
 ### Experiment 6
