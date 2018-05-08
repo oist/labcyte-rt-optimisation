@@ -5,6 +5,8 @@ output:
     keep_md: yes
     number_sections: yes
     toc: yes
+    pandoc_args:
+     - "--lua-filter=links-to-markdown.lua"
 ---
 
 
@@ -173,39 +175,47 @@ removeStrandInvaders(ce)
 ## Loading required namespace: BSgenome.Mmusculus.UCSC.mm9
 ```
 
-Quality controls
-----------------
-
-Custom _scopes_ displaying _strand invasion_ artefacts.
+Save the CAGEexp file.
 
 
 ```r
-msScope_qcSI <- function(libs) {
-  libs$Tag_dust     <- libs$extracted   - libs$rdna - libs$spikes - libs$cleaned
-  libs$rDNA         <- libs$rdna
-  libs$Spikes       <- libs$spikes
-  libs$Unmapped     <- libs$cleaned     - libs$mapped
-  libs$Non_proper   <- libs$mapped      - libs$properpairs
-  libs$Duplicates   <- libs$properpairs - libs$librarySizes - libs$strandInvaders
-  libs$Invaders     <- libs$strandInvaders
-  libs$Counts       <- libs$librarySizes
-  list( libs    = libs
-      , columns = c( "Tag_dust", "rDNA", "Spikes", "Unmapped"
-                   , "Non_proper", "Duplicates", "Invaders", "Counts")
-      , total   = libs$extracted)
-}
-
-msScope_counts <- function(libs) {
-  libs$Promoter   <- libs$promoter
-  libs$Exon       <- libs$exon
-  libs$Intron     <- libs$intron
-  libs$Intergenic <- libs$librarySizes - libs$promoter - libs$intron - libs$exon
-  libs$Invaders   <- libs$strandInvaders
-  list( libs    = libs
-      , columns = c("Promoter", "Exon", "Intron", "Intergenic", "Invaders")
-      , total   = libs$librarySizes + libs$strandInvaders)
-}
+saveRDS(ce, "Labcyte-RT_Data_Analysis_2.Rds")
 ```
+
+Annotation with GENCODE
+-----------------------
+
+Collect Gencode annotations and gene symbols via a local GENCODE file
+(mm9 gencode not available in AnnotationHub)
+
+
+```r
+annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
+```
+
+
+Quality controls
+================
+
+### Barcode normalisation factors
+
+There were considerable variations of RT efficiency solely caused by differences
+in the quality of each TSOs.  Thus, normalisation is needed.  See [experiment 5](Labcyte-RT_Data_Analysis_5.md) for details.
+
+
+
+```r
+bcNormFactors <- dget("bcNormFactors.R")
+```
+
+
+### Custom _scopes_ displaying _strand invasion_ artefacts.
+
+
+```r
+source("customScopes.R")
+```
+
 
 ### By RNA input
 
@@ -226,6 +236,17 @@ ggpubr::ggarrange(legend = "right", common.legend = TRUE,
 ```
 
 ![](Labcyte-RT_Data_Analysis_2_files/figure-html/qc_RNA_quantity-1.png)<!-- -->
+
+```r
+ggpubr::ggarrange(legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = msScope_counts, group = "RNA", normalise = FALSE
+           , title = NULL) + ylab("Number of read pairs") + xlab(NULL),
+  plotAnnot( ce, scope = msScope_counts, group = "RNA", normalise = TRUE
+         , title = NULL) + ylab("Normalised to 100 %") + xlab(NULL)) %>%
+  ggpubr::annotate_figure(top="QC annotation, by RNA amounts (ng)")
+```
+
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/qc_RNA_quantity-2.png)<!-- -->
 
 ### Removal of the RNA negative controls
 
@@ -284,30 +305,46 @@ colData(ce[,ce$RNA == 0]) %>% data.frame %>% summary
 ##  J11    : 3   O      : 7   3rd Qu.:23.00   3rd Qu.:350    3rd Qu.:10  
 ##  J12    : 3   M      : 1   Max.   :24.00   Max.   :350    Max.   :10  
 ##  (Other):67   (Other): 0                                              
-##     TSO_vol      BARCODE_ID     BARCODE_SEQ   RT_PRIMERS   
-##  Min.   :100   Min.   :64.00   GCTATA :14   Min.   :0.000  
-##  1st Qu.:100   1st Qu.:66.00   GCTCAG :14   1st Qu.:0.250  
-##  Median :100   Median :67.00   GCTCTC :14   Median :0.500  
-##  Mean   :100   Mean   :67.25   GCTCGT :13   Mean   :1.188  
-##  3rd Qu.:100   3rd Qu.:69.00   GCTAGC :12   3rd Qu.:2.000  
-##  Max.   :100   Max.   :70.00   GCTGAT :12   Max.   :4.000  
-##                                (Other): 6                  
-##  RT_PRIMERS_vol       RNA       RNA_vol  RNA_group     H2O_vol     
-##  Min.   : 0.00   Min.   :0   Min.   :0   100ng:14   Min.   :25.00  
-##  1st Qu.:25.00   1st Qu.:0   1st Qu.:0   100pg:16   1st Qu.:25.00  
-##  Median :25.00   Median :0   Median :0   10ng :19   Median :25.00  
-##  Mean   :23.24   Mean   :0   Mean   :0   10pg :16   Mean   :26.76  
-##  3rd Qu.:25.00   3rd Qu.:0   3rd Qu.:0   1ng  :20   3rd Qu.:25.00  
-##  Max.   :25.00   Max.   :0   Max.   :0              Max.   :50.00  
-##                                                                    
-##   total_volume PRIMERS_RATIO  librarySizes    strandInvaders  
-##  Min.   :500   20     :14    Min.   : 0.000   Min.   :0.0000  
-##  1st Qu.:500   40     :14    1st Qu.: 1.000   1st Qu.:0.0000  
-##  Median :500   5      :14    Median : 2.000   Median :0.0000  
-##  Mean   :500   10     :13    Mean   : 3.329   Mean   :0.4118  
-##  3rd Qu.:500   2.5    :12    3rd Qu.: 4.000   3rd Qu.:1.0000  
-##  Max.   :500   80     :12    Max.   :16.000   Max.   :3.0000  
-##                (Other): 6
+##     TSO_vol      BARCODE_ID     BARCODE_SEQ BARCODE_Source_Row
+##  Min.   :100   Min.   :64.00   GCTATA :14   J      :85        
+##  1st Qu.:100   1st Qu.:66.00   GCTCAG :14   A      : 0        
+##  Median :100   Median :67.00   GCTCTC :14   B      : 0        
+##  Mean   :100   Mean   :67.25   GCTCGT :13   C      : 0        
+##  3rd Qu.:100   3rd Qu.:69.00   GCTAGC :12   D      : 0        
+##  Max.   :100   Max.   :70.00   GCTGAT :12   E      : 0        
+##                                (Other): 6   (Other): 0        
+##  BARCODE_Source_Col   RT_PRIMERS    RT_PRIMERS_vol       RNA   
+##  Min.   :1.000      Min.   :0.000   Min.   : 0.00   Min.   :0  
+##  1st Qu.:3.000      1st Qu.:0.250   1st Qu.:25.00   1st Qu.:0  
+##  Median :4.000      Median :0.500   Median :25.00   Median :0  
+##  Mean   :4.247      Mean   :1.188   Mean   :23.24   Mean   :0  
+##  3rd Qu.:6.000      3rd Qu.:2.000   3rd Qu.:25.00   3rd Qu.:0  
+##  Max.   :7.000      Max.   :4.000   Max.   :25.00   Max.   :0  
+##                                                                
+##     RNA_vol  RNA_group     H2O_vol       total_volume PRIMERS_RATIO
+##  Min.   :0   100ng:14   Min.   :25.00   Min.   :500   20     :14   
+##  1st Qu.:0   100pg:16   1st Qu.:25.00   1st Qu.:500   40     :14   
+##  Median :0   10ng :19   Median :25.00   Median :500   5      :14   
+##  Mean   :0   10pg :16   Mean   :26.76   Mean   :500   10     :13   
+##  3rd Qu.:0   1ng  :20   3rd Qu.:25.00   3rd Qu.:500   2.5    :12   
+##  Max.   :0              Max.   :50.00   Max.   :500   80     :12   
+##                                                       (Other): 6   
+##   librarySizes    strandInvaders      promoter           exon       
+##  Min.   : 0.000   Min.   :0.0000   Min.   : 0.000   Min.   :0.0000  
+##  1st Qu.: 1.000   1st Qu.:0.0000   1st Qu.: 0.000   1st Qu.:0.0000  
+##  Median : 2.000   Median :0.0000   Median : 1.000   Median :0.0000  
+##  Mean   : 3.329   Mean   :0.4118   Mean   : 1.988   Mean   :0.3412  
+##  3rd Qu.: 4.000   3rd Qu.:1.0000   3rd Qu.: 3.000   3rd Qu.:1.0000  
+##  Max.   :16.000   Max.   :3.0000   Max.   :14.000   Max.   :2.0000  
+##                                                                     
+##      intron          unknown      
+##  Min.   :0.0000   Min.   :0.0000  
+##  1st Qu.:0.0000   1st Qu.:0.0000  
+##  Median :0.0000   Median :1.0000  
+##  Mean   :0.1294   Mean   :0.8706  
+##  3rd Qu.:0.0000   3rd Qu.:1.0000  
+##  Max.   :2.0000   Max.   :5.0000  
+## 
 ```
 
 ```r
@@ -339,6 +376,18 @@ ggpubr::ggarrange(legend = "right", common.legend = TRUE,
 
 ![](Labcyte-RT_Data_Analysis_2_files/figure-html/qc_rt_primer_quantity-1.png)<!-- -->
 
+
+```r
+ggpubr::ggarrange(legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = msScope_counts, group = "RT_PRIMERS", normalise = FALSE
+           , title = NULL) + ylab("Number of read pairs") + xlab(NULL),
+  plotAnnot( ce, scope = msScope_counts, group = "RT_PRIMERS", normalise = TRUE
+         , title = NULL) + ylab("Normalised to 100 %") + xlab(NULL)) %>%
+  ggpubr::annotate_figure(top="QC annotation, by amount of RT primers (in μM)")
+```
+
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/promrate_rt_primer_quantity-1.png)<!-- -->
+
 ### Removal of the primer-negative controls
 
 To ease data handling (for instance when working with primer ratios), the
@@ -362,6 +411,21 @@ ce$PRIMERS_RATIO %<>%
                    , "5", "10", "20", "40", "80", "160", "320", "640"))
 ```
 
+#### Normalised version
+
+
+```r
+ce$libSizeNormByIndex <- mapply(function(n, bc) n / bcNormFactors[bc], n = ce$librarySizes, bc = ce$BARCODE_SEQ)
+ggpubr::ggarrange( legend = "right",
+  plotAnnot( ce, scope = msScope_libSizeNormByIndex, group = "RT_PRIMERS", normalise = FALSE
+           , title = "Yield"),
+  plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = TRUE
+         , title = "normalised to 100 %")
+) %>% ggpubr::annotate_figure(top="QC annotation, by RT primer quantity")
+```
+
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/qc_norm_rt_primer_quantity-1.png)<!-- -->
+
 ### By group and replicates
 
 In all conditions, there are a large number of unmapped sequences.
@@ -383,16 +447,9 @@ ggpubr::ggarrange(legend = "right", common.legend = TRUE,
   ggpubr::annotate_figure(top="QC control, by plate ID and amount of RNA (ng)")
 ```
 
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/qc_by_plate-1.png)<!-- -->
 
 ### By TSO concentration
-
-There is a trend decreasing sequence yield with decreasing TSO amounts.
-Interestingly, the optimum seems to be lower when RNA quantity is lower.
-
-But what is wrong with TSO == 40 ??  (and to some extent with TSO == 1.25)
-We are checking this by making a new experiment where the source plate was
-re-prepared from scratch and concentration range has more points near 40.
 
 rRNA rate seems to increase when TSO concentration is reduced.
 
@@ -400,152 +457,90 @@ Strand invation seems to depend more on RNA quantity than on TSO concentration ?
 
 
 ```r
-plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = FALSE, facet = "group")
+ggpubr::ggarrange(legend = "right",
+  plotAnnot( ce, scope = msScope_libSizeNormByIndex, group = "TSO", facet="group"
+           , normalise = FALSE, title = "Yield") +
+    ylab("Number of read pairs") + xlab("TSO") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_qcSI, group = "TSO", facet="group"
+           , normalise = TRUE, title = "QC report") +
+    ylab("Normalised to 100 %") + xlab(NULL) +
+    facet_wrap(~facet, ncol = 1)) %>%
+  ggpubr::annotate_figure(top="QC control, by TSO concentration and amount of RNA (ng)")
 ```
 
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/qc_norm_TSO_quantity-1.png)<!-- -->
+
+Same, but not normalised.
+
 
 ```r
-plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = TRUE,  facet = "group")
+ggpubr::ggarrange(legend = "right",
+  plotAnnot( ce, scope = msScope_libSizeNormByIndex, group = "TSO", facet="group"
+           , normalise = FALSE, title = "Yield") +
+    ylab("Number of read pairs") + xlab("TSO") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_qcSI, group = "TSO", facet="group"
+           , normalise = FALSE, title = "QC report") +
+    ylab("Number of read pairs") + xlab(NULL) +
+    facet_wrap(~facet, ncol = 1)) %>%
+  ggpubr::annotate_figure(top="QC control, by TSO concentration and amount of RNA (ng)")
 ```
 
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-5-2.png)<!-- -->
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/qc_TSO_quantity-1.png)<!-- -->
+
+
+### TSO-RT ratios
+
 
 ```r
-plotAnnot(ce, scope = msScope_qcSI, group = "TSO", normalise = FALSE, facet = "RT_PRIMERS")
+ce$libSizeNormByIndex <- mapply(function(n, bc) n / bcNormFactors[bc], n = ce$librarySizes, bc = ce$BARCODE_SEQ)
+
+plotAnnot(ce, scope = msScope_libSizeNormByIndex, group = "RT_PRIMERS", normalise = FALSE, facet = "TSO")
 ```
 
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-5-3.png)<!-- -->
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/tso_rt_ratios-1.png)<!-- -->
 
 ```r
-plotAnnot(ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE, facet = "TSO")
+plotAnnot(ce, scope = msScope_libSizeNormByIndex, group = "TSO", normalise = FALSE, facet = "RT_PRIMERS")
 ```
 
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-5-4.png)<!-- -->
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/tso_rt_ratios-2.png)<!-- -->
 
 ```r
-plotAnnot(ce, scope = msScope_qcSI, group = "BARCODE_ID", normalise = FALSE, facet = "group")
+plotAnnot(ce, scope = msScope_libSizeNormByIndex, group = "TSO", normalise = FALSE, facet = "group") +facet_wrap(~facet, scales = "free")
+```
+
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/tso_rt_ratios-3.png)<!-- -->
+
+```r
+plotAnnot(ce[,ce$RNA == 10], scope = msScope_libSizeNormByIndex, group = "RT_PRIMERS", normalise = FALSE, facet = "TSO") + facet_wrap(~facet, scales = "free")
 ```
 
 ```
-## Warning: Removed 16 rows containing missing values (geom_segment).
+## harmonizing input:
+##   removing 641 sampleMap rows with 'colname' not in colnames of experiments
+##   removing 641 colData rownames not in sampleMap 'primary'
 ```
 
-```
-## Warning: Removed 16 rows containing missing values (geom_point).
-```
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/tso_rt_ratios-4.png)<!-- -->
 
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-5-5.png)<!-- -->
-
-Barcode "CTGTCT" gave large amounts of artefacts.  This is not the case for its
-nearest similar barcode "CTGCTC".
-
-Barcodes "ATCAGC" and "CACACG" yielded a large amount of extracted reads.
 
 
 ```r
 ggplot.CAGEexp <- function(data, ...)
   ggplot(as.data.frame(colData(data)), ...)
 
-ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = librarySizes)) + facet_wrap(~repl + group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("molecules")
+ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = libSizeNormByIndex)) + facet_wrap(~repl + group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("molecules")
 ```
 
 ![](Labcyte-RT_Data_Analysis_2_files/figure-html/ggplot_wrapper-1.png)<!-- -->
 
 ```r
-ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = extracted)) + facet_wrap(~repl + group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("extracted")
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/ggplot_wrapper-2.png)<!-- -->
-
-```r
 ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = tagdust / extracted * 100)) + facet_wrap(~repl + group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("%tagdust")
 ```
 
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/ggplot_wrapper-3.png)<!-- -->
-
-Reactions that received multiple droplets of TSOs did not fail (here we are averaging
-very different TSO concentrations, to the point is just to show that for volumes
-of 100 and 50, we have roughly the same amount of data.)
-
-
-```r
-plotAnnot(ce, scope = msScope_qcSI, group = "TSO_vol", normalise = FALSE)
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
-
-### By primer ratio
-
-
-```r
-plotAnnot(ce, scope = msScope_qcSI, group = "PRIMERS_RATIO", normalise = FALSE, facet = "group")
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
-
-
-Annotation with GENCODE
------------------------
-
-Collect Gencode annotations and gene symbols via a local GENCODE file
-(mm9 gencode not available in AnnotationHub)
-
-
-```r
-annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
-```
-
-
-```r
-plotAnnot(ce, scope = msScope_counts, group = "repl", facet = "group") +
-  facet_wrap("facet", nrow = 5)
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/CTSS_annotation_plot_per_replicate-1.png)<!-- -->
-
-```r
-plotAnnot(ce, scope = msScope_counts, group = "repl", facet = "group", norm = F) +
-  facet_wrap("facet", nrow = 5)
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/CTSS_annotation_plot_per_replicate-2.png)<!-- -->
-
-
-```r
-plotAnnot(ce, scope = msScope_counts, group = "TSO", normalise = FALSE, facet = "group") +
-  facet_wrap("facet", ncol = 5)
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/CTSS_annotation_plot_per_group-1.png)<!-- -->
-
-```r
-plotAnnot(ce, scope = msScope_counts, group = "TSO", normalise = TRUE,  facet = "group") +
-  facet_wrap("facet", ncol = 5)
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/CTSS_annotation_plot_per_group-2.png)<!-- -->
-
-Count QC with TSO concentration 40 removed...
-
-
-```r
-ce2 <- ce
-ce2 <- ce2[,ce2$TSO != 40]
-```
-
-```
-## harmonizing input:
-##   removing 90 sampleMap rows with 'colname' not in colnames of experiments
-##   removing 90 colData rownames not in sampleMap 'primary'
-```
-
-```r
-plotAnnot(ce2, scope = "counts", group = "TSO", normalise = FALSE, facet = "group") +
-  facet_wrap("facet", ncol = 5) + ggtitle("")
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/CTSS_annotation_plot_per_group_no40-1.png)<!-- -->
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/ggplot_wrapper-2.png)<!-- -->
 
 
 
@@ -574,9 +569,6 @@ ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raste
 
 ![](Labcyte-RT_Data_Analysis_2_files/figure-html/CTSS_annotation_heatmaps_per_group-2.png)<!-- -->
 
-CTSS ANALYSIS
-=============
-
 Number of nanoCAGE tags mapping at CTSS positions in each sample
 ----------------------------------------------------------------
   
@@ -585,29 +577,6 @@ Number of nanoCAGE tags mapping at CTSS positions in each sample
 ce$l1 <- sapply(CTSStagCountDF(ce), function(x) sum(decode(x) > 0))
 ```
 
-Gene expression analysis
-========================
-
-Make a gene expression table (not really required now).
-
-
-```r
-CTSStoGenes(ce)
-```
-
-
-```r
-ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = genes)) + facet_wrap(~repl + group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("Gene discovery")
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/CTSS_ngenes_heatmaps_all-1.png)<!-- -->
-
-
-```r
-ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = genes)) + facet_wrap(~group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("Gene discovery")
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/CTSS_ngenes_heatmaps_per_group-1.png)<!-- -->
 
 Rarefaction
 ------------
@@ -628,48 +597,8 @@ ce$r100l1[librarySizes(ce) < 10] <- NA
 ggplot(ce, aes(TSO, RT_PRIMERS)) + scale_y_log10()+ scale_x_log10() + geom_raster(aes(fill = r100l1)) + facet_wrap(~group, ncol = 5) + viridis::scale_fill_viridis() + ggtitle("Richness (on a scale of 10)")
 ```
 
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+![](Labcyte-RT_Data_Analysis_2_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
 
-
-
-```r
-rar1 <- hanabi(CTSStagCountDF(ce), from = 0)
-#rarc <- hanabi(assay(consensusClustersSE(myCAGEexp)) %>% as.data.frame, from = 0)
-rarg <- hanabi(assay(GeneExpSE(ce)), from = 0)
-#save(rar1, rarg, file="rar.Rda") 
-```
-
-### Plot TSS discovery
-
-
-```r
-hanabiPlot(rar1, ylab='number of TSS detected', xlab='number of unique molecule counts', main=paste("TSS discovery"), group=ce$TSO, legend.pos = "bottomright")
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/hanabi-TSS_byrep-1.png)<!-- -->
-
-### Plot Cluster discovery
-
-
-```r
-#hanabiPlot(rarc, ylab='number of CTSS clusters detected', xlab='number of unique molecule counts', main=paste("Cluster discovery"), #group=myCAGEexp$group, legend.pos = "bottomright")
-```
-
-### Plot Gene discovery
-
-
-```r
-hanabiPlot(rarg, ylab='number of genes detected', xlab='number of unique molecule counts', main=paste("Gene discovery"), group=ce$TSO, legend.pos = "bottomright")
-```
-
-![](Labcyte-RT_Data_Analysis_2_files/figure-html/hanabi-gene_byrep-1.png)<!-- -->
-
-Save the CAGEexp file.
-
-
-```r
-saveRDS(ce, "Labcyte-RT_Data_Analysis_2.Rds")
-```
 
 
 ```r
@@ -694,7 +623,7 @@ sessionInfo()
 ## [11] LC_MEASUREMENT=en_GB.UTF-8 LC_IDENTIFICATION=C       
 ## 
 ## attached base packages:
-## [1] parallel  stats4    stats     graphics  grDevices utils     datasets 
+## [1] stats4    parallel  stats     graphics  grDevices utils     datasets 
 ## [8] methods   base     
 ## 
 ## other attached packages:
@@ -709,42 +638,31 @@ sessionInfo()
 ## [17] CAGEr_1.21.5.1             
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] nlme_3.1-131                      bitops_1.0-6                     
-##  [3] rprojroot_1.3-2                   tools_3.4.3                      
-##  [5] backports_1.1.2                   R6_2.2.2                         
-##  [7] platetools_0.0.2                  KernSmooth_2.23-15               
-##  [9] lazyeval_0.2.1                    mgcv_1.8-22                      
-## [11] colorspace_1.3-2                  gridExtra_2.3                    
-## [13] compiler_3.4.3                    VennDiagram_1.6.18               
-## [15] rtracklayer_1.39.9                labeling_0.3                     
-## [17] scales_0.5.0                      stringr_1.3.0                    
-## [19] digest_0.6.15                     Rsamtools_1.31.3                 
-## [21] rmarkdown_1.9                     stringdist_0.9.4.6               
-## [23] XVector_0.19.8                    pkgconfig_2.0.1                  
-## [25] htmltools_0.3.6                   BSgenome_1.47.5                  
-## [27] rlang_0.2.0                       VGAM_1.0-4                       
-## [29] bindr_0.1                         BiocParallel_1.12.0              
-## [31] gtools_3.5.0                      dplyr_0.7.4                      
-## [33] RCurl_1.95-4.10                   GenomeInfoDbData_0.99.1          
-## [35] futile.logger_1.4.3               smallCAGEqc_0.12.2.999999        
-## [37] Matrix_1.2-12                     Rcpp_0.12.16                     
-## [39] munsell_0.4.3                     viridis_0.4.0                    
-## [41] stringi_1.1.7                     yaml_2.1.18                      
-## [43] MASS_7.3-47                       zlibbioc_1.24.0                  
-## [45] plyr_1.8.4                        grid_3.4.3                       
-## [47] gdata_2.18.0                      Biostrings_2.47.9                
-## [49] cowplot_0.9.2                     splines_3.4.3                    
-## [51] knitr_1.20                        beanplot_1.2                     
-## [53] pillar_1.2.1                      ggpubr_0.1.6                     
-## [55] reshape2_1.4.2                    codetools_0.2-15                 
-## [57] futile.options_1.0.0              XML_3.98-1.9                     
-## [59] glue_1.2.0                        evaluate_0.10.1                  
-## [61] lambda.r_1.2                      data.table_1.10.4-3              
-## [63] gtable_0.2.0                      BSgenome.Mmusculus.UCSC.mm9_1.4.0
-## [65] purrr_0.2.4                       tidyr_0.7.2                      
-## [67] reshape_0.8.7                     assertthat_0.2.0                 
-## [69] viridisLite_0.2.0                 tibble_1.4.2                     
-## [71] som_0.3-5.1                       GenomicAlignments_1.15.12        
-## [73] memoise_1.1.0                     bindrcpp_0.2                     
-## [75] cluster_2.0.6
+##  [1] stringdist_0.9.4.6        gtools_3.5.0             
+##  [3] reshape2_1.4.2            purrr_0.2.4              
+##  [5] splines_3.4.3             colorspace_1.3-2         
+##  [7] htmltools_0.3.6           mgcv_1.8-22              
+##  [9] beanplot_1.2              rtracklayer_1.39.9       
+## [11] yaml_2.1.18               XML_3.98-1.9             
+## [13] rlang_0.2.0               pillar_1.2.1             
+## [15] glue_1.2.0                BiocParallel_1.12.0      
+## [17] GenomeInfoDbData_0.99.1   plyr_1.8.4               
+## [19] stringr_1.3.0             zlibbioc_1.24.0          
+## [21] Biostrings_2.47.9         munsell_0.4.3            
+## [23] gtable_0.2.0              VGAM_1.0-4               
+## [25] evaluate_0.10.1           memoise_1.1.0            
+## [27] knitr_1.20                Rcpp_0.12.16             
+## [29] KernSmooth_2.23-15        som_0.3-5.1              
+## [31] scales_0.5.0              backports_1.1.2          
+## [33] BSgenome_1.47.5           XVector_0.19.8           
+## [35] Rsamtools_1.31.3          digest_0.6.15            
+## [37] stringi_1.1.7             grid_3.4.3               
+## [39] rprojroot_1.3-2           tools_3.4.3              
+## [41] bitops_1.0-6              lazyeval_0.2.1           
+## [43] RCurl_1.95-4.10           tibble_1.4.2             
+## [45] cluster_2.0.6             tidyr_0.7.2              
+## [47] MASS_7.3-47               Matrix_1.2-12            
+## [49] data.table_1.10.4-3       rmarkdown_1.9            
+## [51] reshape_0.8.7             nlme_3.1-131             
+## [53] GenomicAlignments_1.15.12 compiler_3.4.3
 ```
