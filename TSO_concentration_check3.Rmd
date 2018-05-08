@@ -164,7 +164,7 @@ Here, we verify that the dilution factors were applied as expected.
 
 ```{r dil_factors, dependson = "correct_concentration"}
 dil <- data.frame( Well = levels(conc$Well)
-                 , exp  = read.table("old_TSOs_conc/dilution_table2.txt", dec = ",", sep = "\t", header = TRUE)[,2, drop = T]
+                 , exp  = read.table("old_TSOs_conc/dilution_table2.txt", dec = ",", sep = "\t", header = TRUE)[,2, drop = T] / 10
                  , obs  = conc[conc$plate == "stock", "obs"] / conc[conc$plate == "source", "obs"])
 
 with(dil[dil$obs > 0 & dil$ obs < 100,], plot(obs, exp))
