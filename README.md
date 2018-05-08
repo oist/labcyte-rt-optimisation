@@ -65,27 +65,47 @@ MOIRAI
 
 A new source plate design ([2](Labcyte-RT2.md)) was used to repeat Experiment 2,
 in triplicates again, this time with two different enzymes.  The artefact was
-shown to be positional (TSOs in source plate row B), and not related to the
+shown to be related to TSOs in source plate row B, and not related to the
 actual concentration.
 
 
 ### Experiment 4
 
-[Experiment four](Labcyte-RT_Data_Analysis_4.md) (change of position or contents of "row B" TSOs). MiSeq ID: `180326_M00528_0346_000000000-B4GJR`. MOIRAI
-     [[QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180326_M00528_0346_000000000-B4GJR.paired_raw_quality_control2.20180403111017/180326_M00528_0346_000000000-B4GJR.paired_raw_quality_control2.20180403111017.html)]
-     [[Workflow](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180326_M00528_0346_000000000-B4GJR.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180329132046/180326_M00528_0346_000000000-B4GJR.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180329132046.html)]
+[Experiment four](Labcyte-RT_Data_Analysis_4.md). MiSeq ID: `180326_M00528_0346_000000000-B4GJR`.
+MOIRAI
+  [QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180326_M00528_0346_000000000-B4GJR.paired_raw_quality_control2.20180403111017/180326_M00528_0346_000000000-B4GJR.paired_raw_quality_control2.20180403111017.html),
+  [Workflow](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180326_M00528_0346_000000000-B4GJR.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180329132046/180326_M00528_0346_000000000-B4GJR.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180329132046.html).
      
+A new source plate design ([3](Labcyte-RT3.md)) was used to change of position
+or contents of "row B" TSOs.  The conclusion was that the artefact was related
+to the TSO quality or barcode sequence.
+
 ### Experiment 5
      
-[Experiment five](Labcyte-RT_Data_Analysis_5.md) (Randomisation of TSO position). MiSeq ID: `180411_M00528_0351_000000000-BN3BL`. MOIRAI
-  [[QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.paired_raw_quality_control2.20180412055341/180411_M00528_0351_000000000-BN3BL.paired_raw_quality_control2.20180412055341.html)]
-  [[Workflow](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412203518/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412203518.html)]
+[Experiment five](Labcyte-RT_Data_Analysis_5.md).
+MiSeq ID: `180411_M00528_0351_000000000-BN3BL`.
+MOIRAI
+  [QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.paired_raw_quality_control2.20180412055341/180411_M00528_0351_000000000-BN3BL.paired_raw_quality_control2.20180412055341.html),
+  [Workflow](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412203518/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412203518.html).
+
+A new source plate design with randomised TSO positions ([4](Labcyte-RT5.md) and
+[5](Labcyte-RT5.md) for two independant randomisations) showed a dramatic
+variation of reaction efficiencies, even when the only degree of freedom is the
+TSO.  Thus, the origin of the artefact is either the barcode sequence or the
+the batch of synthesis.
+
 
 ### Experiment 6
 
-[Experiment six](Labcyte-RT_Data_Analysis_6.md) (Randomisation of TSO position, older TSO master plate). MiSeq ID: `180501_M00528_0359_000000000-B4PJY`. MOIRAI
-     [[QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180501_M00528_0359_000000000-B4PJY.paired_raw_quality_control2.20180502080443/180501_M00528_0359_000000000-B4PJY.paired_raw_quality_control2.20180502080443.html)]
-     [[Workflow](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180501_M00528_0359_000000000-B4PJY.OP-WORKFLOW-CAGEscan-short-reads-v2.1.2.20180502081812/180501_M00528_0359_000000000-B4PJY.OP-WORKFLOW-CAGEscan-short-reads-v2.1.2.20180502081812.html)]
+[Experiment six](Labcyte-RT_Data_Analysis_6.md).  MiSeq ID: `180501_M00528_0359_000000000-B4PJY`.
+MOIRAI
+  [QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180501_M00528_0359_000000000-B4PJY.paired_raw_quality_control2.20180502080443/180501_M00528_0359_000000000-B4PJY.paired_raw_quality_control2.20180502080443.html),
+  [Workflow](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180501_M00528_0359_000000000-B4PJY.OP-WORKFLOW-CAGEscan-short-reads-v2.1.2.20180502081812/180501_M00528_0359_000000000-B4PJY.OP-WORKFLOW-CAGEscan-short-reads-v2.1.2.20180502081812.html).
+
+Same randomised designs ([4](Labcyte-RT5.md) and
+[5](Labcyte-RT5.md)), but a different batch of TSOs.  In this experiment, the
+variation of reaction efficiency is much milder, demonstrating that the problem
+was the quality of the TSOs used in the previous experiments.
 
 Xmas project
 ------------
