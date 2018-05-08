@@ -41,20 +41,33 @@ Explanation for the artefact was found later, but this experiment was not re-ana
 
 ### Experiment 2
 
-[Experiment two](Labcyte-RT_Data_Analysis_2.md) (same model, three replicates). MiSeq ID: `180123_M00528_0325_000000000-B4PCK`. MOIRAI
-     [[QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180123_M00528_0325_000000000-B4PCK.paired_raw_quality_control2.20180124101336/180123_M00528_0325_000000000-B4PCK.paired_raw_quality_control2.20180124101336.html)]
-     [[Workflow](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180123_M00528_0325_000000000-B4PCK.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180124102551/180123_M00528_0325_000000000-B4PCK.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180124102551.html)]
+[Experiment two](Labcyte-RT_Data_Analysis_2.md).
+MiSeq ID: `180123_M00528_0325_000000000-B4PCK`.
+MOIRAI
+  [QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180123_M00528_0325_000000000-B4PCK.paired_raw_quality_control2.20180124101336/180123_M00528_0325_000000000-B4PCK.paired_raw_quality_control2.20180124101336.html),
+  [Workflow](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180123_M00528_0325_000000000-B4PCK.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180124102551/180123_M00528_0325_000000000-B4PCK.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180124102551.html).
+
+Same source plate design ([1](Labcyte-RT.md)) was used to repeat Experiment 1,
+this time in triplicates.  All observations, including the artefact, were
+confirmed.
+
 
 ### Experiment 3
 
 [Experiment three](Labcyte-RT_Data_Analysis_3merge.md)
-   [[SSIII QC](Labcyte-RT_Data_Analysis_3a.md)]
-   [[SSIV QC](Labcyte-RT_Data_Analysis_3b.md)]]
-   (same plate model, different concentrations, three replicates, two enzymes).
-   MiSeq ID: `180403_M00528_0348_000000000-B4GP8`.
-   MOIRAI [[QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180403_M00528_0348_000000000-B4GP8.paired_raw_quality_control2.20180404155647/180403_M00528_0348_000000000-B4GP8.paired_raw_quality_control2.20180404155647.html)]
-     [[Workflow plates 1~3]](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180403_M00528_0348_000000000-B4GP8_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180409105009/180403_M00528_0348_000000000-B4GP8_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180409105009.html)
-     [[Workflow plates 4~6]](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180403_M00528_0348_000000000-B4GP8_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180411094125/180403_M00528_0348_000000000-B4GP8_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180411094125.html)
+   ([SSIII QC](Labcyte-RT_Data_Analysis_3a.md),
+   [SSIV QC](Labcyte-RT_Data_Analysis_3b.md)).
+MiSeq ID: `180403_M00528_0348_000000000-B4GP8`.
+MOIRAI
+ [QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180403_M00528_0348_000000000-B4GP8.paired_raw_quality_control2.20180404155647/180403_M00528_0348_000000000-B4GP8.paired_raw_quality_control2.20180404155647.html),
+ [Workflow plates 1~3](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180403_M00528_0348_000000000-B4GP8_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180409105009/180403_M00528_0348_000000000-B4GP8_p123.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180409105009.html),
+ [Workflow plates 4~6](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180403_M00528_0348_000000000-B4GP8_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180411094125/180403_M00528_0348_000000000-B4GP8_p456.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180411094125.html).
+
+A new source plate design ([2](Labcyte-RT2.md)) was used to repeat Experiment 2,
+in triplicates again, this time with two different enzymes.  The artefact was
+shown to be positional (TSOs in source plate row B), and not related to the
+actual concentration.
+
 
 ### Experiment 4
 
@@ -64,9 +77,9 @@ Explanation for the artefact was found later, but this experiment was not re-ana
      
 ### Experiment 5
      
-     [Experiment five](Labcyte-RT_Data_Analysis_5.md) (Randomisation of TSO position). MiSeq ID: `180411_M00528_0351_000000000-BN3BL`. MOIRAI
-     [[QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.paired_raw_quality_control2.20180412055341/180411_M00528_0351_000000000-BN3BL.paired_raw_quality_control2.20180412055341.html)]
-     [[Workflow](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412203518/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412203518.html)]
+[Experiment five](Labcyte-RT_Data_Analysis_5.md) (Randomisation of TSO position). MiSeq ID: `180411_M00528_0351_000000000-BN3BL`. MOIRAI
+  [[QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.paired_raw_quality_control2.20180412055341/180411_M00528_0351_000000000-BN3BL.paired_raw_quality_control2.20180412055341.html)]
+  [[Workflow](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412203518/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412203518.html)]
 
 ### Experiment 6
 
