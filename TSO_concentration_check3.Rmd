@@ -1,0 +1,179 @@
+---
+title: "Concentration control of the TSO stock and source plates of exp. 6"
+output: 
+  html_document: 
+    fig_height: 5.25
+    fig_width: 5.25
+    keep_md: yes
+    toc: yes
+    pandoc_args:
+     - "--lua-filter=links-to-markdown.lua"
+---
+
+```{r set-options, echo=FALSE, cache=FALSE}
+options(width = 100)
+```
+
+
+Load R packages
+===============
+
+```{r load_libraries}
+library("magrittr")
+library("ggplot2")
+```
+
+
+Load data
+=========
+
+Concentrations of the actual TSO solutions in source plates, measured with
+a NanoDrop 8000, that has a dynamic range of 2.5–3,700 ng/μL for dsDNA according
+to the manufacturer's [website](https://www.thermofisher.com/jp/en/home/industrial/spectroscopy-elemental-isotope-analysis/molecular-spectroscopy/ultraviolet-visible-visible-spectrophotometry-uv-vis-vis/uv-vis-vis-instruments/nanodrop-microvolume-spectrophotometers/nanodrop-products-guide.html).
+
+
+Stock plate
+-----------
+
+Original file name `20180419_TSOs_stf.txt`.  This file has one sheet containing
+raw data of old TSOs (first IDT plate ordered) diluted 10× from the original
+stock plate (all TSOs resuspended at 1 mM) and thus at an expected concentration
+of 100 μM.
+
+```{r concentration_QC_load_1}
+stock <- gdata::read.xls( "old_TSOs_conc/20180419_TSOs_stf2.xlsx"
+                        , stringsAsFactors = FALSE)
+stock$Plate.ID <- "stock"
+stock$X <- NA  # For rbind() later
+```
+
+
+Source plate
+------------
+
+Original file name `180507_kato.xlsx`.  This file is for the source plate used
+in [experiment 6](Labcyte-RT_Data_Analysis_6.md)
+(transfer design [6](Labcyte-RT6.md)).  Expected concentration: 100 μM.
+Samples have been dilluted 10 times before measuring concentration (see sheet 4).
+
+```{r concentration_QC_load_2}
+source <- gdata::read.xls( "Labcyte-RT6.quantification.xlsx"
+                         , nrow = 288, sheet = 1, stringsAsFactors = FALSE)
+source$Plate.ID <- "source"
+source$A260. %<>% multiply_by(10)  # Dilution factor
+source$A280. %<>% multiply_by(10)  # Dilution factor
+```
+
+
+Combine plates
+--------------
+
+```{r concentration_QC, dependson = c("concentration_QC_load_1", "concentration_QC_load_2")}
+conc <- rbind(stock, source)
+
+conc <- data.frame( Well  = conc$Well      
+                  , plate = conc$Plate.ID  %>% factor
+                  , A260  = conc$A260.
+                  , A280  = conc$A280.)
+
+conc$Well %<>% factor(levels = levels(conc$Well) %>% gtools::mixedsort())
+conc$exp <- 100
+```
+
+
+Load maker's information
+------------------------
+
+```{r idt_table}
+idt <- read.csv("old_TSOs_conc/TSO_master_plate_PO_8268526.csv")
+idt <- idt[,c("Well.Position", "Extinction.Coefficient.L..mole.cm.")]
+idt$Well <- idt$Well.Position %>% sub(pat = "0(.)", rep = "\\1")
+conc$ext <- idt[match(conc$Well, idt$Well), "Extinction.Coefficient.L..mole.cm."]
+```
+
+
+Calculate concentrations (in micromolars)
+-----------------------------------------
+
+```{r calc_concentration, dependson=c("idt_table", "concentration_QC")}
+conc$obs <- conc$A260 / conc$ext * 1e6
+```
+
+
+Average replicates
+------------------
+
+```{r concentration_average_replicates, dependson = "calc_concentration"}
+conc.sd <- aggregate( conc[,c("obs", "exp", "A260", "A280")]
+                    , list(Well = conc$Well, plate = conc$plate)
+                    , sd)
+
+conc <-    aggregate( conc[,c("obs", "exp", "A260", "A280")]
+                    , list(Well = conc$Well, plate = conc$plate)
+                    , mean)
+
+summary(conc)
+```
+
+
+Histograms
+==========
+
+```{r concentration_QC_histograms, warning = FALSE, dependson = "concentration_average_replicates"}
+hist_obs  <- ggplot(conc, aes(obs,  fill = plate)) + geom_histogram() +
+  facet_wrap(~plate, nrow = 1) + ggtitle("Observed concentrations (ng/μL)")
+hist_a260 <- ggplot(conc, aes(A260, fill = plate)) + geom_histogram() +
+  facet_wrap(~plate, nrow = 1) + ggtitle("Absorbance at 260 nm")
+hist_a280 <- ggplot(conc, aes(A280, fill = plate)) + geom_histogram() +
+  facet_wrap(~plate, nrow = 1) + ggtitle("Absorbance at 280 nm")
+
+ggpubr::ggarrange( ncol = 1, nrow = 3, hist_obs, hist_a260, hist_a280)
+```
+
+
+Absorbances and concentration
+=============================
+
+## A260 vs A280
+
+```{r concentration_QC_abs_ratio}
+ggplot(conc, aes(A280, A260, colour = plate)) + geom_point() +
+    scale_x_log10() + scale_y_log10() +
+  ggtitle("Relation between absorbances at 260 and 280 nm")
+
+ggplot(conc[conc$A260 > 1,], aes(A280, A260, colour = plate)) + geom_point() +
+  ggtitle("Relation between absorbances at 260 and 280 nm (outliers removed)")
+```
+
+## concentration vs A260 after the empty wells
+
+```{r concentration_QC_conc_a260}
+ggplot(conc[conc$obs > 10,], aes(obs, A260, colour = plate)) + geom_point() +
+  ggtitle("Relation between concentration and absorbances at 260 nm")
+```
+
+
+Comparison between source and stock
+===================================
+
+The source plate was made by adjusting concentrations of the stock primers,
+based on the measurement of their concentration, see
+[old_TSOs_conc/TSO_conc2](old_TSOs_conc/TSO_conc2.md) for details.
+
+Here, we verify that the dilution factors were applied as expected.  
+
+```{r dil_factors, dependson = "correct_concentration"}
+dil <- data.frame( Well = levels(conc$Well)
+                 , exp  = read.table("old_TSOs_conc/dilution_table2.txt", dec = ",", sep = "\t", header = TRUE)[,2, drop = T]
+                 , obs  = conc[conc$plate == "stock", "obs"] / conc[conc$plate == "source", "obs"])
+
+with(dil[dil$obs > 0 & dil$ obs < 100,], plot(obs, exp))
+```
+
+
+Session information
+===================
+
+```{r sesion_info}
+sessionInfo()
+```
