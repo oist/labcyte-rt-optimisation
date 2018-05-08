@@ -27,7 +27,7 @@ Experiments
 ### Experiment 1
  
 [Experiment one](Labcyte-RT_Data_Analysis.md)
-MiSeq ID: `171227_M00528_0321_000000000-B4GLP`.
+MiSeq ID: `171227_M00528_0321_000000000-B4GLP` (moderate quality, especially on read 1).
 MOIRAI
   [QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.paired_raw_quality_control2.20171228143720/171227_M00528_0321_000000000-B4GLP.paired_raw_quality_control2.20171228143720.html),
   [Workflow](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850/171227_M00528_0321_000000000-B4GLP.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180104125850.html).
@@ -37,6 +37,11 @@ in a single 384-well plate.  RTs made on the same RNA amounts were multiplexed
 in libraries amplified separately.  Only one amplification was successful.  Analysis
 suggested that reaction efficiency reaches a maximum at 20 μM TSO.  It also
 showed an obvious artefact at 20 μM TSO, where reaction efficiency was abnormally low.
+
+Barcode extraction was assessed by comparing TagDust 2 with a simple match of
+barcode sequence (no HMMs nor correction).  For most of them, the concordance
+was very high.  For a few of them, TagDust 2 detected more, probably thanks
+to error correction.  These barcodes were not related to the artefact at 20 μM TSO.
 
 Explanation for the artefact was found later, but this experiment was not re-analysed
 (superseded by Experiemnt 2 anyway).
