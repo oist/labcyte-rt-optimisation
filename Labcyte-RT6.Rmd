@@ -1,0 +1,327 @@
+New test of TSO, RT primer and RNA amounts
+==========================================
+
+In this design, the TSOs are randomised as much as possible (taking into
+account that all do not have the same stock concentrations).
+
+Each 384-well plate is divided in 6 "sextants", interleaved for easier
+collection of the reaction products.  Each sextant has a different RNA amount,
+and is indexed and amplified independently.  There are 9 × 7 combinations of TSO
+and RT primer concentrations, plus one negative control with no RNA.  Each
+reaction is assigned to a random well within the sextant.
+
+For each plate replicate, a different random seed is used, to generate
+different randomisations.
+
+## Load scripts and libraries.
+
+```{r}
+library("magrittr")   # For its diamond pipe operators
+library("ggplot2")    # For plotting
+library("platetools") # For defining and manipulating 384-well plates
+library("plyr")
+library("tibble")     # For comfortable command-line operations
+
+# The set_block function that will become part of platetools
+source("https://raw.githubusercontent.com/charles-plessy/platetools/76213accb1704d11a2d96fb1f6284d0b46117778/R/set_block.R")
+
+# Do not load the whole smallCAGEqc package, just get the barcode data.
+data("nanoCAGE2017barcodes", package = "smallCAGEqc")
+```
+
+
+Selected TSOs
+=============
+
+TSOs are transferred as 1, 2 or 4 drops from 3 different starting
+concentrations in the source plate.  Let's call each starting concentration
+"Tier_A", "Tier_B" or "Tier_C".  Given constraints on remaining volume, some
+TSOs can only be Tier_C, etc.  Let's refer to the TSOs by their numerical
+identifier.  Tier_N is a set of barcodes that can be used for the negative
+control.  See the file [Labcyte-RT6_TSO_stock_to_source.xls](Labcyte-RT6_TSO_stock_to_source.xls)
+for details on the cherrypicking of the TSOs.
+
+```{r tiers}
+Tier_A <- c(  3, 15, 27, 39, 51, 63, 75
+           , 10, 22, 34, 46, 58, 70, 82
+           , 11, 23, 35, 47, 59, 71, 83)
+
+Tier_B <- c(  1, 13, 25, 37, 49, 61, 73
+           ,  2, 14, 26, 38, 50, 62, 74
+           ,  7, 19, 31, 43, 55, 67, 79)
+
+Tier_C <- c(  4, 16, 28, 40, 52, 64, 76
+           ,  5, 17, 29, 41, 65, 77, 89
+           ,  6, 18, 30, 42, 66, 78, 90)
+
+Tier_N <- c(  8, 20, 32, 44, 68, 80, 92)
+```
+
+Set Random seed
+===============
+
+```{r setRandomSeed}
+set.seed(newseed)
+```
+
+Creation of sextants
+====================
+
+```{r sextants, dependson=c("tiers", "setRandomSeed")}
+createRandomisedSextant <- function(index, rna) {
+  df <- data.frame ( BARCODE_ID = c( sample(Tier_A, 21)
+                                   , sample(Tier_B, 21)
+                                   , sample(Tier_C, 21)
+                                   , sample(Tier_N,  1)))
+  tsoMaxConc <- 800
+  df$TSO_source <- c( rep(tsoMaxConc /  1, 21)
+                    , rep(tsoMaxConc /  8, 21)
+                    , rep(tsoMaxConc /  64, 21)
+                    , tsoMaxConc / 32)
+  df$TSO_vol <- c(rep(c(rep(100,7), rep(50,7), rep(25,7)),3), 25)
+  df$TSO <- df$TSO_source * df$TSO_vol / 500
+  df$RT_PRIMERS <- c(rep(c(0, 1, 2, 4, 8, 16, 24), 9), 1)
+  df$RT_PRIMERS_vol <- 25
+  df[df$RT_PRIMERS == 0, "RT_PRIMERS_vol"] <- 0
+  df$MASTER_MIX_vol <- 350
+  df$INDEX <- index
+  df$RNA <- rna
+  df$RNA_vol <- 25
+  df[64, "RNA_vol"] <- 0
+  df$H2O_vol <- 500 - df$RNA_vol - df$RT_PRIMERS_vol - df$TSO_vol - df$MASTER_MIX_vol
+  df[sample(nrow(df)),]
+}
+```
+
+
+Sextants
+========
+
+Plate layout
+------------
+
+Create a data frame representing the contents of each well.
+
+```{r make_plate_df}
+plate           <- tibble(well = platetools::num_to_well(1:384, plate = "384"))
+plate$row       <- sub("..$", "", plate$well) %>% factor
+plate$col       <- sub("^.",  "", plate$well) %>% as.numeric %>% factor
+```
+
+Fill sextants
+-------------
+
+```{r fill_sextants, dependson=c("sextants", "make_plate_df")}
+plate$sxt <- paste0 (
+  c(rep("A", 8), rep("B", 8), rep("C", 8)),
+  ifelse (plate$row %in% LETTERS[1:8 * 2], 2, 1)
+) %>% factor
+
+plate %<>% arrange(sxt)
+
+plate %<>% cbind( rbind( createRandomisedSextant("index1", 1e5)
+                       , createRandomisedSextant("index2", 1e4)
+                       , createRandomisedSextant("index3", 1e3)
+                       , createRandomisedSextant("index4", 1e2)
+                       , createRandomisedSextant("index5", 1e1)
+                       , createRandomisedSextant("index6", 1e0))
+      ) %>% as.tibble()
+
+plate$BARCODE_ID
+plate$INDEX %<>% factor(labels = indexes)
+plate$BARCODE_SEQ <- nanoCAGE2017barcodes[plate$BARCODE_ID, "barcodes"]
+
+plate$RNA_level <- plate$RNA %>% factor(labels = paste0("RNA_", LETTERS[1:6]))
+plate$RTP_level <- plate$RT_PRIMERS %>% factor(labels = paste0("RTP_", LETTERS[1:7]))
+```
+
+Summary
+=======
+
+```{r plate_summary, dependson="fill_sextants"}
+plate 
+summary(plate)
+write.table(plate, paste0("plate6", variant, ".txt"), sep = "\t", quote = FALSE, row.names = FALSE)
+```
+
+Plate maps
+==========
+
+```{r}
+plateMap <- function(x, title) {
+  platetools::raw_map(plate[[x]], well=plate$well, plate="384") +
+  ggtitle(title) +
+  viridis::scale_fill_viridis(breaks = unique(plate[[x]]))
+}
+
+plateMapLog <- function(x, title) {
+  platetools::raw_map(plate[[x]], well=plate$well, plate="384") +
+  ggtitle(title) +
+  viridis::scale_fill_viridis(breaks = unique(plate[[x]]), trans = "log")
+}
+```
+
+TSO
+---
+
+```{r plot_TSO_concentration}
+(plot_TSO <- plateMapLog("TSO", "TSO concentration"))
+```
+
+```{r plot_TSO_volume}
+(plot_TSO_vol <- plateMap("TSO_vol", "TSO volume"))
+```
+
+```{r plot_barcode_IDs}
+(plot_BARCODES <- platetools::raw_map(plate[["BARCODE_ID"]], well=plate$well, plate="384") +
+  ggtitle("Barcode ID")) + theme(legend.position="none")
+```
+
+Indexes
+-------
+
+```{r plot_Indexes}
+(plot_indexes <- platetools::raw_map(plate[["INDEX"]], well=plate$well, plate="384") +
+  ggtitle("INDEXes"))
+```
+
+H2O
+---
+
+```{r plot_H2O_vol}
+(plot_H2O_vol <- plateMap("H2O_vol", "H2O volume"))
+```
+
+RT primers
+----------
+
+```{r plot_RT_concentration}
+(plot_RT <- plateMapLog("RT_PRIMERS", "RT primer concentration"))
+```
+
+```{r plot_RT_volume}
+(plot_RT_vol <- plateMap("RT_PRIMERS_vol", "RT primer volume"))
+```
+
+RNA mass
+--------
+
+```{r plot_RNA_mass}
+(plot_RNA <- plateMapLog("RNA", "RNA mass (ng)"))
+```
+
+```{r plot_RNA_vol}
+(plot_RNA_vol <- plateMap("RNA_vol", "RNA volume"))
+```
+
+
+Transfer file
+=============
+
+## Source plate layout
+
+### TSO
+
+```{r sourcePlate_TSO}
+nanoCAGE2017barcodes$well <- unlist(lapply(LETTERS[1:8], function(x) paste(x, sprintf("%02d", 1:12), sep = "")))
+
+tso_block <- data.frame( id  = c(Tier_A, Tier_B, Tier_C, Tier_N)
+                       , row = unlist(lapply(LETTERS[1:10], rep, 7))
+                       , col = rep(1:7, 10))
+
+tso_block$well <- paste0(tso_block$row, "0", tso_block$col)
+
+tso_block$barcodes <- nanoCAGE2017barcodes[tso_block$id, "barcodes"]
+
+source <- tibble(well = platetools::num_to_well(1:384, plate = "384"))
+
+for (n in 1:nrow(tso_block))
+  source %<>% set_block( tso_block[n,"well"]
+                       , tso_block[n,"barcodes"]
+                       , 20000)
+```
+
+### Water
+
+```{r sourcePlate_H2O}
+source %<>% set_block("M01~M06", "H2O", 20000)
+```
+
+### RNA
+
+```{r sourcePlate_RNA}
+levels(plate$RNA %>% factor)
+levels(plate$RNA_level)
+source %<>% set_block("L01", "RNA_F", 20000)
+source %<>% set_block("L02", "RNA_E", 20000)
+source %<>% set_block("L03", "RNA_D", 20000)
+source %<>% set_block("L04", "RNA_C", 20000)
+source %<>% set_block("L05", "RNA_B", 20000)
+source %<>% set_block("L06", "RNA_A", 20000)
+```
+
+### RNA
+
+```{r sourcePlate_RTP}
+levels(plate$RT_PRIMERS %>% factor)
+levels(plate$RTP_level)
+source %<>% set_block("K01", "RTP_A", 20000)
+source %<>% set_block("K02", "RTP_B", 20000)
+source %<>% set_block("K03", "RTP_C", 20000)
+source %<>% set_block("K04", "RTP_D", 20000)
+source %<>% set_block("K05", "RTP_E", 20000)
+source %<>% set_block("K06", "RTP_F", 20000)
+source %<>% set_block("K07", "RTP_G", 20000)
+```
+
+## Plan plate
+
+```{r planPlate}
+planPlate <- tibble(well = platetools::num_to_well(1:384, plate = "384"))
+
+for (n in 1:nrow(plate)) {
+  planPlate %<>% set_block( plate[[n,"well"]]
+                          , plate[[n,"BARCODE_SEQ"]] %>% as.character
+                          , plate[[n,"TSO_vol"]])
+  planPlate %<>% set_block( plate[[n,"well"]]
+                          , "H2O"
+                          , plate[[n,"H2O_vol"]])
+  planPlate %<>% set_block( plate[[n,"well"]]
+                          , plate[[n,"RTP_level"]] %>% as.character
+                          , plate[[n,"RT_PRIMERS_vol"]])
+  planPlate %<>% set_block( plate[[n,"well"]]
+                          , plate[[n,"RNA_level"]] %>% as.character
+                          , plate[[n,"RNA_vol"]])
+}
+planPlate %<>% replace( . == 0, NA)
+```
+
+## Plan transfer
+
+```{r transfers}
+source("plates.R")
+source("echo.R")
+
+planPlate   <- Plate(plate = planPlate)
+sourcePlate <- Plate(plate = source)
+destPlate   <- Plate(plate = tibble::tibble(well = num_to_well(1:384, plate = "384")))
+
+echo <- planTransfers(sourcePlate, destPlate, planPlate)
+echo
+
+transfers <- as.data.frame(echo %>% showLogs)
+transfers <- transfers[order(transfers$from),]
+
+colnames(transfers) <- c("Source well", "Destination well", "Transfer volume", "what")
+
+transfers
+
+write.table( transfers[,1:3], file = paste0("Exp7_plate1", variant, ".csv")
+           , quote = FALSE, row.names = FALSE, col.names = TRUE, sep = ",")
+```
+
+## Session information
+
+```{r sessionInfo}
+sessionInfo()
+```
