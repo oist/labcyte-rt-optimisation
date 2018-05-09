@@ -41,7 +41,7 @@ of 100 μM.
 
 
 ```r
-stock <- gdata::read.xls( "old_TSOs_conc/20180419_TSOs_stf2.xlsx"
+stock <- gdata::read.xls( "20180419_TSOs_stf2.xlsx"
                         , stringsAsFactors = FALSE)
 stock$Plate.ID <- "stock"
 stock$X <- NA  # For rbind() later
@@ -88,7 +88,7 @@ Load maker's information
 
 
 ```r
-idt <- read.csv("old_TSOs_conc/TSO_master_plate_PO_8268526.csv")
+idt <- read.csv("TSO_master_plate_PO_8268526.csv")
 idt <- idt[,c("Well.Position", "Extinction.Coefficient.L..mole.cm.")]
 idt$Well <- idt$Well.Position %>% sub(pat = "0(.)", rep = "\\1")
 conc$ext <- idt[match(conc$Well, idt$Well), "Extinction.Coefficient.L..mole.cm."]
@@ -213,14 +213,14 @@ Comparison between source and stock
 
 The source plate was made by adjusting concentrations of the stock primers,
 based on the measurement of their concentration, see
-[old_TSOs_conc/TSO_conc2](old_TSOs_conc/TSO_conc2.md) for details.
+[TSO_concentration_check2](TSO_concentration_check2.md) for details.
 
 Here, we verify that the dilution factors were applied as expected.  
 
 
 ```r
 dil <- data.frame( Well = levels(conc$Well)
-                 , exp  = read.table("old_TSOs_conc/dilution_table2.txt", dec = ",", sep = "\t", header = TRUE)[,2, drop = T] / 10
+                 , exp  = read.table("dilution_table.txt", sep = "\t", header = TRUE)[,2, drop = T] / 10
                  , obs  = conc[conc$plate == "stock", "obs"] / conc[conc$plate == "source", "obs"])
 
 with(dil[dil$obs > 0 & dil$ obs < 100,], plot(obs, exp))

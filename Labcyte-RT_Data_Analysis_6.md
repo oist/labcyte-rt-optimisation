@@ -481,7 +481,7 @@ concentrations.  If not, they will correlate with the normalisation factors.
 
 
 ```r
-dil <- read.table("old_TSOs_conc/dilution_table2.txt", dec = ",", sep = "\t", header = TRUE)[,2, drop = T]
+dil <- read.table("dilution_table.txt", sep = "\t", header = TRUE)[,2, drop = T]
 plot( bcNormFactors[bcNormFactors > 0.1]
     , dil[bcNormFactors > 0.1]
     , xlab = "norm factors"
