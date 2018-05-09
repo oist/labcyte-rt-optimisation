@@ -16,10 +16,21 @@ Transfer designs
  - [2](Labcyte-RT2.md): similar to 2 with different concentration ranges.
  - [3](Labcyte-RT3.md): similar to 3 with different wells used for some TSOs.
  - [4](Labcyte-RT5.md) and [5](Labcyte-RT5.md): fixed concentrations, randomised positions for the TSOs.
- - [6a](Labcyte-RT6a.md]), [6b](Labcyte-RT6b.md]), [6c](Labcyte-RT6c.md]) and [6d](Labcyte-RT6d.md]):
+ - [6a](Labcyte-RT6a.md), [6b](Labcyte-RT6b.md), [6c](Labcyte-RT6c.md) and [6d](Labcyte-RT6d.md):
    [TSO] vs [RT] vs [RNA] with randomised positions.
 
- - [Concentration checks](TSO_concentration_check.md) in source plates 1 and 2.
+
+Concentration checks
+--------------------
+
+ - [1](TSO_concentration_check.md): source plates 1 and 2.  Confirmed that the TSOs
+   in "row B" were present at the correct concentration.
+ - [2](TSO_concentration_check2.md): "old" stock plate (PO_8268526).
+   Showed variations of concentration.
+ - [3](TSO_concentration_check3.md): source plate for Experiment 6.
+   Suggested that attempt to correct variations of concentration in the "old"
+   stock plate did not have effect.
+
 
 
 Experiments
