@@ -6,6 +6,8 @@ output:
     fig_width: 5.25
     keep_md: yes
     toc: yes
+    pandoc_args:
+     - "--lua-filter=links-to-markdown.lua"
 ---
 
 ```{r set-options, echo=FALSE, cache=FALSE}
@@ -26,32 +28,19 @@ Load data
 =========
 
 Concentrations of the actual TSO solutions in source plates, measured with
-the NanoDrop instrument for 8-strip tubes (NanoDrop 8000).
-
-Concentration factor was _50_ (_A260 × 50 = concentration_ in ng/μL).
-
-<!-- [[Concentration factor to apply for nanoCAGE TSOs (based on their sequences) = _27.8_ (_A260 × 27.8 = concentration_ in ng/μL).]] -->
+a NanoDrop 8000, that has a dynamic range of 2.5–3,700 ng/μL for dsDNA according
+to the manufacturer's [website](https://www.thermofisher.com/jp/en/home/industrial/spectroscopy-elemental-isotope-analysis/molecular-spectroscopy/ultraviolet-visible-visible-spectrophotometry-uv-vis-vis/uv-vis-vis-instruments/nanodrop-microvolume-spectrophotometers/nanodrop-products-guide.html).
 
 Original file name `20180419_TSOs_stf.txt`.  This file has one sheet containing
 raw data of old TSOs (first IDT plate ordered) diluted 10x from the original source plate (all TSOs resuspended at 1 mM) and thus at an expected concentration of 100 μM.
 
 ```{r concentration_QC_load_IDs}
-plate1 <- gdata::read.xls( "20180419_TSOs_stf2.xlsx"
+conc <- gdata::read.xls( "20180419_TSOs_stf2.xlsx"
                         , stringsAsFactors = FALSE)
-```
-
-<!-- [[Adjust calculated concentrations based on TSOs concentration factor (_27.8_).]] -->
-
-```{r concentration_QC, dependson = "concentration_QC_load_IDs"}
-plate1$plate <- 1
-conc <- plate1
-rm(plate1)
 ```
 
 ```{r create_conc_table}
 conc <- data.frame( Well  = conc$Well      
-                  , ID    = conc$Sample.ID %>% factor
-                  , plate = conc$plate     %>% factor
                   , A260  = conc$A260.
                   , A280  = conc$A280.
                   , obs_conc = conc$Conc..)
@@ -63,26 +52,38 @@ Average replicates.
 
 ```{r concentration_QC_average_replicates, dependson = "concentration_QC_merge"}
 conc <- aggregate( conc[,c("obs_conc", "A260", "A280")]
-                 , list(Well = conc$Well, ID = conc$ID, plate = conc$plate)
+                 , list(Well = conc$Well)
                  , mean)
 ```
 
 Load maker's information.
  
 ```{r idt_table}
-idt <- read.csv("TSO_master_plate_PO_8268526.csv")
-idt <- idt[,c("Well.Position", "OD260", "nmoles", "µg", "Measured.Molecular.Weight")]
+idt <- read.csv("TSO_master_plate_PO_8268526.csv", dec = ",")
+idt <- idt[,c("Well.Position", "OD260", "nmoles", "µg", "Measured.Molecular.Weight", "Extinction.Coefficient.L..mole.cm.")]
 idt$ug.OD <- idt$µg / idt$OD260
 idt$Well <- idt$Well.Position %>% sub(pat = "0(.)", rep = "\\1")
-conc$conc_corr_Fact <- idt[match(conc$Well, idt$Well), "ug.OD"]
-conc$stock_nmoles <- idt[match(conc$Well, idt$Well), "nmoles"]
+
+conc$ext <- idt[match(conc$Well, idt$Well), "Extinction.Coefficient.L..mole.cm."]
 conc$obs_source_MW <- idt[match(conc$Well, idt$Well), "Measured.Molecular.Weight"]
-conc$obs_source_MW <- sub(",", ".", conc$obs_source_MW)
-conc$obs_source_MW <- as.numeric(conc$obs_source_MW)
+conc$conc_corr_Fact <- idt[match(conc$Well, idt$Well), "ug.OD"]
 ```
 
-Correct concentrations.
- 
+
+Calculate concentrations 
+------------------------
+
+### Molarity using extinction coefficients
+
+```{r calc_concentration, dependson=c("idt_table", "concentration_QC")}
+conc$obs <- conc$A260 / conc$ext * 1e6
+```
+
+### Mass using µg / OD
+
+The nanoDrop reported mass using a coefficient of 50 µg per OD.  They are
+corrected here using the information provided by the maker.
+
 ```{r correct_concentration, dependson=c("idt_table", "concentration_QC_load_molarity")}
 conc$corr_obs_conc <- conc$obs_conc / 50 * conc$conc_corr_Fact
 ```
@@ -96,54 +97,59 @@ Therefore the expected concentration of TSOs at 100 μM (100 μmol/L) should be:
 conc$exp_molarity <- 100
 conc$exp_conc <- conc$exp_molarity * conc$obs_source_MW / 1000
 conc$obs_molarity <- (conc$corr_obs_conc*1000) / conc$obs_source_MW
-conc <- conc[,c(1:3,5,6,7,8,9,12,4,10,11,13)]
 summary(conc)
+cor(conc$obs, conc$obs_molarity)
 ```
 
+The valuse calcutated using calcultated extinction coefficients or using
+empirical µg / OD factors fit well.
+
+
 Find outliers.
+--------------
 
 ```{r TSOs_to_discard_low_concentration}
-out_of_range_down <- subset(conc, conc$obs_molarity < 25)
-out_of_range_down
-nrow(out_of_range_down)
-out_of_range_down$Well
+conc$out_range <- "other"
+conc[conc$obs_molarity < 25, "out_range"] <- "down"
+conc[conc$out_range == "down",]
 ```
 
 ```{r TSOs_to_discard_high_concentration}
-out_of_range_up <- subset(conc, conc$obs_molarity > 175)
-out_of_range_up
-nrow(out_of_range_up)
-out_of_range_up$Well
+conc[conc$obs_molarity > 175, "out_range"] <- "up"
+conc[conc$out_range == "up",]
 ```
 
 Find TSOs in the range of expected concentrations.
 
 ```{r TSOs_in_concentration_range_expected_+/-_25%}
 conc$delta_molarity <- conc$exp_molarity - conc$obs_molarity
-in_range <- subset(conc, abs(conc$delta_molarity) < 25)
-in_range
-nrow(in_range)
-in_range$Well
+conc[abs(conc$delta_molarity) < 25, "out_range"] <- "in"
+conc[conc$out_range == "in", "Well"] %>% as.character
+conc$out_range %<>% factor
 ```
+
 
 Histograms
 ==========
 
 ```{r concentration_QC_histograms, warning = FALSE, dependson = "load_libraries", fig.height = 6.5, fig.width = 6.5}
-#hist_obs_concentration <- ggplot(conc, aes(corr_obs_conc,  fill = exp_conc)) + geom_histogram() +
-#  facet_wrap(~exp_conc, nrow = 1) + ggtitle("Observed concentrations (ng/μL)")
-hist_obs_molarity  <- ggplot(conc, aes(obs_molarity,  fill = exp_molarity)) + geom_histogram() +
-  facet_wrap(~exp_molarity, nrow = 1) + ggtitle("Observed molarity (uM)")
-hist_a260 <- ggplot(conc, aes(A260, fill = exp_molarity)) + geom_histogram() +
-  facet_wrap(~exp_molarity, nrow = 1) + ggtitle("Absorbance at 260 nm")
-hist_a280 <- ggplot(conc, aes(A280, fill = exp_molarity)) + geom_histogram() +
-  facet_wrap(~exp_molarity, nrow = 1) + ggtitle("Absorbance at 280 nm")
+hist_obs_molarity  <- ggplot(conc, aes(obs_molarity,  fill = out_range)) + geom_histogram() + ggtitle("Observed molarity (µM)")
+
+hist_a260 <- ggplot(conc, aes(A260, fill = out_range)) + geom_histogram() +
+  ggtitle("Absorbance at 260 nm")
+
+hist_a280 <- ggplot(conc, aes(A280, fill = out_range)) + geom_histogram() +
+  ggtitle("Absorbance at 280 nm")
 
 ggpubr::ggarrange( ncol = 1, nrow = 4, hist_obs_molarity, hist_a260, hist_a280)
 ```
 
-Absorbances
-===========
+
+
+Absorbances and concentration
+=============================
+
+## A260 vs A280
 
 ```{r concentration_QC_abs_ratio}
 ggplot(conc, aes(A280, A260, colour = exp_molarity)) + geom_point() +
@@ -151,20 +157,14 @@ ggplot(conc, aes(A280, A260, colour = exp_molarity)) + geom_point() +
   ggtitle("Relation between absorbances at 260 and 280 nm")
 ```
 
-Concentrations
-==============
-
-```{r concentration_QC_obs_exp1}
-ggplot(conc, aes(exp_molarity,  obs_molarity, colour = exp_molarity))  + geom_point() +
-  scale_x_log10() + scale_y_log10() +
-  ggtitle("Observed molarity and expected molarity")
-```
+## concentration vs A260
 
 ```{r concentration_QC_obs_exp2}
-ggplot(conc, aes(exp_conc,  corr_obs_conc, colour = exp_conc))  + geom_point() +
+ggplot(conc, aes(A260,  corr_obs_conc, colour = out_range)) + geom_point() +
   scale_x_log10() + scale_y_log10() +
   ggtitle("Observed concentration and expected concentration")
 ```
+
 
 Dilution factors of TSOs
 =========================
@@ -178,13 +178,9 @@ conc$TSO_vol_for_100uM_2 <- 3
 conc$H2O_vol_for_100uM_2 <- ((conc$TSO_vol_for_100uM_2 * conc$source_obs_molarity) / conc$exp_molarity) - conc$TSO_vol_for_100uM_2
 ```
 
+
 Add visual comments
 ====================
-
-<!-- ```{r add_comments} -->
-<!-- conc$comments <- "" -->
-<!-- conc[,c("Well","comments")] <- "low_volume"  -->
-<!-- ``` -->
 
 ```{r TSOs_to_discard}
 do_not_use <- subset(conc, conc$dilution_factor_for_100uM < 2) 
@@ -197,17 +193,14 @@ Create dilution table.
 
 ```{r dilution_tables}
 dilution_table <- conc[, c("Well", "dilution_factor_for_100uM", "TSO_vol_for_100uM", "H20_vol_for_100uM")]
-#dilution_table2 <- conc[, c("Well", "dilution_factor_for_100uM", "TSO_vol_for_100uM_2", "H20_vol_for_100uM_2")]
 ```
 
 Print tables.
 
 ```{r save_file}
-write.table(conc, "old_TSOs_check2.txt", row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
-write.table(do_not_use, "do_not_use_TSOs_.txt", row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
 write.table(dilution_table, "dilution_table.txt", row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
-write.table(dilution_table2, "dilution_table2.txt", row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
 ```
+
 
 Session information
 ===================
