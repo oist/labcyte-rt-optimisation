@@ -30,6 +30,11 @@ Concentration checks
  - [3](TSO_concentration_check3.md): source plate for Experiment 6.
    Suggested that attempt to correct variations of concentration in the "old"
    stock plate did not have effect.
+ - [4](TSO_concentration_check4.md): source plate for Experiment 7.  Stock TSOs
+   were diluted assuming a molarity of 1 mM.  Concentration check number
+   [2](TSO_concentration_check2.md) showed that the real molarity was a bit lower.
+   The measurements here show that this was reflected in the source plate,
+   except for the highest concentrations.
 
 
 
