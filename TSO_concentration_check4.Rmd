@@ -1,5 +1,5 @@
 ---
-title: "Concentration control of the TSO in the source plates of exp. 7"
+title: "TSO concentration in exp. 7's source plate"
 output: 
   html_document: 
     fig_height: 5.25
@@ -14,6 +14,10 @@ output:
 options(width = 100)
 ```
 
+Concentrations of the actual TSO solutions in source plates, measured with
+a NanoDrop 8000, that has a dynamic range of 2.5–3,700 ng/μL for dsDNA according
+to the manufacturer's [website](https://www.thermofisher.com/jp/en/home/industrial/spectroscopy-elemental-isotope-analysis/molecular-spectroscopy/ultraviolet-visible-visible-spectrophotometry-uv-vis-vis/uv-vis-vis-instruments/nanodrop-microvolume-spectrophotometers/nanodrop-products-guide.html).
+
 
 Load R packages
 ===============
@@ -27,35 +31,76 @@ library("ggplot2")
 Load data
 =========
 
-Concentrations of the actual TSO solutions in source plates, measured with
-a NanoDrop 8000, that has a dynamic range of 2.5–3,700 ng/μL for dsDNA according
-to the manufacturer's [website](https://www.thermofisher.com/jp/en/home/industrial/spectroscopy-elemental-isotope-analysis/molecular-spectroscopy/ultraviolet-visible-visible-spectrophotometry-uv-vis-vis/uv-vis-vis-instruments/nanodrop-microvolume-spectrophotometers/nanodrop-products-guide.html).
-
-
 Source plate
 ------------
 
 Original file name `180510_kato.xlsx`.  This file is for the source plate used
-in [experiment 7](Labcyte-RT_Data_Analysis_7.md) (transfer design 6).  See
-[6a](Labcyte-RT6a.md) for example and expected concentrations.
+in [experiment 7](Labcyte-RT_Data_Analysis_7.md), which uses transfer design 6.
+See [design 6a](Labcyte-RT6a.md) for example and expected concentrations.
 
-```{r concentration_QC_load_2}
+
+```{r concentration_QC_load_1}
 source <- gdata::read.xls( "Labcyte-Exp7.quantification.xlsx"
                          , nrow = 210, sheet = 1, stringsAsFactors = FALSE)
-source$Plate.ID <- "source"
+source$Plate.ID <- "exp7"
 
 source$col <- source$Well. %>% sub(pat = ".", rep = "")
 source$row <- source$Well. %>% substr(1,1)
-source$orig_row <- source$col %>% factor(levels = 1:10, labels = c("A", "C", "E", "G", "I", "B", "D", "F", "H", "J"))
-source$orig_col <- source$row %>% factor %>% as.numeric
+```
+
+TSOs were transferred from the source plate to a dillution plate, in new
+coordinates documented in sheet 2.
+
+```{r concentration_QC_load_2, dependson="concentration_QC_load_1"}
+source$orig_row  <- source$col %>%
+                      factor( levels = 1:10,
+                              labels = c("A", "C", "E", "G", "I", "B", "D", "F", "H", "J"))
+source$orig_col  <- source$row %>% factor %>% as.numeric
 source$orig_well <- paste0(source$orig_row, sprintf("%02d", source$orig_col))
+```
 
-conc <- data.frame( Well  = source$orig_well      
-                  , plate = source$Plate.ID  %>% factor
+
+Average replicates
+------------------
+
+```{r concentration_average_replicates, dependson = "concentration_QC_load_2"}
+conc <- data.frame( Well  = source$orig_well
+                  , plate = source$Plate.ID
                   , A260  = source$A260.
-                  , A280  = source$A280.)
+                  , A280  = source$A280.
+                  , stringsAsFactors = FALSE)
 
-conc$Well %<>% factor(levels = levels(conc$Well) %>% gtools::mixedsort())
+conc.sd <- aggregate( conc[,c("A260", "A280")]
+                    , list(Well = conc$Well, plate = conc$plate)
+                    , sd)
+
+conc <-    aggregate( conc[,c("A260", "A280")]
+                    , list(Well = conc$Well, plate = conc$plate)
+                    , mean)
+
+summary(conc)
+```
+
+
+Barcode IDs
+-----------
+
+See [design 6a](Labcyte-RT6a.md) for example and expected concentrations if you
+would like to double-check.
+
+```{r}
+conc$ID <- c(  3, 15, 27, 39, 51, 63, 75
+            , 10, 22, 34, 46, 58, 70, 82
+            , 11, 23, 35, 47, 59, 71, 83
+            ,  1, 13, 25, 37, 49, 61, 73
+            ,  2, 14, 26, 38, 50, 62, 74
+            ,  7, 19, 31, 43, 55, 67, 79
+            ,  4, 16, 28, 40, 52, 64, 76
+            ,  5, 17, 29, 41, 65, 77, 89
+            ,  6, 18, 30, 42, 66, 78, 90
+            ,  8, 20, 32, 44, 68, 80, 92)
+
+conc$stock_Well <- platetools::num_to_well(1:96)[conc$ID]
 ```
 
 
@@ -65,7 +110,7 @@ Load maker's information
 ```{r idt_table}
 idt <- read.csv("TSO_master_plate_PO_8268526.csv")
 idt <- idt[,c("Well.Position", "Extinction.Coefficient.L..mole.cm.")]
-conc$ext <- idt[match(conc$Well, idt$Well), "Extinction.Coefficient.L..mole.cm."]
+conc$ext <- idt[match(conc$stock_Well, idt$Well), "Extinction.Coefficient.L..mole.cm."]
 ```
 
 
@@ -77,38 +122,30 @@ conc$obs <- conc$A260 / conc$ext * 1e6
 ```
 
 
-Average replicates
-------------------
-
-```{r concentration_average_replicates, dependson = "calc_concentration"}
-conc.sd <- aggregate( conc[,c("obs", "A260", "A280")]
-                    , list(Well = conc$Well, plate = conc$plate)
-                    , sd)
-
-conc <-    aggregate( conc[,c("obs", "A260", "A280")]
-                    , list(Well = conc$Well, plate = conc$plate)
-                    , mean)
-
-summary(conc)
-```
-
 
 Expected concentrations
 -----------------------
 
+To stay in the dynamic range, a different dilution factor was applied to the
+TSOs according to their expected concentrations.
+
 ```{r exp_conc, dependson="concentration_average_replicates"}
-conc[grepl("[ABC]", conc$Well),  "exp"] <- 800 / 50
-conc[grepl("[DEFJ]", conc$Well), "exp"] <- 200 / 20
-conc[grepl("[GHI]", conc$Well),  "exp"] <-  50 / 10
+conc[grepl("[ABC]",  conc$Well), "expected"] <- 800 / 50
+conc[grepl("[DEFJ]", conc$Well), "expected"] <- 200 / 20
+conc[grepl("[GHI]",  conc$Well), "expected"] <-  50 / 10
+conc$dil <- 1000 / conc$expected
+conc$expected %<>% paste(" µM") %>% factor
+conc$expected %<>% factor(levels = levels(.) %>% gtools::mixedsort())
 ```
+
 
 Histograms
 ==========
 
 ```{r concentration_QC_histograms, warning = FALSE, dependson = "exp_conc"}
-hist_obs  <- ggplot(conc, aes(obs,  fill = exp %>% factor)) + geom_histogram() + ggtitle("Observed concentrations (ng/μL)")
-hist_a260 <- ggplot(conc, aes(A260, fill = exp %>% factor)) + geom_histogram() + ggtitle("Absorbance at 260 nm")
-hist_a280 <- ggplot(conc, aes(A280, fill = exp %>% factor)) + geom_histogram() + ggtitle("Absorbance at 280 nm")
+hist_obs  <- ggplot(conc, aes(obs,  fill = expected)) + geom_histogram() + ggtitle("Observed concentrations (ng/μL)")
+hist_a260 <- ggplot(conc, aes(A260, fill = expected)) + geom_histogram() + ggtitle("Absorbance at 260 nm")
+hist_a280 <- ggplot(conc, aes(A280, fill = expected)) + geom_histogram() + ggtitle("Absorbance at 280 nm")
 
 ggpubr::ggarrange( ncol = 1, nrow = 3, hist_obs, hist_a260, hist_a280)
 ```
@@ -120,19 +157,39 @@ Absorbances and concentration
 ## A260 vs A280
 
 ```{r concentration_QC_abs_ratio}
-ggplot(conc, aes(A280, A260, colour = exp)) + geom_point() +
+ggplot(conc, aes(A280, A260, colour = expected)) + geom_point() +
     scale_x_log10() + scale_y_log10() +
   ggtitle("Relation between absorbances at 260 and 280 nm")
-
-ggplot(conc[conc$A260 > 1,], aes(A280, A260, colour = exp)) + geom_point() +
-  ggtitle("Relation between absorbances at 260 and 280 nm (outliers removed)")
 ```
 
-## concentration vs A260 after the empty wells
+## concentration vs A260
 
 ```{r concentration_QC_conc_a260}
-ggplot(conc, aes(obs, A260, colour = exp)) + geom_point() +
-  ggtitle("Relation between concentration and absorbances at 260 nm")
+ggplot(conc, aes(obs, A260, colour = expected)) + geom_point() +
+  ggtitle("Relation between concentration and abs. at 260 nm")
+```
+
+
+
+Comparison between source and stock
+===================================
+
+The source plate was made without concentrations of the stock primers (see
+[TSO_concentration_check2](TSO_concentration_check2.md) for details).
+
+Here, we check whether the deviations of concentrations seen in the stock are
+also obsereved in the source plate.
+
+```{r dil_factors, fig.height=3, fig.width=9.5}
+conc$stock <-
+  read.table( "dilution_table.txt"
+            , sep = "\t"
+            , header = TRUE)[,"source_obs_molarity", drop = T][conc$ID]
+
+conc$exp <- conc$stock / conc$dil
+
+ggplot(conc, aes(obs, exp, colour = expected)) + geom_point() +
+  facet_wrap(~expected, scale = "free")
 ```
 
 
