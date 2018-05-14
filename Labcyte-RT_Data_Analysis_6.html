@@ -651,7 +651,7 @@ plot( bcNormFactors[bcNormFactors &gt; 0.1]
 <div id="comparison-with-dilution-factors" class="section level3">
 <h3><span class="header-section-number">6.0.2</span> Comparison with dilution factors</h3>
 <p>This is just to double-check that the dilutions correctly adjusted the concentrations. If not, they will correlate with the normalisation factors.</p>
-<pre class="r"><code>dil &lt;- read.table(&quot;dilution_table.txt&quot;, sep = &quot;\t&quot;, header = TRUE)[,2, drop = T]
+<pre class="r"><code>dil &lt;- read.table(&quot;dilution_table.txt&quot;, sep = &quot;\t&quot;, header = TRUE)[,&quot;dilution_factor_for_100uM&quot;, drop = T]
 plot( bcNormFactors[bcNormFactors &gt; 0.1]
     , dil[bcNormFactors &gt; 0.1]
     , xlab = &quot;norm factors&quot;

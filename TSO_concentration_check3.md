@@ -220,7 +220,7 @@ Here, we verify that the dilution factors were applied as expected.
 
 ```r
 dil <- data.frame( Well = levels(conc$Well)
-                 , exp  = read.table("dilution_table.txt", sep = "\t", header = TRUE)[,2, drop = T] / 10
+                 , exp  = read.table("dilution_table.txt", sep = "\t", header = TRUE)[,"dilution_factor_for_100uM", drop = T] / 10
                  , obs  = conc[conc$plate == "stock", "obs"] / conc[conc$plate == "source", "obs"])
 
 with(dil[dil$obs > 0 & dil$ obs < 100,], plot(obs, exp))
