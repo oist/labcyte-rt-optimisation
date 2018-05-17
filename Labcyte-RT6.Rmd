@@ -119,16 +119,16 @@ plate$sxt <- paste0 (
 
 plate %<>% arrange(sxt)
 
-plate %<>% cbind( rbind( createRandomisedSextant("index1", 1e5)
-                       , createRandomisedSextant("index2", 1e4)
-                       , createRandomisedSextant("index3", 1e3)
-                       , createRandomisedSextant("index4", 1e2)
-                       , createRandomisedSextant("index5", 1e1)
-                       , createRandomisedSextant("index6", 1e0))
+plate %<>% cbind( rbind( createRandomisedSextant(indexes[1], 1e5)
+                       , createRandomisedSextant(indexes[2], 1e4)
+                       , createRandomisedSextant(indexes[3], 1e3)
+                       , createRandomisedSextant(indexes[4], 1e2)
+                       , createRandomisedSextant(indexes[5], 1e1)
+                       , createRandomisedSextant(indexes[6], 1e0))
       ) %>% as.tibble()
 
 plate$BARCODE_ID
-plate$INDEX %<>% factor(labels = indexes)
+plate$INDEX %<>% factor
 plate$BARCODE_SEQ <- nanoCAGE2017barcodes[plate$BARCODE_ID, "barcodes"]
 
 plate$RNA_level <- plate$RNA %>% factor(labels = paste0("RNA_", LETTERS[1:6]))

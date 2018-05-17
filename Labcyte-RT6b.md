@@ -1,5 +1,6 @@
 ---
-title: "RT optimisation with the Labcyte Echo 525 (6th plate design)"
+title: "6th plate design, randomisation b"
+subtitle: "RT optimisation with the Labcyte Echo 525: TSO, RT primer and RNA amounts"
 output: 
   html_document: 
     fig_height: 5.25
@@ -10,13 +11,11 @@ output:
 
 
 
-# Randomisation 2
-
 
 ```r
 variant <- "b"
 newseed <- 2
-indexes <- c("index1", "index2", "index3", "index4", "index5", "index6")
+indexes <- c("CTCTCTAC", "CGAGGCTG", "AAGAGGCA", "GTAGAGGA", "GCTCATGA", "ATCTCAGG")
 ```
 
 
@@ -147,12 +146,12 @@ plate$sxt <- paste0 (
 
 plate %<>% arrange(sxt)
 
-plate %<>% cbind( rbind( createRandomisedSextant("index1", 1e5)
-                       , createRandomisedSextant("index2", 1e4)
-                       , createRandomisedSextant("index3", 1e3)
-                       , createRandomisedSextant("index4", 1e2)
-                       , createRandomisedSextant("index5", 1e1)
-                       , createRandomisedSextant("index6", 1e0))
+plate %<>% cbind( rbind( createRandomisedSextant(indexes[1], 1e5)
+                       , createRandomisedSextant(indexes[2], 1e4)
+                       , createRandomisedSextant(indexes[3], 1e3)
+                       , createRandomisedSextant(indexes[4], 1e2)
+                       , createRandomisedSextant(indexes[5], 1e1)
+                       , createRandomisedSextant(indexes[6], 1e0))
       ) %>% as.tibble()
 
 plate$BARCODE_ID
@@ -175,7 +174,7 @@ plate$BARCODE_ID
 ```
 
 ```r
-plate$INDEX %<>% factor(labels = indexes)
+plate$INDEX %<>% factor
 plate$BARCODE_SEQ <- nanoCAGE2017barcodes[plate$BARCODE_ID, "barcodes"]
 
 plate$RNA_level <- plate$RNA %>% factor(labels = paste0("RNA_", LETTERS[1:6]))
@@ -221,14 +220,14 @@ summary(plate)
 ##                     E      : 24   5      : 16   C1:64   3rd Qu.:65.00   3rd Qu.:800.0  
 ##                     F      : 24   6      : 16   C2:64   Max.   :90.00   Max.   :800.0  
 ##                     (Other):240   (Other):288                                          
-##     TSO_vol            TSO            RT_PRIMERS    RT_PRIMERS_vol  MASTER_MIX_vol    INDEX   
-##  Min.   : 25.00   Min.   :  0.625   Min.   : 0.00   Min.   : 0.00   Min.   :350    index1:64  
-##  1st Qu.: 25.00   1st Qu.:  2.500   1st Qu.: 1.00   1st Qu.:25.00   1st Qu.:350    index2:64  
-##  Median : 50.00   Median : 10.000   Median : 4.00   Median :25.00   Median :350    index3:64  
-##  Mean   : 57.81   Mean   : 34.951   Mean   : 7.75   Mean   :21.48   Mean   :350    index4:64  
-##  3rd Qu.:100.00   3rd Qu.: 40.000   3rd Qu.:16.00   3rd Qu.:25.00   3rd Qu.:350    index5:64  
-##  Max.   :100.00   Max.   :160.000   Max.   :24.00   Max.   :25.00   Max.   :350    index6:64  
-##                                                                                               
+##     TSO_vol            TSO            RT_PRIMERS    RT_PRIMERS_vol  MASTER_MIX_vol      INDEX   
+##  Min.   : 25.00   Min.   :  0.625   Min.   : 0.00   Min.   : 0.00   Min.   :350    AAGAGGCA:64  
+##  1st Qu.: 25.00   1st Qu.:  2.500   1st Qu.: 1.00   1st Qu.:25.00   1st Qu.:350    ATCTCAGG:64  
+##  Median : 50.00   Median : 10.000   Median : 4.00   Median :25.00   Median :350    CGAGGCTG:64  
+##  Mean   : 57.81   Mean   : 34.951   Mean   : 7.75   Mean   :21.48   Mean   :350    CTCTCTAC:64  
+##  3rd Qu.:100.00   3rd Qu.: 40.000   3rd Qu.:16.00   3rd Qu.:25.00   3rd Qu.:350    GCTCATGA:64  
+##  Max.   :100.00   Max.   :160.000   Max.   :24.00   Max.   :25.00   Max.   :350    GTAGAGGA:64  
+##                                                                                                 
 ##       RNA            RNA_vol         H2O_vol       BARCODE_SEQ        RNA_level  RTP_level 
 ##  Min.   :     1   Min.   : 0.00   Min.   :  0.00   Length:384         RNA_A:64   RTP_A:54  
 ##  1st Qu.:    10   1st Qu.:25.00   1st Qu.:  0.00   Class :character   RNA_B:64   RTP_B:60  
