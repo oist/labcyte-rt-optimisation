@@ -43,7 +43,7 @@ Experiments
  
 ### Experiment 1
  
-[Experiment one](Labcyte-RT_Data_Analysis.md)
+[Experiment one](Labcyte-RT_Data_Analysis.md): plate `A`.
 MiSeq ID: `171227_M00528_0321_000000000-B4GLP` (moderate quality, especially on read 1).
 MOIRAI
   [QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/171227_M00528_0321_000000000-B4GLP.paired_raw_quality_control2.20171228143720/171227_M00528_0321_000000000-B4GLP.paired_raw_quality_control2.20171228143720.html),
@@ -66,7 +66,7 @@ Explanation for the artefact was found later, but this experiment was not re-ana
 
 ### Experiment 2
 
-[Experiment two](Labcyte-RT_Data_Analysis_2.md).
+[Experiment two](Labcyte-RT_Data_Analysis_2.md): plates: `B`, `C`, and `D`.
 MiSeq ID: `180123_M00528_0325_000000000-B4PCK` (bad quality, especially on read 1, leading to large numbers of unmapped reads). 
 MOIRAI
   [QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180123_M00528_0325_000000000-B4PCK.paired_raw_quality_control2.20180124101336/180123_M00528_0325_000000000-B4PCK.paired_raw_quality_control2.20180124101336.html),
@@ -84,8 +84,8 @@ of rDNA and high promoter rates.
 ### Experiment 3
 
 [Experiment three](Labcyte-RT_Data_Analysis_3merge.md)
-   ([SSIII QC](Labcyte-RT_Data_Analysis_3a.md),
-   [SSIV QC](Labcyte-RT_Data_Analysis_3b.md)).
+   ([SSIII QC](Labcyte-RT_Data_Analysis_3a.md): plates `E`, `F` and `G`,
+   [SSIV QC](Labcyte-RT_Data_Analysis_3b.md): plates `H`, `I` and `J`).
 MiSeq ID: `180403_M00528_0348_000000000-B4GP8`.
 MOIRAI
  [QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180403_M00528_0348_000000000-B4GP8.paired_raw_quality_control2.20180404155647/180403_M00528_0348_000000000-B4GP8.paired_raw_quality_control2.20180404155647.html),
@@ -100,7 +100,8 @@ actual concentration.
 
 ### Experiment 4
 
-[Experiment four](Labcyte-RT_Data_Analysis_4.md). MiSeq ID: `180326_M00528_0346_000000000-B4GJR`.
+[Experiment four](Labcyte-RT_Data_Analysis_4.md): plates `K` and `L`.
+MiSeq ID: `180326_M00528_0346_000000000-B4GJR`.
 MOIRAI
   [QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180326_M00528_0346_000000000-B4GJR.paired_raw_quality_control2.20180403111017/180326_M00528_0346_000000000-B4GJR.paired_raw_quality_control2.20180403111017.html),
   [Workflow](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180326_M00528_0346_000000000-B4GJR.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180329132046/180326_M00528_0346_000000000-B4GJR.OP-WORKFLOW-CAGEscan-short-reads-v2.1~rc1.20180329132046.html).
@@ -112,7 +113,7 @@ to the TSO quality or barcode sequence.
 
 ### Experiment 5
      
-[Experiment five](Labcyte-RT_Data_Analysis_5.md).
+[Experiment five](Labcyte-RT_Data_Analysis_5.md): plates `M` and `N`.
 MiSeq ID: `180411_M00528_0351_000000000-BN3BL`.
 MOIRAI
   [QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.paired_raw_quality_control2.20180412055341/180411_M00528_0351_000000000-BN3BL.paired_raw_quality_control2.20180412055341.html),
@@ -130,7 +131,8 @@ TSO-specific variations of reaction efficiency.
 
 ### Experiment 6
 
-[Experiment six](Labcyte-RT_Data_Analysis_6.md).  MiSeq ID: `180501_M00528_0359_000000000-B4PJY`.
+[Experiment six](Labcyte-RT_Data_Analysis_6.md): plates `O` and `P`.
+MiSeq ID: `180501_M00528_0359_000000000-B4PJY`.
 MOIRAI
   [QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180501_M00528_0359_000000000-B4PJY.paired_raw_quality_control2.20180502080443/180501_M00528_0359_000000000-B4PJY.paired_raw_quality_control2.20180502080443.html),
   [Workflow](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180501_M00528_0359_000000000-B4PJY.OP-WORKFLOW-CAGEscan-short-reads-v2.1.2.20180502081812/180501_M00528_0359_000000000-B4PJY.OP-WORKFLOW-CAGEscan-short-reads-v2.1.2.20180502081812.html).
@@ -143,7 +145,8 @@ was the quality of the TSOs used in the previous experiments.
 
 ### Experiment 7
 
-[Experiment seven](Labcyte-RT_Data_Analysis_7.md).  MiSeq ID `180517_M00528_0364_000000000-BRGK6`.
+[Experiment seven](Labcyte-RT_Data_Analysis_7.md): plates `Q`, `R`, `S` and `T`.
+MiSeq ID `180517_M00528_0364_000000000-BRGK6`.
 
 
 Xmas project
