@@ -141,6 +141,11 @@ variation of reaction efficiency is much milder, demonstrating that the problem
 was the quality of the TSOs used in the previous experiments.
 
 
+### Experiment 7
+
+[Experiment seven](Labcyte-RT_Data_Analysis_7.md).  MiSeq ID `180517_M00528_0364_000000000-BRGK6`.
+
+
 Xmas project
 ------------
 
