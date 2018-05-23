@@ -1,0 +1,516 @@
+---
+title: "7th plate design"
+subtitle: "RT optimisation with the Labcyte Echo 525: dNTPs and divalent ions."
+output: 
+  html_document: 
+    fig_height: 5.25
+    fig_width: 5.25
+    keep_md: yes
+    toc: yes
+    pandoc_args:
+     - "--lua-filter=links-to-markdown.lua"
+---
+
+```{r set-options, echo=FALSE, cache=FALSE}
+options(width = 100)
+```
+
+Influence of dNTP concentration and divalent ions
+=================================================
+
+It has been reported ([Lee et al., 2017](https://pubmed.gov/28327113)) that
+increasing dNTP concentration increases tailing and favors template switching.
+Here, we will replicate and extend the results, and check if the improvement
+(if any) has a positive or negative impact on cap specificity.
+
+Increase of [dNTP] must be compensated by increase of divalent ions, otherwise
+too many of them will be be chelated and the reaction will be inhibited.
+Indeed, [dNTP] is never higher than [Mg<sup>2+</sup>] + [Mg<sup>2+</sup>] in
+transcriptome protocols.  Therefore we will not test those combinations.
+
+In addition, addition of manganese, reported to also enhance template switching,
+will be tested.
+
+In this design, the TSOs and ion concentrations are randomised as much as
+possible (taking into account that all do not have the same stock
+concentrations). A fixed TSO, RT primer and RNA concentration is chosen, based
+on the results of [Experiment 7](Labcyte-RT_Data_Analysis_7.md).
+
+Each 384-well plate is divided in 6 "sextants", interleaved for easier
+collection of the reaction products.  Each sextant has a different
+Mn<sup>2+</sup> amount, and is indexed and amplified independently.
+There are 9 × 7 combinations of dNTP and Mg<sup>2+</sup>, plus one negative
+control with no RNA.  Each reaction is assigned to a random well within the
+sextant.
+
+For each plate replicate, a different random seed is used, to generate
+different randomisations.
+
+Compared with the previous design, all replicate randomisations and transfers
+are calculated at once, to prevent from running out of reagents.
+
+
+Load scripts and packages
+=========================
+
+```{r load_packages}
+library("magrittr")   # For its diamond pipe operators
+library("ggplot2")    # For plotting
+library("platetools") # For defining and manipulating 384-well plates
+library("plyr")
+library("tibble")     # For comfortable command-line operations
+
+# The set_block function that will become part of platetools
+source("https://raw.githubusercontent.com/charles-plessy/platetools/76213accb1704d11a2d96fb1f6284d0b46117778/R/set_block.R")
+
+# Do not load the whole smallCAGEqc package, just get the barcode data.
+data("nanoCAGE2017barcodes", package = "smallCAGEqc")
+```
+
+
+Selected TSOs
+=============
+
+TSOs are selected according to remaining volume.  See the file [Labcyte-RT7_TSO_stock_to_source.xls](Labcyte-RT7_TSO_stock_to_source.xls)
+for details on the cherrypicking of the TSOs.  This time, the concentrations
+are adjusted according to the
+[concentration check of the stock plate PO_8268526](TSO_concentration_check2.md).
+
+```{r TSOs}
+TSOs <- c(  1, 13, 25, 37, 49, 61, 73
+         ,  2, 14, 26, 38, 50, 62, 74
+         ,  4, 16, 28, 40, 64, 76, 88
+         ,  5, 17, 29, 41, 65, 77, 89
+         ,  6, 18, 30, 42, 66, 78, 90
+         ,  7, 19, 31, 43, 67, 79, 91
+         ,  8, 20, 32, 44, 68, 80, 92
+         ,  9, 21, 33, 45, 69, 81, 24
+         , 10, 22, 34, 46, 70, 82, 36
+         , 11, 23, 35, 47, 59, 83, 48)
+```
+
+Combinations of magnesium and dNTP concentrations
+=================================================
+
+This goes to high extremes, but Smart-Seq 2 has 1 mM dNTP and
+12 mM MgCl<sub>2</sub>...
+
+Master Mix "FS" it the standard SSIII first-strand buffer (375 mM KCl,
+15 mM MgCl<sub>2</sub>, 250 mM Tris-HCl pH 8.3), and Master Mix "C" (custom)
+is the same, without MgCl<sub>2</sub>.
+
+```{r combinations}
+combi <- expand.grid( dNTP = c(0.5, 1:5)
+                    , Mg   = c(0:3, 3, 4, 6, 9, 12, 15))
+combi$MMix <- c(rep("Custom", 24), rep("SSIII", 36))
+
+plot(combi$dNTP, combi$Mg, xlab = "[dNTP] (mM)", ylab ="[Mg] (mM)", main = "Tested combinations", pch = combi$MMix %>% factor %>% as.numeric + 3
+     , sub = "Legend: diamonds = standard buffer, crosses = custom")
+```
+
+Conveniently, there are 60 remaining combinations, which leaves space for
+4 negative control.
+
+
+Creation of sextants
+====================
+
+```{r sextants, dependson=c("tiers", "setRandomSeed")}
+createRandomisedSextant <- function(index, Mn) {
+  df                       <- data.frame(BARCODE_ID = sample(TSOs, 64))
+  df$TSO_source            <- 200
+  df$TSO_vol               <- 25
+  df$TSO                   <- df$TSO_source * df$TSO_vol / 500
+  df$RT_PRIMERS            <- 1
+  df$RNA                   <- 10
+  df$RT_PRIMERS_RNA_vol    <- 25
+  df$MMix                  <- c(combi$MMix, c("Custom", "Custom", "SSIII", "SSIII"))
+  df$MASTER_MIX_vol        <- 300
+  df$INDEX                 <- index
+  df$Mn                    <- Mn
+  df$Mn_vol                <- 25
+  df[df$Mn == 0, "Mn_vol"] <- 0
+  df$Mg                    <- c(combi$Mg, 3, 3, 0, 0)
+  df$Mg_vol                <- 25
+  df[df$Mg == 0, "Mg_vol"] <- 0
+  df$dNTP                  <- c(combi$dNTP, 0, 0, 0, 0)
+  df$dNTP_vol              <- 100
+  df[61:64, "dNTP_vol"]    <- 0  # Negative controls
+
+  df$H2O_vol <- 500 - with(df, dNTP_vol + Mn_vol + Mg_vol +
+                               TSO_vol + RT_PRIMERS_RNA_vol +
+                               MASTER_MIX_vol)
+  df[sample(nrow(df)),]
+}
+```
+
+
+Create plates
+=============
+
+```{r make_plates, dependson=c("sextants")}
+mkPlate <- function(randomSeed, plateID, indexes) {
+  plate           <- tibble(well = platetools::num_to_well(1:384, plate = "384"))
+  plate$row       <- sub("..$", "", plate$well) %>% factor
+  plate$col       <- sub("^.",  "", plate$well) %>% as.numeric %>% factor
+
+  set.seed(randomSeed)
+  plate$sxt <- paste0 (
+    c(rep("A", 8), rep("B", 8), rep("C", 8)),
+    ifelse (plate$row %in% LETTERS[1:8 * 2], 2, 1)
+  ) %>% factor
+  
+  plate %<>% arrange(sxt)
+  
+  plate %<>% cbind( rbind( createRandomisedSextant(indexes[1], 0)
+                         , createRandomisedSextant(indexes[2], 1)
+                         , createRandomisedSextant(indexes[3], 2)
+                         , createRandomisedSextant(indexes[4], 3)
+                         , createRandomisedSextant(indexes[5], 4)
+                         , createRandomisedSextant(indexes[6], 5))
+        ) %>% as.tibble()
+  
+  plate$INDEX %<>% factor
+  plate$BARCODE_SEQ <- nanoCAGE2017barcodes[plate$BARCODE_ID, "barcodes"]
+  
+  plate$Mg_level     <- plate$Mg   %>% factor(labels = paste0("Mg_",   LETTERS[1:9]))
+  plate$Mn_level     <- plate$Mn   %>% factor(labels = paste0("Mn_",   LETTERS[1:6]))
+  plate$dNTP_level   <- plate$dNTP %>% factor(labels = paste0("dNTP_", LETTERS[1:7]))
+  plate$plateID <- plateID
+  plate
+}
+
+plate7a <- mkPlate(1, "U", c("TAAGGCGA", "CGTACTAG", "AGGCAGAA", "TCCTGAGC", "GGACTCCT", "TAGGCATG"))
+plate7b <- mkPlate(2, "V", c("CTCTCTAC", "CGAGGCTG", "AAGAGGCA", "GTAGAGGA", "GCTCATGA", "ATCTCAGG"))
+plate7c <- mkPlate(3, "W", c("ACTCGCTA", "GGAGCTAC", "GCGTAGTA", "CGGAGCCT", "TACGCTGC", "ATGCGCAG"))
+plate7d <- mkPlate(4, "X", c("TAGCGCTC", "ACTGAGCG", "CCTAAGAC", "CGATCAGT", "TGCAGCTA", "TCGACGTC"))
+```
+
+
+Summary
+=======
+
+```{r plate_summary, dependson="make_plates"}
+writePlate <- function(plate) {
+  plateName <- deparse(substitute(plate))
+  write.table( plate
+             , paste0(plateName, ".txt")
+             , sep = "\t"
+             , quote = FALSE
+             , row.names = FALSE)
+}
+
+writePlate(plate7a)
+writePlate(plate7b)
+writePlate(plate7c)
+writePlate(plate7d)
+```
+
+
+Plate maps for randomisation a
+==============================
+
+```{r}
+plateMap <- function(x, title) {
+  plate <- plate7a
+  platetools::raw_map(plate[[x]], well=plate$well, plate="384") +
+  ggtitle(title) +
+  viridis::scale_fill_viridis(breaks = unique(plate[[x]]))
+}
+
+plateMapLog <- function(x, title) {
+  plate <- plate7a
+  platetools::raw_map(plate[[x]], well=plate$well, plate="384") +
+  ggtitle(title) +
+  viridis::scale_fill_viridis(breaks = unique(plate[[x]]), trans = "log")
+}
+```
+
+dNTP, Mg, Mn
+------------
+
+```{r plot_dNTP_concentration}
+(plot_dNTP <- plateMapLog("dNTP", "dNTP concentration"))
+```
+
+```{r plot_Mg_concentration}
+(plot_Mg   <- plateMapLog("Mg",   "Mg concentration"))
+```
+
+```{r plot_Mn_concentration}
+(plot_Mn   <- plateMapLog("Mn",   "Mn concentration"))
+```
+
+Barcode IDs
+-----------
+
+```{r plot_barcode_IDs}
+(plot_BARCODES <- platetools::raw_map(plate7a[["BARCODE_ID"]], well=plate7a$well, plate="384") +
+  ggtitle("Barcode ID")) + theme(legend.position="none")
+```
+
+Indexes
+-------
+
+```{r plot_Indexes}
+(plot_indexes <- platetools::raw_map(plate7a[["INDEX"]], well=plate7a$well, plate="384") +
+  ggtitle("INDEXes"))
+```
+
+H2O
+---
+
+```{r plot_H2O_vol}
+(plot_H2O_vol <- plateMap("H2O_vol", "H2O volume"))
+```
+
+
+Transfer file
+=============
+
+## Source plate layout
+
+### TSOs in wells A01~J07
+
+Source plate concentration is 200 μM, for a 10 μM final concentration
+(25 nL transfer).  This time, the dilution factors calculated from the
+concentration checks in the stock plate have been applied.  The TSOs will be in
+wells A1 to J7 of the source plate.
+
+```{r sourcePlate_TSO}
+tso_block <- data.frame( id  = TSOs
+                       , row = unlist(lapply(LETTERS[1:10], rep, 7))
+                       , col = rep(1:7, 10))
+
+tso_block$well <- paste0(tso_block$row, "0", tso_block$col)
+
+tso_block$barcodes <- nanoCAGE2017barcodes[tso_block$id, "barcodes"]
+
+source <- tibble(well = platetools::num_to_well(1:384, plate = "384"))
+
+for (n in 1:nrow(tso_block))
+  source %<>% set_block( tso_block[n,"well"]
+                       , tso_block[n,"barcodes"]
+                       , 20000)
+```
+
+
+### RNA / RT primer mix in well K01
+
+This time it was needed to combine RNA and RT primers to reduce the total volume.
+Fixed RT primer concentration and RNA amount: 20 μM RT primer ; 400 ng / μL RNA.
+
+```{r sourcePlate_RNA_RTP}
+source %<>% set_block("K01", "RT_PRIMERS_RNA", 60000)
+```
+
+
+### Water in well K02
+
+```{r sourcePlate_H2O}
+source %<>% set_block("K02", "H2O", 60000)
+```
+
+
+### Mn<sup>2+</sup> in wells L01 to L05
+
+Wells L01 to L05 filled with 20, 40, 60, 80 and 100 μM MnCl<sub>2</sub> respectively.
+
+```{r sourcePlate_Mn}
+levels(plate7a$Mn %>% factor)
+levels(plate7a$Mn_level)
+source %<>% set_block("L01", "Mn_B", 60000)
+source %<>% set_block("L02", "Mn_C", 60000)
+source %<>% set_block("L03", "Mn_D", 60000)
+source %<>% set_block("L04", "Mn_E", 60000)
+source %<>% set_block("L05", "Mn_F", 60000)
+```
+
+
+### Mg<sup>2+</sup> in wells M01 to M08
+
+Wells M01 to M08 filled with 20, 40, 60, 80, 120, 180, 240, and 300 μM
+MgCl<sub>2</sub> respectively.
+
+
+```{r sourcePlate_Mg}
+levels(plate7a$Mg %>% factor)
+levels(plate7a$Mg_level)
+source %<>% set_block("M01", "Mg_B", 60000)
+source %<>% set_block("M02", "Mg_C", 60000)
+source %<>% set_block("M03", "Mg_D", 60000)
+source %<>% set_block("M04", "Mg_E", 60000)
+source %<>% set_block("M05", "Mg_F", 60000)
+source %<>% set_block("M06", "Mg_G", 60000)
+source %<>% set_block("M07", "Mg_H", 60000)
+source %<>% set_block("M08", "Mg_I", 60000)
+```
+
+
+### dNTPs
+
+Wells N01 to N06 filled with 2.5, 5, 10, 15, 20, 25 mM dNTPs respectively.
+
+```{r sourcePlate_dNTP}
+levels(plate7a$dNTP %>% factor)
+levels(plate7a$dNTP_level)
+source %<>% set_block("N01", "dNTP_B", 60000)
+source %<>% set_block("N02", "dNTP_C", 60000)
+source %<>% set_block("N03", "dNTP_D", 60000)
+source %<>% set_block("N04", "dNTP_E", 60000)
+source %<>% set_block("N05", "dNTP_F", 60000)
+source %<>% set_block("N06", "dNTP_G", 60000)
+```
+
+
+### Mastermixes
+
+Wells O01 to O06 filled with custom mastermix; wells P01 to P07 filled
+with standard mastermix.
+
+```{r sourcePlate_MM}
+levels(plate7a$MMix %>% factor)
+source %<>% set_block("O01~O06", "Custom", 60000)
+source %<>% set_block("P01~P07", "SSIII",  60000)
+```
+
+
+## Plan plate
+
+```{r planPlate}
+mkPlanPlate <- function(plate) {
+  planPlate <- tibble(well = platetools::num_to_well(1:384, plate = "384"))
+  
+  for (n in 1:nrow(plate)) {
+    planPlate %<>% set_block( plate[[n,"well"]]
+                            , plate[[n,"BARCODE_SEQ"]] %>% as.character
+                            , plate[[n,"TSO_vol"]])
+    
+    planPlate %<>% set_block( plate[[n,"well"]]
+                            , "H2O"
+                            , plate[[n,"H2O_vol"]])
+    
+    planPlate %<>% set_block( plate[[n,"well"]]
+                            , "RT_PRIMERS_RNA"
+                            , plate[[n,"RT_PRIMERS_RNA_vol"]])
+    
+    planPlate %<>% set_block( plate[[n,"well"]]
+                            , plate[[n,"Mg_level"]] %>% as.character
+                            , plate[[n,"Mg_vol"]])
+    
+    planPlate %<>% set_block( plate[[n,"well"]]
+                            , plate[[n,"Mn_level"]] %>% as.character
+                            , plate[[n,"Mn_vol"]])
+    
+    planPlate %<>% set_block( plate[[n,"well"]]
+                            , plate[[n,"dNTP_level"]] %>% as.character
+                            , plate[[n,"dNTP_vol"]])
+    
+    planPlate %<>% set_block( plate[[n,"well"]]
+                            , plate[[n,"MMix"]] %>% as.character
+                            , plate[[n,"MASTER_MIX_vol"]])
+  }
+  planPlate %<>% replace( . == 0, NA)
+  planPlate <- planPlate[,sapply(planPlate, function(x) !all(is.na(x)))]
+  planPlate
+}
+```
+
+## Plan transfer
+
+```{r transfers_a}
+source("plates.R")
+source("echo.R")
+
+planPlate7a <- Plate(plate = mkPlanPlate(plate7a))
+sourcePlate <- Plate(plate = source, deadVolume = 16000)
+destPlate   <- Plate(plate = tibble::tibble(well = num_to_well(1:384, plate = "384")))
+
+echo <- planTransfers(sourcePlate, destPlate, planPlate7a)
+echo
+echo@source@plate[,-1] %>% colSums(na.rm = TRUE)
+
+transfers7a <- as.data.frame(echo %>% showLogs)
+transfers7a <- transfers7a[order(transfers7a$from),]
+
+colnames(transfers7a) <- c("Source well", "Destination well", "Transfer volume", "what")
+
+writeMMixTransfers <- function(transfers, filename) {
+  transfers <- transfers[transfers$what %in% c("SSIII","Custom"),]
+  write.table( transfers[,1:3], file = filename
+             , quote = FALSE, row.names = FALSE, col.names = TRUE, sep = ",")
+}
+
+writeOtherTransfers <- function(transfers, filename) {
+  transfers <- transfers[!transfers$what %in% c("SSIII","Custom"),]
+  write.table( transfers[,1:3], file = filename
+             , quote = FALSE, row.names = FALSE, col.names = TRUE, sep = ",")
+}
+
+writeMMixTransfers (transfers7a, "Exp8_plate1_mastermix.csv")
+writeOtherTransfers(transfers7a, "Exp8_plate1_other-reagents.csv")
+```
+
+```{r transfers_b}
+planPlate7b <- Plate(plate = mkPlanPlate(plate7b))
+sourcePlate <- echo@source
+
+echo <- planTransfers(sourcePlate, destPlate, planPlate7b)
+echo
+echo@source@plate[,-1] %>% colSums(na.rm = TRUE)
+
+transfers7b <- as.data.frame(echo %>% showLogs)
+transfers7b <- transfers7b[order(transfers7b$from),]
+
+writeMMixTransfers (transfers7b, "Exp8_plate2_mastermix.csv")
+writeOtherTransfers(transfers7b, "Exp8_plate2_other-reagents.csv")
+```
+
+```{r transfers_c}
+planPlate7c <- Plate(plate = mkPlanPlate(plate7c))
+sourcePlate <- echo@source
+
+echo <- planTransfers(sourcePlate, destPlate, planPlate7c)
+echo
+echo@source@plate[,-1] %>% colSums(na.rm = TRUE)
+
+transfers7c <- as.data.frame(echo %>% showLogs)
+transfers7c <- transfers7c[order(transfers7c$from),]
+
+writeMMixTransfers (transfers7c, "Exp8_plate3_mastermix.csv")
+writeOtherTransfers(transfers7c, "Exp8_plate3_other-reagents.csv")
+```
+
+```{r transfers_d}
+planPlate7d <- Plate(plate = mkPlanPlate(plate7d))
+sourcePlate <- echo@source
+
+echo <- planTransfers(sourcePlate, destPlate, planPlate7d)
+echo
+echo@source@plate[,-1] %>% colSums(na.rm = TRUE)
+
+transfers7d <- as.data.frame(echo %>% showLogs)
+transfers7d <- transfers7d[order(transfers7d$from),]
+
+writeMMixTransfers (transfers7d, "Exp8_plate4_mastermix.csv")
+writeOtherTransfers(transfers7d, "Exp8_plate4_other-reagents.csv")
+```
+
+## Inline copy of the tables
+
+```{r}
+plate7a %>% as.data.frame
+plate7b %>% as.data.frame
+plate7c %>% as.data.frame
+plate7d %>% as.data.frame
+transfers7a
+transfers7b
+transfers7c
+transfers7d
+```
+
+## Session information
+
+```{r sessionInfo}
+sessionInfo()
+```
