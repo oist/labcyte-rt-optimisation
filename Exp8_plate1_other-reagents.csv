@@ -1,4 +1,4 @@
-Source well,Destination well,Transfer volume
+from,to,vol
 A01,A12,25
 A01,D14,25
 A01,G07,25
