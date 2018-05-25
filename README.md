@@ -18,6 +18,7 @@ Transfer designs
  - [4](Labcyte-RT5.md) and [5](Labcyte-RT5.md): fixed concentrations, randomised positions for the TSOs.
  - [6a](Labcyte-RT6a.md), [6b](Labcyte-RT6b.md), [6c](Labcyte-RT6c.md) and [6d](Labcyte-RT6d.md):
    [TSO] vs [RT] vs [RNA] with randomised positions.
+ - [7](Labcyte-RT7.md): [dNTP] vs [Mg<sup>2+</sup>] vs [Mn<sup>2+</sup>] with randomised positions.
 
 
 Concentration checks
