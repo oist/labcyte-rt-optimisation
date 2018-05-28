@@ -82,16 +82,17 @@ are adjusted according to the
 
 
 ```r
-TSOs <- c(  1, 13, 25, 37, 49, 61, 73
-         ,  2, 14, 26, 38, 50, 62, 74
-         ,  4, 16, 28, 40, 64, 76, 88
-         ,  5, 17, 29, 41, 65, 77, 89
-         ,  6, 18, 30, 42, 66, 78, 90
-         ,  7, 19, 31, 43, 67, 79, 91
-         ,  8, 20, 32, 44, 68, 80, 92
-         ,  9, 21, 33, 45, 69, 81, 24
-         , 10, 22, 34, 46, 70, 82, 36
-         , 11, 23, 35, 47, 59, 83, 48)
+#           1   2   3   4   5   6   7
+TSOs <- c(  1, 13, 25, 37, 49, 61, 73  # A
+         ,  2, 14, 39, 38, 50, 62, 74  # B
+         ,  4, 16, 28, 40, 64, 76, 88  # C
+         ,  5, 17, 29, 41, 65, 77, 89  # D
+         , 51, 18, 30, 42, 66, 78, 90  # E
+         ,  7, 19, 31, 43, 67, 79, 91  # F
+         ,  8, 87, 32, 44, 68, 80, 92  # G
+         ,  9, 21, 33, 45, 69, 81, 24  # H 
+         , 71, 23, 60, 47, 70, 83, 36  # I
+         , 72, 22, 35, 46, 59, 82, 48) # J
 ```
 
 Combinations of magnesium and dNTP concentrations
@@ -558,27 +559,27 @@ echo@source@plate[,-1] %>% colSums(na.rm = TRUE)
 ```
 ##         ACACAG         AGTCAG         ATCTAC         CGACAG         CTGCAG         GAGTAC 
 ##          19875          19875          19850          19875          19850          19875 
-##         GTACAG         ACACGT         AGTCGT         ATCTCT         CGACGT         CTGCGT 
+##         GTACAG         ACACGT         AGTCGT         CGACTC         CGACGT         CTGCGT 
 ##          19875          19875          19875          19850          19850          19875 
 ##         GAGTCT         GTACGT         ACAGAT         AGTGAT         CACACG         CGAGAT 
 ##          19850          19850          19875          19850          19850          19850 
 ##         GCTACG         GTAGAT         TATGAT         ACAGCA         AGTGCA         CACAGC 
 ##          19850          19850          19875          19875          19875          19875 
-##         CGAGCA         GCTAGC         GTAGCA         TATGCA         ACAGTG         AGTGTG 
+##         CGAGCA         GCTAGC         GTAGCA         TATGCA         CTGCTC         AGTGTG 
 ##          19900          19850          19875          19850          19875          19850 
 ##         CACATA         CGAGTG         GCTATA         GTAGTG         TATGTG         ACATAC 
 ##          19950          19875          19850          19875          19850          19875 
 ##         ATCACG         CACGAT         CGATAC         GCTCAG         GTATAC         TCGACG 
 ##          19850          19900          19875          19875          19850          19850 
-##         ACATCT         ATCAGC         CACGCA         CGATCT         GCTCGT         GTATCT 
+##         ACATCT         TATCTC         CACGCA         CGATCT         GCTCGT         GTATCT 
 ##          19850          19850          19850          19875          19850          19925 
 ##         TCGAGC         ACATGA         ATCATA         CACGTG         CGATGA         GCTCTC 
 ##          19850          19875          19875          19850          19850          19875 
-##         GTATGA         ATCGTG         AGTACG         ATCGAT         CACTAC         CTGACG 
+##         GTATGA         ATCGTG         GCTGCA         ATCGCA         GAGCTC         CTGAGC 
 ##          19850          19850          19850          19850          19850          19850 
-##         GCTGAT         TATACG         CACTGA         AGTAGC         ATCGCA         CACTCT 
+##         GCTGAT         TATAGC         CACTGA         GCTGTG         ATCGAT         CACTCT 
 ##          19875          19850          19850          19850          19850          19850 
-##         CTGAGC         GAGCGT         TATAGC         CTGATA RT_PRIMERS_RNA            H2O 
+##         CTGACG         GAGCGT         TATACG         CTGATA RT_PRIMERS_RNA            H2O 
 ##          19850          19850          19850          19850          50400          54800 
 ##           Mn_B           Mn_C           Mn_D           Mn_E           Mn_F           Mg_B 
 ##          58400          58400          58400          58400          58400          59100 
@@ -636,27 +637,27 @@ echo@source@plate[,-1] %>% colSums(na.rm = TRUE)
 ```
 ##         ACACAG         AGTCAG         ATCTAC         CGACAG         CTGCAG         GAGTAC 
 ##          19725          19725          19750          19725          19750          19775 
-##         GTACAG         ACACGT         AGTCGT         ATCTCT         CGACGT         CTGCGT 
+##         GTACAG         ACACGT         AGTCGT         CGACTC         CGACGT         CTGCGT 
 ##          19725          19750          19725          19700          19725          19725 
 ##         GAGTCT         GTACGT         ACAGAT         AGTGAT         CACACG         CGAGAT 
 ##          19700          19700          19725          19700          19725          19700 
 ##         GCTACG         GTAGAT         TATGAT         ACAGCA         AGTGCA         CACAGC 
 ##          19750          19700          19750          19725          19775          19725 
-##         CGAGCA         GCTAGC         GTAGCA         TATGCA         ACAGTG         AGTGTG 
+##         CGAGCA         GCTAGC         GTAGCA         TATGCA         CTGCTC         AGTGTG 
 ##          19750          19725          19725          19725          19725          19700 
 ##         CACATA         CGAGTG         GCTATA         GTAGTG         TATGTG         ACATAC 
 ##          19800          19725          19750          19725          19775          19800 
 ##         ATCACG         CACGAT         CGATAC         GCTCAG         GTATAC         TCGACG 
 ##          19725          19750          19725          19750          19700          19700 
-##         ACATCT         ATCAGC         CACGCA         CGATCT         GCTCGT         GTATCT 
+##         ACATCT         TATCTC         CACGCA         CGATCT         GCTCGT         GTATCT 
 ##          19700          19700          19700          19725          19725          19775 
 ##         TCGAGC         ACATGA         ATCATA         CACGTG         CGATGA         GCTCTC 
 ##          19700          19725          19725          19725          19700          19725 
-##         GTATGA         ATCGTG         AGTACG         ATCGAT         CACTAC         CTGACG 
+##         GTATGA         ATCGTG         GCTGCA         ATCGCA         GAGCTC         CTGAGC 
 ##          19700          19725          19700          19750          19700          19700 
-##         GCTGAT         TATACG         CACTGA         AGTAGC         ATCGCA         CACTCT 
+##         GCTGAT         TATAGC         CACTGA         GCTGTG         ATCGAT         CACTCT 
 ##          19725          19725          19700          19700          19700          19700 
-##         CTGAGC         GAGCGT         TATAGC         CTGATA RT_PRIMERS_RNA            H2O 
+##         CTGACG         GAGCGT         TATACG         CTGATA RT_PRIMERS_RNA            H2O 
 ##          19725          19725          19725          19725          40800          49600 
 ##           Mn_B           Mn_C           Mn_D           Mn_E           Mn_F           Mg_B 
 ##          56800          56800          56800          56800          56800          58200 
@@ -702,27 +703,27 @@ echo@source@plate[,-1] %>% colSums(na.rm = TRUE)
 ```
 ##         ACACAG         AGTCAG         ATCTAC         CGACAG         CTGCAG         GAGTAC 
 ##          19625          19575          19600          19600          19600          19675 
-##         GTACAG         ACACGT         AGTCGT         ATCTCT         CGACGT         CTGCGT 
+##         GTACAG         ACACGT         AGTCGT         CGACTC         CGACGT         CTGCGT 
 ##          19575          19625          19600          19575          19575          19600 
 ##         GAGTCT         GTACGT         ACAGAT         AGTGAT         CACACG         CGAGAT 
 ##          19600          19550          19575          19550          19600          19550 
 ##         GCTACG         GTAGAT         TATGAT         ACAGCA         AGTGCA         CACAGC 
 ##          19600          19550          19600          19575          19625          19575 
-##         CGAGCA         GCTAGC         GTAGCA         TATGCA         ACAGTG         AGTGTG 
+##         CGAGCA         GCTAGC         GTAGCA         TATGCA         CTGCTC         AGTGTG 
 ##          19625          19600          19600          19575          19575          19550 
 ##         CACATA         CGAGTG         GCTATA         GTAGTG         TATGTG         ACATAC 
 ##          19650          19575          19600          19600          19650          19675 
 ##         ATCACG         CACGAT         CGATAC         GCTCAG         GTATAC         TCGACG 
 ##          19600          19600          19575          19625          19550          19600 
-##         ACATCT         ATCAGC         CACGCA         CGATCT         GCTCGT         GTATCT 
+##         ACATCT         TATCTC         CACGCA         CGATCT         GCTCGT         GTATCT 
 ##          19550          19550          19550          19625          19575          19625 
 ##         TCGAGC         ACATGA         ATCATA         CACGTG         CGATGA         GCTCTC 
 ##          19550          19625          19600          19575          19600          19575 
-##         GTATGA         ATCGTG         AGTACG         ATCGAT         CACTAC         CTGACG 
+##         GTATGA         ATCGTG         GCTGCA         ATCGCA         GAGCTC         CTGAGC 
 ##          19575          19575          19600          19600          19550          19550 
-##         GCTGAT         TATACG         CACTGA         AGTAGC         ATCGCA         CACTCT 
+##         GCTGAT         TATAGC         CACTGA         GCTGTG         ATCGAT         CACTCT 
 ##          19575          19575          19550          19575          19575          19550 
-##         CTGAGC         GAGCGT         TATAGC         CTGATA RT_PRIMERS_RNA            H2O 
+##         CTGACG         GAGCGT         TATACG         CTGATA RT_PRIMERS_RNA            H2O 
 ##          19600          19575          19600          19575          31200          44400 
 ##           Mn_B           Mn_C           Mn_D           Mn_E           Mn_F           Mg_B 
 ##          55200          55200          55200          55200          55200          57300 
@@ -768,27 +769,27 @@ echo@source@plate[,-1] %>% colSums(na.rm = TRUE)
 ```
 ##         ACACAG         AGTCAG         ATCTAC         CGACAG         CTGCAG         GAGTAC 
 ##          19475          19450          19450          19475          19475          19525 
-##         GTACAG         ACACGT         AGTCGT         ATCTCT         CGACGT         CTGCGT 
+##         GTACAG         ACACGT         AGTCGT         CGACTC         CGACGT         CTGCGT 
 ##          19425          19475          19450          19425          19425          19450 
 ##         GAGTCT         GTACGT         ACAGAT         AGTGAT         CACACG         CGAGAT 
 ##          19450          19400          19450          19400          19450          19450 
 ##         GCTACG         GTAGAT         TATGAT         ACAGCA         AGTGCA         CACAGC 
 ##          19475          19400          19500          19425          19500          19425 
-##         CGAGCA         GCTAGC         GTAGCA         TATGCA         ACAGTG         AGTGTG 
+##         CGAGCA         GCTAGC         GTAGCA         TATGCA         CTGCTC         AGTGTG 
 ##          19500          19475          19500          19450          19450          19400 
 ##         CACATA         CGAGTG         GCTATA         GTAGTG         TATGTG         ACATAC 
 ##          19525          19475          19450          19475          19500          19550 
 ##         ATCACG         CACGAT         CGATAC         GCTCAG         GTATAC         TCGACG 
 ##          19475          19450          19425          19525          19400          19450 
-##         ACATCT         ATCAGC         CACGCA         CGATCT         GCTCGT         GTATCT 
+##         ACATCT         TATCTC         CACGCA         CGATCT         GCTCGT         GTATCT 
 ##          19400          19400          19400          19475          19450          19500 
 ##         TCGAGC         ACATGA         ATCATA         CACGTG         CGATGA         GCTCTC 
 ##          19400          19475          19450          19475          19450          19450 
-##         GTATGA         ATCGTG         AGTACG         ATCGAT         CACTAC         CTGACG 
+##         GTATGA         ATCGTG         GCTGCA         ATCGCA         GAGCTC         CTGAGC 
 ##          19425          19425          19450          19450          19400          19450 
-##         GCTGAT         TATACG         CACTGA         AGTAGC         ATCGCA         CACTCT 
+##         GCTGAT         TATAGC         CACTGA         GCTGTG         ATCGAT         CACTCT 
 ##          19425          19450          19450          19425          19425          19425 
-##         CTGAGC         GAGCGT         TATAGC         CTGATA RT_PRIMERS_RNA            H2O 
+##         CTGACG         GAGCGT         TATACG         CTGATA RT_PRIMERS_RNA            H2O 
 ##          19450          19425          19475          19425          21600          39200 
 ##           Mn_B           Mn_C           Mn_D           Mn_E           Mn_F           Mg_B 
 ##          53600          53600          53600          53600          53600          56400 
@@ -823,14 +824,14 @@ plate7a %>% as.data.frame
 ## 17   A02   A   2  A1         59        200      25  10          1  10                 25 Custom
 ## 30   A03   A   3  A1         35        200      25  10          1  10                 25  SSIII
 ## 47   A04   A   4  A1         24        200      25  10          1  10                 25  SSIII
-## 6    A05   A   5  A1         34        200      25  10          1  10                 25 Custom
+## 6    A05   A   5  A1         60        200      25  10          1  10                 25 Custom
 ## 52   A06   A   6  A1         78        200      25  10          1  10                 25  SSIII
-## 20   A07   A   7  A1         22        200      25  10          1  10                 25 Custom
+## 20   A07   A   7  A1         23        200      25  10          1  10                 25 Custom
 ## 48   A08   A   8  A1         92        200      25  10          1  10                 25  SSIII
 ## 58   C01   C   1  A1         36        200      25  10          1  10                 25  SSIII
 ## 19   C02   C   2  A1         76        200      25  10          1  10                 25 Custom
 ## 26   C03   C   3  A1         40        200      25  10          1  10                 25  SSIII
-## 57   C04   C   4  A1          6        200      25  10          1  10                 25  SSIII
+## 57   C04   C   4  A1         51        200      25  10          1  10                 25  SSIII
 ## 45   C05   C   5  A1         79        200      25  10          1  10                 25  SSIII
 ## 56   C06   C   6  A1         16        200      25  10          1  10                 25  SSIII
 ## 39   C07   C   7  A1         90        200      25  10          1  10                 25  SSIII
@@ -838,13 +839,13 @@ plate7a %>% as.data.frame
 ## 21   E01   E   1  A1         68        200      25  10          1  10                 25 Custom
 ## 34   E02   E   2  A1         73        200      25  10          1  10                 25  SSIII
 ## 55   E03   E   3  A1         13        200      25  10          1  10                 25  SSIII
-## 15   E04   E   4  A1         20        200      25  10          1  10                 25 Custom
+## 15   E04   E   4  A1         87        200      25  10          1  10                 25 Custom
 ## 61   E05   E   5  A1          7        200      25  10          1  10                 25 Custom
 ## 9    E06   E   6  A1         67        200      25  10          1  10                 25 Custom
 ## 62   E07   E   7  A1         25        200      25  10          1  10                 25 Custom
 ## 5    E08   E   8  A1         74        200      25  10          1  10                 25 Custom
 ## 10   G01   G   1  A1         37        200      25  10          1  10                 25 Custom
-## 60   G02   G   2  A1         83        200      25  10          1  10                 25  SSIII
+## 60   G02   G   2  A1         82        200      25  10          1  10                 25  SSIII
 ## 40   G03   G   3  A1         44        200      25  10          1  10                 25  SSIII
 ## 3    G04   G   4  A1         43        200      25  10          1  10                 25 Custom
 ## 24   G05   G   5  A1         61        200      25  10          1  10                 25 Custom
@@ -852,11 +853,11 @@ plate7a %>% as.data.frame
 ## 27   G07   G   7  A1          1        200      25  10          1  10                 25  SSIII
 ## 44   G08   G   8  A1          4        200      25  10          1  10                 25  SSIII
 ## 59   I01   I   1  A1         32        200      25  10          1  10                 25  SSIII
-## 13   I02   I   2  A1         82        200      25  10          1  10                 25 Custom
-## 25   I03   I   3  A1         46        200      25  10          1  10                 25  SSIII
+## 13   I02   I   2  A1         83        200      25  10          1  10                 25 Custom
+## 25   I03   I   3  A1         47        200      25  10          1  10                 25  SSIII
 ## 18   I04   I   4  A1         45        200      25  10          1  10                 25 Custom
 ## 46   I05   I   5  A1         21        200      25  10          1  10                 25  SSIII
-## 38   I06   I   6  A1         11        200      25  10          1  10                 25  SSIII
+## 38   I06   I   6  A1         72        200      25  10          1  10                 25  SSIII
 ## 8    I07   I   7  A1         91        200      25  10          1  10                 25 Custom
 ## 64   I08   I   8  A1         14        200      25  10          1  10                 25  SSIII
 ## 16   K01   K   1  A1         89        200      25  10          1  10                 25 Custom
@@ -868,10 +869,10 @@ plate7a %>% as.data.frame
 ## 29   K07   K   7  A1         19        200      25  10          1  10                 25  SSIII
 ## 35   K08   K   8  A1         18        200      25  10          1  10                 25  SSIII
 ## 50   M01   M   1  A1         77        200      25  10          1  10                 25  SSIII
-## 7    M02   M   2  A1         47        200      25  10          1  10                 25 Custom
-## 22   M03   M   3  A1         23        200      25  10          1  10                 25 Custom
+## 7    M02   M   2  A1         46        200      25  10          1  10                 25 Custom
+## 22   M03   M   3  A1         22        200      25  10          1  10                 25 Custom
 ## 1    M04   M   4  A1         64        200      25  10          1  10                 25 Custom
-## 43   M05   M   5  A1         10        200      25  10          1  10                 25  SSIII
+## 43   M05   M   5  A1         71        200      25  10          1  10                 25  SSIII
 ## 2    M06   M   6  A1         65        200      25  10          1  10                 25 Custom
 ## 23   M07   M   7  A1         42        200      25  10          1  10                 25 Custom
 ## 36   M08   M   8  A1         69        200      25  10          1  10                 25  SSIII
@@ -881,15 +882,15 @@ plate7a %>% as.data.frame
 ## 63   O04   O   4  A1         66        200      25  10          1  10                 25  SSIII
 ## 32   O05   O   5  A1         29        200      25  10          1  10                 25  SSIII
 ## 49   O06   O   6  A1          8        200      25  10          1  10                 25  SSIII
-## 51   O07   O   7  A1         26        200      25  10          1  10                 25  SSIII
+## 51   O07   O   7  A1         39        200      25  10          1  10                 25  SSIII
 ## 33   O08   O   8  A1         48        200      25  10          1  10                 25  SSIII
-## 71   B01   B   1  A2         46        200      25  10          1  10                 25 Custom
+## 71   B01   B   1  A2         47        200      25  10          1  10                 25 Custom
 ## 591  B02   B   2  A2         45        200      25  10          1  10                 25  SSIII
 ## 181  B03   B   3  A2         29        200      25  10          1  10                 25 Custom
 ## 371  B04   B   4  A2         80        200      25  10          1  10                 25  SSIII
 ## 641  B05   B   5  A2         70        200      25  10          1  10                 25  SSIII
 ## 501  B06   B   6  A2         44        200      25  10          1  10                 25  SSIII
-## 191  B07   B   7  A2         26        200      25  10          1  10                 25 Custom
+## 191  B07   B   7  A2         39        200      25  10          1  10                 25 Custom
 ## 451  B08   B   8  A2         68        200      25  10          1  10                 25  SSIII
 ## 151  D01   D   1  A2         74        200      25  10          1  10                 25 Custom
 ## 131  D02   D   2  A2         59        200      25  10          1  10                 25 Custom
@@ -897,7 +898,7 @@ plate7a %>% as.data.frame
 ## 561  D04   D   4  A2         92        200      25  10          1  10                 25  SSIII
 ## 101  D05   D   5  A2         66        200      25  10          1  10                 25 Custom
 ## 271  D06   D   6  A2         17        200      25  10          1  10                 25  SSIII
-## 291  D07   D   7  A2         20        200      25  10          1  10                 25  SSIII
+## 291  D07   D   7  A2         87        200      25  10          1  10                 25  SSIII
 ## 601  D08   D   8  A2         65        200      25  10          1  10                 25  SSIII
 ## 551  F01   F   1  A2         19        200      25  10          1  10                 25  SSIII
 ## 341  F02   F   2  A2         78        200      25  10          1  10                 25  SSIII
@@ -911,10 +912,10 @@ plate7a %>% as.data.frame
 ## 381  H02   H   2  A2         24        200      25  10          1  10                 25  SSIII
 ## 611  H03   H   3  A2         69        200      25  10          1  10                 25 Custom
 ## 431  H04   H   4  A2         40        200      25  10          1  10                 25  SSIII
-## 521  H05   H   5  A2         10        200      25  10          1  10                 25  SSIII
-## 65   H06   H   6  A2         83        200      25  10          1  10                 25 Custom
-## 111  H07   H   7  A2         11        200      25  10          1  10                 25 Custom
-## 171  H08   H   8  A2         22        200      25  10          1  10                 25 Custom
+## 521  H05   H   5  A2         71        200      25  10          1  10                 25  SSIII
+## 65   H06   H   6  A2         82        200      25  10          1  10                 25 Custom
+## 111  H07   H   7  A2         72        200      25  10          1  10                 25 Custom
+## 171  H08   H   8  A2         23        200      25  10          1  10                 25 Custom
 ## 301  J01   J   1  A2         37        200      25  10          1  10                 25  SSIII
 ## 161  J02   J   2  A2          4        200      25  10          1  10                 25 Custom
 ## 81   J03   J   3  A2         31        200      25  10          1  10                 25 Custom
@@ -926,12 +927,12 @@ plate7a %>% as.data.frame
 ## 91   L01   L   1  A2         90        200      25  10          1  10                 25 Custom
 ## 531  L02   L   2  A2          9        200      25  10          1  10                 25  SSIII
 ## 511  L03   L   3  A2         62        200      25  10          1  10                 25  SSIII
-## 231  L04   L   4  A2         34        200      25  10          1  10                 25 Custom
-## 141  L05   L   5  A2         82        200      25  10          1  10                 25 Custom
-## 441  L06   L   6  A2         23        200      25  10          1  10                 25  SSIII
+## 231  L04   L   4  A2         60        200      25  10          1  10                 25 Custom
+## 141  L05   L   5  A2         83        200      25  10          1  10                 25 Custom
+## 441  L06   L   6  A2         22        200      25  10          1  10                 25  SSIII
 ## 321  L07   L   7  A2         14        200      25  10          1  10                 25  SSIII
 ## 621  L08   L   8  A2         49        200      25  10          1  10                 25 Custom
-## 461  N01   N   1  A2          6        200      25  10          1  10                 25  SSIII
+## 461  N01   N   1  A2         51        200      25  10          1  10                 25  SSIII
 ## 221  N02   N   2  A2          8        200      25  10          1  10                 25 Custom
 ## 391  N03   N   3  A2         35        200      25  10          1  10                 25  SSIII
 ## 631  N04   N   4  A2         64        200      25  10          1  10                 25  SSIII
@@ -943,21 +944,21 @@ plate7a %>% as.data.frame
 ## 491  P02   P   2  A2         81        200      25  10          1  10                 25  SSIII
 ## 401  P03   P   3  A2         36        200      25  10          1  10                 25  SSIII
 ## 421  P04   P   4  A2         33        200      25  10          1  10                 25  SSIII
-## 211  P05   P   5  A2         47        200      25  10          1  10                 25 Custom
+## 211  P05   P   5  A2         46        200      25  10          1  10                 25 Custom
 ## 331  P06   P   6  A2         38        200      25  10          1  10                 25  SSIII
 ## 110  P07   P   7  A2         28        200      25  10          1  10                 25 Custom
 ## 581  P08   P   8  A2         42        200      25  10          1  10                 25  SSIII
 ## 432  A09   A   9  B1         44        200      25  10          1  10                 25  SSIII
-## 202  A10   A  10  B1         10        200      25  10          1  10                 25 Custom
+## 202  A10   A  10  B1         71        200      25  10          1  10                 25 Custom
 ## 262  A11   A  11  B1         29        200      25  10          1  10                 25  SSIII
 ## 612  A12   A  12  B1          1        200      25  10          1  10                 25 Custom
 ## 522  A13   A  13  B1         33        200      25  10          1  10                 25  SSIII
-## 572  A14   A  14  B1         34        200      25  10          1  10                 25  SSIII
+## 572  A14   A  14  B1         60        200      25  10          1  10                 25  SSIII
 ## 482  A15   A  15  B1         66        200      25  10          1  10                 25  SSIII
-## 452  A16   A  16  B1         11        200      25  10          1  10                 25  SSIII
+## 452  A16   A  16  B1         72        200      25  10          1  10                 25  SSIII
 ## 162  C09   C   9  B1         61        200      25  10          1  10                 25 Custom
 ## 422  C10   C  10  B1         24        200      25  10          1  10                 25  SSIII
-## 542  C11   C  11  B1         82        200      25  10          1  10                 25  SSIII
+## 542  C11   C  11  B1         83        200      25  10          1  10                 25  SSIII
 ## 562  C12   C  12  B1         64        200      25  10          1  10                 25  SSIII
 ## 212  C13   C  13  B1         62        200      25  10          1  10                 25 Custom
 ## 552  C14   C  14  B1         41        200      25  10          1  10                 25  SSIII
@@ -973,16 +974,16 @@ plate7a %>% as.data.frame
 ## 532  E16   E  16  B1         89        200      25  10          1  10                 25  SSIII
 ## 282  G09   G   9  B1         28        200      25  10          1  10                 25  SSIII
 ## 112  G10   G  10  B1         37        200      25  10          1  10                 25 Custom
-## 492  G11   G  11  B1         22        200      25  10          1  10                 25  SSIII
+## 492  G11   G  11  B1         23        200      25  10          1  10                 25  SSIII
 ## 72   G12   G  12  B1         48        200      25  10          1  10                 25 Custom
-## 142  G13   G  13  B1         26        200      25  10          1  10                 25 Custom
+## 142  G13   G  13  B1         39        200      25  10          1  10                 25 Custom
 ## 622  G14   G  14  B1         74        200      25  10          1  10                 25 Custom
-## 172  G15   G  15  B1         23        200      25  10          1  10                 25 Custom
+## 172  G15   G  15  B1         22        200      25  10          1  10                 25 Custom
 ## 312  G16   G  16  B1         65        200      25  10          1  10                 25 Custom
 ## 352  I09   I   9  B1         68        200      25  10          1  10                 25  SSIII
 ## 132  I10   I  10  B1          7        200      25  10          1  10                 25 Custom
 ## 302  I11   I  11  B1         81        200      25  10          1  10                 25  SSIII
-## 92   I12   I  12  B1         20        200      25  10          1  10                 25 Custom
+## 92   I12   I  12  B1         87        200      25  10          1  10                 25 Custom
 ## 242  I13   I  13  B1         19        200      25  10          1  10                 25 Custom
 ## 332  I14   I  14  B1         79        200      25  10          1  10                 25  SSIII
 ## 402  I15   I  15  B1          5        200      25  10          1  10                 25  SSIII
@@ -997,8 +998,8 @@ plate7a %>% as.data.frame
 ## 632  K16   K  16  B1          2        200      25  10          1  10                 25  SSIII
 ## 342  M09   M   9  B1         92        200      25  10          1  10                 25  SSIII
 ## 372  M10   M  10  B1         78        200      25  10          1  10                 25  SSIII
-## 152  M11   M  11  B1         46        200      25  10          1  10                 25 Custom
-## 512  M12   M  12  B1          6        200      25  10          1  10                 25  SSIII
+## 152  M11   M  11  B1         47        200      25  10          1  10                 25 Custom
+## 512  M12   M  12  B1         51        200      25  10          1  10                 25  SSIII
 ## 582  M13   M  13  B1         21        200      25  10          1  10                 25  SSIII
 ## 322  M14   M  14  B1         73        200      25  10          1  10                 25  SSIII
 ## 392  M15   M  15  B1          8        200      25  10          1  10                 25  SSIII
@@ -1006,24 +1007,24 @@ plate7a %>% as.data.frame
 ## 102  O09   O   9  B1         38        200      25  10          1  10                 25 Custom
 ## 362  O10   O  10  B1         49        200      25  10          1  10                 25  SSIII
 ## 382  O11   O  11  B1         70        200      25  10          1  10                 25  SSIII
-## 313  O12   O  12  B1         47        200      25  10          1  10                 25  SSIII
+## 313  O12   O  12  B1         46        200      25  10          1  10                 25  SSIII
 ## 602  O13   O  13  B1         31        200      25  10          1  10                 25  SSIII
 ## 292  O14   O  14  B1         25        200      25  10          1  10                 25  SSIII
-## 513  O15   O  15  B1         83        200      25  10          1  10                 25 Custom
+## 513  O15   O  15  B1         82        200      25  10          1  10                 25 Custom
 ## 113  O16   O  16  B1         40        200      25  10          1  10                 25 Custom
-## 83   B09   B   9  B2         11        200      25  10          1  10                 25 Custom
+## 83   B09   B   9  B2         72        200      25  10          1  10                 25 Custom
 ## 514  B10   B  10  B2          2        200      25  10          1  10                 25 Custom
-## 603  B11   B  11  B2         34        200      25  10          1  10                 25  SSIII
-## 273  B12   B  12  B2         20        200      25  10          1  10                 25  SSIII
-## 233  B13   B  13  B2         10        200      25  10          1  10                 25 Custom
-## 114  B14   B  14  B2         23        200      25  10          1  10                 25 Custom
+## 603  B11   B  11  B2         60        200      25  10          1  10                 25  SSIII
+## 273  B12   B  12  B2         87        200      25  10          1  10                 25  SSIII
+## 233  B13   B  13  B2         71        200      25  10          1  10                 25 Custom
+## 114  B14   B  14  B2         22        200      25  10          1  10                 25 Custom
 ## 414  B15   B  15  B2         24        200      25  10          1  10                 25 Custom
-## 383  B16   B  16  B2         83        200      25  10          1  10                 25  SSIII
-## 333  D09   D   9  B2         82        200      25  10          1  10                 25  SSIII
+## 383  B16   B  16  B2         82        200      25  10          1  10                 25  SSIII
+## 333  D09   D   9  B2         83        200      25  10          1  10                 25  SSIII
 ## 553  D10   D  10  B2         35        200      25  10          1  10                 25  SSIII
 ## 563  D11   D  11  B2         33        200      25  10          1  10                 25  SSIII
 ## 583  D12   D  12  B2         37        200      25  10          1  10                 25  SSIII
-## 93   D13   D  13  B2         22        200      25  10          1  10                 25 Custom
+## 93   D13   D  13  B2         23        200      25  10          1  10                 25 Custom
 ## 253  D14   D  14  B2          1        200      25  10          1  10                 25  SSIII
 ## 115  D15   D  15  B2         28        200      25  10          1  10                 25 Custom
 ## 223  D16   D  16  B2         69        200      25  10          1  10                 25 Custom
@@ -1049,7 +1050,7 @@ plate7a %>% as.data.frame
 ## 283  J12   J  12  B2         16        200      25  10          1  10                 25  SSIII
 ## 343  J13   J  13  B2         50        200      25  10          1  10                 25  SSIII
 ## 143  J14   J  14  B2         40        200      25  10          1  10                 25 Custom
-## 314  J15   J  15  B2          6        200      25  10          1  10                 25  SSIII
+## 314  J15   J  15  B2         51        200      25  10          1  10                 25  SSIII
 ## 503  J16   J  16  B2         90        200      25  10          1  10                 25  SSIII
 ## 493  L09   L   9  B2         59        200      25  10          1  10                 25  SSIII
 ## 533  L10   L  10  B2         74        200      25  10          1  10                 25  SSIII
@@ -1058,14 +1059,14 @@ plate7a %>% as.data.frame
 ## 67   L13   L  13  B2         36        200      25  10          1  10                 25 Custom
 ## 463  L14   L  14  B2         77        200      25  10          1  10                 25  SSIII
 ## 473  L15   L  15  B2         17        200      25  10          1  10                 25  SSIII
-## 183  L16   L  16  B2         46        200      25  10          1  10                 25 Custom
-## 73   N09   N   9  B2         26        200      25  10          1  10                 25 Custom
+## 183  L16   L  16  B2         47        200      25  10          1  10                 25 Custom
+## 73   N09   N   9  B2         39        200      25  10          1  10                 25 Custom
 ## 415  N10   N  10  B2         38        200      25  10          1  10                 25  SSIII
 ## 123  N11   N  11  B2         88        200      25  10          1  10                 25 Custom
 ## 243  N12   N  12  B2         19        200      25  10          1  10                 25 Custom
 ## 353  N13   N  13  B2         65        200      25  10          1  10                 25  SSIII
 ## 153  N14   N  14  B2         76        200      25  10          1  10                 25 Custom
-## 613  N15   N  15  B2         47        200      25  10          1  10                 25 Custom
+## 613  N15   N  15  B2         46        200      25  10          1  10                 25 Custom
 ## 443  N16   N  16  B2         92        200      25  10          1  10                 25  SSIII
 ## 193  P09   P   9  B2          9        200      25  10          1  10                 25 Custom
 ## 103  P10   P  10  B2         30        200      25  10          1  10                 25 Custom
@@ -1075,12 +1076,12 @@ plate7a %>% as.data.frame
 ## 215  P14   P  14  B2         48        200      25  10          1  10                 25 Custom
 ## 373  P15   P  15  B2          4        200      25  10          1  10                 25  SSIII
 ## 483  P16   P  16  B2         13        200      25  10          1  10                 25  SSIII
-## 434  A17   A  17  C1         11        200      25  10          1  10                 25  SSIII
+## 434  A17   A  17  C1         72        200      25  10          1  10                 25  SSIII
 ## 264  A18   A  18  C1         16        200      25  10          1  10                 25  SSIII
 ## 534  A19   A  19  C1         81        200      25  10          1  10                 25  SSIII
 ## 454  A20   A  20  C1         68        200      25  10          1  10                 25  SSIII
 ## 216  A21   A  21  C1         28        200      25  10          1  10                 25 Custom
-## 564  A22   A  22  C1         26        200      25  10          1  10                 25  SSIII
+## 564  A22   A  22  C1         39        200      25  10          1  10                 25  SSIII
 ## 384  A23   A  23  C1         41        200      25  10          1  10                 25  SSIII
 ## 316  A24   A  24  C1         92        200      25  10          1  10                 25 Custom
 ## 344  C17   C  17  C1         49        200      25  10          1  10                 25  SSIII
@@ -1104,7 +1105,7 @@ plate7a %>% as.data.frame
 ## 68   G19   G  19  C1          7        200      25  10          1  10                 25 Custom
 ## 504  G20   G  20  C1         65        200      25  10          1  10                 25  SSIII
 ## 364  G21   G  21  C1         59        200      25  10          1  10                 25  SSIII
-## 354  G22   G  22  C1         23        200      25  10          1  10                 25  SSIII
+## 354  G22   G  22  C1         22        200      25  10          1  10                 25  SSIII
 ## 494  G23   G  23  C1          4        200      25  10          1  10                 25  SSIII
 ## 144  G24   G  24  C1         45        200      25  10          1  10                 25 Custom
 ## 474  I17   I  17  C1         78        200      25  10          1  10                 25  SSIII
@@ -1112,16 +1113,16 @@ plate7a %>% as.data.frame
 ## 294  I19   I  19  C1          9        200      25  10          1  10                 25  SSIII
 ## 116  I20   I  20  C1         88        200      25  10          1  10                 25 Custom
 ## 154  I21   I  21  C1         44        200      25  10          1  10                 25 Custom
-## 464  I22   I  22  C1         83        200      25  10          1  10                 25  SSIII
+## 464  I22   I  22  C1         82        200      25  10          1  10                 25  SSIII
 ## 417  I23   I  23  C1         48        200      25  10          1  10                 25  SSIII
-## 614  I24   I  24  C1         46        200      25  10          1  10                 25 Custom
-## 324  K17   K  17  C1         47        200      25  10          1  10                 25  SSIII
+## 614  I24   I  24  C1         47        200      25  10          1  10                 25 Custom
+## 324  K17   K  17  C1         46        200      25  10          1  10                 25  SSIII
 ## 84   K18   K  18  C1         79        200      25  10          1  10                 25 Custom
 ## 404  K19   K  19  C1         24        200      25  10          1  10                 25  SSIII
 ## 217  K20   K  20  C1         21        200      25  10          1  10                 25 Custom
-## 184  K21   K  21  C1         10        200      25  10          1  10                 25 Custom
+## 184  K21   K  21  C1         71        200      25  10          1  10                 25 Custom
 ## 544  K22   K  22  C1         50        200      25  10          1  10                 25  SSIII
-## 104  K23   K  23  C1         20        200      25  10          1  10                 25 Custom
+## 104  K23   K  23  C1         87        200      25  10          1  10                 25 Custom
 ## 574  K24   K  24  C1         32        200      25  10          1  10                 25  SSIII
 ## 484  M17   M  17  C1         29        200      25  10          1  10                 25  SSIII
 ## 204  M18   M  18  C1         13        200      25  10          1  10                 25 Custom
@@ -1131,33 +1132,33 @@ plate7a %>% as.data.frame
 ## 254  M22   M  22  C1         40        200      25  10          1  10                 25  SSIII
 ## 134  M23   M  23  C1         17        200      25  10          1  10                 25 Custom
 ## 644  M24   M  24  C1         64        200      25  10          1  10                 25  SSIII
-## 174  O17   O  17  C1         82        200      25  10          1  10                 25 Custom
+## 174  O17   O  17  C1         83        200      25  10          1  10                 25 Custom
 ## 594  O18   O  18  C1         66        200      25  10          1  10                 25  SSIII
 ## 554  O19   O  19  C1         37        200      25  10          1  10                 25  SSIII
 ## 604  O20   O  20  C1         19        200      25  10          1  10                 25  SSIII
 ## 117  O21   O  21  C1          1        200      25  10          1  10                 25 Custom
-## 274  O22   O  22  C1         34        200      25  10          1  10                 25  SSIII
-## 634  O23   O  23  C1         22        200      25  10          1  10                 25  SSIII
+## 274  O22   O  22  C1         60        200      25  10          1  10                 25  SSIII
+## 634  O23   O  23  C1         23        200      25  10          1  10                 25  SSIII
 ## 74   O24   O  24  C1          5        200      25  10          1  10                 25 Custom
-## 425  B17   B  17  C2         10        200      25  10          1  10                 25  SSIII
+## 425  B17   B  17  C2         71        200      25  10          1  10                 25  SSIII
 ## 518  B18   B  18  C2         45        200      25  10          1  10                 25 Custom
-## 275  B19   B  19  C2         46        200      25  10          1  10                 25  SSIII
+## 275  B19   B  19  C2         47        200      25  10          1  10                 25  SSIII
 ## 335  B20   B  20  C2         35        200      25  10          1  10                 25  SSIII
 ## 575  B21   B  21  C2         50        200      25  10          1  10                 25  SSIII
 ## 435  B22   B  22  C2         66        200      25  10          1  10                 25  SSIII
 ## 595  B23   B  23  C2         21        200      25  10          1  10                 25  SSIII
 ## 625  B24   B  24  C2         40        200      25  10          1  10                 25 Custom
 ## 75   D17   D  17  C2         13        200      25  10          1  10                 25 Custom
-## 445  D18   D  18  C2         47        200      25  10          1  10                 25  SSIII
+## 445  D18   D  18  C2         46        200      25  10          1  10                 25  SSIII
 ## 245  D19   D  19  C2         18        200      25  10          1  10                 25 Custom
 ## 235  D20   D  20  C2         25        200      25  10          1  10                 25 Custom
 ## 218  D21   D  21  C2         88        200      25  10          1  10                 25 Custom
 ## 85   D22   D  22  C2         81        200      25  10          1  10                 25 Custom
 ## 225  D23   D  23  C2         33        200      25  10          1  10                 25 Custom
 ## 385  D24   D  24  C2         49        200      25  10          1  10                 25  SSIII
-## 118  F17   F  17  C2         11        200      25  10          1  10                 25 Custom
+## 118  F17   F  17  C2         72        200      25  10          1  10                 25 Custom
 ## 295  F18   F  18  C2         16        200      25  10          1  10                 25  SSIII
-## 645  F19   F  19  C2         20        200      25  10          1  10                 25  SSIII
+## 645  F19   F  19  C2         87        200      25  10          1  10                 25  SSIII
 ## 325  F20   F  20  C2         70        200      25  10          1  10                 25  SSIII
 ## 125  F21   F  21  C2          9        200      25  10          1  10                 25 Custom
 ## 375  F22   F  22  C2         62        200      25  10          1  10                 25  SSIII
@@ -1168,13 +1169,13 @@ plate7a %>% as.data.frame
 ## 285  H19   H  19  C2         14        200      25  10          1  10                 25  SSIII
 ## 219  H20   H  20  C2         64        200      25  10          1  10                 25 Custom
 ## 495  H21   H  21  C2          1        200      25  10          1  10                 25  SSIII
-## 525  H22   H  22  C2          6        200      25  10          1  10                 25  SSIII
+## 525  H22   H  22  C2         51        200      25  10          1  10                 25  SSIII
 ## 255  H23   H  23  C2         28        200      25  10          1  10                 25  SSIII
-## 105  H24   H  24  C2         22        200      25  10          1  10                 25 Custom
+## 105  H24   H  24  C2         23        200      25  10          1  10                 25 Custom
 ## 615  J17   J  17  C2          7        200      25  10          1  10                 25 Custom
 ## 265  J18   J  18  C2         77        200      25  10          1  10                 25  SSIII
-## 395  J19   J  19  C2         26        200      25  10          1  10                 25  SSIII
-## 355  J20   J  20  C2         34        200      25  10          1  10                 25  SSIII
+## 395  J19   J  19  C2         39        200      25  10          1  10                 25  SSIII
+## 355  J20   J  20  C2         60        200      25  10          1  10                 25  SSIII
 ## 455  J21   J  21  C2         91        200      25  10          1  10                 25  SSIII
 ## 465  J22   J  22  C2         78        200      25  10          1  10                 25  SSIII
 ## 165  J23   J  23  C2         61        200      25  10          1  10                 25 Custom
@@ -1182,9 +1183,9 @@ plate7a %>% as.data.frame
 ## 635  L17   L  17  C2         65        200      25  10          1  10                 25  SSIII
 ## 95   L18   L  18  C2          8        200      25  10          1  10                 25 Custom
 ## 119  L19   L  19  C2         79        200      25  10          1  10                 25 Custom
-## 405  L20   L  20  C2         82        200      25  10          1  10                 25  SSIII
+## 405  L20   L  20  C2         83        200      25  10          1  10                 25  SSIII
 ## 305  L21   L  21  C2         89        200      25  10          1  10                 25  SSIII
-## 135  L22   L  22  C2         83        200      25  10          1  10                 25 Custom
+## 135  L22   L  22  C2         82        200      25  10          1  10                 25 Custom
 ## 535  L23   L  23  C2         90        200      25  10          1  10                 25  SSIII
 ## 319  L24   L  24  C2         30        200      25  10          1  10                 25  SSIII
 ## 585  N17   N  17  C2         80        200      25  10          1  10                 25  SSIII
@@ -1193,7 +1194,7 @@ plate7a %>% as.data.frame
 ## 205  N20   N  20  C2         32        200      25  10          1  10                 25 Custom
 ## 69   N21   N  21  C2          4        200      25  10          1  10                 25 Custom
 ## 195  N22   N  22  C2         67        200      25  10          1  10                 25 Custom
-## 365  N23   N  23  C2         23        200      25  10          1  10                 25  SSIII
+## 365  N23   N  23  C2         22        200      25  10          1  10                 25  SSIII
 ## 418  N24   N  24  C2         29        200      25  10          1  10                 25  SSIII
 ## 145  P17   P  17  C2         17        200      25  10          1  10                 25 Custom
 ## 605  P18   P  18  C2         36        200      25  10          1  10                 25  SSIII
@@ -1208,14 +1209,14 @@ plate7a %>% as.data.frame
 ## 17             300 TAAGGCGA  0      0  2     25  4.0      100      25      GAGCGT     Mg_C     Mn_A
 ## 30             300 TAAGGCGA  0      0  3     25  5.0      100      25      CACTCT     Mg_D     Mn_A
 ## 47             300 TAAGGCGA  0      0  9     25  4.0      100      25      ATCGTG     Mg_G     Mn_A
-## 6              300 TAAGGCGA  0      0  0      0  5.0      100      50      CACTAC     Mg_A     Mn_A
+## 6              300 TAAGGCGA  0      0  0      0  5.0      100      50      GAGCTC     Mg_A     Mn_A
 ## 52             300 TAAGGCGA  0      0 12     25  3.0      100      25      GTAGTG     Mg_H     Mn_A
-## 20             300 TAAGGCGA  0      0  3     25  1.0      100      25      ATCGAT     Mg_D     Mn_A
+## 20             300 TAAGGCGA  0      0  3     25  1.0      100      25      ATCGCA     Mg_D     Mn_A
 ## 48             300 TAAGGCGA  0      0  9     25  5.0      100      25      TCGAGC     Mg_G     Mn_A
 ## 58             300 TAAGGCGA  0      0 15     25  3.0      100      25      CACTGA     Mg_I     Mn_A
 ## 19             300 TAAGGCGA  0      0  3     25  0.5      100      25      GTAGAT     Mg_D     Mn_A
 ## 26             300 TAAGGCGA  0      0  3     25  1.0      100      25      CGAGAT     Mg_D     Mn_A
-## 57             300 TAAGGCGA  0      0 15     25  2.0      100      25      ACAGTG     Mg_I     Mn_A
+## 57             300 TAAGGCGA  0      0 15     25  2.0      100      25      CTGCTC     Mg_I     Mn_A
 ## 45             300 TAAGGCGA  0      0  9     25  2.0      100      25      GTATAC     Mg_G     Mn_A
 ## 56             300 TAAGGCGA  0      0 15     25  1.0      100      25      AGTGAT     Mg_I     Mn_A
 ## 39             300 TAAGGCGA  0      0  6     25  2.0      100      25      TATGTG     Mg_F     Mn_A
@@ -1223,13 +1224,13 @@ plate7a %>% as.data.frame
 ## 21             300 TAAGGCGA  0      0  3     25  2.0      100      25      GCTCGT     Mg_D     Mn_A
 ## 34             300 TAAGGCGA  0      0  4     25  3.0      100      25      GTACAG     Mg_E     Mn_A
 ## 55             300 TAAGGCGA  0      0 15     25  0.5      100      25      AGTCAG     Mg_I     Mn_A
-## 15             300 TAAGGCGA  0      0  2     25  2.0      100      25      ATCAGC     Mg_C     Mn_A
+## 15             300 TAAGGCGA  0      0  2     25  2.0      100      25      TATCTC     Mg_C     Mn_A
 ## 61             300 TAAGGCGA  0      0  3     25  0.0        0     125      ACATAC     Mg_D     Mn_A
 ## 9              300 TAAGGCGA  0      0  1     25  2.0      100      25      GCTCAG     Mg_B     Mn_A
 ## 62             300 TAAGGCGA  0      0  3     25  0.0        0     125      ATCTAC     Mg_D     Mn_A
 ## 5              300 TAAGGCGA  0      0  0      0  4.0      100      50      GTACGT     Mg_A     Mn_A
 ## 10             300 TAAGGCGA  0      0  1     25  3.0      100      25      CGACAG     Mg_B     Mn_A
-## 60             300 TAAGGCGA  0      0 15     25  5.0      100      25      TATAGC     Mg_I     Mn_A
+## 60             300 TAAGGCGA  0      0 15     25  5.0      100      25      TATACG     Mg_I     Mn_A
 ## 40             300 TAAGGCGA  0      0  6     25  3.0      100      25      CGATCT     Mg_F     Mn_A
 ## 3              300 TAAGGCGA  0      0  0      0  2.0      100      50      CGATAC     Mg_A     Mn_A
 ## 24             300 TAAGGCGA  0      0  3     25  5.0      100      25      GAGTAC     Mg_D     Mn_A
@@ -1237,11 +1238,11 @@ plate7a %>% as.data.frame
 ## 27             300 TAAGGCGA  0      0  3     25  2.0      100      25      ACACAG     Mg_D     Mn_A
 ## 44             300 TAAGGCGA  0      0  9     25  1.0      100      25      ACAGAT     Mg_G     Mn_A
 ## 59             300 TAAGGCGA  0      0 15     25  4.0      100      25      CACGCA     Mg_I     Mn_A
-## 13             300 TAAGGCGA  0      0  2     25  0.5      100      25      TATACG     Mg_C     Mn_A
-## 25             300 TAAGGCGA  0      0  3     25  0.5      100      25      CTGACG     Mg_D     Mn_A
+## 13             300 TAAGGCGA  0      0  2     25  0.5      100      25      TATAGC     Mg_C     Mn_A
+## 25             300 TAAGGCGA  0      0  3     25  0.5      100      25      CTGAGC     Mg_D     Mn_A
 ## 18             300 TAAGGCGA  0      0  2     25  5.0      100      25      CGATGA     Mg_C     Mn_A
 ## 46             300 TAAGGCGA  0      0  9     25  3.0      100      25      ATCATA     Mg_G     Mn_A
-## 38             300 TAAGGCGA  0      0  6     25  1.0      100      25      AGTAGC     Mg_F     Mn_A
+## 38             300 TAAGGCGA  0      0  6     25  1.0      100      25      GCTGTG     Mg_F     Mn_A
 ## 8              300 TAAGGCGA  0      0  1     25  1.0      100      25      TCGACG     Mg_B     Mn_A
 ## 64             300 TAAGGCGA  0      0  0      0  0.0        0     150      AGTCGT     Mg_A     Mn_A
 ## 16             300 TAAGGCGA  0      0  2     25  3.0      100      25      TATGCA     Mg_C     Mn_A
@@ -1253,10 +1254,10 @@ plate7a %>% as.data.frame
 ## 29             300 TAAGGCGA  0      0  3     25  4.0      100      25      ATCACG     Mg_D     Mn_A
 ## 35             300 TAAGGCGA  0      0  4     25  4.0      100      25      AGTGTG     Mg_E     Mn_A
 ## 50             300 TAAGGCGA  0      0 12     25  1.0      100      25      GTAGCA     Mg_H     Mn_A
-## 7              300 TAAGGCGA  0      0  1     25  0.5      100      25      CTGAGC     Mg_B     Mn_A
-## 22             300 TAAGGCGA  0      0  3     25  3.0      100      25      ATCGCA     Mg_D     Mn_A
+## 7              300 TAAGGCGA  0      0  1     25  0.5      100      25      CTGACG     Mg_B     Mn_A
+## 22             300 TAAGGCGA  0      0  3     25  3.0      100      25      ATCGAT     Mg_D     Mn_A
 ## 1              300 TAAGGCGA  0      0  0      0  0.5      100      50      GCTACG     Mg_A     Mn_A
-## 43             300 TAAGGCGA  0      0  9     25  0.5      100      25      AGTACG     Mg_G     Mn_A
+## 43             300 TAAGGCGA  0      0  9     25  0.5      100      25      GCTGCA     Mg_G     Mn_A
 ## 2              300 TAAGGCGA  0      0  0      0  1.0      100      50      GCTAGC     Mg_A     Mn_A
 ## 23             300 TAAGGCGA  0      0  3     25  4.0      100      25      CGAGTG     Mg_D     Mn_A
 ## 36             300 TAAGGCGA  0      0  4     25  5.0      100      25      GCTCTC     Mg_E     Mn_A
@@ -1266,15 +1267,15 @@ plate7a %>% as.data.frame
 ## 63             300 TAAGGCGA  0      0  0      0  0.0        0     150      GCTATA     Mg_A     Mn_A
 ## 32             300 TAAGGCGA  0      0  4     25  1.0      100      25      CACAGC     Mg_E     Mn_A
 ## 49             300 TAAGGCGA  0      0 12     25  0.5      100      25      ACATCT     Mg_H     Mn_A
-## 51             300 TAAGGCGA  0      0 12     25  2.0      100      25      ATCTCT     Mg_H     Mn_A
+## 51             300 TAAGGCGA  0      0 12     25  2.0      100      25      CGACTC     Mg_H     Mn_A
 ## 33             300 TAAGGCGA  0      0  4     25  2.0      100      25      CTGATA     Mg_E     Mn_A
-## 71             300 CGTACTAG  1     25  1     25  0.5      100       0      CTGACG     Mg_B     Mn_B
+## 71             300 CGTACTAG  1     25  1     25  0.5      100       0      CTGAGC     Mg_B     Mn_B
 ## 591            300 CGTACTAG  1     25 15     25  4.0      100       0      CGATGA     Mg_I     Mn_B
 ## 181            300 CGTACTAG  1     25  2     25  5.0      100       0      CACAGC     Mg_C     Mn_B
 ## 371            300 CGTACTAG  1     25  6     25  0.5      100       0      GTATCT     Mg_F     Mn_B
 ## 641            300 CGTACTAG  1     25  0      0  0.0        0     125      GCTGAT     Mg_A     Mn_B
 ## 501            300 CGTACTAG  1     25 12     25  1.0      100       0      CGATCT     Mg_H     Mn_B
-## 191            300 CGTACTAG  1     25  3     25  0.5      100       0      ATCTCT     Mg_D     Mn_B
+## 191            300 CGTACTAG  1     25  3     25  0.5      100       0      CGACTC     Mg_D     Mn_B
 ## 451            300 CGTACTAG  1     25  9     25  2.0      100       0      GCTCGT     Mg_G     Mn_B
 ## 151            300 CGTACTAG  1     25  2     25  2.0      100       0      GTACGT     Mg_C     Mn_B
 ## 131            300 CGTACTAG  1     25  2     25  0.5      100       0      GAGCGT     Mg_C     Mn_B
@@ -1282,7 +1283,7 @@ plate7a %>% as.data.frame
 ## 561            300 CGTACTAG  1     25 15     25  1.0      100       0      TCGAGC     Mg_I     Mn_B
 ## 101            300 CGTACTAG  1     25  1     25  3.0      100       0      GCTATA     Mg_B     Mn_B
 ## 271            300 CGTACTAG  1     25  3     25  2.0      100       0      AGTGCA     Mg_D     Mn_B
-## 291            300 CGTACTAG  1     25  3     25  4.0      100       0      ATCAGC     Mg_D     Mn_B
+## 291            300 CGTACTAG  1     25  3     25  4.0      100       0      TATCTC     Mg_D     Mn_B
 ## 601            300 CGTACTAG  1     25 15     25  5.0      100       0      GCTAGC     Mg_I     Mn_B
 ## 551            300 CGTACTAG  1     25 15     25  0.5      100       0      ATCACG     Mg_I     Mn_B
 ## 341            300 CGTACTAG  1     25  4     25  3.0      100       0      GTAGTG     Mg_E     Mn_B
@@ -1296,10 +1297,10 @@ plate7a %>% as.data.frame
 ## 381            300 CGTACTAG  1     25  6     25  1.0      100       0      ATCGTG     Mg_F     Mn_B
 ## 611            300 CGTACTAG  1     25  3     25  0.0        0     100      GCTCTC     Mg_D     Mn_B
 ## 431            300 CGTACTAG  1     25  9     25  0.5      100       0      CGAGAT     Mg_G     Mn_B
-## 521            300 CGTACTAG  1     25 12     25  3.0      100       0      AGTACG     Mg_H     Mn_B
-## 65             300 CGTACTAG  1     25  0      0  5.0      100      25      TATAGC     Mg_A     Mn_B
-## 111            300 CGTACTAG  1     25  1     25  4.0      100       0      AGTAGC     Mg_B     Mn_B
-## 171            300 CGTACTAG  1     25  2     25  4.0      100       0      ATCGAT     Mg_C     Mn_B
+## 521            300 CGTACTAG  1     25 12     25  3.0      100       0      GCTGCA     Mg_H     Mn_B
+## 65             300 CGTACTAG  1     25  0      0  5.0      100      25      TATACG     Mg_A     Mn_B
+## 111            300 CGTACTAG  1     25  1     25  4.0      100       0      GCTGTG     Mg_B     Mn_B
+## 171            300 CGTACTAG  1     25  2     25  4.0      100       0      ATCGCA     Mg_C     Mn_B
 ## 301            300 CGTACTAG  1     25  3     25  5.0      100       0      CGACAG     Mg_D     Mn_B
 ## 161            300 CGTACTAG  1     25  2     25  3.0      100       0      ACAGAT     Mg_C     Mn_B
 ## 81             300 CGTACTAG  1     25  1     25  1.0      100       0      CACGAT     Mg_B     Mn_B
@@ -1311,12 +1312,12 @@ plate7a %>% as.data.frame
 ## 91             300 CGTACTAG  1     25  1     25  2.0      100       0      TATGTG     Mg_B     Mn_B
 ## 531            300 CGTACTAG  1     25 12     25  4.0      100       0      ACATGA     Mg_H     Mn_B
 ## 511            300 CGTACTAG  1     25 12     25  2.0      100       0      GAGTCT     Mg_H     Mn_B
-## 231            300 CGTACTAG  1     25  3     25  4.0      100       0      CACTAC     Mg_D     Mn_B
-## 141            300 CGTACTAG  1     25  2     25  1.0      100       0      TATACG     Mg_C     Mn_B
-## 441            300 CGTACTAG  1     25  9     25  1.0      100       0      ATCGCA     Mg_G     Mn_B
+## 231            300 CGTACTAG  1     25  3     25  4.0      100       0      GAGCTC     Mg_D     Mn_B
+## 141            300 CGTACTAG  1     25  2     25  1.0      100       0      TATAGC     Mg_C     Mn_B
+## 441            300 CGTACTAG  1     25  9     25  1.0      100       0      ATCGAT     Mg_G     Mn_B
 ## 321            300 CGTACTAG  1     25  4     25  1.0      100       0      AGTCGT     Mg_E     Mn_B
 ## 621            300 CGTACTAG  1     25  3     25  0.0        0     100      CTGCAG     Mg_D     Mn_B
-## 461            300 CGTACTAG  1     25  9     25  3.0      100       0      ACAGTG     Mg_G     Mn_B
+## 461            300 CGTACTAG  1     25  9     25  3.0      100       0      CTGCTC     Mg_G     Mn_B
 ## 221            300 CGTACTAG  1     25  3     25  3.0      100       0      ACATCT     Mg_D     Mn_B
 ## 391            300 CGTACTAG  1     25  6     25  2.0      100       0      CACTCT     Mg_F     Mn_B
 ## 631            300 CGTACTAG  1     25  0      0  0.0        0     125      GCTACG     Mg_A     Mn_B
@@ -1328,21 +1329,21 @@ plate7a %>% as.data.frame
 ## 491            300 CGTACTAG  1     25 12     25  0.5      100       0      GTATGA     Mg_H     Mn_B
 ## 401            300 CGTACTAG  1     25  6     25  3.0      100       0      CACTGA     Mg_F     Mn_B
 ## 421            300 CGTACTAG  1     25  6     25  5.0      100       0      CACGTG     Mg_F     Mn_B
-## 211            300 CGTACTAG  1     25  3     25  2.0      100       0      CTGAGC     Mg_D     Mn_B
+## 211            300 CGTACTAG  1     25  3     25  2.0      100       0      CTGACG     Mg_D     Mn_B
 ## 331            300 CGTACTAG  1     25  4     25  2.0      100       0      CGACGT     Mg_E     Mn_B
 ## 110            300 CGTACTAG  1     25  0      0  0.5      100      25      CACACG     Mg_A     Mn_B
 ## 581            300 CGTACTAG  1     25 15     25  3.0      100       0      CGAGTG     Mg_I     Mn_B
 ## 432            300 AGGCAGAA  2     25  9     25  0.5      100       0      CGATCT     Mg_G     Mn_C
-## 202            300 AGGCAGAA  2     25  3     25  1.0      100       0      AGTACG     Mg_D     Mn_C
+## 202            300 AGGCAGAA  2     25  3     25  1.0      100       0      GCTGCA     Mg_D     Mn_C
 ## 262            300 AGGCAGAA  2     25  3     25  1.0      100       0      CACAGC     Mg_D     Mn_C
 ## 612            300 AGGCAGAA  2     25  3     25  0.0        0     100      ACACAG     Mg_D     Mn_C
 ## 522            300 AGGCAGAA  2     25 12     25  3.0      100       0      CACGTG     Mg_H     Mn_C
-## 572            300 AGGCAGAA  2     25 15     25  2.0      100       0      CACTAC     Mg_I     Mn_C
+## 572            300 AGGCAGAA  2     25 15     25  2.0      100       0      GAGCTC     Mg_I     Mn_C
 ## 482            300 AGGCAGAA  2     25  9     25  5.0      100       0      GCTATA     Mg_G     Mn_C
-## 452            300 AGGCAGAA  2     25  9     25  2.0      100       0      AGTAGC     Mg_G     Mn_C
+## 452            300 AGGCAGAA  2     25  9     25  2.0      100       0      GCTGTG     Mg_G     Mn_C
 ## 162            300 AGGCAGAA  2     25  2     25  3.0      100       0      GAGTAC     Mg_C     Mn_C
 ## 422            300 AGGCAGAA  2     25  6     25  5.0      100       0      ATCGTG     Mg_F     Mn_C
-## 542            300 AGGCAGAA  2     25 12     25  5.0      100       0      TATACG     Mg_H     Mn_C
+## 542            300 AGGCAGAA  2     25 12     25  5.0      100       0      TATAGC     Mg_H     Mn_C
 ## 562            300 AGGCAGAA  2     25 15     25  1.0      100       0      GCTACG     Mg_I     Mn_C
 ## 212            300 AGGCAGAA  2     25  3     25  2.0      100       0      GAGTCT     Mg_D     Mn_C
 ## 552            300 AGGCAGAA  2     25 15     25  0.5      100       0      CGAGCA     Mg_I     Mn_C
@@ -1358,16 +1359,16 @@ plate7a %>% as.data.frame
 ## 532            300 AGGCAGAA  2     25 12     25  4.0      100       0      TATGCA     Mg_H     Mn_C
 ## 282            300 AGGCAGAA  2     25  3     25  3.0      100       0      CACACG     Mg_D     Mn_C
 ## 112            300 AGGCAGAA  2     25  1     25  4.0      100       0      CGACAG     Mg_B     Mn_C
-## 492            300 AGGCAGAA  2     25 12     25  0.5      100       0      ATCGAT     Mg_H     Mn_C
+## 492            300 AGGCAGAA  2     25 12     25  0.5      100       0      ATCGCA     Mg_H     Mn_C
 ## 72             300 AGGCAGAA  2     25  1     25  0.5      100       0      CTGATA     Mg_B     Mn_C
-## 142            300 AGGCAGAA  2     25  2     25  1.0      100       0      ATCTCT     Mg_C     Mn_C
+## 142            300 AGGCAGAA  2     25  2     25  1.0      100       0      CGACTC     Mg_C     Mn_C
 ## 622            300 AGGCAGAA  2     25  3     25  0.0        0     100      GTACGT     Mg_D     Mn_C
-## 172            300 AGGCAGAA  2     25  2     25  4.0      100       0      ATCGCA     Mg_C     Mn_C
+## 172            300 AGGCAGAA  2     25  2     25  4.0      100       0      ATCGAT     Mg_C     Mn_C
 ## 312            300 AGGCAGAA  2     25  0      0  2.0      100      25      GCTAGC     Mg_A     Mn_C
 ## 352            300 AGGCAGAA  2     25  4     25  4.0      100       0      GCTCGT     Mg_E     Mn_C
 ## 132            300 AGGCAGAA  2     25  2     25  0.5      100       0      ACATAC     Mg_C     Mn_C
 ## 302            300 AGGCAGAA  2     25  3     25  5.0      100       0      GTATGA     Mg_D     Mn_C
-## 92             300 AGGCAGAA  2     25  1     25  2.0      100       0      ATCAGC     Mg_B     Mn_C
+## 92             300 AGGCAGAA  2     25  1     25  2.0      100       0      TATCTC     Mg_B     Mn_C
 ## 242            300 AGGCAGAA  2     25  3     25  5.0      100       0      ATCACG     Mg_D     Mn_C
 ## 332            300 AGGCAGAA  2     25  4     25  2.0      100       0      GTATAC     Mg_E     Mn_C
 ## 402            300 AGGCAGAA  2     25  6     25  3.0      100       0      ACAGCA     Mg_F     Mn_C
@@ -1382,8 +1383,8 @@ plate7a %>% as.data.frame
 ## 632            300 AGGCAGAA  2     25  0      0  0.0        0     125      ACACGT     Mg_A     Mn_C
 ## 342            300 AGGCAGAA  2     25  4     25  3.0      100       0      TCGAGC     Mg_E     Mn_C
 ## 372            300 AGGCAGAA  2     25  6     25  0.5      100       0      GTAGTG     Mg_F     Mn_C
-## 152            300 AGGCAGAA  2     25  2     25  2.0      100       0      CTGACG     Mg_C     Mn_C
-## 512            300 AGGCAGAA  2     25 12     25  2.0      100       0      ACAGTG     Mg_H     Mn_C
+## 152            300 AGGCAGAA  2     25  2     25  2.0      100       0      CTGAGC     Mg_C     Mn_C
+## 512            300 AGGCAGAA  2     25 12     25  2.0      100       0      CTGCTC     Mg_H     Mn_C
 ## 582            300 AGGCAGAA  2     25 15     25  3.0      100       0      ATCATA     Mg_I     Mn_C
 ## 322            300 AGGCAGAA  2     25  4     25  1.0      100       0      GTACAG     Mg_E     Mn_C
 ## 392            300 AGGCAGAA  2     25  6     25  2.0      100       0      ACATCT     Mg_F     Mn_C
@@ -1391,24 +1392,24 @@ plate7a %>% as.data.frame
 ## 102            300 AGGCAGAA  2     25  1     25  3.0      100       0      CGACGT     Mg_B     Mn_C
 ## 362            300 AGGCAGAA  2     25  4     25  5.0      100       0      CTGCAG     Mg_E     Mn_C
 ## 382            300 AGGCAGAA  2     25  6     25  1.0      100       0      GCTGAT     Mg_F     Mn_C
-## 313            300 AGGCAGAA  2     25  4     25  0.5      100       0      CTGAGC     Mg_E     Mn_C
+## 313            300 AGGCAGAA  2     25  4     25  0.5      100       0      CTGACG     Mg_E     Mn_C
 ## 602            300 AGGCAGAA  2     25 15     25  5.0      100       0      CACGAT     Mg_I     Mn_C
 ## 292            300 AGGCAGAA  2     25  3     25  4.0      100       0      ATCTAC     Mg_D     Mn_C
-## 513            300 AGGCAGAA  2     25  0      0  4.0      100      25      TATAGC     Mg_A     Mn_C
+## 513            300 AGGCAGAA  2     25  0      0  4.0      100      25      TATACG     Mg_A     Mn_C
 ## 113            300 AGGCAGAA  2     25  0      0  0.5      100      25      CGAGAT     Mg_A     Mn_C
-## 83             300 TCCTGAGC  3     25  1     25  1.0      100       0      AGTAGC     Mg_B     Mn_D
+## 83             300 TCCTGAGC  3     25  1     25  1.0      100       0      GCTGTG     Mg_B     Mn_D
 ## 514            300 TCCTGAGC  3     25  0      0  4.0      100      25      ACACGT     Mg_A     Mn_D
-## 603            300 TCCTGAGC  3     25 15     25  5.0      100       0      CACTAC     Mg_I     Mn_D
-## 273            300 TCCTGAGC  3     25  3     25  2.0      100       0      ATCAGC     Mg_D     Mn_D
-## 233            300 TCCTGAGC  3     25  3     25  4.0      100       0      AGTACG     Mg_D     Mn_D
-## 114            300 TCCTGAGC  3     25  1     25  4.0      100       0      ATCGCA     Mg_B     Mn_D
+## 603            300 TCCTGAGC  3     25 15     25  5.0      100       0      GAGCTC     Mg_I     Mn_D
+## 273            300 TCCTGAGC  3     25  3     25  2.0      100       0      TATCTC     Mg_D     Mn_D
+## 233            300 TCCTGAGC  3     25  3     25  4.0      100       0      GCTGCA     Mg_D     Mn_D
+## 114            300 TCCTGAGC  3     25  1     25  4.0      100       0      ATCGAT     Mg_B     Mn_D
 ## 414            300 TCCTGAGC  3     25  0      0  3.0      100      25      ATCGTG     Mg_A     Mn_D
-## 383            300 TCCTGAGC  3     25  6     25  1.0      100       0      TATAGC     Mg_F     Mn_D
-## 333            300 TCCTGAGC  3     25  4     25  2.0      100       0      TATACG     Mg_E     Mn_D
+## 383            300 TCCTGAGC  3     25  6     25  1.0      100       0      TATACG     Mg_F     Mn_D
+## 333            300 TCCTGAGC  3     25  4     25  2.0      100       0      TATAGC     Mg_E     Mn_D
 ## 553            300 TCCTGAGC  3     25 15     25  0.5      100       0      CACTCT     Mg_I     Mn_D
 ## 563            300 TCCTGAGC  3     25 15     25  1.0      100       0      CACGTG     Mg_I     Mn_D
 ## 583            300 TCCTGAGC  3     25 15     25  3.0      100       0      CGACAG     Mg_I     Mn_D
-## 93             300 TCCTGAGC  3     25  1     25  2.0      100       0      ATCGAT     Mg_B     Mn_D
+## 93             300 TCCTGAGC  3     25  1     25  2.0      100       0      ATCGCA     Mg_B     Mn_D
 ## 253            300 TCCTGAGC  3     25  3     25  0.5      100       0      ACACAG     Mg_D     Mn_D
 ## 115            300 TCCTGAGC  3     25  0      0  0.5      100      25      CACACG     Mg_A     Mn_D
 ## 223            300 TCCTGAGC  3     25  3     25  3.0      100       0      GCTCTC     Mg_D     Mn_D
@@ -1434,7 +1435,7 @@ plate7a %>% as.data.frame
 ## 283            300 TCCTGAGC  3     25  3     25  3.0      100       0      AGTGAT     Mg_D     Mn_D
 ## 343            300 TCCTGAGC  3     25  4     25  3.0      100       0      CTGCGT     Mg_E     Mn_D
 ## 143            300 TCCTGAGC  3     25  2     25  1.0      100       0      CGAGAT     Mg_C     Mn_D
-## 314            300 TCCTGAGC  3     25  4     25  0.5      100       0      ACAGTG     Mg_E     Mn_D
+## 314            300 TCCTGAGC  3     25  4     25  0.5      100       0      CTGCTC     Mg_E     Mn_D
 ## 503            300 TCCTGAGC  3     25 12     25  1.0      100       0      TATGTG     Mg_H     Mn_D
 ## 493            300 TCCTGAGC  3     25 12     25  0.5      100       0      GAGCGT     Mg_H     Mn_D
 ## 533            300 TCCTGAGC  3     25 12     25  4.0      100       0      GTACGT     Mg_H     Mn_D
@@ -1443,14 +1444,14 @@ plate7a %>% as.data.frame
 ## 67             300 TCCTGAGC  3     25  0      0  5.0      100      25      CACTGA     Mg_A     Mn_D
 ## 463            300 TCCTGAGC  3     25  9     25  3.0      100       0      GTAGCA     Mg_G     Mn_D
 ## 473            300 TCCTGAGC  3     25  9     25  4.0      100       0      AGTGCA     Mg_G     Mn_D
-## 183            300 TCCTGAGC  3     25  2     25  5.0      100       0      CTGACG     Mg_C     Mn_D
-## 73             300 TCCTGAGC  3     25  1     25  0.5      100       0      ATCTCT     Mg_B     Mn_D
+## 183            300 TCCTGAGC  3     25  2     25  5.0      100       0      CTGAGC     Mg_C     Mn_D
+## 73             300 TCCTGAGC  3     25  1     25  0.5      100       0      CGACTC     Mg_B     Mn_D
 ## 415            300 TCCTGAGC  3     25  6     25  4.0      100       0      CGACGT     Mg_F     Mn_D
 ## 123            300 TCCTGAGC  3     25  1     25  5.0      100       0      TATGAT     Mg_B     Mn_D
 ## 243            300 TCCTGAGC  3     25  3     25  5.0      100       0      ATCACG     Mg_D     Mn_D
 ## 353            300 TCCTGAGC  3     25  4     25  4.0      100       0      GCTAGC     Mg_E     Mn_D
 ## 153            300 TCCTGAGC  3     25  2     25  2.0      100       0      GTAGAT     Mg_C     Mn_D
-## 613            300 TCCTGAGC  3     25  3     25  0.0        0     100      CTGAGC     Mg_D     Mn_D
+## 613            300 TCCTGAGC  3     25  3     25  0.0        0     100      CTGACG     Mg_D     Mn_D
 ## 443            300 TCCTGAGC  3     25  9     25  1.0      100       0      TCGAGC     Mg_G     Mn_D
 ## 193            300 TCCTGAGC  3     25  3     25  0.5      100       0      ACATGA     Mg_D     Mn_D
 ## 103            300 TCCTGAGC  3     25  1     25  3.0      100       0      CACATA     Mg_B     Mn_D
@@ -1460,12 +1461,12 @@ plate7a %>% as.data.frame
 ## 215            300 TCCTGAGC  3     25  0      0  1.0      100      25      CTGATA     Mg_A     Mn_D
 ## 373            300 TCCTGAGC  3     25  6     25  0.5      100       0      ACAGAT     Mg_F     Mn_D
 ## 483            300 TCCTGAGC  3     25  9     25  5.0      100       0      AGTCAG     Mg_G     Mn_D
-## 434            300 GGACTCCT  4     25  9     25  0.5      100       0      AGTAGC     Mg_G     Mn_E
+## 434            300 GGACTCCT  4     25  9     25  0.5      100       0      GCTGTG     Mg_G     Mn_E
 ## 264            300 GGACTCCT  4     25  3     25  1.0      100       0      AGTGAT     Mg_D     Mn_E
 ## 534            300 GGACTCCT  4     25 12     25  4.0      100       0      GTATGA     Mg_H     Mn_E
 ## 454            300 GGACTCCT  4     25  9     25  2.0      100       0      GCTCGT     Mg_G     Mn_E
 ## 216            300 GGACTCCT  4     25  3     25  2.0      100       0      CACACG     Mg_D     Mn_E
-## 564            300 GGACTCCT  4     25 15     25  1.0      100       0      ATCTCT     Mg_I     Mn_E
+## 564            300 GGACTCCT  4     25 15     25  1.0      100       0      CGACTC     Mg_I     Mn_E
 ## 384            300 GGACTCCT  4     25  6     25  1.0      100       0      CGAGCA     Mg_F     Mn_E
 ## 316            300 GGACTCCT  4     25  0      0  2.0      100      25      TCGAGC     Mg_A     Mn_E
 ## 344            300 GGACTCCT  4     25  4     25  3.0      100       0      CTGCAG     Mg_E     Mn_E
@@ -1489,7 +1490,7 @@ plate7a %>% as.data.frame
 ## 68             300 GGACTCCT  4     25  0      0  5.0      100      25      ACATAC     Mg_A     Mn_E
 ## 504            300 GGACTCCT  4     25 12     25  1.0      100       0      GCTAGC     Mg_H     Mn_E
 ## 364            300 GGACTCCT  4     25  4     25  5.0      100       0      GAGCGT     Mg_E     Mn_E
-## 354            300 GGACTCCT  4     25  4     25  4.0      100       0      ATCGCA     Mg_E     Mn_E
+## 354            300 GGACTCCT  4     25  4     25  4.0      100       0      ATCGAT     Mg_E     Mn_E
 ## 494            300 GGACTCCT  4     25 12     25  0.5      100       0      ACAGAT     Mg_H     Mn_E
 ## 144            300 GGACTCCT  4     25  2     25  1.0      100       0      CGATGA     Mg_C     Mn_E
 ## 474            300 GGACTCCT  4     25  9     25  4.0      100       0      GTAGTG     Mg_G     Mn_E
@@ -1497,16 +1498,16 @@ plate7a %>% as.data.frame
 ## 294            300 GGACTCCT  4     25  3     25  4.0      100       0      ACATGA     Mg_D     Mn_E
 ## 116            300 GGACTCCT  4     25  1     25  4.0      100       0      TATGAT     Mg_B     Mn_E
 ## 154            300 GGACTCCT  4     25  2     25  2.0      100       0      CGATCT     Mg_C     Mn_E
-## 464            300 GGACTCCT  4     25  9     25  3.0      100       0      TATAGC     Mg_G     Mn_E
+## 464            300 GGACTCCT  4     25  9     25  3.0      100       0      TATACG     Mg_G     Mn_E
 ## 417            300 GGACTCCT  4     25  6     25  4.0      100       0      CTGATA     Mg_F     Mn_E
-## 614            300 GGACTCCT  4     25  3     25  0.0        0     100      CTGACG     Mg_D     Mn_E
-## 324            300 GGACTCCT  4     25  4     25  1.0      100       0      CTGAGC     Mg_E     Mn_E
+## 614            300 GGACTCCT  4     25  3     25  0.0        0     100      CTGAGC     Mg_D     Mn_E
+## 324            300 GGACTCCT  4     25  4     25  1.0      100       0      CTGACG     Mg_E     Mn_E
 ## 84             300 GGACTCCT  4     25  1     25  1.0      100       0      GTATAC     Mg_B     Mn_E
 ## 404            300 GGACTCCT  4     25  6     25  3.0      100       0      ATCGTG     Mg_F     Mn_E
 ## 217            300 GGACTCCT  4     25  0      0  1.0      100      25      ATCATA     Mg_A     Mn_E
-## 184            300 GGACTCCT  4     25  2     25  5.0      100       0      AGTACG     Mg_C     Mn_E
+## 184            300 GGACTCCT  4     25  2     25  5.0      100       0      GCTGCA     Mg_C     Mn_E
 ## 544            300 GGACTCCT  4     25 12     25  5.0      100       0      CTGCGT     Mg_H     Mn_E
-## 104            300 GGACTCCT  4     25  1     25  3.0      100       0      ATCAGC     Mg_B     Mn_E
+## 104            300 GGACTCCT  4     25  1     25  3.0      100       0      TATCTC     Mg_B     Mn_E
 ## 574            300 GGACTCCT  4     25 15     25  2.0      100       0      CACGCA     Mg_I     Mn_E
 ## 484            300 GGACTCCT  4     25  9     25  5.0      100       0      CACAGC     Mg_G     Mn_E
 ## 204            300 GGACTCCT  4     25  3     25  1.0      100       0      AGTCAG     Mg_D     Mn_E
@@ -1516,33 +1517,33 @@ plate7a %>% as.data.frame
 ## 254            300 GGACTCCT  4     25  3     25  0.5      100       0      CGAGAT     Mg_D     Mn_E
 ## 134            300 GGACTCCT  4     25  2     25  0.5      100       0      AGTGCA     Mg_C     Mn_E
 ## 644            300 GGACTCCT  4     25  0      0  0.0        0     125      GCTACG     Mg_A     Mn_E
-## 174            300 GGACTCCT  4     25  2     25  4.0      100       0      TATACG     Mg_C     Mn_E
+## 174            300 GGACTCCT  4     25  2     25  4.0      100       0      TATAGC     Mg_C     Mn_E
 ## 594            300 GGACTCCT  4     25 15     25  4.0      100       0      GCTATA     Mg_I     Mn_E
 ## 554            300 GGACTCCT  4     25 15     25  0.5      100       0      CGACAG     Mg_I     Mn_E
 ## 604            300 GGACTCCT  4     25 15     25  5.0      100       0      ATCACG     Mg_I     Mn_E
 ## 117            300 GGACTCCT  4     25  0      0  0.5      100      25      ACACAG     Mg_A     Mn_E
-## 274            300 GGACTCCT  4     25  3     25  2.0      100       0      CACTAC     Mg_D     Mn_E
-## 634            300 GGACTCCT  4     25  0      0  0.0        0     125      ATCGAT     Mg_A     Mn_E
+## 274            300 GGACTCCT  4     25  3     25  2.0      100       0      GAGCTC     Mg_D     Mn_E
+## 634            300 GGACTCCT  4     25  0      0  0.0        0     125      ATCGCA     Mg_A     Mn_E
 ## 74             300 GGACTCCT  4     25  1     25  0.5      100       0      ACAGCA     Mg_B     Mn_E
-## 425            300 TAGGCATG  5     25  6     25  5.0      100       0      AGTACG     Mg_F     Mn_F
+## 425            300 TAGGCATG  5     25  6     25  5.0      100       0      GCTGCA     Mg_F     Mn_F
 ## 518            300 TAGGCATG  5     25  0      0  4.0      100      25      CGATGA     Mg_A     Mn_F
-## 275            300 TAGGCATG  5     25  3     25  2.0      100       0      CTGACG     Mg_D     Mn_F
+## 275            300 TAGGCATG  5     25  3     25  2.0      100       0      CTGAGC     Mg_D     Mn_F
 ## 335            300 TAGGCATG  5     25  4     25  2.0      100       0      CACTCT     Mg_E     Mn_F
 ## 575            300 TAGGCATG  5     25 15     25  2.0      100       0      CTGCGT     Mg_I     Mn_F
 ## 435            300 TAGGCATG  5     25  9     25  0.5      100       0      GCTATA     Mg_G     Mn_F
 ## 595            300 TAGGCATG  5     25 15     25  4.0      100       0      ATCATA     Mg_I     Mn_F
 ## 625            300 TAGGCATG  5     25  3     25  0.0        0     100      CGAGAT     Mg_D     Mn_F
 ## 75             300 TAGGCATG  5     25  1     25  0.5      100       0      AGTCAG     Mg_B     Mn_F
-## 445            300 TAGGCATG  5     25  9     25  1.0      100       0      CTGAGC     Mg_G     Mn_F
+## 445            300 TAGGCATG  5     25  9     25  1.0      100       0      CTGACG     Mg_G     Mn_F
 ## 245            300 TAGGCATG  5     25  3     25  5.0      100       0      AGTGTG     Mg_D     Mn_F
 ## 235            300 TAGGCATG  5     25  3     25  4.0      100       0      ATCTAC     Mg_D     Mn_F
 ## 218            300 TAGGCATG  5     25  0      0  1.0      100      25      TATGAT     Mg_A     Mn_F
 ## 85             300 TAGGCATG  5     25  1     25  1.0      100       0      GTATGA     Mg_B     Mn_F
 ## 225            300 TAGGCATG  5     25  3     25  3.0      100       0      CACGTG     Mg_D     Mn_F
 ## 385            300 TAGGCATG  5     25  6     25  1.0      100       0      CTGCAG     Mg_F     Mn_F
-## 118            300 TAGGCATG  5     25  0      0  0.5      100      25      AGTAGC     Mg_A     Mn_F
+## 118            300 TAGGCATG  5     25  0      0  0.5      100      25      GCTGTG     Mg_A     Mn_F
 ## 295            300 TAGGCATG  5     25  3     25  4.0      100       0      AGTGAT     Mg_D     Mn_F
-## 645            300 TAGGCATG  5     25  0      0  0.0        0     125      ATCAGC     Mg_A     Mn_F
+## 645            300 TAGGCATG  5     25  0      0  0.0        0     125      TATCTC     Mg_A     Mn_F
 ## 325            300 TAGGCATG  5     25  4     25  1.0      100       0      GCTGAT     Mg_E     Mn_F
 ## 125            300 TAGGCATG  5     25  1     25  5.0      100       0      ACATGA     Mg_B     Mn_F
 ## 375            300 TAGGCATG  5     25  6     25  0.5      100       0      GAGTCT     Mg_F     Mn_F
@@ -1553,13 +1554,13 @@ plate7a %>% as.data.frame
 ## 285            300 TAGGCATG  5     25  3     25  3.0      100       0      AGTCGT     Mg_D     Mn_F
 ## 219            300 TAGGCATG  5     25  3     25  2.0      100       0      GCTACG     Mg_D     Mn_F
 ## 495            300 TAGGCATG  5     25 12     25  0.5      100       0      ACACAG     Mg_H     Mn_F
-## 525            300 TAGGCATG  5     25 12     25  3.0      100       0      ACAGTG     Mg_H     Mn_F
+## 525            300 TAGGCATG  5     25 12     25  3.0      100       0      CTGCTC     Mg_H     Mn_F
 ## 255            300 TAGGCATG  5     25  3     25  0.5      100       0      CACACG     Mg_D     Mn_F
-## 105            300 TAGGCATG  5     25  1     25  3.0      100       0      ATCGAT     Mg_B     Mn_F
+## 105            300 TAGGCATG  5     25  1     25  3.0      100       0      ATCGCA     Mg_B     Mn_F
 ## 615            300 TAGGCATG  5     25  3     25  0.0        0     100      ACATAC     Mg_D     Mn_F
 ## 265            300 TAGGCATG  5     25  3     25  1.0      100       0      GTAGCA     Mg_D     Mn_F
-## 395            300 TAGGCATG  5     25  6     25  2.0      100       0      ATCTCT     Mg_F     Mn_F
-## 355            300 TAGGCATG  5     25  4     25  4.0      100       0      CACTAC     Mg_E     Mn_F
+## 395            300 TAGGCATG  5     25  6     25  2.0      100       0      CGACTC     Mg_F     Mn_F
+## 355            300 TAGGCATG  5     25  4     25  4.0      100       0      GAGCTC     Mg_E     Mn_F
 ## 455            300 TAGGCATG  5     25  9     25  2.0      100       0      TCGACG     Mg_G     Mn_F
 ## 465            300 TAGGCATG  5     25  9     25  3.0      100       0      GTAGTG     Mg_G     Mn_F
 ## 165            300 TAGGCATG  5     25  2     25  3.0      100       0      GAGTAC     Mg_C     Mn_F
@@ -1567,9 +1568,9 @@ plate7a %>% as.data.frame
 ## 635            300 TAGGCATG  5     25  0      0  0.0        0     125      GCTAGC     Mg_A     Mn_F
 ## 95             300 TAGGCATG  5     25  1     25  2.0      100       0      ACATCT     Mg_B     Mn_F
 ## 119            300 TAGGCATG  5     25  1     25  4.0      100       0      GTATAC     Mg_B     Mn_F
-## 405            300 TAGGCATG  5     25  6     25  3.0      100       0      TATACG     Mg_F     Mn_F
+## 405            300 TAGGCATG  5     25  6     25  3.0      100       0      TATAGC     Mg_F     Mn_F
 ## 305            300 TAGGCATG  5     25  3     25  5.0      100       0      TATGCA     Mg_D     Mn_F
-## 135            300 TAGGCATG  5     25  2     25  0.5      100       0      TATAGC     Mg_C     Mn_F
+## 135            300 TAGGCATG  5     25  2     25  0.5      100       0      TATACG     Mg_C     Mn_F
 ## 535            300 TAGGCATG  5     25 12     25  4.0      100       0      TATGTG     Mg_H     Mn_F
 ## 319            300 TAGGCATG  5     25  4     25  0.5      100       0      CACATA     Mg_E     Mn_F
 ## 585            300 TAGGCATG  5     25 15     25  3.0      100       0      GTATCT     Mg_I     Mn_F
@@ -1578,7 +1579,7 @@ plate7a %>% as.data.frame
 ## 205            300 TAGGCATG  5     25  3     25  1.0      100       0      CACGCA     Mg_D     Mn_F
 ## 69             300 TAGGCATG  5     25  0      0  5.0      100      25      ACAGAT     Mg_A     Mn_F
 ## 195            300 TAGGCATG  5     25  3     25  0.5      100       0      GCTCAG     Mg_D     Mn_F
-## 365            300 TAGGCATG  5     25  4     25  5.0      100       0      ATCGCA     Mg_E     Mn_F
+## 365            300 TAGGCATG  5     25  4     25  5.0      100       0      ATCGAT     Mg_E     Mn_F
 ## 418            300 TAGGCATG  5     25  6     25  4.0      100       0      CACAGC     Mg_F     Mn_F
 ## 145            300 TAGGCATG  5     25  2     25  1.0      100       0      AGTGCA     Mg_C     Mn_F
 ## 605            300 TAGGCATG  5     25 15     25  5.0      100       0      CACTGA     Mg_I     Mn_F
@@ -1988,42 +1989,42 @@ plate7b %>% as.data.frame
 ## 14   A05   A   5  A1         38        200      25  10          1  10                 25 Custom
 ## 4    A06   A   6  A1         50        200      25  10          1  10                 25 Custom
 ## 16   A07   A   7  A1         68        200      25  10          1  10                 25 Custom
-## 18   A08   A   8  A1         47        200      25  10          1  10                 25 Custom
+## 18   A08   A   8  A1         46        200      25  10          1  10                 25 Custom
 ## 3    C01   C   1  A1         43        200      25  10          1  10                 25 Custom
 ## 11   C02   C   2  A1         70        200      25  10          1  10                 25 Custom
 ## 10   C03   C   3  A1         78        200      25  10          1  10                 25 Custom
-## 41   C04   C   4  A1         23        200      25  10          1  10                 25  SSIII
+## 41   C04   C   4  A1         22        200      25  10          1  10                 25  SSIII
 ## 15   C05   C   5  A1         17        200      25  10          1  10                 25 Custom
 ## 45   C06   C   6  A1         41        200      25  10          1  10                 25  SSIII
-## 21   C07   C   7  A1         46        200      25  10          1  10                 25 Custom
-## 61   C08   C   8  A1         10        200      25  10          1  10                 25 Custom
+## 21   C07   C   7  A1         47        200      25  10          1  10                 25 Custom
+## 61   C08   C   8  A1         71        200      25  10          1  10                 25 Custom
 ## 17   E01   E   1  A1         35        200      25  10          1  10                 25 Custom
-## 32   E02   E   2  A1         20        200      25  10          1  10                 25  SSIII
+## 32   E02   E   2  A1         87        200      25  10          1  10                 25  SSIII
 ## 2    E03   E   3  A1         92        200      25  10          1  10                 25 Custom
 ## 19   E04   E   4  A1         29        200      25  10          1  10                 25 Custom
 ## 9    E05   E   5  A1         18        200      25  10          1  10                 25 Custom
-## 37   E06   E   6  A1          6        200      25  10          1  10                 25  SSIII
+## 37   E06   E   6  A1         51        200      25  10          1  10                 25  SSIII
 ## 53   E07   E   7  A1         48        200      25  10          1  10                 25  SSIII
 ## 60   E08   E   8  A1         74        200      25  10          1  10                 25  SSIII
 ## 30   G01   G   1  A1         61        200      25  10          1  10                 25  SSIII
-## 42   G02   G   2  A1         11        200      25  10          1  10                 25  SSIII
-## 38   G03   G   3  A1         26        200      25  10          1  10                 25  SSIII
+## 42   G02   G   2  A1         72        200      25  10          1  10                 25  SSIII
+## 38   G03   G   3  A1         39        200      25  10          1  10                 25  SSIII
 ## 52   G04   G   4  A1         65        200      25  10          1  10                 25  SSIII
 ## 39   G05   G   5  A1         90        200      25  10          1  10                 25  SSIII
 ## 20   G06   G   6  A1         37        200      25  10          1  10                 25 Custom
-## 58   G07   G   7  A1         34        200      25  10          1  10                 25  SSIII
+## 58   G07   G   7  A1         60        200      25  10          1  10                 25  SSIII
 ## 7    G08   G   8  A1         14        200      25  10          1  10                 25 Custom
-## 36   I01   I   1  A1         22        200      25  10          1  10                 25  SSIII
+## 36   I01   I   1  A1         23        200      25  10          1  10                 25  SSIII
 ## 56   I02   I   2  A1         88        200      25  10          1  10                 25  SSIII
 ## 59   I03   I   3  A1         81        200      25  10          1  10                 25  SSIII
 ## 13   I04   I   4  A1         32        200      25  10          1  10                 25 Custom
-## 6    I05   I   5  A1         82        200      25  10          1  10                 25 Custom
+## 6    I05   I   5  A1         83        200      25  10          1  10                 25 Custom
 ## 12   I06   I   6  A1          4        200      25  10          1  10                 25 Custom
 ## 26   I07   I   7  A1          5        200      25  10          1  10                 25  SSIII
 ## 50   I08   I   8  A1         40        200      25  10          1  10                 25  SSIII
 ## 33   K01   K   1  A1         30        200      25  10          1  10                 25  SSIII
 ## 47   K02   K   2  A1         33        200      25  10          1  10                 25  SSIII
-## 35   K03   K   3  A1         83        200      25  10          1  10                 25  SSIII
+## 35   K03   K   3  A1         82        200      25  10          1  10                 25  SSIII
 ## 54   K04   K   4  A1          8        200      25  10          1  10                 25  SSIII
 ## 31   K05   K   5  A1          1        200      25  10          1  10                 25  SSIII
 ## 22   K06   K   6  A1         64        200      25  10          1  10                 25 Custom
@@ -2047,16 +2048,16 @@ plate7b %>% as.data.frame
 ## 40   O08   O   8  A1         49        200      25  10          1  10                 25  SSIII
 ## 631  B01   B   1  A2          8        200      25  10          1  10                 25  SSIII
 ## 111  B02   B   2  A2         50        200      25  10          1  10                 25 Custom
-## 321  B03   B   3  A2         46        200      25  10          1  10                 25  SSIII
+## 321  B03   B   3  A2         47        200      25  10          1  10                 25  SSIII
 ## 131  B04   B   4  A2         38        200      25  10          1  10                 25 Custom
-## 121  B05   B   5  A2         83        200      25  10          1  10                 25 Custom
-## 641  B06   B   6  A2         11        200      25  10          1  10                 25  SSIII
-## 161  B07   B   7  A2         10        200      25  10          1  10                 25 Custom
+## 121  B05   B   5  A2         82        200      25  10          1  10                 25 Custom
+## 641  B06   B   6  A2         72        200      25  10          1  10                 25  SSIII
+## 161  B07   B   7  A2         71        200      25  10          1  10                 25 Custom
 ## 81   B08   B   8  A2         91        200      25  10          1  10                 25 Custom
 ## 491  D01   D   1  A2         79        200      25  10          1  10                 25  SSIII
 ## 361  D02   D   2  A2         77        200      25  10          1  10                 25  SSIII
 ## 331  D03   D   3  A2         42        200      25  10          1  10                 25  SSIII
-## 521  D04   D   4  A2         47        200      25  10          1  10                 25  SSIII
+## 521  D04   D   4  A2         46        200      25  10          1  10                 25  SSIII
 ## 201  D05   D   5  A2         16        200      25  10          1  10                 25 Custom
 ## 421  D06   D   6  A2         21        200      25  10          1  10                 25  SSIII
 ## 601  D07   D   7  A2         80        200      25  10          1  10                 25  SSIII
@@ -2065,7 +2066,7 @@ plate7b %>% as.data.frame
 ## 501  F02   F   2  A2         19        200      25  10          1  10                 25  SSIII
 ## 461  F03   F   3  A2         17        200      25  10          1  10                 25  SSIII
 ## 241  F04   F   4  A2         81        200      25  10          1  10                 25 Custom
-## 371  F05   F   5  A2         22        200      25  10          1  10                 25  SSIII
+## 371  F05   F   5  A2         23        200      25  10          1  10                 25  SSIII
 ## 291  F06   F   6  A2         24        200      25  10          1  10                 25  SSIII
 ## 511  F07   F   7  A2         74        200      25  10          1  10                 25  SSIII
 ## 310  F08   F   8  A2          4        200      25  10          1  10                 25 Custom
@@ -2076,11 +2077,11 @@ plate7b %>% as.data.frame
 ## 65   H05   H   5  A2         36        200      25  10          1  10                 25 Custom
 ## 541  H06   H   6  A2         70        200      25  10          1  10                 25  SSIII
 ## 381  H07   H   7  A2          5        200      25  10          1  10                 25  SSIII
-## 171  H08   H   8  A2         34        200      25  10          1  10                 25 Custom
+## 171  H08   H   8  A2         60        200      25  10          1  10                 25 Custom
 ## 221  J01   J   1  A2         59        200      25  10          1  10                 25 Custom
 ## 271  J02   J   2  A2         33        200      25  10          1  10                 25  SSIII
 ## 281  J03   J   3  A2         62        200      25  10          1  10                 25  SSIII
-## 341  J04   J   4  A2         20        200      25  10          1  10                 25  SSIII
+## 341  J04   J   4  A2         87        200      25  10          1  10                 25  SSIII
 ## 531  J05   J   5  A2         32        200      25  10          1  10                 25  SSIII
 ## 231  J06   J   6  A2         14        200      25  10          1  10                 25 Custom
 ## 181  J07   J   7  A2         43        200      25  10          1  10                 25 Custom
@@ -2088,16 +2089,16 @@ plate7b %>% as.data.frame
 ## 621  L01   L   1  A2         68        200      25  10          1  10                 25 Custom
 ## 611  L02   L   2  A2         18        200      25  10          1  10                 25 Custom
 ## 301  L03   L   3  A2          2        200      25  10          1  10                 25  SSIII
-## 551  L04   L   4  A2          6        200      25  10          1  10                 25  SSIII
+## 551  L04   L   4  A2         51        200      25  10          1  10                 25  SSIII
 ## 561  L05   L   5  A2         45        200      25  10          1  10                 25  SSIII
 ## 510  L06   L   6  A2         13        200      25  10          1  10                 25 Custom
-## 410  L07   L   7  A2         82        200      25  10          1  10                 25 Custom
-## 251  L08   L   8  A2         23        200      25  10          1  10                 25  SSIII
+## 410  L07   L   7  A2         83        200      25  10          1  10                 25 Custom
+## 251  L08   L   8  A2         22        200      25  10          1  10                 25  SSIII
 ## 151  N01   N   1  A2          7        200      25  10          1  10                 25 Custom
 ## 191  N02   N   2  A2         90        200      25  10          1  10                 25 Custom
 ## 441  N03   N   3  A2         31        200      25  10          1  10                 25  SSIII
 ## 481  N04   N   4  A2         64        200      25  10          1  10                 25  SSIII
-## 471  N05   N   5  A2         26        200      25  10          1  10                 25  SSIII
+## 471  N05   N   5  A2         39        200      25  10          1  10                 25  SSIII
 ## 451  N06   N   6  A2         73        200      25  10          1  10                 25  SSIII
 ## 261  N07   N   7  A2         40        200      25  10          1  10                 25  SSIII
 ## 581  N08   N   8  A2         41        200      25  10          1  10                 25  SSIII
@@ -2126,26 +2127,26 @@ plate7b %>% as.data.frame
 ## 113  C15   C  15  B1         25        200      25  10          1  10                 25 Custom
 ## 312  C16   C  16  B1         48        200      25  10          1  10                 25 Custom
 ## 562  E09   E   9  B1         31        200      25  10          1  10                 25  SSIII
-## 272  E10   E  10  B1          6        200      25  10          1  10                 25  SSIII
+## 272  E10   E  10  B1         51        200      25  10          1  10                 25  SSIII
 ## 392  E11   E  11  B1         43        200      25  10          1  10                 25  SSIII
 ## 372  E12   E  12  B1         81        200      25  10          1  10                 25  SSIII
 ## 582  E13   E  13  B1         45        200      25  10          1  10                 25  SSIII
 ## 452  E14   E  14  B1         67        200      25  10          1  10                 25  SSIII
 ## 342  E15   E  15  B1         74        200      25  10          1  10                 25  SSIII
-## 502  E16   E  16  B1         46        200      25  10          1  10                 25  SSIII
+## 502  E16   E  16  B1         47        200      25  10          1  10                 25  SSIII
 ## 212  G09   G   9  B1         24        200      25  10          1  10                 25 Custom
 ## 572  G10   G  10  B1         29        200      25  10          1  10                 25  SSIII
 ## 602  G11   G  11  B1         40        200      25  10          1  10                 25  SSIII
 ## 642  G12   G  12  B1         41        200      25  10          1  10                 25  SSIII
 ## 72   G13   G  13  B1         79        200      25  10          1  10                 25 Custom
-## 162  G14   G  14  B1         82        200      25  10          1  10                 25 Custom
+## 162  G14   G  14  B1         83        200      25  10          1  10                 25 Custom
 ## 92   G15   G  15  B1         21        200      25  10          1  10                 25 Custom
 ## 512  G16   G  16  B1         80        200      25  10          1  10                 25  SSIII
 ## 592  I09   I   9  B1         91        200      25  10          1  10                 25  SSIII
 ## 282  I10   I  10  B1         32        200      25  10          1  10                 25  SSIII
 ## 482  I11   I  11  B1         88        200      25  10          1  10                 25  SSIII
 ## 442  I12   I  12  B1         19        200      25  10          1  10                 25  SSIII
-## 232  I13   I  13  B1         23        200      25  10          1  10                 25 Custom
+## 232  I13   I  13  B1         22        200      25  10          1  10                 25 Custom
 ## 622  I14   I  14  B1         89        200      25  10          1  10                 25 Custom
 ## 213  I15   I  15  B1         76        200      25  10          1  10                 25 Custom
 ## 182  I16   I  16  B1         16        200      25  10          1  10                 25 Custom
@@ -2160,21 +2161,21 @@ plate7b %>% as.data.frame
 ## 122  M09   M   9  B1         70        200      25  10          1  10                 25 Custom
 ## 532  M10   M  10  B1         78        200      25  10          1  10                 25  SSIII
 ## 322  M11   M  11  B1         36        200      25  10          1  10                 25  SSIII
-## 462  M12   M  12  B1         10        200      25  10          1  10                 25  SSIII
+## 462  M12   M  12  B1         71        200      25  10          1  10                 25  SSIII
 ## 362  M13   M  13  B1         92        200      25  10          1  10                 25  SSIII
 ## 82   M14   M  14  B1         17        200      25  10          1  10                 25 Custom
-## 352  M15   M  15  B1         26        200      25  10          1  10                 25  SSIII
-## 302  M16   M  16  B1         22        200      25  10          1  10                 25  SSIII
+## 352  M15   M  15  B1         39        200      25  10          1  10                 25  SSIII
+## 302  M16   M  16  B1         23        200      25  10          1  10                 25  SSIII
 ## 252  O09   O   9  B1         62        200      25  10          1  10                 25  SSIII
-## 102  O10   O  10  B1         11        200      25  10          1  10                 25 Custom
-## 192  O11   O  11  B1         34        200      25  10          1  10                 25 Custom
+## 102  O10   O  10  B1         72        200      25  10          1  10                 25 Custom
+## 192  O11   O  11  B1         60        200      25  10          1  10                 25 Custom
 ## 332  O12   O  12  B1         18        200      25  10          1  10                 25  SSIII
 ## 432  O13   O  13  B1         49        200      25  10          1  10                 25  SSIII
-## 262  O14   O  14  B1         20        200      25  10          1  10                 25  SSIII
+## 262  O14   O  14  B1         87        200      25  10          1  10                 25  SSIII
 ## 292  O15   O  15  B1         14        200      25  10          1  10                 25  SSIII
 ## 542  O16   O  16  B1          1        200      25  10          1  10                 25  SSIII
 ## 343  B09   B   9  B2         68        200      25  10          1  10                 25  SSIII
-## 143  B10   B  10  B2         11        200      25  10          1  10                 25 Custom
+## 143  B10   B  10  B2         72        200      25  10          1  10                 25 Custom
 ## 433  B11   B  11  B2         35        200      25  10          1  10                 25  SSIII
 ## 463  B12   B  12  B2         21        200      25  10          1  10                 25  SSIII
 ## 283  B13   B  13  B2         45        200      25  10          1  10                 25  SSIII
@@ -2191,11 +2192,11 @@ plate7b %>% as.data.frame
 ## 243  D16   D  16  B2         16        200      25  10          1  10                 25 Custom
 ## 133  F09   F   9  B2         50        200      25  10          1  10                 25 Custom
 ## 363  F10   F  10  B2         31        200      25  10          1  10                 25  SSIII
-## 233  F11   F  11  B2          6        200      25  10          1  10                 25 Custom
+## 233  F11   F  11  B2         51        200      25  10          1  10                 25 Custom
 ## 533  F12   F  12  B2         90        200      25  10          1  10                 25  SSIII
 ## 503  F13   F  13  B2         36        200      25  10          1  10                 25  SSIII
 ## 193  F14   F  14  B2         14        200      25  10          1  10                 25 Custom
-## 73   F15   F  15  B2         23        200      25  10          1  10                 25 Custom
+## 73   F15   F  15  B2         22        200      25  10          1  10                 25 Custom
 ## 623  F16   F  16  B2         38        200      25  10          1  10                 25 Custom
 ## 123  H09   H   9  B2         48        200      25  10          1  10                 25 Custom
 ## 314  H10   H  10  B2         77        200      25  10          1  10                 25 Custom
@@ -2203,17 +2204,17 @@ plate7b %>% as.data.frame
 ## 303  H12   H  12  B2         25        200      25  10          1  10                 25  SSIII
 ## 563  H13   H  13  B2         44        200      25  10          1  10                 25  SSIII
 ## 514  H14   H  14  B2         41        200      25  10          1  10                 25  SSIII
-## 103  H15   H  15  B2         26        200      25  10          1  10                 25 Custom
-## 603  H16   H  16  B2         82        200      25  10          1  10                 25  SSIII
-## 153  J09   J   9  B2         46        200      25  10          1  10                 25 Custom
+## 103  H15   H  15  B2         39        200      25  10          1  10                 25 Custom
+## 603  H16   H  16  B2         83        200      25  10          1  10                 25  SSIII
+## 153  J09   J   9  B2         47        200      25  10          1  10                 25 Custom
 ## 523  J10   J  10  B2         59        200      25  10          1  10                 25  SSIII
-## 373  J11   J  11  B2         20        200      25  10          1  10                 25  SSIII
+## 373  J11   J  11  B2         87        200      25  10          1  10                 25  SSIII
 ## 613  J12   J  12  B2         24        200      25  10          1  10                 25 Custom
 ## 253  J13   J  13  B2          2        200      25  10          1  10                 25  SSIII
 ## 633  J14   J  14  B2         29        200      25  10          1  10                 25  SSIII
 ## 414  J15   J  15  B2         69        200      25  10          1  10                 25  SSIII
 ## 573  J16   J  16  B2         42        200      25  10          1  10                 25  SSIII
-## 263  L09   L   9  B2         47        200      25  10          1  10                 25  SSIII
+## 263  L09   L   9  B2         46        200      25  10          1  10                 25  SSIII
 ## 215  L10   L  10  B2          9        200      25  10          1  10                 25 Custom
 ## 423  L11   L  11  B2         37        200      25  10          1  10                 25  SSIII
 ## 333  L12   L  12  B2         89        200      25  10          1  10                 25  SSIII
@@ -2223,14 +2224,14 @@ plate7b %>% as.data.frame
 ## 415  L16   L  16  B2         19        200      25  10          1  10                 25 Custom
 ## 67   N09   N   9  B2         92        200      25  10          1  10                 25 Custom
 ## 383  N10   N  10  B2          1        200      25  10          1  10                 25  SSIII
-## 515  N11   N  11  B2         10        200      25  10          1  10                 25 Custom
-## 83   N12   N  12  B2         34        200      25  10          1  10                 25 Custom
+## 515  N11   N  11  B2         71        200      25  10          1  10                 25 Custom
+## 83   N12   N  12  B2         60        200      25  10          1  10                 25 Custom
 ## 593  N13   N  13  B2         74        200      25  10          1  10                 25  SSIII
 ## 223  N14   N  14  B2         79        200      25  10          1  10                 25 Custom
 ## 173  N15   N  15  B2         78        200      25  10          1  10                 25 Custom
 ## 393  N16   N  16  B2         70        200      25  10          1  10                 25  SSIII
 ## 453  P09   P   9  B2         67        200      25  10          1  10                 25  SSIII
-## 163  P10   P  10  B2         83        200      25  10          1  10                 25 Custom
+## 163  P10   P  10  B2         82        200      25  10          1  10                 25 Custom
 ## 403  P11   P  11  B2          7        200      25  10          1  10                 25  SSIII
 ## 183  P12   P  12  B2         30        200      25  10          1  10                 25 Custom
 ## 293  P13   P  13  B2         64        200      25  10          1  10                 25  SSIII
@@ -2245,26 +2246,26 @@ plate7b %>% as.data.frame
 ## 604  A22   A  22  C1          9        200      25  10          1  10                 25  SSIII
 ## 424  A23   A  23  C1         16        200      25  10          1  10                 25  SSIII
 ## 344  A24   A  24  C1         91        200      25  10          1  10                 25  SSIII
-## 304  C17   C  17  C1         47        200      25  10          1  10                 25  SSIII
+## 304  C17   C  17  C1         46        200      25  10          1  10                 25  SSIII
 ## 644  C18   C  18  C1         40        200      25  10          1  10                 25  SSIII
 ## 234  C19   C  19  C1         66        200      25  10          1  10                 25 Custom
 ## 516  C20   C  20  C1         24        200      25  10          1  10                 25 Custom
-## 494  C21   C  21  C1         20        200      25  10          1  10                 25  SSIII
+## 494  C21   C  21  C1         87        200      25  10          1  10                 25  SSIII
 ## 374  C22   C  22  C1         88        200      25  10          1  10                 25  SSIII
 ## 194  C23   C  23  C1         49        200      25  10          1  10                 25 Custom
 ## 224  C24   C  24  C1         73        200      25  10          1  10                 25 Custom
-## 324  E17   E  17  C1         34        200      25  10          1  10                 25  SSIII
-## 216  E18   E  18  C1          6        200      25  10          1  10                 25 Custom
-## 634  E19   E  19  C1         83        200      25  10          1  10                 25  SSIII
-## 574  E20   E  20  C1         46        200      25  10          1  10                 25  SSIII
+## 324  E17   E  17  C1         60        200      25  10          1  10                 25  SSIII
+## 216  E18   E  18  C1         51        200      25  10          1  10                 25 Custom
+## 634  E19   E  19  C1         82        200      25  10          1  10                 25  SSIII
+## 574  E20   E  20  C1         47        200      25  10          1  10                 25  SSIII
 ## 416  E21   E  21  C1         67        200      25  10          1  10                 25 Custom
 ## 104  E22   E  22  C1         37        200      25  10          1  10                 25 Custom
-## 117  E23   E  23  C1         11        200      25  10          1  10                 25 Custom
+## 117  E23   E  23  C1         72        200      25  10          1  10                 25 Custom
 ## 474  E24   E  24  C1         32        200      25  10          1  10                 25  SSIII
 ## 164  G17   G  17  C1         43        200      25  10          1  10                 25 Custom
 ## 444  G18   G  18  C1         69        200      25  10          1  10                 25  SSIII
-## 154  G19   G  19  C1         82        200      25  10          1  10                 25 Custom
-## 94   G20   G  20  C1         10        200      25  10          1  10                 25 Custom
+## 154  G19   G  19  C1         83        200      25  10          1  10                 25 Custom
+## 94   G20   G  20  C1         71        200      25  10          1  10                 25 Custom
 ## 564  G21   G  21  C1         44        200      25  10          1  10                 25  SSIII
 ## 534  G22   G  22  C1         28        200      25  10          1  10                 25  SSIII
 ## 417  G23   G  23  C1          4        200      25  10          1  10                 25  SSIII
@@ -2275,8 +2276,8 @@ plate7b %>% as.data.frame
 ## 434  I20   I  20  C1         29        200      25  10          1  10                 25  SSIII
 ## 174  I21   I  21  C1         74        200      25  10          1  10                 25 Custom
 ## 74   I22   I  22  C1         89        200      25  10          1  10                 25 Custom
-## 524  I23   I  23  C1         26        200      25  10          1  10                 25  SSIII
-## 274  I24   I  24  C1         22        200      25  10          1  10                 25  SSIII
+## 524  I23   I  23  C1         39        200      25  10          1  10                 25  SSIII
+## 274  I24   I  24  C1         23        200      25  10          1  10                 25  SSIII
 ## 264  K17   K  17  C1         62        200      25  10          1  10                 25  SSIII
 ## 404  K18   K  18  C1         50        200      25  10          1  10                 25  SSIII
 ## 68   K19   K  19  C1         78        200      25  10          1  10                 25 Custom
@@ -2291,7 +2292,7 @@ plate7b %>% as.data.frame
 ## 554  M20   M  20  C1         33        200      25  10          1  10                 25  SSIII
 ## 394  M21   M  21  C1         30        200      25  10          1  10                 25  SSIII
 ## 316  M22   M  22  C1         48        200      25  10          1  10                 25 Custom
-## 484  M23   M  23  C1         23        200      25  10          1  10                 25  SSIII
+## 484  M23   M  23  C1         22        200      25  10          1  10                 25  SSIII
 ## 614  M24   M  24  C1         81        200      25  10          1  10                 25 Custom
 ## 334  O17   O  17  C1         79        200      25  10          1  10                 25  SSIII
 ## 544  O18   O  18  C1         61        200      25  10          1  10                 25  SSIII
@@ -2309,17 +2310,17 @@ plate7b %>% as.data.frame
 ## 118  B22   B  22  C2          5        200      25  10          1  10                 25 Custom
 ## 545  B23   B  23  C2         89        200      25  10          1  10                 25  SSIII
 ## 105  B24   B  24  C2         50        200      25  10          1  10                 25 Custom
-## 575  D17   D  17  C2         83        200      25  10          1  10                 25  SSIII
+## 575  D17   D  17  C2         82        200      25  10          1  10                 25  SSIII
 ## 175  D18   D  18  C2         21        200      25  10          1  10                 25 Custom
-## 445  D19   D  19  C2         26        200      25  10          1  10                 25  SSIII
+## 445  D19   D  19  C2         39        200      25  10          1  10                 25  SSIII
 ## 125  D20   D  20  C2         65        200      25  10          1  10                 25 Custom
 ## 405  D21   D  21  C2         69        200      25  10          1  10                 25  SSIII
 ## 285  D22   D  22  C2         32        200      25  10          1  10                 25  SSIII
 ## 518  D23   D  23  C2         14        200      25  10          1  10                 25  SSIII
-## 145  D24   D  24  C2         47        200      25  10          1  10                 25 Custom
+## 145  D24   D  24  C2         46        200      25  10          1  10                 25 Custom
 ## 465  F17   F  17  C2         61        200      25  10          1  10                 25  SSIII
-## 425  F18   F  18  C2         23        200      25  10          1  10                 25  SSIII
-## 435  F19   F  19  C2         10        200      25  10          1  10                 25  SSIII
+## 425  F18   F  18  C2         22        200      25  10          1  10                 25  SSIII
+## 435  F19   F  19  C2         71        200      25  10          1  10                 25  SSIII
 ## 495  F20   F  20  C2         28        200      25  10          1  10                 25  SSIII
 ## 165  F21   F  21  C2         59        200      25  10          1  10                 25 Custom
 ## 345  F22   F  22  C2          1        200      25  10          1  10                 25  SSIII
@@ -2346,20 +2347,20 @@ plate7b %>% as.data.frame
 ## 205  L19   L  19  C2         73        200      25  10          1  10                 25 Custom
 ## 455  L20   L  20  C2         25        200      25  10          1  10                 25  SSIII
 ## 565  L21   L  21  C2         66        200      25  10          1  10                 25  SSIII
-## 245  L22   L  22  C2         20        200      25  10          1  10                 25 Custom
-## 385  L23   L  23  C2          6        200      25  10          1  10                 25  SSIII
+## 245  L22   L  22  C2         87        200      25  10          1  10                 25 Custom
+## 385  L23   L  23  C2         51        200      25  10          1  10                 25  SSIII
 ## 75   L24   L  24  C2         91        200      25  10          1  10                 25 Custom
 ## 555  N17   N  17  C2         74        200      25  10          1  10                 25  SSIII
 ## 155  N18   N  18  C2         35        200      25  10          1  10                 25 Custom
-## 219  N19   N  19  C2         11        200      25  10          1  10                 25 Custom
+## 219  N19   N  19  C2         72        200      25  10          1  10                 25 Custom
 ## 195  N20   N  20  C2         76        200      25  10          1  10                 25 Custom
 ## 485  N21   N  21  C2         70        200      25  10          1  10                 25  SSIII
 ## 625  N22   N  22  C2         62        200      25  10          1  10                 25 Custom
 ## 85   N23   N  23  C2         80        200      25  10          1  10                 25 Custom
 ## 95   N24   N  24  C2         43        200      25  10          1  10                 25 Custom
-## 319  P17   P  17  C2         34        200      25  10          1  10                 25 Custom
+## 319  P17   P  17  C2         60        200      25  10          1  10                 25 Custom
 ## 635  P18   P  18  C2         38        200      25  10          1  10                 25  SSIII
-## 525  P19   P  19  C2         46        200      25  10          1  10                 25  SSIII
+## 525  P19   P  19  C2         47        200      25  10          1  10                 25  SSIII
 ## 255  P20   P  20  C2         33        200      25  10          1  10                 25  SSIII
 ## 225  P21   P  21  C2         24        200      25  10          1  10                 25 Custom
 ## 505  P22   P  22  C2         29        200      25  10          1  10                 25  SSIII
@@ -2373,42 +2374,42 @@ plate7b %>% as.data.frame
 ## 14             300 CTCTCTAC  0      0  2     25  1.0      100      25      CGACGT     Mg_C     Mn_A
 ## 4              300 CTCTCTAC  0      0  0      0  3.0      100      50      CTGCGT     Mg_A     Mn_A
 ## 16             300 CTCTCTAC  0      0  2     25  3.0      100      25      GCTCGT     Mg_C     Mn_A
-## 18             300 CTCTCTAC  0      0  2     25  5.0      100      25      CTGAGC     Mg_C     Mn_A
+## 18             300 CTCTCTAC  0      0  2     25  5.0      100      25      CTGACG     Mg_C     Mn_A
 ## 3              300 CTCTCTAC  0      0  0      0  2.0      100      50      CGATAC     Mg_A     Mn_A
 ## 11             300 CTCTCTAC  0      0  1     25  4.0      100      25      GCTGAT     Mg_B     Mn_A
 ## 10             300 CTCTCTAC  0      0  1     25  3.0      100      25      GTAGTG     Mg_B     Mn_A
-## 41             300 CTCTCTAC  0      0  6     25  4.0      100      25      ATCGCA     Mg_F     Mn_A
+## 41             300 CTCTCTAC  0      0  6     25  4.0      100      25      ATCGAT     Mg_F     Mn_A
 ## 15             300 CTCTCTAC  0      0  2     25  2.0      100      25      AGTGCA     Mg_C     Mn_A
 ## 45             300 CTCTCTAC  0      0  9     25  2.0      100      25      CGAGCA     Mg_G     Mn_A
-## 21             300 CTCTCTAC  0      0  3     25  2.0      100      25      CTGACG     Mg_D     Mn_A
-## 61             300 CTCTCTAC  0      0  3     25  0.0        0     125      AGTACG     Mg_D     Mn_A
+## 21             300 CTCTCTAC  0      0  3     25  2.0      100      25      CTGAGC     Mg_D     Mn_A
+## 61             300 CTCTCTAC  0      0  3     25  0.0        0     125      GCTGCA     Mg_D     Mn_A
 ## 17             300 CTCTCTAC  0      0  2     25  4.0      100      25      CACTCT     Mg_C     Mn_A
-## 32             300 CTCTCTAC  0      0  4     25  1.0      100      25      ATCAGC     Mg_E     Mn_A
+## 32             300 CTCTCTAC  0      0  4     25  1.0      100      25      TATCTC     Mg_E     Mn_A
 ## 2              300 CTCTCTAC  0      0  0      0  1.0      100      50      TCGAGC     Mg_A     Mn_A
 ## 19             300 CTCTCTAC  0      0  3     25  0.5      100      25      CACAGC     Mg_D     Mn_A
 ## 9              300 CTCTCTAC  0      0  1     25  2.0      100      25      AGTGTG     Mg_B     Mn_A
-## 37             300 CTCTCTAC  0      0  6     25  0.5      100      25      ACAGTG     Mg_F     Mn_A
+## 37             300 CTCTCTAC  0      0  6     25  0.5      100      25      CTGCTC     Mg_F     Mn_A
 ## 53             300 CTCTCTAC  0      0 12     25  4.0      100      25      CTGATA     Mg_H     Mn_A
 ## 60             300 CTCTCTAC  0      0 15     25  5.0      100      25      GTACGT     Mg_I     Mn_A
 ## 30             300 CTCTCTAC  0      0  3     25  5.0      100      25      GAGTAC     Mg_D     Mn_A
-## 42             300 CTCTCTAC  0      0  6     25  5.0      100      25      AGTAGC     Mg_F     Mn_A
-## 38             300 CTCTCTAC  0      0  6     25  1.0      100      25      ATCTCT     Mg_F     Mn_A
+## 42             300 CTCTCTAC  0      0  6     25  5.0      100      25      GCTGTG     Mg_F     Mn_A
+## 38             300 CTCTCTAC  0      0  6     25  1.0      100      25      CGACTC     Mg_F     Mn_A
 ## 52             300 CTCTCTAC  0      0 12     25  3.0      100      25      GCTAGC     Mg_H     Mn_A
 ## 39             300 CTCTCTAC  0      0  6     25  2.0      100      25      TATGTG     Mg_F     Mn_A
 ## 20             300 CTCTCTAC  0      0  3     25  1.0      100      25      CGACAG     Mg_D     Mn_A
-## 58             300 CTCTCTAC  0      0 15     25  3.0      100      25      CACTAC     Mg_I     Mn_A
+## 58             300 CTCTCTAC  0      0 15     25  3.0      100      25      GAGCTC     Mg_I     Mn_A
 ## 7              300 CTCTCTAC  0      0  1     25  0.5      100      25      AGTCGT     Mg_B     Mn_A
-## 36             300 CTCTCTAC  0      0  4     25  5.0      100      25      ATCGAT     Mg_E     Mn_A
+## 36             300 CTCTCTAC  0      0  4     25  5.0      100      25      ATCGCA     Mg_E     Mn_A
 ## 56             300 CTCTCTAC  0      0 15     25  1.0      100      25      TATGAT     Mg_I     Mn_A
 ## 59             300 CTCTCTAC  0      0 15     25  4.0      100      25      GTATGA     Mg_I     Mn_A
 ## 13             300 CTCTCTAC  0      0  2     25  0.5      100      25      CACGCA     Mg_C     Mn_A
-## 6              300 CTCTCTAC  0      0  0      0  5.0      100      50      TATACG     Mg_A     Mn_A
+## 6              300 CTCTCTAC  0      0  0      0  5.0      100      50      TATAGC     Mg_A     Mn_A
 ## 12             300 CTCTCTAC  0      0  1     25  5.0      100      25      ACAGAT     Mg_B     Mn_A
 ## 26             300 CTCTCTAC  0      0  3     25  1.0      100      25      ACAGCA     Mg_D     Mn_A
 ## 50             300 CTCTCTAC  0      0 12     25  1.0      100      25      CGAGAT     Mg_H     Mn_A
 ## 33             300 CTCTCTAC  0      0  4     25  2.0      100      25      CACATA     Mg_E     Mn_A
 ## 47             300 CTCTCTAC  0      0  9     25  4.0      100      25      CACGTG     Mg_G     Mn_A
-## 35             300 CTCTCTAC  0      0  4     25  4.0      100      25      TATAGC     Mg_E     Mn_A
+## 35             300 CTCTCTAC  0      0  4     25  4.0      100      25      TATACG     Mg_E     Mn_A
 ## 54             300 CTCTCTAC  0      0 12     25  5.0      100      25      ACATCT     Mg_H     Mn_A
 ## 31             300 CTCTCTAC  0      0  4     25  0.5      100      25      ACACAG     Mg_E     Mn_A
 ## 22             300 CTCTCTAC  0      0  3     25  3.0      100      25      GCTACG     Mg_D     Mn_A
@@ -2432,16 +2433,16 @@ plate7b %>% as.data.frame
 ## 40             300 CTCTCTAC  0      0  6     25  3.0      100      25      CTGCAG     Mg_F     Mn_A
 ## 631            300 CGAGGCTG  1     25  0      0  0.0        0     125      ACATCT     Mg_A     Mn_B
 ## 111            300 CGAGGCTG  1     25  1     25  4.0      100       0      CTGCGT     Mg_B     Mn_B
-## 321            300 CGAGGCTG  1     25  4     25  1.0      100       0      CTGACG     Mg_E     Mn_B
+## 321            300 CGAGGCTG  1     25  4     25  1.0      100       0      CTGAGC     Mg_E     Mn_B
 ## 131            300 CGAGGCTG  1     25  2     25  0.5      100       0      CGACGT     Mg_C     Mn_B
-## 121            300 CGAGGCTG  1     25  1     25  5.0      100       0      TATAGC     Mg_B     Mn_B
-## 641            300 CGAGGCTG  1     25  0      0  0.0        0     125      AGTAGC     Mg_A     Mn_B
-## 161            300 CGAGGCTG  1     25  2     25  3.0      100       0      AGTACG     Mg_C     Mn_B
+## 121            300 CGAGGCTG  1     25  1     25  5.0      100       0      TATACG     Mg_B     Mn_B
+## 641            300 CGAGGCTG  1     25  0      0  0.0        0     125      GCTGTG     Mg_A     Mn_B
+## 161            300 CGAGGCTG  1     25  2     25  3.0      100       0      GCTGCA     Mg_C     Mn_B
 ## 81             300 CGAGGCTG  1     25  1     25  1.0      100       0      TCGACG     Mg_B     Mn_B
 ## 491            300 CGAGGCTG  1     25 12     25  0.5      100       0      GTATAC     Mg_H     Mn_B
 ## 361            300 CGAGGCTG  1     25  4     25  5.0      100       0      GTAGCA     Mg_E     Mn_B
 ## 331            300 CGAGGCTG  1     25  4     25  2.0      100       0      CGAGTG     Mg_E     Mn_B
-## 521            300 CGAGGCTG  1     25 12     25  3.0      100       0      CTGAGC     Mg_H     Mn_B
+## 521            300 CGAGGCTG  1     25 12     25  3.0      100       0      CTGACG     Mg_H     Mn_B
 ## 201            300 CGAGGCTG  1     25  3     25  1.0      100       0      AGTGAT     Mg_D     Mn_B
 ## 421            300 CGAGGCTG  1     25  6     25  5.0      100       0      ATCATA     Mg_F     Mn_B
 ## 601            300 CGAGGCTG  1     25 15     25  5.0      100       0      GTATCT     Mg_I     Mn_B
@@ -2450,7 +2451,7 @@ plate7b %>% as.data.frame
 ## 501            300 CGAGGCTG  1     25 12     25  1.0      100       0      ATCACG     Mg_H     Mn_B
 ## 461            300 CGAGGCTG  1     25  9     25  3.0      100       0      AGTGCA     Mg_G     Mn_B
 ## 241            300 CGAGGCTG  1     25  3     25  5.0      100       0      GTATGA     Mg_D     Mn_B
-## 371            300 CGAGGCTG  1     25  6     25  0.5      100       0      ATCGAT     Mg_F     Mn_B
+## 371            300 CGAGGCTG  1     25  6     25  0.5      100       0      ATCGCA     Mg_F     Mn_B
 ## 291            300 CGAGGCTG  1     25  3     25  4.0      100       0      ATCGTG     Mg_D     Mn_B
 ## 511            300 CGAGGCTG  1     25 12     25  2.0      100       0      GTACGT     Mg_H     Mn_B
 ## 310            300 CGAGGCTG  1     25  0      0  2.0      100      25      ACAGAT     Mg_A     Mn_B
@@ -2461,11 +2462,11 @@ plate7b %>% as.data.frame
 ## 65             300 CGAGGCTG  1     25  0      0  5.0      100      25      CACTGA     Mg_A     Mn_B
 ## 541            300 CGAGGCTG  1     25 12     25  5.0      100       0      GCTGAT     Mg_H     Mn_B
 ## 381            300 CGAGGCTG  1     25  6     25  1.0      100       0      ACAGCA     Mg_F     Mn_B
-## 171            300 CGAGGCTG  1     25  2     25  4.0      100       0      CACTAC     Mg_C     Mn_B
+## 171            300 CGAGGCTG  1     25  2     25  4.0      100       0      GAGCTC     Mg_C     Mn_B
 ## 221            300 CGAGGCTG  1     25  3     25  3.0      100       0      GAGCGT     Mg_D     Mn_B
 ## 271            300 CGAGGCTG  1     25  3     25  2.0      100       0      CACGTG     Mg_D     Mn_B
 ## 281            300 CGAGGCTG  1     25  3     25  3.0      100       0      GAGTCT     Mg_D     Mn_B
-## 341            300 CGAGGCTG  1     25  4     25  3.0      100       0      ATCAGC     Mg_E     Mn_B
+## 341            300 CGAGGCTG  1     25  4     25  3.0      100       0      TATCTC     Mg_E     Mn_B
 ## 531            300 CGAGGCTG  1     25 12     25  4.0      100       0      CACGCA     Mg_H     Mn_B
 ## 231            300 CGAGGCTG  1     25  3     25  4.0      100       0      AGTCGT     Mg_D     Mn_B
 ## 181            300 CGAGGCTG  1     25  2     25  5.0      100       0      CGATAC     Mg_C     Mn_B
@@ -2473,16 +2474,16 @@ plate7b %>% as.data.frame
 ## 621            300 CGAGGCTG  1     25  3     25  0.0        0     100      GCTCGT     Mg_D     Mn_B
 ## 611            300 CGAGGCTG  1     25  3     25  0.0        0     100      AGTGTG     Mg_D     Mn_B
 ## 301            300 CGAGGCTG  1     25  3     25  5.0      100       0      ACACGT     Mg_D     Mn_B
-## 551            300 CGAGGCTG  1     25 15     25  0.5      100       0      ACAGTG     Mg_I     Mn_B
+## 551            300 CGAGGCTG  1     25 15     25  0.5      100       0      CTGCTC     Mg_I     Mn_B
 ## 561            300 CGAGGCTG  1     25 15     25  1.0      100       0      CGATGA     Mg_I     Mn_B
 ## 510            300 CGAGGCTG  1     25  0      0  4.0      100      25      AGTCAG     Mg_A     Mn_B
-## 410            300 CGAGGCTG  1     25  0      0  3.0      100      25      TATACG     Mg_A     Mn_B
-## 251            300 CGAGGCTG  1     25  3     25  0.5      100       0      ATCGCA     Mg_D     Mn_B
+## 410            300 CGAGGCTG  1     25  0      0  3.0      100      25      TATAGC     Mg_A     Mn_B
+## 251            300 CGAGGCTG  1     25  3     25  0.5      100       0      ATCGAT     Mg_D     Mn_B
 ## 151            300 CGAGGCTG  1     25  2     25  2.0      100       0      ACATAC     Mg_C     Mn_B
 ## 191            300 CGAGGCTG  1     25  3     25  0.5      100       0      TATGTG     Mg_D     Mn_B
 ## 441            300 CGAGGCTG  1     25  9     25  1.0      100       0      CACGAT     Mg_G     Mn_B
 ## 481            300 CGAGGCTG  1     25  9     25  5.0      100       0      GCTACG     Mg_G     Mn_B
-## 471            300 CGAGGCTG  1     25  9     25  4.0      100       0      ATCTCT     Mg_G     Mn_B
+## 471            300 CGAGGCTG  1     25  9     25  4.0      100       0      CGACTC     Mg_G     Mn_B
 ## 451            300 CGAGGCTG  1     25  9     25  2.0      100       0      GTACAG     Mg_G     Mn_B
 ## 261            300 CGAGGCTG  1     25  3     25  1.0      100       0      CGAGAT     Mg_D     Mn_B
 ## 581            300 CGAGGCTG  1     25 15     25  3.0      100       0      CGAGCA     Mg_I     Mn_B
@@ -2511,26 +2512,26 @@ plate7b %>% as.data.frame
 ## 113            300 AAGAGGCA  2     25  0      0  0.5      100      25      ATCTAC     Mg_A     Mn_C
 ## 312            300 AAGAGGCA  2     25  0      0  2.0      100      25      CTGATA     Mg_A     Mn_C
 ## 562            300 AAGAGGCA  2     25 15     25  1.0      100       0      CACGAT     Mg_I     Mn_C
-## 272            300 AAGAGGCA  2     25  3     25  2.0      100       0      ACAGTG     Mg_D     Mn_C
+## 272            300 AAGAGGCA  2     25  3     25  2.0      100       0      CTGCTC     Mg_D     Mn_C
 ## 392            300 AAGAGGCA  2     25  6     25  2.0      100       0      CGATAC     Mg_F     Mn_C
 ## 372            300 AAGAGGCA  2     25  6     25  0.5      100       0      GTATGA     Mg_F     Mn_C
 ## 582            300 AAGAGGCA  2     25 15     25  3.0      100       0      CGATGA     Mg_I     Mn_C
 ## 452            300 AAGAGGCA  2     25  9     25  2.0      100       0      GCTCAG     Mg_G     Mn_C
 ## 342            300 AAGAGGCA  2     25  4     25  3.0      100       0      GTACGT     Mg_E     Mn_C
-## 502            300 AAGAGGCA  2     25 12     25  1.0      100       0      CTGACG     Mg_H     Mn_C
+## 502            300 AAGAGGCA  2     25 12     25  1.0      100       0      CTGAGC     Mg_H     Mn_C
 ## 212            300 AAGAGGCA  2     25  3     25  2.0      100       0      ATCGTG     Mg_D     Mn_C
 ## 572            300 AAGAGGCA  2     25 15     25  2.0      100       0      CACAGC     Mg_I     Mn_C
 ## 602            300 AAGAGGCA  2     25 15     25  5.0      100       0      CGAGAT     Mg_I     Mn_C
 ## 642            300 AAGAGGCA  2     25  0      0  0.0        0     125      CGAGCA     Mg_A     Mn_C
 ## 72             300 AAGAGGCA  2     25  1     25  0.5      100       0      GTATAC     Mg_B     Mn_C
-## 162            300 AAGAGGCA  2     25  2     25  3.0      100       0      TATACG     Mg_C     Mn_C
+## 162            300 AAGAGGCA  2     25  2     25  3.0      100       0      TATAGC     Mg_C     Mn_C
 ## 92             300 AAGAGGCA  2     25  1     25  2.0      100       0      ATCATA     Mg_B     Mn_C
 ## 512            300 AAGAGGCA  2     25 12     25  2.0      100       0      GTATCT     Mg_H     Mn_C
 ## 592            300 AAGAGGCA  2     25 15     25  4.0      100       0      TCGACG     Mg_I     Mn_C
 ## 282            300 AAGAGGCA  2     25  3     25  3.0      100       0      CACGCA     Mg_D     Mn_C
 ## 482            300 AAGAGGCA  2     25  9     25  5.0      100       0      TATGAT     Mg_G     Mn_C
 ## 442            300 AAGAGGCA  2     25  9     25  1.0      100       0      ATCACG     Mg_G     Mn_C
-## 232            300 AAGAGGCA  2     25  3     25  4.0      100       0      ATCGCA     Mg_D     Mn_C
+## 232            300 AAGAGGCA  2     25  3     25  4.0      100       0      ATCGAT     Mg_D     Mn_C
 ## 622            300 AAGAGGCA  2     25  3     25  0.0        0     100      TATGCA     Mg_D     Mn_C
 ## 213            300 AAGAGGCA  2     25  0      0  1.0      100      25      GTAGAT     Mg_A     Mn_C
 ## 182            300 AAGAGGCA  2     25  2     25  5.0      100       0      AGTGAT     Mg_C     Mn_C
@@ -2545,21 +2546,21 @@ plate7b %>% as.data.frame
 ## 122            300 AAGAGGCA  2     25  1     25  5.0      100       0      GCTGAT     Mg_B     Mn_C
 ## 532            300 AAGAGGCA  2     25 12     25  4.0      100       0      GTAGTG     Mg_H     Mn_C
 ## 322            300 AAGAGGCA  2     25  4     25  1.0      100       0      CACTGA     Mg_E     Mn_C
-## 462            300 AAGAGGCA  2     25  9     25  3.0      100       0      AGTACG     Mg_G     Mn_C
+## 462            300 AAGAGGCA  2     25  9     25  3.0      100       0      GCTGCA     Mg_G     Mn_C
 ## 362            300 AAGAGGCA  2     25  4     25  5.0      100       0      TCGAGC     Mg_E     Mn_C
 ## 82             300 AAGAGGCA  2     25  1     25  1.0      100       0      AGTGCA     Mg_B     Mn_C
-## 352            300 AAGAGGCA  2     25  4     25  4.0      100       0      ATCTCT     Mg_E     Mn_C
-## 302            300 AAGAGGCA  2     25  3     25  5.0      100       0      ATCGAT     Mg_D     Mn_C
+## 352            300 AAGAGGCA  2     25  4     25  4.0      100       0      CGACTC     Mg_E     Mn_C
+## 302            300 AAGAGGCA  2     25  3     25  5.0      100       0      ATCGCA     Mg_D     Mn_C
 ## 252            300 AAGAGGCA  2     25  3     25  0.5      100       0      GAGTCT     Mg_D     Mn_C
-## 102            300 AAGAGGCA  2     25  1     25  3.0      100       0      AGTAGC     Mg_B     Mn_C
-## 192            300 AAGAGGCA  2     25  3     25  0.5      100       0      CACTAC     Mg_D     Mn_C
+## 102            300 AAGAGGCA  2     25  1     25  3.0      100       0      GCTGTG     Mg_B     Mn_C
+## 192            300 AAGAGGCA  2     25  3     25  0.5      100       0      GAGCTC     Mg_D     Mn_C
 ## 332            300 AAGAGGCA  2     25  4     25  2.0      100       0      AGTGTG     Mg_E     Mn_C
 ## 432            300 AAGAGGCA  2     25  9     25  0.5      100       0      CTGCAG     Mg_G     Mn_C
-## 262            300 AAGAGGCA  2     25  3     25  1.0      100       0      ATCAGC     Mg_D     Mn_C
+## 262            300 AAGAGGCA  2     25  3     25  1.0      100       0      TATCTC     Mg_D     Mn_C
 ## 292            300 AAGAGGCA  2     25  3     25  4.0      100       0      AGTCGT     Mg_D     Mn_C
 ## 542            300 AAGAGGCA  2     25 12     25  5.0      100       0      ACACAG     Mg_H     Mn_C
 ## 343            300 GTAGAGGA  3     25  4     25  3.0      100       0      GCTCGT     Mg_E     Mn_D
-## 143            300 GTAGAGGA  3     25  2     25  1.0      100       0      AGTAGC     Mg_C     Mn_D
+## 143            300 GTAGAGGA  3     25  2     25  1.0      100       0      GCTGTG     Mg_C     Mn_D
 ## 433            300 GTAGAGGA  3     25  9     25  0.5      100       0      CACTCT     Mg_G     Mn_D
 ## 463            300 GTAGAGGA  3     25  9     25  3.0      100       0      ATCATA     Mg_G     Mn_D
 ## 283            300 GTAGAGGA  3     25  3     25  3.0      100       0      CGATGA     Mg_D     Mn_D
@@ -2576,11 +2577,11 @@ plate7b %>% as.data.frame
 ## 243            300 GTAGAGGA  3     25  3     25  5.0      100       0      AGTGAT     Mg_D     Mn_D
 ## 133            300 GTAGAGGA  3     25  2     25  0.5      100       0      CTGCGT     Mg_C     Mn_D
 ## 363            300 GTAGAGGA  3     25  4     25  5.0      100       0      CACGAT     Mg_E     Mn_D
-## 233            300 GTAGAGGA  3     25  3     25  4.0      100       0      ACAGTG     Mg_D     Mn_D
+## 233            300 GTAGAGGA  3     25  3     25  4.0      100       0      CTGCTC     Mg_D     Mn_D
 ## 533            300 GTAGAGGA  3     25 12     25  4.0      100       0      TATGTG     Mg_H     Mn_D
 ## 503            300 GTAGAGGA  3     25 12     25  1.0      100       0      CACTGA     Mg_H     Mn_D
 ## 193            300 GTAGAGGA  3     25  3     25  0.5      100       0      AGTCGT     Mg_D     Mn_D
-## 73             300 GTAGAGGA  3     25  1     25  0.5      100       0      ATCGCA     Mg_B     Mn_D
+## 73             300 GTAGAGGA  3     25  1     25  0.5      100       0      ATCGAT     Mg_B     Mn_D
 ## 623            300 GTAGAGGA  3     25  3     25  0.0        0     100      CGACGT     Mg_D     Mn_D
 ## 123            300 GTAGAGGA  3     25  1     25  5.0      100       0      CTGATA     Mg_B     Mn_D
 ## 314            300 GTAGAGGA  3     25  0      0  2.0      100      25      GTAGCA     Mg_A     Mn_D
@@ -2588,17 +2589,17 @@ plate7b %>% as.data.frame
 ## 303            300 GTAGAGGA  3     25  3     25  5.0      100       0      ATCTAC     Mg_D     Mn_D
 ## 563            300 GTAGAGGA  3     25 15     25  1.0      100       0      CGATCT     Mg_I     Mn_D
 ## 514            300 GTAGAGGA  3     25 12     25  2.0      100       0      CGAGCA     Mg_H     Mn_D
-## 103            300 GTAGAGGA  3     25  1     25  3.0      100       0      ATCTCT     Mg_B     Mn_D
-## 603            300 GTAGAGGA  3     25 15     25  5.0      100       0      TATACG     Mg_I     Mn_D
-## 153            300 GTAGAGGA  3     25  2     25  2.0      100       0      CTGACG     Mg_C     Mn_D
+## 103            300 GTAGAGGA  3     25  1     25  3.0      100       0      CGACTC     Mg_B     Mn_D
+## 603            300 GTAGAGGA  3     25 15     25  5.0      100       0      TATAGC     Mg_I     Mn_D
+## 153            300 GTAGAGGA  3     25  2     25  2.0      100       0      CTGAGC     Mg_C     Mn_D
 ## 523            300 GTAGAGGA  3     25 12     25  3.0      100       0      GAGCGT     Mg_H     Mn_D
-## 373            300 GTAGAGGA  3     25  6     25  0.5      100       0      ATCAGC     Mg_F     Mn_D
+## 373            300 GTAGAGGA  3     25  6     25  0.5      100       0      TATCTC     Mg_F     Mn_D
 ## 613            300 GTAGAGGA  3     25  3     25  0.0        0     100      ATCGTG     Mg_D     Mn_D
 ## 253            300 GTAGAGGA  3     25  3     25  0.5      100       0      ACACGT     Mg_D     Mn_D
 ## 633            300 GTAGAGGA  3     25  0      0  0.0        0     125      CACAGC     Mg_A     Mn_D
 ## 414            300 GTAGAGGA  3     25  6     25  4.0      100       0      GCTCTC     Mg_F     Mn_D
 ## 573            300 GTAGAGGA  3     25 15     25  2.0      100       0      CGAGTG     Mg_I     Mn_D
-## 263            300 GTAGAGGA  3     25  3     25  1.0      100       0      CTGAGC     Mg_D     Mn_D
+## 263            300 GTAGAGGA  3     25  3     25  1.0      100       0      CTGACG     Mg_D     Mn_D
 ## 215            300 GTAGAGGA  3     25  3     25  2.0      100       0      ACATGA     Mg_D     Mn_D
 ## 423            300 GTAGAGGA  3     25  6     25  5.0      100       0      CGACAG     Mg_F     Mn_D
 ## 333            300 GTAGAGGA  3     25  4     25  2.0      100       0      TATGCA     Mg_E     Mn_D
@@ -2608,14 +2609,14 @@ plate7b %>% as.data.frame
 ## 415            300 GTAGAGGA  3     25  0      0  3.0      100      25      ATCACG     Mg_A     Mn_D
 ## 67             300 GTAGAGGA  3     25  0      0  5.0      100      25      TCGAGC     Mg_A     Mn_D
 ## 383            300 GTAGAGGA  3     25  6     25  1.0      100       0      ACACAG     Mg_F     Mn_D
-## 515            300 GTAGAGGA  3     25  0      0  4.0      100      25      AGTACG     Mg_A     Mn_D
-## 83             300 GTAGAGGA  3     25  1     25  1.0      100       0      CACTAC     Mg_B     Mn_D
+## 515            300 GTAGAGGA  3     25  0      0  4.0      100      25      GCTGCA     Mg_A     Mn_D
+## 83             300 GTAGAGGA  3     25  1     25  1.0      100       0      GAGCTC     Mg_B     Mn_D
 ## 593            300 GTAGAGGA  3     25 15     25  4.0      100       0      GTACGT     Mg_I     Mn_D
 ## 223            300 GTAGAGGA  3     25  3     25  3.0      100       0      GTATAC     Mg_D     Mn_D
 ## 173            300 GTAGAGGA  3     25  2     25  4.0      100       0      GTAGTG     Mg_C     Mn_D
 ## 393            300 GTAGAGGA  3     25  6     25  2.0      100       0      GCTGAT     Mg_F     Mn_D
 ## 453            300 GTAGAGGA  3     25  9     25  2.0      100       0      GCTCAG     Mg_G     Mn_D
-## 163            300 GTAGAGGA  3     25  2     25  3.0      100       0      TATAGC     Mg_C     Mn_D
+## 163            300 GTAGAGGA  3     25  2     25  3.0      100       0      TATACG     Mg_C     Mn_D
 ## 403            300 GTAGAGGA  3     25  6     25  3.0      100       0      ACATAC     Mg_F     Mn_D
 ## 183            300 GTAGAGGA  3     25  2     25  5.0      100       0      CACATA     Mg_C     Mn_D
 ## 293            300 GTAGAGGA  3     25  3     25  4.0      100       0      GCTACG     Mg_D     Mn_D
@@ -2630,26 +2631,26 @@ plate7b %>% as.data.frame
 ## 604            300 GCTCATGA  4     25 15     25  5.0      100       0      ACATGA     Mg_I     Mn_E
 ## 424            300 GCTCATGA  4     25  6     25  5.0      100       0      AGTGAT     Mg_F     Mn_E
 ## 344            300 GCTCATGA  4     25  4     25  3.0      100       0      TCGACG     Mg_E     Mn_E
-## 304            300 GCTCATGA  4     25  3     25  5.0      100       0      CTGAGC     Mg_D     Mn_E
+## 304            300 GCTCATGA  4     25  3     25  5.0      100       0      CTGACG     Mg_D     Mn_E
 ## 644            300 GCTCATGA  4     25  0      0  0.0        0     125      CGAGAT     Mg_A     Mn_E
 ## 234            300 GCTCATGA  4     25  3     25  4.0      100       0      GCTATA     Mg_D     Mn_E
 ## 516            300 GCTCATGA  4     25  0      0  4.0      100      25      ATCGTG     Mg_A     Mn_E
-## 494            300 GCTCATGA  4     25 12     25  0.5      100       0      ATCAGC     Mg_H     Mn_E
+## 494            300 GCTCATGA  4     25 12     25  0.5      100       0      TATCTC     Mg_H     Mn_E
 ## 374            300 GCTCATGA  4     25  6     25  0.5      100       0      TATGAT     Mg_F     Mn_E
 ## 194            300 GCTCATGA  4     25  3     25  0.5      100       0      CTGCAG     Mg_D     Mn_E
 ## 224            300 GCTCATGA  4     25  3     25  3.0      100       0      GTACAG     Mg_D     Mn_E
-## 324            300 GCTCATGA  4     25  4     25  1.0      100       0      CACTAC     Mg_E     Mn_E
-## 216            300 GCTCATGA  4     25  0      0  1.0      100      25      ACAGTG     Mg_A     Mn_E
-## 634            300 GCTCATGA  4     25  0      0  0.0        0     125      TATAGC     Mg_A     Mn_E
-## 574            300 GCTCATGA  4     25 15     25  2.0      100       0      CTGACG     Mg_I     Mn_E
+## 324            300 GCTCATGA  4     25  4     25  1.0      100       0      GAGCTC     Mg_E     Mn_E
+## 216            300 GCTCATGA  4     25  0      0  1.0      100      25      CTGCTC     Mg_A     Mn_E
+## 634            300 GCTCATGA  4     25  0      0  0.0        0     125      TATACG     Mg_A     Mn_E
+## 574            300 GCTCATGA  4     25 15     25  2.0      100       0      CTGAGC     Mg_I     Mn_E
 ## 416            300 GCTCATGA  4     25  0      0  3.0      100      25      GCTCAG     Mg_A     Mn_E
 ## 104            300 GCTCATGA  4     25  1     25  3.0      100       0      CGACAG     Mg_B     Mn_E
-## 117            300 GCTCATGA  4     25  1     25  4.0      100       0      AGTAGC     Mg_B     Mn_E
+## 117            300 GCTCATGA  4     25  1     25  4.0      100       0      GCTGTG     Mg_B     Mn_E
 ## 474            300 GCTCATGA  4     25  9     25  4.0      100       0      CACGCA     Mg_G     Mn_E
 ## 164            300 GCTCATGA  4     25  2     25  3.0      100       0      CGATAC     Mg_C     Mn_E
 ## 444            300 GCTCATGA  4     25  9     25  1.0      100       0      GCTCTC     Mg_G     Mn_E
-## 154            300 GCTCATGA  4     25  2     25  2.0      100       0      TATACG     Mg_C     Mn_E
-## 94             300 GCTCATGA  4     25  1     25  2.0      100       0      AGTACG     Mg_B     Mn_E
+## 154            300 GCTCATGA  4     25  2     25  2.0      100       0      TATAGC     Mg_C     Mn_E
+## 94             300 GCTCATGA  4     25  1     25  2.0      100       0      GCTGCA     Mg_B     Mn_E
 ## 564            300 GCTCATGA  4     25 15     25  1.0      100       0      CGATCT     Mg_I     Mn_E
 ## 534            300 GCTCATGA  4     25 12     25  4.0      100       0      CACACG     Mg_H     Mn_E
 ## 417            300 GCTCATGA  4     25  6     25  4.0      100       0      ACAGAT     Mg_F     Mn_E
@@ -2660,8 +2661,8 @@ plate7b %>% as.data.frame
 ## 434            300 GCTCATGA  4     25  9     25  0.5      100       0      CACAGC     Mg_G     Mn_E
 ## 174            300 GCTCATGA  4     25  2     25  4.0      100       0      GTACGT     Mg_C     Mn_E
 ## 74             300 GCTCATGA  4     25  1     25  0.5      100       0      TATGCA     Mg_B     Mn_E
-## 524            300 GCTCATGA  4     25 12     25  3.0      100       0      ATCTCT     Mg_H     Mn_E
-## 274            300 GCTCATGA  4     25  3     25  2.0      100       0      ATCGAT     Mg_D     Mn_E
+## 524            300 GCTCATGA  4     25 12     25  3.0      100       0      CGACTC     Mg_H     Mn_E
+## 274            300 GCTCATGA  4     25  3     25  2.0      100       0      ATCGCA     Mg_D     Mn_E
 ## 264            300 GCTCATGA  4     25  3     25  1.0      100       0      GAGTCT     Mg_D     Mn_E
 ## 404            300 GCTCATGA  4     25  6     25  3.0      100       0      CTGCGT     Mg_F     Mn_E
 ## 68             300 GCTCATGA  4     25  0      0  5.0      100      25      GTAGTG     Mg_A     Mn_E
@@ -2676,7 +2677,7 @@ plate7b %>% as.data.frame
 ## 554            300 GCTCATGA  4     25 15     25  0.5      100       0      CACGTG     Mg_I     Mn_E
 ## 394            300 GCTCATGA  4     25  6     25  2.0      100       0      CACATA     Mg_F     Mn_E
 ## 316            300 GCTCATGA  4     25  0      0  2.0      100      25      CTGATA     Mg_A     Mn_E
-## 484            300 GCTCATGA  4     25  9     25  5.0      100       0      ATCGCA     Mg_G     Mn_E
+## 484            300 GCTCATGA  4     25  9     25  5.0      100       0      ATCGAT     Mg_G     Mn_E
 ## 614            300 GCTCATGA  4     25  3     25  0.0        0     100      GTATGA     Mg_D     Mn_E
 ## 334            300 GCTCATGA  4     25  4     25  2.0      100       0      GTATAC     Mg_E     Mn_E
 ## 544            300 GCTCATGA  4     25 12     25  5.0      100       0      GAGTAC     Mg_H     Mn_E
@@ -2694,17 +2695,17 @@ plate7b %>% as.data.frame
 ## 118            300 ATCTCAGG  5     25  0      0  0.5      100      25      ACAGCA     Mg_A     Mn_F
 ## 545            300 ATCTCAGG  5     25 12     25  5.0      100       0      TATGCA     Mg_H     Mn_F
 ## 105            300 ATCTCAGG  5     25  1     25  3.0      100       0      CTGCGT     Mg_B     Mn_F
-## 575            300 ATCTCAGG  5     25 15     25  2.0      100       0      TATAGC     Mg_I     Mn_F
+## 575            300 ATCTCAGG  5     25 15     25  2.0      100       0      TATACG     Mg_I     Mn_F
 ## 175            300 ATCTCAGG  5     25  2     25  4.0      100       0      ATCATA     Mg_C     Mn_F
-## 445            300 ATCTCAGG  5     25  9     25  1.0      100       0      ATCTCT     Mg_G     Mn_F
+## 445            300 ATCTCAGG  5     25  9     25  1.0      100       0      CGACTC     Mg_G     Mn_F
 ## 125            300 ATCTCAGG  5     25  1     25  5.0      100       0      GCTAGC     Mg_B     Mn_F
 ## 405            300 ATCTCAGG  5     25  6     25  3.0      100       0      GCTCTC     Mg_F     Mn_F
 ## 285            300 ATCTCAGG  5     25  3     25  3.0      100       0      CACGCA     Mg_D     Mn_F
 ## 518            300 ATCTCAGG  5     25 12     25  2.0      100       0      AGTCGT     Mg_H     Mn_F
-## 145            300 ATCTCAGG  5     25  2     25  1.0      100       0      CTGAGC     Mg_C     Mn_F
+## 145            300 ATCTCAGG  5     25  2     25  1.0      100       0      CTGACG     Mg_C     Mn_F
 ## 465            300 ATCTCAGG  5     25  9     25  3.0      100       0      GAGTAC     Mg_G     Mn_F
-## 425            300 ATCTCAGG  5     25  6     25  5.0      100       0      ATCGCA     Mg_F     Mn_F
-## 435            300 ATCTCAGG  5     25  9     25  0.5      100       0      AGTACG     Mg_G     Mn_F
+## 425            300 ATCTCAGG  5     25  6     25  5.0      100       0      ATCGAT     Mg_F     Mn_F
+## 435            300 ATCTCAGG  5     25  9     25  0.5      100       0      GCTGCA     Mg_G     Mn_F
 ## 495            300 ATCTCAGG  5     25 12     25  0.5      100       0      CACACG     Mg_H     Mn_F
 ## 165            300 ATCTCAGG  5     25  2     25  3.0      100       0      GAGCGT     Mg_C     Mn_F
 ## 345            300 ATCTCAGG  5     25  4     25  3.0      100       0      ACACAG     Mg_E     Mn_F
@@ -2731,20 +2732,20 @@ plate7b %>% as.data.frame
 ## 205            300 ATCTCAGG  5     25  3     25  1.0      100       0      GTACAG     Mg_D     Mn_F
 ## 455            300 ATCTCAGG  5     25  9     25  2.0      100       0      ATCTAC     Mg_G     Mn_F
 ## 565            300 ATCTCAGG  5     25 15     25  1.0      100       0      GCTATA     Mg_I     Mn_F
-## 245            300 ATCTCAGG  5     25  3     25  5.0      100       0      ATCAGC     Mg_D     Mn_F
-## 385            300 ATCTCAGG  5     25  6     25  1.0      100       0      ACAGTG     Mg_F     Mn_F
+## 245            300 ATCTCAGG  5     25  3     25  5.0      100       0      TATCTC     Mg_D     Mn_F
+## 385            300 ATCTCAGG  5     25  6     25  1.0      100       0      CTGCTC     Mg_F     Mn_F
 ## 75             300 ATCTCAGG  5     25  1     25  0.5      100       0      TCGACG     Mg_B     Mn_F
 ## 555            300 ATCTCAGG  5     25 15     25  0.5      100       0      GTACGT     Mg_I     Mn_F
 ## 155            300 ATCTCAGG  5     25  2     25  2.0      100       0      CACTCT     Mg_C     Mn_F
-## 219            300 ATCTCAGG  5     25  3     25  2.0      100       0      AGTAGC     Mg_D     Mn_F
+## 219            300 ATCTCAGG  5     25  3     25  2.0      100       0      GCTGTG     Mg_D     Mn_F
 ## 195            300 ATCTCAGG  5     25  3     25  0.5      100       0      GTAGAT     Mg_D     Mn_F
 ## 485            300 ATCTCAGG  5     25  9     25  5.0      100       0      GCTGAT     Mg_G     Mn_F
 ## 625            300 ATCTCAGG  5     25  3     25  0.0        0     100      GAGTCT     Mg_D     Mn_F
 ## 85             300 ATCTCAGG  5     25  1     25  1.0      100       0      GTATCT     Mg_B     Mn_F
 ## 95             300 ATCTCAGG  5     25  1     25  2.0      100       0      CGATAC     Mg_B     Mn_F
-## 319            300 ATCTCAGG  5     25  0      0  2.0      100      25      CACTAC     Mg_A     Mn_F
+## 319            300 ATCTCAGG  5     25  0      0  2.0      100      25      GAGCTC     Mg_A     Mn_F
 ## 635            300 ATCTCAGG  5     25  0      0  0.0        0     125      CGACGT     Mg_A     Mn_F
-## 525            300 ATCTCAGG  5     25 12     25  3.0      100       0      CTGACG     Mg_H     Mn_F
+## 525            300 ATCTCAGG  5     25 12     25  3.0      100       0      CTGAGC     Mg_H     Mn_F
 ## 255            300 ATCTCAGG  5     25  3     25  0.5      100       0      CACGTG     Mg_D     Mn_F
 ## 225            300 ATCTCAGG  5     25  3     25  3.0      100       0      ATCGTG     Mg_D     Mn_F
 ## 505            300 ATCTCAGG  5     25 12     25  1.0      100       0      CACAGC     Mg_H     Mn_F
@@ -3153,8 +3154,8 @@ plate7c %>% as.data.frame
 ## 44   A08   A   8  A1          8        200      25  10          1  10                 25  SSIII
 ## 51   C01   C   1  A1         89        200      25  10          1  10                 25  SSIII
 ## 54   C02   C   2  A1         88        200      25  10          1  10                 25  SSIII
-## 28   C03   C   3  A1         23        200      25  10          1  10                 25  SSIII
-## 30   C04   C   4  A1         22        200      25  10          1  10                 25  SSIII
+## 28   C03   C   3  A1         22        200      25  10          1  10                 25  SSIII
+## 30   C04   C   4  A1         23        200      25  10          1  10                 25  SSIII
 ## 9    C05   C   5  A1          7        200      25  10          1  10                 25 Custom
 ## 52   C06   C   6  A1         76        200      25  10          1  10                 25  SSIII
 ## 40   C07   C   7  A1         66        200      25  10          1  10                 25  SSIII
@@ -3167,16 +3168,16 @@ plate7c %>% as.data.frame
 ## 49   E06   E   6  A1         41        200      25  10          1  10                 25  SSIII
 ## 56   E07   E   7  A1         40        200      25  10          1  10                 25  SSIII
 ## 21   E08   E   8  A1         48        200      25  10          1  10                 25 Custom
-## 26   G01   G   1  A1         82        200      25  10          1  10                 25  SSIII
+## 26   G01   G   1  A1         83        200      25  10          1  10                 25  SSIII
 ## 36   G02   G   2  A1          9        200      25  10          1  10                 25  SSIII
-## 58   G03   G   3  A1          6        200      25  10          1  10                 25  SSIII
+## 58   G03   G   3  A1         51        200      25  10          1  10                 25  SSIII
 ## 10   G04   G   4  A1         43        200      25  10          1  10                 25 Custom
 ## 16   G05   G   5  A1         44        200      25  10          1  10                 25 Custom
-## 53   G06   G   6  A1         20        200      25  10          1  10                 25  SSIII
-## 35   G07   G   7  A1         26        200      25  10          1  10                 25  SSIII
+## 53   G06   G   6  A1         87        200      25  10          1  10                 25  SSIII
+## 35   G07   G   7  A1         39        200      25  10          1  10                 25  SSIII
 ## 42   G08   G   8  A1         17        200      25  10          1  10                 25  SSIII
 ## 11   I01   I   1  A1         30        200      25  10          1  10                 25 Custom
-## 57   I02   I   2  A1         47        200      25  10          1  10                 25  SSIII
+## 57   I02   I   2  A1         46        200      25  10          1  10                 25  SSIII
 ## 59   I03   I   3  A1         91        200      25  10          1  10                 25  SSIII
 ## 63   I04   I   4  A1         70        200      25  10          1  10                 25  SSIII
 ## 60   I05   I   5  A1         37        200      25  10          1  10                 25  SSIII
@@ -3185,15 +3186,15 @@ plate7c %>% as.data.frame
 ## 46   I08   I   8  A1         78        200      25  10          1  10                 25  SSIII
 ## 15   K01   K   1  A1         92        200      25  10          1  10                 25 Custom
 ## 8    K02   K   2  A1         64        200      25  10          1  10                 25 Custom
-## 62   K03   K   3  A1         83        200      25  10          1  10                 25 Custom
-## 61   K04   K   4  A1         34        200      25  10          1  10                 25 Custom
+## 62   K03   K   3  A1         82        200      25  10          1  10                 25 Custom
+## 61   K04   K   4  A1         60        200      25  10          1  10                 25 Custom
 ## 2    K05   K   5  A1         24        200      25  10          1  10                 25 Custom
 ## 64   K06   K   6  A1         32        200      25  10          1  10                 25  SSIII
 ## 27   K07   K   7  A1         59        200      25  10          1  10                 25  SSIII
 ## 29   K08   K   8  A1         29        200      25  10          1  10                 25  SSIII
 ## 3    M01   M   1  A1         77        200      25  10          1  10                 25 Custom
 ## 39   M02   M   2  A1         36        200      25  10          1  10                 25  SSIII
-## 13   M03   M   3  A1         46        200      25  10          1  10                 25 Custom
+## 13   M03   M   3  A1         47        200      25  10          1  10                 25 Custom
 ## 47   M04   M   4  A1         13        200      25  10          1  10                 25  SSIII
 ## 14   M05   M   5  A1         42        200      25  10          1  10                 25 Custom
 ## 23   M06   M   6  A1         69        200      25  10          1  10                 25 Custom
@@ -3212,27 +3213,27 @@ plate7c %>% as.data.frame
 ## 441  B03   B   3  A2         25        200      25  10          1  10                 25  SSIII
 ## 241  B04   B   4  A2         61        200      25  10          1  10                 25 Custom
 ## 501  B05   B   5  A2         28        200      25  10          1  10                 25  SSIII
-## 541  B06   B   6  A2         46        200      25  10          1  10                 25  SSIII
+## 541  B06   B   6  A2         47        200      25  10          1  10                 25  SSIII
 ## 251  B07   B   7  A2         79        200      25  10          1  10                 25  SSIII
 ## 161  B08   B   8  A2         80        200      25  10          1  10                 25 Custom
 ## 411  D01   D   1  A2         29        200      25  10          1  10                 25  SSIII
 ## 481  D02   D   2  A2         62        200      25  10          1  10                 25  SSIII
-## 191  D03   D   3  A2         34        200      25  10          1  10                 25 Custom
-## 271  D04   D   4  A2         22        200      25  10          1  10                 25  SSIII
+## 191  D03   D   3  A2         60        200      25  10          1  10                 25 Custom
+## 271  D04   D   4  A2         23        200      25  10          1  10                 25  SSIII
 ## 451  D05   D   5  A2         33        200      25  10          1  10                 25  SSIII
 ## 201  D06   D   6  A2          8        200      25  10          1  10                 25 Custom
 ## 371  D07   D   7  A2         65        200      25  10          1  10                 25  SSIII
-## 341  D08   D   8  A2         10        200      25  10          1  10                 25  SSIII
+## 341  D08   D   8  A2         71        200      25  10          1  10                 25  SSIII
 ## 561  F01   F   1  A2         24        200      25  10          1  10                 25  SSIII
 ## 210  F02   F   2  A2         17        200      25  10          1  10                 25 Custom
 ## 491  F03   F   3  A2         45        200      25  10          1  10                 25  SSIII
-## 221  F04   F   4  A2         26        200      25  10          1  10                 25 Custom
+## 221  F04   F   4  A2         39        200      25  10          1  10                 25 Custom
 ## 261  F05   F   5  A2         74        200      25  10          1  10                 25  SSIII
 ## 91   F06   F   6  A2         73        200      25  10          1  10                 25 Custom
-## 471  F07   F   7  A2         11        200      25  10          1  10                 25  SSIII
+## 471  F07   F   7  A2         72        200      25  10          1  10                 25  SSIII
 ## 401  F08   F   8  A2         68        200      25  10          1  10                 25  SSIII
 ## 101  H01   H   1  A2         48        200      25  10          1  10                 25 Custom
-## 510  H02   H   2  A2         83        200      25  10          1  10                 25 Custom
+## 510  H02   H   2  A2         82        200      25  10          1  10                 25 Custom
 ## 531  H03   H   3  A2         76        200      25  10          1  10                 25  SSIII
 ## 281  H04   H   4  A2         50        200      25  10          1  10                 25  SSIII
 ## 121  H05   H   5  A2         42        200      25  10          1  10                 25 Custom
@@ -3247,7 +3248,7 @@ plate7c %>% as.data.frame
 ## 551  J06   J   6  A2         77        200      25  10          1  10                 25  SSIII
 ## 431  J07   J   7  A2          7        200      25  10          1  10                 25  SSIII
 ## 321  J08   J   8  A2         13        200      25  10          1  10                 25  SSIII
-## 131  L01   L   1  A2          6        200      25  10          1  10                 25 Custom
+## 131  L01   L   1  A2         51        200      25  10          1  10                 25 Custom
 ## 151  L02   L   2  A2         43        200      25  10          1  10                 25 Custom
 ## 611  L03   L   3  A2         89        200      25  10          1  10                 25 Custom
 ## 591  L04   L   4  A2         81        200      25  10          1  10                 25  SSIII
@@ -3258,17 +3259,17 @@ plate7c %>% as.data.frame
 ## 421  N01   N   1  A2         16        200      25  10          1  10                 25  SSIII
 ## 331  N02   N   2  A2         19        200      25  10          1  10                 25  SSIII
 ## 381  N03   N   3  A2         36        200      25  10          1  10                 25  SSIII
-## 110  N04   N   4  A2         82        200      25  10          1  10                 25 Custom
-## 181  N05   N   5  A2         23        200      25  10          1  10                 25 Custom
+## 110  N04   N   4  A2         83        200      25  10          1  10                 25 Custom
+## 181  N05   N   5  A2         22        200      25  10          1  10                 25 Custom
 ## 410  N06   N   6  A2         78        200      25  10          1  10                 25 Custom
 ## 171  N07   N   7  A2         44        200      25  10          1  10                 25 Custom
 ## 311  N08   N   8  A2         40        200      25  10          1  10                 25  SSIII
 ## 601  P01   P   1  A2         59        200      25  10          1  10                 25  SSIII
-## 391  P02   P   2  A2         20        200      25  10          1  10                 25  SSIII
+## 391  P02   P   2  A2         87        200      25  10          1  10                 25  SSIII
 ## 571  P03   P   3  A2         67        200      25  10          1  10                 25  SSIII
 ## 641  P04   P   4  A2         88        200      25  10          1  10                 25  SSIII
 ## 301  P05   P   5  A2         49        200      25  10          1  10                 25  SSIII
-## 81   P06   P   6  A2         47        200      25  10          1  10                 25 Custom
+## 81   P06   P   6  A2         46        200      25  10          1  10                 25 Custom
 ## 521  P07   P   7  A2         38        200      25  10          1  10                 25  SSIII
 ## 461  P08   P   8  A2         35        200      25  10          1  10                 25  SSIII
 ## 172  A09   A   9  B1         35        200      25  10          1  10                 25 Custom
@@ -3278,20 +3279,20 @@ plate7c %>% as.data.frame
 ## 502  A13   A  13  B1         74        200      25  10          1  10                 25  SSIII
 ## 322  A14   A  14  B1         43        200      25  10          1  10                 25  SSIII
 ## 552  A15   A  15  B1         80        200      25  10          1  10                 25  SSIII
-## 472  A16   A  16  B1         47        200      25  10          1  10                 25  SSIII
+## 472  A16   A  16  B1         46        200      25  10          1  10                 25  SSIII
 ## 582  C09   C   9  B1         31        200      25  10          1  10                 25  SSIII
 ## 622  C10   C  10  B1         88        200      25  10          1  10                 25 Custom
 ## 412  C11   C  11  B1         18        200      25  10          1  10                 25  SSIII
 ## 272  C12   C  12  B1         13        200      25  10          1  10                 25  SSIII
-## 572  C13   C  13  B1          6        200      25  10          1  10                 25  SSIII
+## 572  C13   C  13  B1         51        200      25  10          1  10                 25  SSIII
 ## 72   C14   C  14  B1          7        200      25  10          1  10                 25 Custom
 ## 562  C15   C  15  B1         32        200      25  10          1  10                 25  SSIII
 ## 462  C16   C  16  B1          2        200      25  10          1  10                 25  SSIII
 ## 362  E09   E   9  B1          5        200      25  10          1  10                 25  SSIII
-## 312  E10   E  10  B1         46        200      25  10          1  10                 25 Custom
+## 312  E10   E  10  B1         47        200      25  10          1  10                 25 Custom
 ## 542  E11   E  11  B1         76        200      25  10          1  10                 25  SSIII
 ## 513  E12   E  12  B1          9        200      25  10          1  10                 25 Custom
-## 532  E13   E  13  B1         83        200      25  10          1  10                 25  SSIII
+## 532  E13   E  13  B1         82        200      25  10          1  10                 25  SSIII
 ## 132  E14   E  14  B1         42        200      25  10          1  10                 25 Custom
 ## 152  E15   E  15  B1          1        200      25  10          1  10                 25 Custom
 ## 212  E16   E  16  B1         49        200      25  10          1  10                 25 Custom
@@ -3302,14 +3303,14 @@ plate7c %>% as.data.frame
 ## 382  G13   G  13  B1         90        200      25  10          1  10                 25  SSIII
 ## 313  G14   G  14  B1         40        200      25  10          1  10                 25  SSIII
 ## 302  G15   G  15  B1         16        200      25  10          1  10                 25  SSIII
-## 92   G16   G  16  B1         22        200      25  10          1  10                 25 Custom
-## 592  I09   I   9  B1         20        200      25  10          1  10                 25  SSIII
+## 92   G16   G  16  B1         23        200      25  10          1  10                 25 Custom
+## 592  I09   I   9  B1         87        200      25  10          1  10                 25  SSIII
 ## 282  I10   I  10  B1         28        200      25  10          1  10                 25  SSIII
 ## 372  I11   I  11  B1         92        200      25  10          1  10                 25  SSIII
 ## 112  I12   I  12  B1         37        200      25  10          1  10                 25 Custom
 ## 342  I13   I  13  B1         65        200      25  10          1  10                 25  SSIII
-## 492  I14   I  14  B1         23        200      25  10          1  10                 25  SSIII
-## 413  I15   I  15  B1         11        200      25  10          1  10                 25 Custom
+## 492  I14   I  14  B1         22        200      25  10          1  10                 25  SSIII
+## 413  I15   I  15  B1         72        200      25  10          1  10                 25 Custom
 ## 252  I16   I  16  B1         61        200      25  10          1  10                 25  SSIII
 ## 162  K09   K   9  B1         36        200      25  10          1  10                 25 Custom
 ## 522  K10   K  10  B1         77        200      25  10          1  10                 25  SSIII
@@ -3318,7 +3319,7 @@ plate7c %>% as.data.frame
 ## 632  K13   K  13  B1         68        200      25  10          1  10                 25  SSIII
 ## 232  K14   K  14  B1         33        200      25  10          1  10                 25 Custom
 ## 292  K15   K  15  B1         73        200      25  10          1  10                 25  SSIII
-## 332  K16   K  16  B1         82        200      25  10          1  10                 25  SSIII
+## 332  K16   K  16  B1         83        200      25  10          1  10                 25  SSIII
 ## 66   M09   M   9  B1         70        200      25  10          1  10                 25 Custom
 ## 222  M10   M  10  B1         59        200      25  10          1  10                 25 Custom
 ## 422  M11   M  11  B1         41        200      25  10          1  10                 25  SSIII
@@ -3329,22 +3330,22 @@ plate7c %>% as.data.frame
 ## 392  M16   M  16  B1         14        200      25  10          1  10                 25  SSIII
 ## 102  O09   O   9  B1         79        200      25  10          1  10                 25 Custom
 ## 482  O10   O  10  B1          8        200      25  10          1  10                 25  SSIII
-## 192  O11   O  11  B1         26        200      25  10          1  10                 25 Custom
+## 192  O11   O  11  B1         39        200      25  10          1  10                 25 Custom
 ## 113  O12   O  12  B1         25        200      25  10          1  10                 25 Custom
 ## 202  O13   O  13  B1         64        200      25  10          1  10                 25 Custom
 ## 602  O14   O  14  B1         89        200      25  10          1  10                 25  SSIII
-## 442  O15   O  15  B1         34        200      25  10          1  10                 25  SSIII
+## 442  O15   O  15  B1         60        200      25  10          1  10                 25  SSIII
 ## 402  O16   O  16  B1         21        200      25  10          1  10                 25  SSIII
 ## 193  B09   B   9  B2         42        200      25  10          1  10                 25 Custom
 ## 143  B10   B  10  B2         48        200      25  10          1  10                 25 Custom
-## 623  B11   B  11  B2         10        200      25  10          1  10                 25 Custom
+## 623  B11   B  11  B2         71        200      25  10          1  10                 25 Custom
 ## 314  B12   B  12  B2         31        200      25  10          1  10                 25  SSIII
 ## 233  B13   B  13  B2         25        200      25  10          1  10                 25 Custom
 ## 273  B14   B  14  B2         79        200      25  10          1  10                 25  SSIII
 ## 593  B15   B  15  B2         90        200      25  10          1  10                 25  SSIII
 ## 493  B16   B  16  B2         18        200      25  10          1  10                 25  SSIII
-## 473  D09   D   9  B2         22        200      25  10          1  10                 25  SSIII
-## 183  D10   D  10  B2         20        200      25  10          1  10                 25 Custom
+## 473  D09   D   9  B2         23        200      25  10          1  10                 25  SSIII
+## 183  D10   D  10  B2         87        200      25  10          1  10                 25 Custom
 ## 403  D11   D  11  B2         32        200      25  10          1  10                 25  SSIII
 ## 483  D12   D  12  B2         91        200      25  10          1  10                 25  SSIII
 ## 67   D13   D  13  B2          5        200      25  10          1  10                 25 Custom
@@ -3354,16 +3355,16 @@ plate7c %>% as.data.frame
 ## 323  F09   F   9  B2         41        200      25  10          1  10                 25  SSIII
 ## 583  F10   F  10  B2         29        200      25  10          1  10                 25  SSIII
 ## 315  F11   F  11  B2         69        200      25  10          1  10                 25 Custom
-## 643  F12   F  12  B2          6        200      25  10          1  10                 25  SSIII
+## 643  F12   F  12  B2         51        200      25  10          1  10                 25  SSIII
 ## 114  F13   F  13  B2         65        200      25  10          1  10                 25 Custom
 ## 373  F14   F  14  B2         68        200      25  10          1  10                 25  SSIII
 ## 573  F15   F  15  B2         21        200      25  10          1  10                 25  SSIII
 ## 83   F16   F  16  B2         59        200      25  10          1  10                 25 Custom
 ## 73   H09   H   9  B2         61        200      25  10          1  10                 25 Custom
-## 463  H10   H  10  B2         34        200      25  10          1  10                 25  SSIII
+## 463  H10   H  10  B2         60        200      25  10          1  10                 25  SSIII
 ## 543  H11   H  11  B2          8        200      25  10          1  10                 25  SSIII
 ## 603  H12   H  12  B2         64        200      25  10          1  10                 25  SSIII
-## 253  H13   H  13  B2         83        200      25  10          1  10                 25  SSIII
+## 253  H13   H  13  B2         82        200      25  10          1  10                 25  SSIII
 ## 433  H14   H  14  B2         14        200      25  10          1  10                 25  SSIII
 ## 133  H15   H  15  B2         73        200      25  10          1  10                 25 Custom
 ## 214  H16   H  16  B2         45        200      25  10          1  10                 25 Custom
@@ -3371,7 +3372,7 @@ plate7c %>% as.data.frame
 ## 363  J10   J  10  B2         88        200      25  10          1  10                 25  SSIII
 ## 283  J11   J  11  B2         78        200      25  10          1  10                 25  SSIII
 ## 293  J12   J  12  B2         13        200      25  10          1  10                 25  SSIII
-## 553  J13   J  13  B2         82        200      25  10          1  10                 25  SSIII
+## 553  J13   J  13  B2         83        200      25  10          1  10                 25  SSIII
 ## 215  J14   J  14  B2         92        200      25  10          1  10                 25 Custom
 ## 243  J15   J  15  B2         62        200      25  10          1  10                 25 Custom
 ## 93   J16   J  16  B2         66        200      25  10          1  10                 25 Custom
@@ -3380,15 +3381,15 @@ plate7c %>% as.data.frame
 ## 423  L11   L  11  B2         16        200      25  10          1  10                 25  SSIII
 ## 514  L12   L  12  B2         30        200      25  10          1  10                 25  SSIII
 ## 414  L13   L  13  B2          9        200      25  10          1  10                 25  SSIII
-## 263  L14   L  14  B2         46        200      25  10          1  10                 25  SSIII
+## 263  L14   L  14  B2         47        200      25  10          1  10                 25  SSIII
 ## 533  L15   L  15  B2         28        200      25  10          1  10                 25  SSIII
 ## 153  L16   L  16  B2          4        200      25  10          1  10                 25 Custom
 ## 443  N09   N   9  B2          7        200      25  10          1  10                 25  SSIII
 ## 303  N10   N  10  B2         43        200      25  10          1  10                 25  SSIII
-## 633  N11   N  11  B2         23        200      25  10          1  10                 25  SSIII
+## 633  N11   N  11  B2         22        200      25  10          1  10                 25  SSIII
 ## 103  N12   N  12  B2         70        200      25  10          1  10                 25 Custom
 ## 415  N13   N  13  B2         77        200      25  10          1  10                 25 Custom
-## 393  N14   N  14  B2         11        200      25  10          1  10                 25  SSIII
+## 393  N14   N  14  B2         72        200      25  10          1  10                 25  SSIII
 ## 223  N15   N  15  B2         24        200      25  10          1  10                 25 Custom
 ## 163  N16   N  16  B2         17        200      25  10          1  10                 25 Custom
 ## 515  P09   P   9  B2         35        200      25  10          1  10                 25 Custom
@@ -3400,7 +3401,7 @@ plate7c %>% as.data.frame
 ## 383  P15   P  15  B2         38        200      25  10          1  10                 25  SSIII
 ## 115  P16   P  16  B2         33        200      25  10          1  10                 25 Custom
 ## 594  A17   A  17  C1         13        200      25  10          1  10                 25  SSIII
-## 494  A18   A  18  C1         47        200      25  10          1  10                 25  SSIII
+## 494  A18   A  18  C1         46        200      25  10          1  10                 25  SSIII
 ## 134  A19   A  19  C1         64        200      25  10          1  10                 25 Custom
 ## 584  A20   A  20  C1         61        200      25  10          1  10                 25  SSIII
 ## 464  A21   A  21  C1         31        200      25  10          1  10                 25  SSIII
@@ -3413,19 +3414,19 @@ plate7c %>% as.data.frame
 ## 424  C20   C  20  C1         92        200      25  10          1  10                 25  SSIII
 ## 484  C21   C  21  C1         70        200      25  10          1  10                 25  SSIII
 ## 74   C22   C  22  C1          1        200      25  10          1  10                 25 Custom
-## 324  C23   C  23  C1         34        200      25  10          1  10                 25  SSIII
+## 324  C23   C  23  C1         60        200      25  10          1  10                 25  SSIII
 ## 634  C24   C  24  C1         69        200      25  10          1  10                 25  SSIII
 ## 154  E17   E  17  C1         40        200      25  10          1  10                 25 Custom
 ## 116  E18   E  18  C1         25        200      25  10          1  10                 25 Custom
-## 534  E19   E  19  C1         20        200      25  10          1  10                 25  SSIII
-## 416  E20   E  20  C1         22        200      25  10          1  10                 25  SSIII
-## 614  E21   E  21  C1          6        200      25  10          1  10                 25 Custom
+## 534  E19   E  19  C1         87        200      25  10          1  10                 25  SSIII
+## 416  E20   E  20  C1         23        200      25  10          1  10                 25  SSIII
+## 614  E21   E  21  C1         51        200      25  10          1  10                 25 Custom
 ## 364  E22   E  22  C1         77        200      25  10          1  10                 25  SSIII
-## 344  E23   E  23  C1         11        200      25  10          1  10                 25  SSIII
+## 344  E23   E  23  C1         72        200      25  10          1  10                 25  SSIII
 ## 374  E24   E  24  C1         32        200      25  10          1  10                 25  SSIII
 ## 516  G17   G  17  C1         66        200      25  10          1  10                 25 Custom
 ## 264  G18   G  18  C1         33        200      25  10          1  10                 25  SSIII
-## 304  G19   G  19  C1         26        200      25  10          1  10                 25  SSIII
+## 304  G19   G  19  C1         39        200      25  10          1  10                 25  SSIII
 ## 316  G20   G  20  C1         24        200      25  10          1  10                 25  SSIII
 ## 84   G21   G  21  C1         78        200      25  10          1  10                 25 Custom
 ## 517  G22   G  22  C1         88        200      25  10          1  10                 25  SSIII
@@ -3435,10 +3436,10 @@ plate7c %>% as.data.frame
 ## 194  I18   I  18  C1         14        200      25  10          1  10                 25 Custom
 ## 384  I19   I  19  C1         37        200      25  10          1  10                 25  SSIII
 ## 224  I20   I  20  C1         79        200      25  10          1  10                 25 Custom
-## 417  I21   I  21  C1         10        200      25  10          1  10                 25 Custom
+## 417  I21   I  21  C1         71        200      25  10          1  10                 25 Custom
 ## 216  I22   I  22  C1          4        200      25  10          1  10                 25 Custom
 ## 164  I23   I  23  C1         29        200      25  10          1  10                 25 Custom
-## 574  I24   I  24  C1         82        200      25  10          1  10                 25  SSIII
+## 574  I24   I  24  C1         83        200      25  10          1  10                 25  SSIII
 ## 624  K17   K  17  C1         16        200      25  10          1  10                 25 Custom
 ## 204  K18   K  18  C1         28        200      25  10          1  10                 25 Custom
 ## 404  K19   K  19  C1         18        200      25  10          1  10                 25  SSIII
@@ -3455,12 +3456,12 @@ plate7c %>% as.data.frame
 ## 217  M22   M  22  C1         67        200      25  10          1  10                 25 Custom
 ## 294  M23   M  23  C1         89        200      25  10          1  10                 25  SSIII
 ## 184  M24   M  24  C1          2        200      25  10          1  10                 25 Custom
-## 284  O17   O  17  C1         23        200      25  10          1  10                 25  SSIII
+## 284  O17   O  17  C1         22        200      25  10          1  10                 25  SSIII
 ## 274  O18   O  18  C1         43        200      25  10          1  10                 25  SSIII
 ## 444  O19   O  19  C1         81        200      25  10          1  10                 25  SSIII
 ## 454  O20   O  20  C1          5        200      25  10          1  10                 25  SSIII
 ## 604  O21   O  21  C1         59        200      25  10          1  10                 25  SSIII
-## 94   O22   O  22  C1         46        200      25  10          1  10                 25 Custom
+## 94   O22   O  22  C1         47        200      25  10          1  10                 25 Custom
 ## 104  O23   O  23  C1         44        200      25  10          1  10                 25 Custom
 ## 544  O24   O  24  C1         80        200      25  10          1  10                 25  SSIII
 ## 418  B17   B  17  C2         74        200      25  10          1  10                 25  SSIII
@@ -3476,21 +3477,21 @@ plate7c %>% as.data.frame
 ## 518  D19   D  19  C2         38        200      25  10          1  10                 25  SSIII
 ## 275  D20   D  20  C2          2        200      25  10          1  10                 25  SSIII
 ## 345  D21   D  21  C2         32        200      25  10          1  10                 25  SSIII
-## 565  D22   D  22  C2         83        200      25  10          1  10                 25  SSIII
+## 565  D22   D  22  C2         82        200      25  10          1  10                 25  SSIII
 ## 525  D23   D  23  C2         14        200      25  10          1  10                 25  SSIII
-## 419  D24   D  24  C2         22        200      25  10          1  10                 25 Custom
-## 385  F17   F  17  C2         10        200      25  10          1  10                 25  SSIII
+## 419  D24   D  24  C2         23        200      25  10          1  10                 25 Custom
+## 385  F17   F  17  C2         71        200      25  10          1  10                 25  SSIII
 ## 265  F18   F  18  C2         21        200      25  10          1  10                 25  SSIII
 ## 318  F19   F  19  C2         68        200      25  10          1  10                 25  SSIII
-## 119  F20   F  20  C2         11        200      25  10          1  10                 25 Custom
+## 119  F20   F  20  C2         72        200      25  10          1  10                 25 Custom
 ## 545  F21   F  21  C2         91        200      25  10          1  10                 25  SSIII
 ## 625  F22   F  22  C2         43        200      25  10          1  10                 25 Custom
 ## 69   F23   F  23  C2         25        200      25  10          1  10                 25 Custom
 ## 495  F24   F  24  C2         35        200      25  10          1  10                 25  SSIII
-## 355  H17   H  17  C2         46        200      25  10          1  10                 25  SSIII
+## 355  H17   H  17  C2         47        200      25  10          1  10                 25  SSIII
 ## 575  H18   H  18  C2         76        200      25  10          1  10                 25  SSIII
 ## 485  H19   H  19  C2         33        200      25  10          1  10                 25  SSIII
-## 395  H20   H  20  C2         47        200      25  10          1  10                 25  SSIII
+## 395  H20   H  20  C2         46        200      25  10          1  10                 25  SSIII
 ## 125  H21   H  21  C2         37        200      25  10          1  10                 25 Custom
 ## 305  H22   H  22  C2         17        200      25  10          1  10                 25  SSIII
 ## 235  H23   H  23  C2         16        200      25  10          1  10                 25 Custom
@@ -3501,7 +3502,7 @@ plate7c %>% as.data.frame
 ## 335  J20   J  20  C2         59        200      25  10          1  10                 25  SSIII
 ## 635  J21   J  21  C2         49        200      25  10          1  10                 25  SSIII
 ## 165  J22   J  22  C2         88        200      25  10          1  10                 25 Custom
-## 85   J23   J  23  C2         26        200      25  10          1  10                 25 Custom
+## 85   J23   J  23  C2         39        200      25  10          1  10                 25 Custom
 ## 219  J24   J  24  C2         13        200      25  10          1  10                 25 Custom
 ## 295  L17   L  17  C2         42        200      25  10          1  10                 25  SSIII
 ## 319  L18   L  18  C2         24        200      25  10          1  10                 25 Custom
@@ -3511,20 +3512,20 @@ plate7c %>% as.data.frame
 ## 225  L22   L  22  C2         79        200      25  10          1  10                 25 Custom
 ## 155  L23   L  23  C2          5        200      25  10          1  10                 25 Custom
 ## 595  L24   L  24  C2         69        200      25  10          1  10                 25  SSIII
-## 645  N17   N  17  C2         82        200      25  10          1  10                 25  SSIII
+## 645  N17   N  17  C2         83        200      25  10          1  10                 25  SSIII
 ## 505  N18   N  18  C2         18        200      25  10          1  10                 25  SSIII
-## 185  N19   N  19  C2         34        200      25  10          1  10                 25 Custom
+## 185  N19   N  19  C2         60        200      25  10          1  10                 25 Custom
 ## 555  N20   N  20  C2          8        200      25  10          1  10                 25  SSIII
 ## 285  N21   N  21  C2         44        200      25  10          1  10                 25  SSIII
 ## 519  N22   N  22  C2         41        200      25  10          1  10                 25 Custom
 ## 195  N23   N  23  C2         73        200      25  10          1  10                 25 Custom
-## 455  N24   N  24  C2          6        200      25  10          1  10                 25  SSIII
+## 455  N24   N  24  C2         51        200      25  10          1  10                 25  SSIII
 ## 145  P17   P  17  C2          4        200      25  10          1  10                 25 Custom
 ## 535  P18   P  18  C2         50        200      25  10          1  10                 25  SSIII
 ## 375  P19   P  19  C2          7        200      25  10          1  10                 25  SSIII
 ## 465  P20   P  20  C2         48        200      25  10          1  10                 25  SSIII
 ## 175  P21   P  21  C2         30        200      25  10          1  10                 25 Custom
-## 205  P22   P  22  C2         20        200      25  10          1  10                 25 Custom
+## 205  P22   P  22  C2         87        200      25  10          1  10                 25 Custom
 ## 95   P23   P  23  C2         70        200      25  10          1  10                 25 Custom
 ## 605  P24   P  24  C2         40        200      25  10          1  10                 25  SSIII
 ##     MASTER_MIX_vol    INDEX Mn Mn_vol Mg Mg_vol dNTP dNTP_vol H2O_vol BARCODE_SEQ Mg_level Mn_level
@@ -3538,8 +3539,8 @@ plate7c %>% as.data.frame
 ## 44             300 ACTCGCTA  0      0  9     25  1.0      100      25      ACATCT     Mg_G     Mn_A
 ## 51             300 ACTCGCTA  0      0 12     25  2.0      100      25      TATGCA     Mg_H     Mn_A
 ## 54             300 ACTCGCTA  0      0 12     25  5.0      100      25      TATGAT     Mg_H     Mn_A
-## 28             300 ACTCGCTA  0      0  3     25  3.0      100      25      ATCGCA     Mg_D     Mn_A
-## 30             300 ACTCGCTA  0      0  3     25  5.0      100      25      ATCGAT     Mg_D     Mn_A
+## 28             300 ACTCGCTA  0      0  3     25  3.0      100      25      ATCGAT     Mg_D     Mn_A
+## 30             300 ACTCGCTA  0      0  3     25  5.0      100      25      ATCGCA     Mg_D     Mn_A
 ## 9              300 ACTCGCTA  0      0  1     25  2.0      100      25      ACATAC     Mg_B     Mn_A
 ## 52             300 ACTCGCTA  0      0 12     25  3.0      100      25      GTAGAT     Mg_H     Mn_A
 ## 40             300 ACTCGCTA  0      0  6     25  3.0      100      25      GCTATA     Mg_F     Mn_A
@@ -3552,16 +3553,16 @@ plate7c %>% as.data.frame
 ## 49             300 ACTCGCTA  0      0 12     25  0.5      100      25      CGAGCA     Mg_H     Mn_A
 ## 56             300 ACTCGCTA  0      0 15     25  1.0      100      25      CGAGAT     Mg_I     Mn_A
 ## 21             300 ACTCGCTA  0      0  3     25  2.0      100      25      CTGATA     Mg_D     Mn_A
-## 26             300 ACTCGCTA  0      0  3     25  1.0      100      25      TATACG     Mg_D     Mn_A
+## 26             300 ACTCGCTA  0      0  3     25  1.0      100      25      TATAGC     Mg_D     Mn_A
 ## 36             300 ACTCGCTA  0      0  4     25  5.0      100      25      ACATGA     Mg_E     Mn_A
-## 58             300 ACTCGCTA  0      0 15     25  3.0      100      25      ACAGTG     Mg_I     Mn_A
+## 58             300 ACTCGCTA  0      0 15     25  3.0      100      25      CTGCTC     Mg_I     Mn_A
 ## 10             300 ACTCGCTA  0      0  1     25  3.0      100      25      CGATAC     Mg_B     Mn_A
 ## 16             300 ACTCGCTA  0      0  2     25  3.0      100      25      CGATCT     Mg_C     Mn_A
-## 53             300 ACTCGCTA  0      0 12     25  4.0      100      25      ATCAGC     Mg_H     Mn_A
-## 35             300 ACTCGCTA  0      0  4     25  4.0      100      25      ATCTCT     Mg_E     Mn_A
+## 53             300 ACTCGCTA  0      0 12     25  4.0      100      25      TATCTC     Mg_H     Mn_A
+## 35             300 ACTCGCTA  0      0  4     25  4.0      100      25      CGACTC     Mg_E     Mn_A
 ## 42             300 ACTCGCTA  0      0  6     25  5.0      100      25      AGTGCA     Mg_F     Mn_A
 ## 11             300 ACTCGCTA  0      0  1     25  4.0      100      25      CACATA     Mg_B     Mn_A
-## 57             300 ACTCGCTA  0      0 15     25  2.0      100      25      CTGAGC     Mg_I     Mn_A
+## 57             300 ACTCGCTA  0      0 15     25  2.0      100      25      CTGACG     Mg_I     Mn_A
 ## 59             300 ACTCGCTA  0      0 15     25  4.0      100      25      TCGACG     Mg_I     Mn_A
 ## 63             300 ACTCGCTA  0      0  0      0  0.0        0     150      GCTGAT     Mg_A     Mn_A
 ## 60             300 ACTCGCTA  0      0 15     25  5.0      100      25      CGACAG     Mg_I     Mn_A
@@ -3570,15 +3571,15 @@ plate7c %>% as.data.frame
 ## 46             300 ACTCGCTA  0      0  9     25  3.0      100      25      GTAGTG     Mg_G     Mn_A
 ## 15             300 ACTCGCTA  0      0  2     25  2.0      100      25      TCGAGC     Mg_C     Mn_A
 ## 8              300 ACTCGCTA  0      0  1     25  1.0      100      25      GCTACG     Mg_B     Mn_A
-## 62             300 ACTCGCTA  0      0  3     25  0.0        0     125      TATAGC     Mg_D     Mn_A
-## 61             300 ACTCGCTA  0      0  3     25  0.0        0     125      CACTAC     Mg_D     Mn_A
+## 62             300 ACTCGCTA  0      0  3     25  0.0        0     125      TATACG     Mg_D     Mn_A
+## 61             300 ACTCGCTA  0      0  3     25  0.0        0     125      GAGCTC     Mg_D     Mn_A
 ## 2              300 ACTCGCTA  0      0  0      0  1.0      100      50      ATCGTG     Mg_A     Mn_A
 ## 64             300 ACTCGCTA  0      0  0      0  0.0        0     150      CACGCA     Mg_A     Mn_A
 ## 27             300 ACTCGCTA  0      0  3     25  2.0      100      25      GAGCGT     Mg_D     Mn_A
 ## 29             300 ACTCGCTA  0      0  3     25  4.0      100      25      CACAGC     Mg_D     Mn_A
 ## 3              300 ACTCGCTA  0      0  0      0  2.0      100      50      GTAGCA     Mg_A     Mn_A
 ## 39             300 ACTCGCTA  0      0  6     25  2.0      100      25      CACTGA     Mg_F     Mn_A
-## 13             300 ACTCGCTA  0      0  2     25  0.5      100      25      CTGACG     Mg_C     Mn_A
+## 13             300 ACTCGCTA  0      0  2     25  0.5      100      25      CTGAGC     Mg_C     Mn_A
 ## 47             300 ACTCGCTA  0      0  9     25  4.0      100      25      AGTCAG     Mg_G     Mn_A
 ## 14             300 ACTCGCTA  0      0  2     25  1.0      100      25      CGAGTG     Mg_C     Mn_A
 ## 23             300 ACTCGCTA  0      0  3     25  4.0      100      25      GCTCTC     Mg_D     Mn_A
@@ -3597,27 +3598,27 @@ plate7c %>% as.data.frame
 ## 441            300 GGAGCTAC  1     25  9     25  1.0      100       0      ATCTAC     Mg_G     Mn_B
 ## 241            300 GGAGCTAC  1     25  3     25  5.0      100       0      GAGTAC     Mg_D     Mn_B
 ## 501            300 GGAGCTAC  1     25 12     25  1.0      100       0      CACACG     Mg_H     Mn_B
-## 541            300 GGAGCTAC  1     25 12     25  5.0      100       0      CTGACG     Mg_H     Mn_B
+## 541            300 GGAGCTAC  1     25 12     25  5.0      100       0      CTGAGC     Mg_H     Mn_B
 ## 251            300 GGAGCTAC  1     25  3     25  0.5      100       0      GTATAC     Mg_D     Mn_B
 ## 161            300 GGAGCTAC  1     25  2     25  3.0      100       0      GTATCT     Mg_C     Mn_B
 ## 411            300 GGAGCTAC  1     25  6     25  4.0      100       0      CACAGC     Mg_F     Mn_B
 ## 481            300 GGAGCTAC  1     25  9     25  5.0      100       0      GAGTCT     Mg_G     Mn_B
-## 191            300 GGAGCTAC  1     25  3     25  0.5      100       0      CACTAC     Mg_D     Mn_B
-## 271            300 GGAGCTAC  1     25  3     25  2.0      100       0      ATCGAT     Mg_D     Mn_B
+## 191            300 GGAGCTAC  1     25  3     25  0.5      100       0      GAGCTC     Mg_D     Mn_B
+## 271            300 GGAGCTAC  1     25  3     25  2.0      100       0      ATCGCA     Mg_D     Mn_B
 ## 451            300 GGAGCTAC  1     25  9     25  2.0      100       0      CACGTG     Mg_G     Mn_B
 ## 201            300 GGAGCTAC  1     25  3     25  1.0      100       0      ACATCT     Mg_D     Mn_B
 ## 371            300 GGAGCTAC  1     25  6     25  0.5      100       0      GCTAGC     Mg_F     Mn_B
-## 341            300 GGAGCTAC  1     25  4     25  3.0      100       0      AGTACG     Mg_E     Mn_B
+## 341            300 GGAGCTAC  1     25  4     25  3.0      100       0      GCTGCA     Mg_E     Mn_B
 ## 561            300 GGAGCTAC  1     25 15     25  1.0      100       0      ATCGTG     Mg_I     Mn_B
 ## 210            300 GGAGCTAC  1     25  0      0  1.0      100      25      AGTGCA     Mg_A     Mn_B
 ## 491            300 GGAGCTAC  1     25 12     25  0.5      100       0      CGATGA     Mg_H     Mn_B
-## 221            300 GGAGCTAC  1     25  3     25  3.0      100       0      ATCTCT     Mg_D     Mn_B
+## 221            300 GGAGCTAC  1     25  3     25  3.0      100       0      CGACTC     Mg_D     Mn_B
 ## 261            300 GGAGCTAC  1     25  3     25  1.0      100       0      GTACGT     Mg_D     Mn_B
 ## 91             300 GGAGCTAC  1     25  1     25  2.0      100       0      GTACAG     Mg_B     Mn_B
-## 471            300 GGAGCTAC  1     25  9     25  4.0      100       0      AGTAGC     Mg_G     Mn_B
+## 471            300 GGAGCTAC  1     25  9     25  4.0      100       0      GCTGTG     Mg_G     Mn_B
 ## 401            300 GGAGCTAC  1     25  6     25  3.0      100       0      GCTCGT     Mg_F     Mn_B
 ## 101            300 GGAGCTAC  1     25  1     25  3.0      100       0      CTGATA     Mg_B     Mn_B
-## 510            300 GGAGCTAC  1     25  0      0  4.0      100      25      TATAGC     Mg_A     Mn_B
+## 510            300 GGAGCTAC  1     25  0      0  4.0      100      25      TATACG     Mg_A     Mn_B
 ## 531            300 GGAGCTAC  1     25 12     25  4.0      100       0      GTAGAT     Mg_H     Mn_B
 ## 281            300 GGAGCTAC  1     25  3     25  3.0      100       0      CTGCGT     Mg_D     Mn_B
 ## 121            300 GGAGCTAC  1     25  1     25  5.0      100       0      CGAGTG     Mg_B     Mn_B
@@ -3632,7 +3633,7 @@ plate7c %>% as.data.frame
 ## 551            300 GGAGCTAC  1     25 15     25  0.5      100       0      GTAGCA     Mg_I     Mn_B
 ## 431            300 GGAGCTAC  1     25  9     25  0.5      100       0      ACATAC     Mg_G     Mn_B
 ## 321            300 GGAGCTAC  1     25  4     25  1.0      100       0      AGTCAG     Mg_E     Mn_B
-## 131            300 GGAGCTAC  1     25  2     25  0.5      100       0      ACAGTG     Mg_C     Mn_B
+## 131            300 GGAGCTAC  1     25  2     25  0.5      100       0      CTGCTC     Mg_C     Mn_B
 ## 151            300 GGAGCTAC  1     25  2     25  2.0      100       0      CGATAC     Mg_C     Mn_B
 ## 611            300 GGAGCTAC  1     25  3     25  0.0        0     100      TATGCA     Mg_D     Mn_B
 ## 591            300 GGAGCTAC  1     25 15     25  4.0      100       0      GTATGA     Mg_I     Mn_B
@@ -3643,17 +3644,17 @@ plate7c %>% as.data.frame
 ## 421            300 GGAGCTAC  1     25  6     25  5.0      100       0      AGTGAT     Mg_F     Mn_B
 ## 331            300 GGAGCTAC  1     25  4     25  2.0      100       0      ATCACG     Mg_E     Mn_B
 ## 381            300 GGAGCTAC  1     25  6     25  1.0      100       0      CACTGA     Mg_F     Mn_B
-## 110            300 GGAGCTAC  1     25  0      0  0.5      100      25      TATACG     Mg_A     Mn_B
-## 181            300 GGAGCTAC  1     25  2     25  5.0      100       0      ATCGCA     Mg_C     Mn_B
+## 110            300 GGAGCTAC  1     25  0      0  0.5      100      25      TATAGC     Mg_A     Mn_B
+## 181            300 GGAGCTAC  1     25  2     25  5.0      100       0      ATCGAT     Mg_C     Mn_B
 ## 410            300 GGAGCTAC  1     25  0      0  3.0      100      25      GTAGTG     Mg_A     Mn_B
 ## 171            300 GGAGCTAC  1     25  2     25  4.0      100       0      CGATCT     Mg_C     Mn_B
 ## 311            300 GGAGCTAC  1     25  4     25  0.5      100       0      CGAGAT     Mg_E     Mn_B
 ## 601            300 GGAGCTAC  1     25 15     25  5.0      100       0      GAGCGT     Mg_I     Mn_B
-## 391            300 GGAGCTAC  1     25  6     25  2.0      100       0      ATCAGC     Mg_F     Mn_B
+## 391            300 GGAGCTAC  1     25  6     25  2.0      100       0      TATCTC     Mg_F     Mn_B
 ## 571            300 GGAGCTAC  1     25 15     25  2.0      100       0      GCTCAG     Mg_I     Mn_B
 ## 641            300 GGAGCTAC  1     25  0      0  0.0        0     125      TATGAT     Mg_A     Mn_B
 ## 301            300 GGAGCTAC  1     25  3     25  5.0      100       0      CTGCAG     Mg_D     Mn_B
-## 81             300 GGAGCTAC  1     25  1     25  1.0      100       0      CTGAGC     Mg_B     Mn_B
+## 81             300 GGAGCTAC  1     25  1     25  1.0      100       0      CTGACG     Mg_B     Mn_B
 ## 521            300 GGAGCTAC  1     25 12     25  3.0      100       0      CGACGT     Mg_H     Mn_B
 ## 461            300 GGAGCTAC  1     25  9     25  3.0      100       0      CACTCT     Mg_G     Mn_B
 ## 172            300 GCGTAGTA  2     25  2     25  4.0      100       0      CACTCT     Mg_C     Mn_C
@@ -3663,20 +3664,20 @@ plate7c %>% as.data.frame
 ## 502            300 GCGTAGTA  2     25 12     25  1.0      100       0      GTACGT     Mg_H     Mn_C
 ## 322            300 GCGTAGTA  2     25  4     25  1.0      100       0      CGATAC     Mg_E     Mn_C
 ## 552            300 GCGTAGTA  2     25 15     25  0.5      100       0      GTATCT     Mg_I     Mn_C
-## 472            300 GCGTAGTA  2     25  9     25  4.0      100       0      CTGAGC     Mg_G     Mn_C
+## 472            300 GCGTAGTA  2     25  9     25  4.0      100       0      CTGACG     Mg_G     Mn_C
 ## 582            300 GCGTAGTA  2     25 15     25  3.0      100       0      CACGAT     Mg_I     Mn_C
 ## 622            300 GCGTAGTA  2     25  3     25  0.0        0     100      TATGAT     Mg_D     Mn_C
 ## 412            300 GCGTAGTA  2     25  6     25  4.0      100       0      AGTGTG     Mg_F     Mn_C
 ## 272            300 GCGTAGTA  2     25  3     25  2.0      100       0      AGTCAG     Mg_D     Mn_C
-## 572            300 GCGTAGTA  2     25 15     25  2.0      100       0      ACAGTG     Mg_I     Mn_C
+## 572            300 GCGTAGTA  2     25 15     25  2.0      100       0      CTGCTC     Mg_I     Mn_C
 ## 72             300 GCGTAGTA  2     25  1     25  0.5      100       0      ACATAC     Mg_B     Mn_C
 ## 562            300 GCGTAGTA  2     25 15     25  1.0      100       0      CACGCA     Mg_I     Mn_C
 ## 462            300 GCGTAGTA  2     25  9     25  3.0      100       0      ACACGT     Mg_G     Mn_C
 ## 362            300 GCGTAGTA  2     25  4     25  5.0      100       0      ACAGCA     Mg_E     Mn_C
-## 312            300 GCGTAGTA  2     25  0      0  2.0      100      25      CTGACG     Mg_A     Mn_C
+## 312            300 GCGTAGTA  2     25  0      0  2.0      100      25      CTGAGC     Mg_A     Mn_C
 ## 542            300 GCGTAGTA  2     25 12     25  5.0      100       0      GTAGAT     Mg_H     Mn_C
 ## 513            300 GCGTAGTA  2     25  0      0  4.0      100      25      ACATGA     Mg_A     Mn_C
-## 532            300 GCGTAGTA  2     25 12     25  4.0      100       0      TATAGC     Mg_H     Mn_C
+## 532            300 GCGTAGTA  2     25 12     25  4.0      100       0      TATACG     Mg_H     Mn_C
 ## 132            300 GCGTAGTA  2     25  2     25  0.5      100       0      CGAGTG     Mg_C     Mn_C
 ## 152            300 GCGTAGTA  2     25  2     25  2.0      100       0      ACACAG     Mg_C     Mn_C
 ## 212            300 GCGTAGTA  2     25  3     25  2.0      100       0      CTGCAG     Mg_D     Mn_C
@@ -3687,14 +3688,14 @@ plate7c %>% as.data.frame
 ## 382            300 GCGTAGTA  2     25  6     25  1.0      100       0      TATGTG     Mg_F     Mn_C
 ## 313            300 GCGTAGTA  2     25  4     25  0.5      100       0      CGAGAT     Mg_E     Mn_C
 ## 302            300 GCGTAGTA  2     25  3     25  5.0      100       0      AGTGAT     Mg_D     Mn_C
-## 92             300 GCGTAGTA  2     25  1     25  2.0      100       0      ATCGAT     Mg_B     Mn_C
-## 592            300 GCGTAGTA  2     25 15     25  4.0      100       0      ATCAGC     Mg_I     Mn_C
+## 92             300 GCGTAGTA  2     25  1     25  2.0      100       0      ATCGCA     Mg_B     Mn_C
+## 592            300 GCGTAGTA  2     25 15     25  4.0      100       0      TATCTC     Mg_I     Mn_C
 ## 282            300 GCGTAGTA  2     25  3     25  3.0      100       0      CACACG     Mg_D     Mn_C
 ## 372            300 GCGTAGTA  2     25  6     25  0.5      100       0      TCGAGC     Mg_F     Mn_C
 ## 112            300 GCGTAGTA  2     25  1     25  4.0      100       0      CGACAG     Mg_B     Mn_C
 ## 342            300 GCGTAGTA  2     25  4     25  3.0      100       0      GCTAGC     Mg_E     Mn_C
-## 492            300 GCGTAGTA  2     25 12     25  0.5      100       0      ATCGCA     Mg_H     Mn_C
-## 413            300 GCGTAGTA  2     25  0      0  3.0      100      25      AGTAGC     Mg_A     Mn_C
+## 492            300 GCGTAGTA  2     25 12     25  0.5      100       0      ATCGAT     Mg_H     Mn_C
+## 413            300 GCGTAGTA  2     25  0      0  3.0      100      25      GCTGTG     Mg_A     Mn_C
 ## 252            300 GCGTAGTA  2     25  3     25  0.5      100       0      GAGTAC     Mg_D     Mn_C
 ## 162            300 GCGTAGTA  2     25  2     25  3.0      100       0      CACTGA     Mg_C     Mn_C
 ## 522            300 GCGTAGTA  2     25 12     25  3.0      100       0      GTAGCA     Mg_H     Mn_C
@@ -3703,7 +3704,7 @@ plate7c %>% as.data.frame
 ## 632            300 GCGTAGTA  2     25  0      0  0.0        0     125      GCTCGT     Mg_A     Mn_C
 ## 232            300 GCGTAGTA  2     25  3     25  4.0      100       0      CACGTG     Mg_D     Mn_C
 ## 292            300 GCGTAGTA  2     25  3     25  4.0      100       0      GTACAG     Mg_D     Mn_C
-## 332            300 GCGTAGTA  2     25  4     25  2.0      100       0      TATACG     Mg_E     Mn_C
+## 332            300 GCGTAGTA  2     25  4     25  2.0      100       0      TATAGC     Mg_E     Mn_C
 ## 66             300 GCGTAGTA  2     25  0      0  5.0      100      25      GCTGAT     Mg_A     Mn_C
 ## 222            300 GCGTAGTA  2     25  3     25  3.0      100       0      GAGCGT     Mg_D     Mn_C
 ## 422            300 GCGTAGTA  2     25  6     25  5.0      100       0      CGAGCA     Mg_F     Mn_C
@@ -3714,22 +3715,22 @@ plate7c %>% as.data.frame
 ## 392            300 GCGTAGTA  2     25  6     25  2.0      100       0      AGTCGT     Mg_F     Mn_C
 ## 102            300 GCGTAGTA  2     25  1     25  3.0      100       0      GTATAC     Mg_B     Mn_C
 ## 482            300 GCGTAGTA  2     25  9     25  5.0      100       0      ACATCT     Mg_G     Mn_C
-## 192            300 GCGTAGTA  2     25  3     25  0.5      100       0      ATCTCT     Mg_D     Mn_C
+## 192            300 GCGTAGTA  2     25  3     25  0.5      100       0      CGACTC     Mg_D     Mn_C
 ## 113            300 GCGTAGTA  2     25  0      0  0.5      100      25      ATCTAC     Mg_A     Mn_C
 ## 202            300 GCGTAGTA  2     25  3     25  1.0      100       0      GCTACG     Mg_D     Mn_C
 ## 602            300 GCGTAGTA  2     25 15     25  5.0      100       0      TATGCA     Mg_I     Mn_C
-## 442            300 GCGTAGTA  2     25  9     25  1.0      100       0      CACTAC     Mg_G     Mn_C
+## 442            300 GCGTAGTA  2     25  9     25  1.0      100       0      GAGCTC     Mg_G     Mn_C
 ## 402            300 GCGTAGTA  2     25  6     25  3.0      100       0      ATCATA     Mg_F     Mn_C
 ## 193            300 CGGAGCCT  3     25  3     25  0.5      100       0      CGAGTG     Mg_D     Mn_D
 ## 143            300 CGGAGCCT  3     25  2     25  1.0      100       0      CTGATA     Mg_C     Mn_D
-## 623            300 CGGAGCCT  3     25  3     25  0.0        0     100      AGTACG     Mg_D     Mn_D
+## 623            300 CGGAGCCT  3     25  3     25  0.0        0     100      GCTGCA     Mg_D     Mn_D
 ## 314            300 CGGAGCCT  3     25  4     25  0.5      100       0      CACGAT     Mg_E     Mn_D
 ## 233            300 CGGAGCCT  3     25  3     25  4.0      100       0      ATCTAC     Mg_D     Mn_D
 ## 273            300 CGGAGCCT  3     25  3     25  2.0      100       0      GTATAC     Mg_D     Mn_D
 ## 593            300 CGGAGCCT  3     25 15     25  4.0      100       0      TATGTG     Mg_I     Mn_D
 ## 493            300 CGGAGCCT  3     25 12     25  0.5      100       0      AGTGTG     Mg_H     Mn_D
-## 473            300 CGGAGCCT  3     25  9     25  4.0      100       0      ATCGAT     Mg_G     Mn_D
-## 183            300 CGGAGCCT  3     25  2     25  5.0      100       0      ATCAGC     Mg_C     Mn_D
+## 473            300 CGGAGCCT  3     25  9     25  4.0      100       0      ATCGCA     Mg_G     Mn_D
+## 183            300 CGGAGCCT  3     25  2     25  5.0      100       0      TATCTC     Mg_C     Mn_D
 ## 403            300 CGGAGCCT  3     25  6     25  3.0      100       0      CACGCA     Mg_F     Mn_D
 ## 483            300 CGGAGCCT  3     25  9     25  5.0      100       0      TCGACG     Mg_G     Mn_D
 ## 67             300 CGGAGCCT  3     25  0      0  5.0      100      25      ACAGCA     Mg_A     Mn_D
@@ -3739,16 +3740,16 @@ plate7c %>% as.data.frame
 ## 323            300 CGGAGCCT  3     25  4     25  1.0      100       0      CGAGCA     Mg_E     Mn_D
 ## 583            300 CGGAGCCT  3     25 15     25  3.0      100       0      CACAGC     Mg_I     Mn_D
 ## 315            300 CGGAGCCT  3     25  0      0  2.0      100      25      GCTCTC     Mg_A     Mn_D
-## 643            300 CGGAGCCT  3     25  0      0  0.0        0     125      ACAGTG     Mg_A     Mn_D
+## 643            300 CGGAGCCT  3     25  0      0  0.0        0     125      CTGCTC     Mg_A     Mn_D
 ## 114            300 CGGAGCCT  3     25  1     25  4.0      100       0      GCTAGC     Mg_B     Mn_D
 ## 373            300 CGGAGCCT  3     25  6     25  0.5      100       0      GCTCGT     Mg_F     Mn_D
 ## 573            300 CGGAGCCT  3     25 15     25  2.0      100       0      ATCATA     Mg_I     Mn_D
 ## 83             300 CGGAGCCT  3     25  1     25  1.0      100       0      GAGCGT     Mg_B     Mn_D
 ## 73             300 CGGAGCCT  3     25  1     25  0.5      100       0      GAGTAC     Mg_B     Mn_D
-## 463            300 CGGAGCCT  3     25  9     25  3.0      100       0      CACTAC     Mg_G     Mn_D
+## 463            300 CGGAGCCT  3     25  9     25  3.0      100       0      GAGCTC     Mg_G     Mn_D
 ## 543            300 CGGAGCCT  3     25 12     25  5.0      100       0      ACATCT     Mg_H     Mn_D
 ## 603            300 CGGAGCCT  3     25 15     25  5.0      100       0      GCTACG     Mg_I     Mn_D
-## 253            300 CGGAGCCT  3     25  3     25  0.5      100       0      TATAGC     Mg_D     Mn_D
+## 253            300 CGGAGCCT  3     25  3     25  0.5      100       0      TATACG     Mg_D     Mn_D
 ## 433            300 CGGAGCCT  3     25  9     25  0.5      100       0      AGTCGT     Mg_G     Mn_D
 ## 133            300 CGGAGCCT  3     25  2     25  0.5      100       0      GTACAG     Mg_C     Mn_D
 ## 214            300 CGGAGCCT  3     25  3     25  2.0      100       0      CGATGA     Mg_D     Mn_D
@@ -3756,7 +3757,7 @@ plate7c %>% as.data.frame
 ## 363            300 CGGAGCCT  3     25  4     25  5.0      100       0      TATGAT     Mg_E     Mn_D
 ## 283            300 CGGAGCCT  3     25  3     25  3.0      100       0      GTAGTG     Mg_D     Mn_D
 ## 293            300 CGGAGCCT  3     25  3     25  4.0      100       0      AGTCAG     Mg_D     Mn_D
-## 553            300 CGGAGCCT  3     25 15     25  0.5      100       0      TATACG     Mg_I     Mn_D
+## 553            300 CGGAGCCT  3     25 15     25  0.5      100       0      TATAGC     Mg_I     Mn_D
 ## 215            300 CGGAGCCT  3     25  0      0  1.0      100      25      TCGAGC     Mg_A     Mn_D
 ## 243            300 CGGAGCCT  3     25  3     25  5.0      100       0      GAGTCT     Mg_D     Mn_D
 ## 93             300 CGGAGCCT  3     25  1     25  2.0      100       0      GCTATA     Mg_B     Mn_D
@@ -3765,15 +3766,15 @@ plate7c %>% as.data.frame
 ## 423            300 CGGAGCCT  3     25  6     25  5.0      100       0      AGTGAT     Mg_F     Mn_D
 ## 514            300 CGGAGCCT  3     25 12     25  2.0      100       0      CACATA     Mg_H     Mn_D
 ## 414            300 CGGAGCCT  3     25  6     25  4.0      100       0      ACATGA     Mg_F     Mn_D
-## 263            300 CGGAGCCT  3     25  3     25  1.0      100       0      CTGACG     Mg_D     Mn_D
+## 263            300 CGGAGCCT  3     25  3     25  1.0      100       0      CTGAGC     Mg_D     Mn_D
 ## 533            300 CGGAGCCT  3     25 12     25  4.0      100       0      CACACG     Mg_H     Mn_D
 ## 153            300 CGGAGCCT  3     25  2     25  2.0      100       0      ACAGAT     Mg_C     Mn_D
 ## 443            300 CGGAGCCT  3     25  9     25  1.0      100       0      ACATAC     Mg_G     Mn_D
 ## 303            300 CGGAGCCT  3     25  3     25  5.0      100       0      CGATAC     Mg_D     Mn_D
-## 633            300 CGGAGCCT  3     25  0      0  0.0        0     125      ATCGCA     Mg_A     Mn_D
+## 633            300 CGGAGCCT  3     25  0      0  0.0        0     125      ATCGAT     Mg_A     Mn_D
 ## 103            300 CGGAGCCT  3     25  1     25  3.0      100       0      GCTGAT     Mg_B     Mn_D
 ## 415            300 CGGAGCCT  3     25  0      0  3.0      100      25      GTAGCA     Mg_A     Mn_D
-## 393            300 CGGAGCCT  3     25  6     25  2.0      100       0      AGTAGC     Mg_F     Mn_D
+## 393            300 CGGAGCCT  3     25  6     25  2.0      100       0      GCTGTG     Mg_F     Mn_D
 ## 223            300 CGGAGCCT  3     25  3     25  3.0      100       0      ATCGTG     Mg_D     Mn_D
 ## 163            300 CGGAGCCT  3     25  2     25  3.0      100       0      AGTGCA     Mg_C     Mn_D
 ## 515            300 CGGAGCCT  3     25  0      0  4.0      100      25      CACTCT     Mg_A     Mn_D
@@ -3785,7 +3786,7 @@ plate7c %>% as.data.frame
 ## 383            300 CGGAGCCT  3     25  6     25  1.0      100       0      CGACGT     Mg_F     Mn_D
 ## 115            300 CGGAGCCT  3     25  0      0  0.5      100      25      CACGTG     Mg_A     Mn_D
 ## 594            300 TACGCTGC  4     25 15     25  4.0      100       0      AGTCAG     Mg_I     Mn_E
-## 494            300 TACGCTGC  4     25 12     25  0.5      100       0      CTGAGC     Mg_H     Mn_E
+## 494            300 TACGCTGC  4     25 12     25  0.5      100       0      CTGACG     Mg_H     Mn_E
 ## 134            300 TACGCTGC  4     25  2     25  0.5      100       0      GCTACG     Mg_C     Mn_E
 ## 584            300 TACGCTGC  4     25 15     25  3.0      100       0      GAGTAC     Mg_I     Mn_E
 ## 464            300 TACGCTGC  4     25  9     25  3.0      100       0      CACGAT     Mg_G     Mn_E
@@ -3798,19 +3799,19 @@ plate7c %>% as.data.frame
 ## 424            300 TACGCTGC  4     25  6     25  5.0      100       0      TCGAGC     Mg_F     Mn_E
 ## 484            300 TACGCTGC  4     25  9     25  5.0      100       0      GCTGAT     Mg_G     Mn_E
 ## 74             300 TACGCTGC  4     25  1     25  0.5      100       0      ACACAG     Mg_B     Mn_E
-## 324            300 TACGCTGC  4     25  4     25  1.0      100       0      CACTAC     Mg_E     Mn_E
+## 324            300 TACGCTGC  4     25  4     25  1.0      100       0      GAGCTC     Mg_E     Mn_E
 ## 634            300 TACGCTGC  4     25  0      0  0.0        0     125      GCTCTC     Mg_A     Mn_E
 ## 154            300 TACGCTGC  4     25  2     25  2.0      100       0      CGAGAT     Mg_C     Mn_E
 ## 116            300 TACGCTGC  4     25  0      0  0.5      100      25      ATCTAC     Mg_A     Mn_E
-## 534            300 TACGCTGC  4     25 12     25  4.0      100       0      ATCAGC     Mg_H     Mn_E
-## 416            300 TACGCTGC  4     25  6     25  4.0      100       0      ATCGAT     Mg_F     Mn_E
-## 614            300 TACGCTGC  4     25  3     25  0.0        0     100      ACAGTG     Mg_D     Mn_E
+## 534            300 TACGCTGC  4     25 12     25  4.0      100       0      TATCTC     Mg_H     Mn_E
+## 416            300 TACGCTGC  4     25  6     25  4.0      100       0      ATCGCA     Mg_F     Mn_E
+## 614            300 TACGCTGC  4     25  3     25  0.0        0     100      CTGCTC     Mg_D     Mn_E
 ## 364            300 TACGCTGC  4     25  4     25  5.0      100       0      GTAGCA     Mg_E     Mn_E
-## 344            300 TACGCTGC  4     25  4     25  3.0      100       0      AGTAGC     Mg_E     Mn_E
+## 344            300 TACGCTGC  4     25  4     25  3.0      100       0      GCTGTG     Mg_E     Mn_E
 ## 374            300 TACGCTGC  4     25  6     25  0.5      100       0      CACGCA     Mg_F     Mn_E
 ## 516            300 TACGCTGC  4     25  0      0  4.0      100      25      GCTATA     Mg_A     Mn_E
 ## 264            300 TACGCTGC  4     25  3     25  1.0      100       0      CACGTG     Mg_D     Mn_E
-## 304            300 TACGCTGC  4     25  3     25  5.0      100       0      ATCTCT     Mg_D     Mn_E
+## 304            300 TACGCTGC  4     25  3     25  5.0      100       0      CGACTC     Mg_D     Mn_E
 ## 316            300 TACGCTGC  4     25  4     25  0.5      100       0      ATCGTG     Mg_E     Mn_E
 ## 84             300 TACGCTGC  4     25  1     25  1.0      100       0      GTAGTG     Mg_B     Mn_E
 ## 517            300 TACGCTGC  4     25 12     25  2.0      100       0      TATGAT     Mg_H     Mn_E
@@ -3820,10 +3821,10 @@ plate7c %>% as.data.frame
 ## 194            300 TACGCTGC  4     25  3     25  0.5      100       0      AGTCGT     Mg_D     Mn_E
 ## 384            300 TACGCTGC  4     25  6     25  1.0      100       0      CGACAG     Mg_F     Mn_E
 ## 224            300 TACGCTGC  4     25  3     25  3.0      100       0      GTATAC     Mg_D     Mn_E
-## 417            300 TACGCTGC  4     25  0      0  3.0      100      25      AGTACG     Mg_A     Mn_E
+## 417            300 TACGCTGC  4     25  0      0  3.0      100      25      GCTGCA     Mg_A     Mn_E
 ## 216            300 TACGCTGC  4     25  3     25  2.0      100       0      ACAGAT     Mg_D     Mn_E
 ## 164            300 TACGCTGC  4     25  2     25  3.0      100       0      CACAGC     Mg_C     Mn_E
-## 574            300 TACGCTGC  4     25 15     25  2.0      100       0      TATACG     Mg_I     Mn_E
+## 574            300 TACGCTGC  4     25 15     25  2.0      100       0      TATAGC     Mg_I     Mn_E
 ## 624            300 TACGCTGC  4     25  3     25  0.0        0     100      AGTGAT     Mg_D     Mn_E
 ## 204            300 TACGCTGC  4     25  3     25  1.0      100       0      CACACG     Mg_D     Mn_E
 ## 404            300 TACGCTGC  4     25  6     25  3.0      100       0      AGTGTG     Mg_F     Mn_E
@@ -3840,12 +3841,12 @@ plate7c %>% as.data.frame
 ## 217            300 TACGCTGC  4     25  0      0  1.0      100      25      GCTCAG     Mg_A     Mn_E
 ## 294            300 TACGCTGC  4     25  3     25  4.0      100       0      TATGCA     Mg_D     Mn_E
 ## 184            300 TACGCTGC  4     25  2     25  5.0      100       0      ACACGT     Mg_C     Mn_E
-## 284            300 TACGCTGC  4     25  3     25  3.0      100       0      ATCGCA     Mg_D     Mn_E
+## 284            300 TACGCTGC  4     25  3     25  3.0      100       0      ATCGAT     Mg_D     Mn_E
 ## 274            300 TACGCTGC  4     25  3     25  2.0      100       0      CGATAC     Mg_D     Mn_E
 ## 444            300 TACGCTGC  4     25  9     25  1.0      100       0      GTATGA     Mg_G     Mn_E
 ## 454            300 TACGCTGC  4     25  9     25  2.0      100       0      ACAGCA     Mg_G     Mn_E
 ## 604            300 TACGCTGC  4     25 15     25  5.0      100       0      GAGCGT     Mg_I     Mn_E
-## 94             300 TACGCTGC  4     25  1     25  2.0      100       0      CTGACG     Mg_B     Mn_E
+## 94             300 TACGCTGC  4     25  1     25  2.0      100       0      CTGAGC     Mg_B     Mn_E
 ## 104            300 TACGCTGC  4     25  1     25  3.0      100       0      CGATCT     Mg_B     Mn_E
 ## 544            300 TACGCTGC  4     25 12     25  5.0      100       0      GTATCT     Mg_H     Mn_E
 ## 418            300 ATGCGCAG  5     25  6     25  4.0      100       0      GTACGT     Mg_F     Mn_F
@@ -3861,21 +3862,21 @@ plate7c %>% as.data.frame
 ## 518            300 ATGCGCAG  5     25 12     25  2.0      100       0      CGACGT     Mg_H     Mn_F
 ## 275            300 ATGCGCAG  5     25  3     25  2.0      100       0      ACACGT     Mg_D     Mn_F
 ## 345            300 ATGCGCAG  5     25  4     25  3.0      100       0      CACGCA     Mg_E     Mn_F
-## 565            300 ATGCGCAG  5     25 15     25  1.0      100       0      TATAGC     Mg_I     Mn_F
+## 565            300 ATGCGCAG  5     25 15     25  1.0      100       0      TATACG     Mg_I     Mn_F
 ## 525            300 ATGCGCAG  5     25 12     25  3.0      100       0      AGTCGT     Mg_H     Mn_F
-## 419            300 ATGCGCAG  5     25  0      0  3.0      100      25      ATCGAT     Mg_A     Mn_F
-## 385            300 ATGCGCAG  5     25  6     25  1.0      100       0      AGTACG     Mg_F     Mn_F
+## 419            300 ATGCGCAG  5     25  0      0  3.0      100      25      ATCGCA     Mg_A     Mn_F
+## 385            300 ATGCGCAG  5     25  6     25  1.0      100       0      GCTGCA     Mg_F     Mn_F
 ## 265            300 ATGCGCAG  5     25  3     25  1.0      100       0      ATCATA     Mg_D     Mn_F
 ## 318            300 ATGCGCAG  5     25  4     25  0.5      100       0      GCTCGT     Mg_E     Mn_F
-## 119            300 ATGCGCAG  5     25  1     25  4.0      100       0      AGTAGC     Mg_B     Mn_F
+## 119            300 ATGCGCAG  5     25  1     25  4.0      100       0      GCTGTG     Mg_B     Mn_F
 ## 545            300 ATGCGCAG  5     25 12     25  5.0      100       0      TCGACG     Mg_H     Mn_F
 ## 625            300 ATGCGCAG  5     25  3     25  0.0        0     100      CGATAC     Mg_D     Mn_F
 ## 69             300 ATGCGCAG  5     25  0      0  5.0      100      25      ATCTAC     Mg_A     Mn_F
 ## 495            300 ATGCGCAG  5     25 12     25  0.5      100       0      CACTCT     Mg_H     Mn_F
-## 355            300 ATGCGCAG  5     25  4     25  4.0      100       0      CTGACG     Mg_E     Mn_F
+## 355            300 ATGCGCAG  5     25  4     25  4.0      100       0      CTGAGC     Mg_E     Mn_F
 ## 575            300 ATGCGCAG  5     25 15     25  2.0      100       0      GTAGAT     Mg_I     Mn_F
 ## 485            300 ATGCGCAG  5     25  9     25  5.0      100       0      CACGTG     Mg_G     Mn_F
-## 395            300 ATGCGCAG  5     25  6     25  2.0      100       0      CTGAGC     Mg_F     Mn_F
+## 395            300 ATGCGCAG  5     25  6     25  2.0      100       0      CTGACG     Mg_F     Mn_F
 ## 125            300 ATGCGCAG  5     25  1     25  5.0      100       0      CGACAG     Mg_B     Mn_F
 ## 305            300 ATGCGCAG  5     25  3     25  5.0      100       0      AGTGCA     Mg_D     Mn_F
 ## 235            300 ATGCGCAG  5     25  3     25  4.0      100       0      AGTGAT     Mg_D     Mn_F
@@ -3886,7 +3887,7 @@ plate7c %>% as.data.frame
 ## 335            300 ATGCGCAG  5     25  4     25  2.0      100       0      GAGCGT     Mg_E     Mn_F
 ## 635            300 ATGCGCAG  5     25  0      0  0.0        0     125      CTGCAG     Mg_A     Mn_F
 ## 165            300 ATGCGCAG  5     25  2     25  3.0      100       0      TATGAT     Mg_C     Mn_F
-## 85             300 ATGCGCAG  5     25  1     25  1.0      100       0      ATCTCT     Mg_B     Mn_F
+## 85             300 ATGCGCAG  5     25  1     25  1.0      100       0      CGACTC     Mg_B     Mn_F
 ## 219            300 ATGCGCAG  5     25  3     25  2.0      100       0      AGTCAG     Mg_D     Mn_F
 ## 295            300 ATGCGCAG  5     25  3     25  4.0      100       0      CGAGTG     Mg_D     Mn_F
 ## 319            300 ATGCGCAG  5     25  0      0  2.0      100      25      ATCGTG     Mg_A     Mn_F
@@ -3896,20 +3897,20 @@ plate7c %>% as.data.frame
 ## 225            300 ATGCGCAG  5     25  3     25  3.0      100       0      GTATAC     Mg_D     Mn_F
 ## 155            300 ATGCGCAG  5     25  2     25  2.0      100       0      ACAGCA     Mg_C     Mn_F
 ## 595            300 ATGCGCAG  5     25 15     25  4.0      100       0      GCTCTC     Mg_I     Mn_F
-## 645            300 ATGCGCAG  5     25  0      0  0.0        0     125      TATACG     Mg_A     Mn_F
+## 645            300 ATGCGCAG  5     25  0      0  0.0        0     125      TATAGC     Mg_A     Mn_F
 ## 505            300 ATGCGCAG  5     25 12     25  1.0      100       0      AGTGTG     Mg_H     Mn_F
-## 185            300 ATGCGCAG  5     25  2     25  5.0      100       0      CACTAC     Mg_C     Mn_F
+## 185            300 ATGCGCAG  5     25  2     25  5.0      100       0      GAGCTC     Mg_C     Mn_F
 ## 555            300 ATGCGCAG  5     25 15     25  0.5      100       0      ACATCT     Mg_I     Mn_F
 ## 285            300 ATGCGCAG  5     25  3     25  3.0      100       0      CGATCT     Mg_D     Mn_F
 ## 519            300 ATGCGCAG  5     25  0      0  4.0      100      25      CGAGCA     Mg_A     Mn_F
 ## 195            300 ATGCGCAG  5     25  3     25  0.5      100       0      GTACAG     Mg_D     Mn_F
-## 455            300 ATGCGCAG  5     25  9     25  2.0      100       0      ACAGTG     Mg_G     Mn_F
+## 455            300 ATGCGCAG  5     25  9     25  2.0      100       0      CTGCTC     Mg_G     Mn_F
 ## 145            300 ATGCGCAG  5     25  2     25  1.0      100       0      ACAGAT     Mg_C     Mn_F
 ## 535            300 ATGCGCAG  5     25 12     25  4.0      100       0      CTGCGT     Mg_H     Mn_F
 ## 375            300 ATGCGCAG  5     25  6     25  0.5      100       0      ACATAC     Mg_F     Mn_F
 ## 465            300 ATGCGCAG  5     25  9     25  3.0      100       0      CTGATA     Mg_G     Mn_F
 ## 175            300 ATGCGCAG  5     25  2     25  4.0      100       0      CACATA     Mg_C     Mn_F
-## 205            300 ATGCGCAG  5     25  3     25  1.0      100       0      ATCAGC     Mg_D     Mn_F
+## 205            300 ATGCGCAG  5     25  3     25  1.0      100       0      TATCTC     Mg_D     Mn_F
 ## 95             300 ATGCGCAG  5     25  1     25  2.0      100       0      GCTGAT     Mg_B     Mn_F
 ## 605            300 ATGCGCAG  5     25 15     25  5.0      100       0      CGAGAT     Mg_I     Mn_F
 ##     dNTP_level plateID
@@ -4306,16 +4307,16 @@ plate7d %>% as.data.frame
 ```
 ##     well row col sxt BARCODE_ID TSO_source TSO_vol TSO RT_PRIMERS RNA RT_PRIMERS_RNA_vol   MMix
 ## 15   A01   A   1  A1         29        200      25  10          1  10                 25 Custom
-## 40   A02   A   2  A1         83        200      25  10          1  10                 25  SSIII
+## 40   A02   A   2  A1         82        200      25  10          1  10                 25  SSIII
 ## 5    A03   A   3  A1         69        200      25  10          1  10                 25 Custom
-## 32   A04   A   4  A1         26        200      25  10          1  10                 25  SSIII
+## 32   A04   A   4  A1         39        200      25  10          1  10                 25  SSIII
 ## 49   A05   A   5  A1         89        200      25  10          1  10                 25  SSIII
-## 58   A06   A   6  A1         10        200      25  10          1  10                 25  SSIII
+## 58   A06   A   6  A1         71        200      25  10          1  10                 25  SSIII
 ## 20   A07   A   7  A1         43        200      25  10          1  10                 25 Custom
 ## 36   A08   A   8  A1         32        200      25  10          1  10                 25  SSIII
 ## 23   C01   C   1  A1         41        200      25  10          1  10                 25 Custom
 ## 59   C02   C   2  A1         38        200      25  10          1  10                 25  SSIII
-## 45   C03   C   3  A1         11        200      25  10          1  10                 25  SSIII
+## 45   C03   C   3  A1         72        200      25  10          1  10                 25  SSIII
 ## 37   C04   C   4  A1         16        200      25  10          1  10                 25  SSIII
 ## 17   C05   C   5  A1         45        200      25  10          1  10                 25 Custom
 ## 56   C06   C   6  A1         73        200      25  10          1  10                 25  SSIII
@@ -4325,13 +4326,13 @@ plate7d %>% as.data.frame
 ## 34   E02   E   2  A1         80        200      25  10          1  10                 25  SSIII
 ## 27   E03   E   3  A1          5        200      25  10          1  10                 25  SSIII
 ## 42   E04   E   4  A1          2        200      25  10          1  10                 25  SSIII
-## 63   E05   E   5  A1         47        200      25  10          1  10                 25  SSIII
+## 63   E05   E   5  A1         46        200      25  10          1  10                 25  SSIII
 ## 3    E06   E   6  A1         76        200      25  10          1  10                 25 Custom
 ## 2    E07   E   7  A1          1        200      25  10          1  10                 25 Custom
-## 41   E08   E   8  A1          6        200      25  10          1  10                 25  SSIII
-## 9    G01   G   1  A1         34        200      25  10          1  10                 25 Custom
-## 53   G02   G   2  A1         82        200      25  10          1  10                 25  SSIII
-## 8    G03   G   3  A1         22        200      25  10          1  10                 25 Custom
+## 41   E08   E   8  A1         51        200      25  10          1  10                 25  SSIII
+## 9    G01   G   1  A1         60        200      25  10          1  10                 25 Custom
+## 53   G02   G   2  A1         83        200      25  10          1  10                 25  SSIII
+## 8    G03   G   3  A1         23        200      25  10          1  10                 25 Custom
 ## 62   G04   G   4  A1         35        200      25  10          1  10                 25 Custom
 ## 55   G05   G   5  A1          9        200      25  10          1  10                 25  SSIII
 ## 10   G06   G   6  A1         49        200      25  10          1  10                 25 Custom
@@ -4345,13 +4346,13 @@ plate7d %>% as.data.frame
 ## 18   I06   I   6  A1         30        200      25  10          1  10                 25 Custom
 ## 60   I07   I   7  A1         14        200      25  10          1  10                 25  SSIII
 ## 31   I08   I   8  A1         17        200      25  10          1  10                 25  SSIII
-## 12   K01   K   1  A1         23        200      25  10          1  10                 25 Custom
+## 12   K01   K   1  A1         22        200      25  10          1  10                 25 Custom
 ## 61   K02   K   2  A1         36        200      25  10          1  10                 25 Custom
 ## 64   K03   K   3  A1         59        200      25  10          1  10                 25  SSIII
 ## 39   K04   K   4  A1         62        200      25  10          1  10                 25  SSIII
 ## 57   K05   K   5  A1          8        200      25  10          1  10                 25  SSIII
 ## 16   K06   K   6  A1         65        200      25  10          1  10                 25 Custom
-## 29   K07   K   7  A1         20        200      25  10          1  10                 25  SSIII
+## 29   K07   K   7  A1         87        200      25  10          1  10                 25  SSIII
 ## 26   K08   K   8  A1         31        200      25  10          1  10                 25  SSIII
 ## 46   M01   M   1  A1         25        200      25  10          1  10                 25  SSIII
 ## 28   M02   M   2  A1         19        200      25  10          1  10                 25  SSIII
@@ -4365,19 +4366,19 @@ plate7d %>% as.data.frame
 ## 33   O02   O   2  A1         78        200      25  10          1  10                 25  SSIII
 ## 24   O03   O   3  A1         24        200      25  10          1  10                 25 Custom
 ## 22   O04   O   4  A1         92        200      25  10          1  10                 25 Custom
-## 51   O05   O   5  A1         46        200      25  10          1  10                 25  SSIII
+## 51   O05   O   5  A1         47        200      25  10          1  10                 25  SSIII
 ## 47   O06   O   6  A1         79        200      25  10          1  10                 25  SSIII
 ## 19   O07   O   7  A1         21        200      25  10          1  10                 25 Custom
 ## 4    O08   O   8  A1         64        200      25  10          1  10                 25 Custom
 ## 641  B01   B   1  A2         73        200      25  10          1  10                 25  SSIII
 ## 151  B02   B   2  A2         40        200      25  10          1  10                 25 Custom
-## 181  B03   B   3  A2         83        200      25  10          1  10                 25 Custom
+## 181  B03   B   3  A2         82        200      25  10          1  10                 25 Custom
 ## 431  B04   B   4  A2         42        200      25  10          1  10                 25  SSIII
 ## 511  B05   B   5  A2         91        200      25  10          1  10                 25  SSIII
 ## 281  B06   B   6  A2         19        200      25  10          1  10                 25  SSIII
 ## 231  B07   B   7  A2         36        200      25  10          1  10                 25 Custom
 ## 65   B08   B   8  A2         50        200      25  10          1  10                 25 Custom
-## 611  D01   D   1  A2          6        200      25  10          1  10                 25 Custom
+## 611  D01   D   1  A2         51        200      25  10          1  10                 25 Custom
 ## 441  D02   D   2  A2         70        200      25  10          1  10                 25  SSIII
 ## 251  D03   D   3  A2         59        200      25  10          1  10                 25  SSIII
 ## 201  D04   D   4  A2          9        200      25  10          1  10                 25 Custom
@@ -4395,14 +4396,14 @@ plate7d %>% as.data.frame
 ## 311  F08   F   8  A2         76        200      25  10          1  10                 25  SSIII
 ## 571  H01   H   1  A2          2        200      25  10          1  10                 25  SSIII
 ## 71   H02   H   2  A2         45        200      25  10          1  10                 25 Custom
-## 461  H03   H   3  A2         47        200      25  10          1  10                 25  SSIII
-## 481  H04   H   4  A2         34        200      25  10          1  10                 25  SSIII
+## 461  H03   H   3  A2         46        200      25  10          1  10                 25  SSIII
+## 481  H04   H   4  A2         60        200      25  10          1  10                 25  SSIII
 ## 491  H05   H   5  A2          7        200      25  10          1  10                 25  SSIII
-## 501  H06   H   6  A2         46        200      25  10          1  10                 25  SSIII
-## 271  H07   H   7  A2         23        200      25  10          1  10                 25  SSIII
+## 501  H06   H   6  A2         47        200      25  10          1  10                 25  SSIII
+## 271  H07   H   7  A2         22        200      25  10          1  10                 25  SSIII
 ## 101  H08   H   8  A2         28        200      25  10          1  10                 25 Custom
-## 261  J01   J   1  A2         82        200      25  10          1  10                 25  SSIII
-## 171  J02   J   2  A2         26        200      25  10          1  10                 25 Custom
+## 261  J01   J   1  A2         83        200      25  10          1  10                 25  SSIII
+## 171  J02   J   2  A2         39        200      25  10          1  10                 25 Custom
 ## 521  J03   J   3  A2         74        200      25  10          1  10                 25  SSIII
 ## 141  J04   J   4  A2         48        200      25  10          1  10                 25 Custom
 ## 131  J05   J   5  A2         66        200      25  10          1  10                 25 Custom
@@ -4411,7 +4412,7 @@ plate7d %>% as.data.frame
 ## 221  J08   J   8  A2          5        200      25  10          1  10                 25 Custom
 ## 401  L01   L   1  A2         49        200      25  10          1  10                 25  SSIII
 ## 510  L02   L   2  A2         17        200      25  10          1  10                 25 Custom
-## 391  L03   L   3  A2         22        200      25  10          1  10                 25  SSIII
+## 391  L03   L   3  A2         23        200      25  10          1  10                 25  SSIII
 ## 561  L04   L   4  A2         64        200      25  10          1  10                 25  SSIII
 ## 531  L05   L   5  A2         68        200      25  10          1  10                 25  SSIII
 ## 351  L06   L   6  A2          4        200      25  10          1  10                 25  SSIII
@@ -4420,30 +4421,30 @@ plate7d %>% as.data.frame
 ## 81   N01   N   1  A2         24        200      25  10          1  10                 25 Custom
 ## 361  N02   N   2  A2         79        200      25  10          1  10                 25  SSIII
 ## 310  N03   N   3  A2         89        200      25  10          1  10                 25 Custom
-## 91   N04   N   4  A2         20        200      25  10          1  10                 25 Custom
+## 91   N04   N   4  A2         87        200      25  10          1  10                 25 Custom
 ## 121  N05   N   5  A2          1        200      25  10          1  10                 25 Custom
 ## 110  N06   N   6  A2         43        200      25  10          1  10                 25 Custom
 ## 601  N07   N   7  A2         44        200      25  10          1  10                 25  SSIII
 ## 371  N08   N   8  A2         69        200      25  10          1  10                 25  SSIII
-## 211  P01   P   1  A2         10        200      25  10          1  10                 25 Custom
+## 211  P01   P   1  A2         71        200      25  10          1  10                 25 Custom
 ## 381  P02   P   2  A2         25        200      25  10          1  10                 25  SSIII
 ## 631  P03   P   3  A2         41        200      25  10          1  10                 25  SSIII
 ## 111  P04   P   4  A2         65        200      25  10          1  10                 25 Custom
 ## 451  P05   P   5  A2         61        200      25  10          1  10                 25  SSIII
-## 161  P06   P   6  A2         11        200      25  10          1  10                 25 Custom
+## 161  P06   P   6  A2         72        200      25  10          1  10                 25 Custom
 ## 291  P07   P   7  A2         14        200      25  10          1  10                 25  SSIII
 ## 551  P08   P   8  A2         81        200      25  10          1  10                 25  SSIII
-## 412  A09   A   9  B1         26        200      25  10          1  10                 25  SSIII
+## 412  A09   A   9  B1         39        200      25  10          1  10                 25  SSIII
 ## 122  A10   A  10  B1         66        200      25  10          1  10                 25 Custom
 ## 432  A11   A  11  B1         17        200      25  10          1  10                 25  SSIII
 ## 212  A12   A  12  B1         25        200      25  10          1  10                 25 Custom
 ## 112  A13   A  13  B1         13        200      25  10          1  10                 25 Custom
 ## 532  A14   A  14  B1         61        200      25  10          1  10                 25  SSIII
-## 512  A15   A  15  B1         10        200      25  10          1  10                 25 Custom
+## 512  A15   A  15  B1         71        200      25  10          1  10                 25 Custom
 ## 582  A16   A  16  B1         16        200      25  10          1  10                 25  SSIII
 ## 472  C09   C   9  B1         77        200      25  10          1  10                 25  SSIII
 ## 392  C10   C  10  B1         88        200      25  10          1  10                 25  SSIII
-## 413  C11   C  11  B1         34        200      25  10          1  10                 25 Custom
+## 413  C11   C  11  B1         60        200      25  10          1  10                 25 Custom
 ## 292  C12   C  12  B1         14        200      25  10          1  10                 25  SSIII
 ## 272  C13   C  13  B1         78        200      25  10          1  10                 25  SSIII
 ## 522  C14   C  14  B1         48        200      25  10          1  10                 25  SSIII
@@ -4453,37 +4454,37 @@ plate7d %>% as.data.frame
 ## 442  E10   E  10  B1         92        200      25  10          1  10                 25  SSIII
 ## 192  E11   E  11  B1         41        200      25  10          1  10                 25 Custom
 ## 502  E12   E  12  B1         65        200      25  10          1  10                 25  SSIII
-## 622  E13   E  13  B1         20        200      25  10          1  10                 25 Custom
+## 622  E13   E  13  B1         87        200      25  10          1  10                 25 Custom
 ## 113  E14   E  14  B1         76        200      25  10          1  10                 25 Custom
 ## 142  E15   E  15  B1         45        200      25  10          1  10                 25 Custom
 ## 66   E16   E  16  B1          2        200      25  10          1  10                 25 Custom
 ## 492  G09   G   9  B1         42        200      25  10          1  10                 25  SSIII
 ## 102  G10   G  10  B1         59        200      25  10          1  10                 25 Custom
-## 562  G11   G  11  B1         82        200      25  10          1  10                 25  SSIII
+## 562  G11   G  11  B1         83        200      25  10          1  10                 25  SSIII
 ## 482  G12   G  12  B1         29        200      25  10          1  10                 25  SSIII
 ## 352  G13   G  13  B1         50        200      25  10          1  10                 25  SSIII
-## 213  G14   G  14  B1         83        200      25  10          1  10                 25 Custom
+## 213  G14   G  14  B1         82        200      25  10          1  10                 25 Custom
 ## 182  G15   G  15  B1         30        200      25  10          1  10                 25 Custom
-## 362  G16   G  16  B1         11        200      25  10          1  10                 25  SSIII
+## 362  G16   G  16  B1         72        200      25  10          1  10                 25  SSIII
 ## 452  I09   I   9  B1          5        200      25  10          1  10                 25  SSIII
 ## 172  I10   I  10  B1         43        200      25  10          1  10                 25 Custom
 ## 232  I11   I  11  B1          8        200      25  10          1  10                 25 Custom
 ## 462  I12   I  12  B1         74        200      25  10          1  10                 25  SSIII
 ## 642  I13   I  13  B1         62        200      25  10          1  10                 25  SSIII
 ## 132  I14   I  14  B1         28        200      25  10          1  10                 25 Custom
-## 542  I15   I  15  B1         47        200      25  10          1  10                 25  SSIII
+## 542  I15   I  15  B1         46        200      25  10          1  10                 25  SSIII
 ## 92   I16   I  16  B1         38        200      25  10          1  10                 25 Custom
 ## 262  K09   K   9  B1         64        200      25  10          1  10                 25  SSIII
 ## 72   K10   K  10  B1         80        200      25  10          1  10                 25 Custom
 ## 402  K11   K  11  B1         35        200      25  10          1  10                 25  SSIII
 ## 252  K12   K  12  B1         69        200      25  10          1  10                 25  SSIII
 ## 513  K13   K  13  B1         21        200      25  10          1  10                 25  SSIII
-## 82   K14   K  14  B1         23        200      25  10          1  10                 25 Custom
+## 82   K14   K  14  B1         22        200      25  10          1  10                 25 Custom
 ## 382  K15   K  15  B1          4        200      25  10          1  10                 25  SSIII
-## 342  K16   K  16  B1         22        200      25  10          1  10                 25  SSIII
+## 342  K16   K  16  B1         23        200      25  10          1  10                 25  SSIII
 ## 162  M09   M   9  B1         33        200      25  10          1  10                 25 Custom
 ## 572  M10   M  10  B1          9        200      25  10          1  10                 25  SSIII
-## 242  M11   M  11  B1          6        200      25  10          1  10                 25 Custom
+## 242  M11   M  11  B1         51        200      25  10          1  10                 25 Custom
 ## 312  M12   M  12  B1          1        200      25  10          1  10                 25 Custom
 ## 592  M13   M  13  B1         81        200      25  10          1  10                 25  SSIII
 ## 282  M14   M  14  B1         70        200      25  10          1  10                 25  SSIII
@@ -4516,9 +4517,9 @@ plate7d %>% as.data.frame
 ## 243  F09   F   9  B2         91        200      25  10          1  10                 25 Custom
 ## 543  F10   F  10  B2         25        200      25  10          1  10                 25  SSIII
 ## 343  F11   F  11  B2          5        200      25  10          1  10                 25  SSIII
-## 373  F12   F  12  B2         23        200      25  10          1  10                 25  SSIII
+## 373  F12   F  12  B2         22        200      25  10          1  10                 25  SSIII
 ## 83   F13   F  13  B2         73        200      25  10          1  10                 25 Custom
-## 303  F14   F  14  B2         20        200      25  10          1  10                 25  SSIII
+## 303  F14   F  14  B2         87        200      25  10          1  10                 25  SSIII
 ## 163  F15   F  15  B2         19        200      25  10          1  10                 25 Custom
 ## 443  F16   F  16  B2         14        200      25  10          1  10                 25  SSIII
 ## 515  H09   H   9  B2         32        200      25  10          1  10                 25  SSIII
@@ -4540,29 +4541,29 @@ plate7d %>% as.data.frame
 ## 623  L09   L   9  B2         30        200      25  10          1  10                 25 Custom
 ## 115  L10   L  10  B2          9        200      25  10          1  10                 25 Custom
 ## 403  L11   L  11  B2         59        200      25  10          1  10                 25  SSIII
-## 314  L12   L  12  B2          6        200      25  10          1  10                 25  SSIII
+## 314  L12   L  12  B2         51        200      25  10          1  10                 25  SSIII
 ## 215  L13   L  13  B2         76        200      25  10          1  10                 25 Custom
 ## 473  L14   L  14  B2         33        200      25  10          1  10                 25  SSIII
 ## 613  L15   L  15  B2         43        200      25  10          1  10                 25 Custom
-## 593  L16   L  16  B2         10        200      25  10          1  10                 25  SSIII
+## 593  L16   L  16  B2         71        200      25  10          1  10                 25  SSIII
 ## 263  N09   N   9  B2         13        200      25  10          1  10                 25  SSIII
 ## 193  N10   N  10  B2         37        200      25  10          1  10                 25 Custom
-## 103  N11   N  11  B2         22        200      25  10          1  10                 25 Custom
+## 103  N11   N  11  B2         23        200      25  10          1  10                 25 Custom
 ## 353  N12   N  12  B2         88        200      25  10          1  10                 25  SSIII
 ## 393  N13   N  13  B2         78        200      25  10          1  10                 25  SSIII
 ## 283  N14   N  14  B2         89        200      25  10          1  10                 25  SSIII
 ## 433  N15   N  15  B2         90        200      25  10          1  10                 25  SSIII
 ## 503  N16   N  16  B2         31        200      25  10          1  10                 25  SSIII
-## 173  P09   P   9  B2         47        200      25  10          1  10                 25 Custom
+## 173  P09   P   9  B2         46        200      25  10          1  10                 25 Custom
 ## 423  P10   P  10  B2         65        200      25  10          1  10                 25  SSIII
 ## 463  P11   P  11  B2         67        200      25  10          1  10                 25  SSIII
-## 523  P12   P  12  B2         34        200      25  10          1  10                 25  SSIII
+## 523  P12   P  12  B2         60        200      25  10          1  10                 25  SSIII
 ## 315  P13   P  13  B2          2        200      25  10          1  10                 25 Custom
-## 483  P14   P  14  B2         26        200      25  10          1  10                 25  SSIII
-## 123  P15   P  15  B2         11        200      25  10          1  10                 25 Custom
+## 483  P14   P  14  B2         39        200      25  10          1  10                 25  SSIII
+## 123  P15   P  15  B2         72        200      25  10          1  10                 25 Custom
 ## 415  P16   P  16  B2         80        200      25  10          1  10                 25 Custom
 ## 364  A17   A  17  C1         35        200      25  10          1  10                 25  SSIII
-## 216  A18   A  18  C1         34        200      25  10          1  10                 25 Custom
+## 216  A18   A  18  C1         60        200      25  10          1  10                 25 Custom
 ## 474  A19   A  19  C1         67        200      25  10          1  10                 25  SSIII
 ## 494  A20   A  20  C1         48        200      25  10          1  10                 25  SSIII
 ## 464  A21   A  21  C1         13        200      25  10          1  10                 25  SSIII
@@ -4579,12 +4580,12 @@ plate7d %>% as.data.frame
 ## 424  C24   C  24  C1         62        200      25  10          1  10                 25  SSIII
 ## 174  E17   E  17  C1         31        200      25  10          1  10                 25 Custom
 ## 194  E18   E  18  C1         33        200      25  10          1  10                 25 Custom
-## 116  E19   E  19  C1         23        200      25  10          1  10                 25 Custom
+## 116  E19   E  19  C1         22        200      25  10          1  10                 25 Custom
 ## 644  E20   E  20  C1         81        200      25  10          1  10                 25  SSIII
-## 204  E21   E  21  C1         82        200      25  10          1  10                 25 Custom
+## 204  E21   E  21  C1         83        200      25  10          1  10                 25 Custom
 ## 484  E22   E  22  C1         30        200      25  10          1  10                 25  SSIII
 ## 74   E23   E  23  C1         66        200      25  10          1  10                 25 Custom
-## 117  E24   E  24  C1         26        200      25  10          1  10                 25 Custom
+## 117  E24   E  24  C1         39        200      25  10          1  10                 25 Custom
 ## 417  G17   G  17  C1         91        200      25  10          1  10                 25  SSIII
 ## 294  G18   G  18  C1          7        200      25  10          1  10                 25  SSIII
 ## 454  G19   G  19  C1         21        200      25  10          1  10                 25  SSIII
@@ -4595,21 +4596,21 @@ plate7d %>% as.data.frame
 ## 404  G24   G  24  C1         77        200      25  10          1  10                 25  SSIII
 ## 84   I17   I  17  C1          5        200      25  10          1  10                 25 Custom
 ## 94   I18   I  18  C1         73        200      25  10          1  10                 25 Custom
-## 184  I19   I  19  C1         46        200      25  10          1  10                 25 Custom
-## 604  I20   I  20  C1         47        200      25  10          1  10                 25  SSIII
+## 184  I19   I  19  C1         47        200      25  10          1  10                 25 Custom
+## 604  I20   I  20  C1         46        200      25  10          1  10                 25  SSIII
 ## 394  I21   I  21  C1         24        200      25  10          1  10                 25  SSIII
 ## 254  I22   I  22  C1         19        200      25  10          1  10                 25  SSIII
 ## 154  I23   I  23  C1         32        200      25  10          1  10                 25 Custom
 ## 134  I24   I  24  C1         45        200      25  10          1  10                 25 Custom
 ## 594  K17   K  17  C1         38        200      25  10          1  10                 25  SSIII
-## 374  K18   K  18  C1         83        200      25  10          1  10                 25  SSIII
+## 374  K18   K  18  C1         82        200      25  10          1  10                 25  SSIII
 ## 544  K19   K  19  C1         37        200      25  10          1  10                 25  SSIII
 ## 217  K20   K  20  C1         76        200      25  10          1  10                 25 Custom
 ## 324  K21   K  21  C1         43        200      25  10          1  10                 25  SSIII
 ## 274  K22   K  22  C1          9        200      25  10          1  10                 25  SSIII
 ## 264  K23   K  23  C1         14        200      25  10          1  10                 25  SSIII
 ## 124  K24   K  24  C1          1        200      25  10          1  10                 25 Custom
-## 234  M17   M  17  C1         10        200      25  10          1  10                 25 Custom
+## 234  M17   M  17  C1         71        200      25  10          1  10                 25 Custom
 ## 554  M18   M  18  C1         78        200      25  10          1  10                 25  SSIII
 ## 334  M19   M  19  C1         16        200      25  10          1  10                 25  SSIII
 ## 384  M20   M  20  C1          8        200      25  10          1  10                 25  SSIII
@@ -4620,24 +4621,24 @@ plate7d %>% as.data.frame
 ## 534  O17   O  17  C1         29        200      25  10          1  10                 25  SSIII
 ## 224  O18   O  18  C1         70        200      25  10          1  10                 25 Custom
 ## 624  O19   O  19  C1         42        200      25  10          1  10                 25 Custom
-## 634  O20   O  20  C1         22        200      25  10          1  10                 25  SSIII
+## 634  O20   O  20  C1         23        200      25  10          1  10                 25  SSIII
 ## 317  O21   O  21  C1         68        200      25  10          1  10                 25  SSIII
-## 564  O22   O  22  C1         11        200      25  10          1  10                 25  SSIII
-## 164  O23   O  23  C1         20        200      25  10          1  10                 25 Custom
+## 564  O22   O  22  C1         72        200      25  10          1  10                 25  SSIII
+## 164  O23   O  23  C1         87        200      25  10          1  10                 25 Custom
 ## 444  O24   O  24  C1         49        200      25  10          1  10                 25  SSIII
 ## 435  B17   B  17  C2         35        200      25  10          1  10                 25  SSIII
 ## 645  B18   B  18  C2         43        200      25  10          1  10                 25  SSIII
-## 345  B19   B  19  C2         23        200      25  10          1  10                 25  SSIII
+## 345  B19   B  19  C2         22        200      25  10          1  10                 25  SSIII
 ## 565  B20   B  20  C2         92        200      25  10          1  10                 25  SSIII
 ## 635  B21   B  21  C2         61        200      25  10          1  10                 25  SSIII
 ## 485  B22   B  22  C2          2        200      25  10          1  10                 25  SSIII
-## 185  B23   B  23  C2         11        200      25  10          1  10                 25 Custom
+## 185  B23   B  23  C2         72        200      25  10          1  10                 25 Custom
 ## 105  B24   B  24  C2         31        200      25  10          1  10                 25 Custom
 ## 318  D17   D  17  C2         21        200      25  10          1  10                 25  SSIII
 ## 175  D18   D  18  C2         76        200      25  10          1  10                 25 Custom
-## 465  D19   D  19  C2         10        200      25  10          1  10                 25  SSIII
+## 465  D19   D  19  C2         71        200      25  10          1  10                 25  SSIII
 ## 295  D20   D  20  C2          4        200      25  10          1  10                 25  SSIII
-## 455  D21   D  21  C2         83        200      25  10          1  10                 25  SSIII
+## 455  D21   D  21  C2         82        200      25  10          1  10                 25  SSIII
 ## 325  D22   D  22  C2         91        200      25  10          1  10                 25  SSIII
 ## 555  D23   D  23  C2         79        200      25  10          1  10                 25  SSIII
 ## 418  D24   D  24  C2         89        200      25  10          1  10                 25 Custom
@@ -4650,7 +4651,7 @@ plate7d %>% as.data.frame
 ## 505  F23   F  23  C2         40        200      25  10          1  10                 25  SSIII
 ## 218  F24   F  24  C2         13        200      25  10          1  10                 25 Custom
 ## 419  H17   H  17  C2          5        200      25  10          1  10                 25  SSIII
-## 519  H18   H  18  C2         20        200      25  10          1  10                 25  SSIII
+## 519  H18   H  18  C2         87        200      25  10          1  10                 25  SSIII
 ## 205  H19   H  19  C2         90        200      25  10          1  10                 25 Custom
 ## 275  H20   H  20  C2         59        200      25  10          1  10                 25  SSIII
 ## 118  H21   H  21  C2         67        200      25  10          1  10                 25 Custom
@@ -4665,42 +4666,42 @@ plate7d %>% as.data.frame
 ## 219  J22   J  22  C2          8        200      25  10          1  10                 25 Custom
 ## 119  J23   J  23  C2         44        200      25  10          1  10                 25 Custom
 ## 165  J24   J  24  C2          9        200      25  10          1  10                 25 Custom
-## 225  L17   L  17  C2         46        200      25  10          1  10                 25 Custom
+## 225  L17   L  17  C2         47        200      25  10          1  10                 25 Custom
 ## 535  L18   L  18  C2         29        200      25  10          1  10                 25  SSIII
 ## 605  L19   L  19  C2         70        200      25  10          1  10                 25  SSIII
 ## 305  L20   L  20  C2         74        200      25  10          1  10                 25  SSIII
 ## 235  L21   L  21  C2         81        200      25  10          1  10                 25 Custom
 ## 155  L22   L  22  C2         14        200      25  10          1  10                 25 Custom
-## 319  L23   L  23  C2         22        200      25  10          1  10                 25 Custom
-## 125  L24   L  24  C2         47        200      25  10          1  10                 25 Custom
+## 319  L23   L  23  C2         23        200      25  10          1  10                 25 Custom
+## 125  L24   L  24  C2         46        200      25  10          1  10                 25 Custom
 ## 265  N17   N  17  C2         17        200      25  10          1  10                 25  SSIII
-## 69   N18   N  18  C2         82        200      25  10          1  10                 25 Custom
+## 69   N18   N  18  C2         83        200      25  10          1  10                 25 Custom
 ## 525  N19   N  19  C2         16        200      25  10          1  10                 25  SSIII
 ## 585  N20   N  20  C2          1        200      25  10          1  10                 25  SSIII
 ## 75   N21   N  21  C2         38        200      25  10          1  10                 25 Custom
 ## 95   N22   N  22  C2         77        200      25  10          1  10                 25 Custom
-## 445  N23   N  23  C2          6        200      25  10          1  10                 25  SSIII
+## 445  N23   N  23  C2         51        200      25  10          1  10                 25  SSIII
 ## 575  N24   N  24  C2         42        200      25  10          1  10                 25  SSIII
 ## 475  P17   P  17  C2         80        200      25  10          1  10                 25  SSIII
 ## 625  P18   P  18  C2         45        200      25  10          1  10                 25 Custom
-## 425  P19   P  19  C2         34        200      25  10          1  10                 25  SSIII
+## 425  P19   P  19  C2         60        200      25  10          1  10                 25  SSIII
 ## 595  P20   P  20  C2         66        200      25  10          1  10                 25  SSIII
-## 135  P21   P  21  C2         26        200      25  10          1  10                 25 Custom
+## 135  P21   P  21  C2         39        200      25  10          1  10                 25 Custom
 ## 355  P22   P  22  C2         50        200      25  10          1  10                 25  SSIII
 ## 255  P23   P  23  C2         19        200      25  10          1  10                 25  SSIII
 ## 285  P24   P  24  C2         62        200      25  10          1  10                 25  SSIII
 ##     MASTER_MIX_vol    INDEX Mn Mn_vol Mg Mg_vol dNTP dNTP_vol H2O_vol BARCODE_SEQ Mg_level Mn_level
 ## 15             300 TAGCGCTC  0      0  2     25  2.0      100      25      CACAGC     Mg_C     Mn_A
-## 40             300 TAGCGCTC  0      0  6     25  3.0      100      25      TATAGC     Mg_F     Mn_A
+## 40             300 TAGCGCTC  0      0  6     25  3.0      100      25      TATACG     Mg_F     Mn_A
 ## 5              300 TAGCGCTC  0      0  0      0  4.0      100      50      GCTCTC     Mg_A     Mn_A
-## 32             300 TAGCGCTC  0      0  4     25  1.0      100      25      ATCTCT     Mg_E     Mn_A
+## 32             300 TAGCGCTC  0      0  4     25  1.0      100      25      CGACTC     Mg_E     Mn_A
 ## 49             300 TAGCGCTC  0      0 12     25  0.5      100      25      TATGCA     Mg_H     Mn_A
-## 58             300 TAGCGCTC  0      0 15     25  3.0      100      25      AGTACG     Mg_I     Mn_A
+## 58             300 TAGCGCTC  0      0 15     25  3.0      100      25      GCTGCA     Mg_I     Mn_A
 ## 20             300 TAGCGCTC  0      0  3     25  1.0      100      25      CGATAC     Mg_D     Mn_A
 ## 36             300 TAGCGCTC  0      0  4     25  5.0      100      25      CACGCA     Mg_E     Mn_A
 ## 23             300 TAGCGCTC  0      0  3     25  4.0      100      25      CGAGCA     Mg_D     Mn_A
 ## 59             300 TAGCGCTC  0      0 15     25  4.0      100      25      CGACGT     Mg_I     Mn_A
-## 45             300 TAGCGCTC  0      0  9     25  2.0      100      25      AGTAGC     Mg_G     Mn_A
+## 45             300 TAGCGCTC  0      0  9     25  2.0      100      25      GCTGTG     Mg_G     Mn_A
 ## 37             300 TAGCGCTC  0      0  6     25  0.5      100      25      AGTGAT     Mg_F     Mn_A
 ## 17             300 TAGCGCTC  0      0  2     25  4.0      100      25      CGATGA     Mg_C     Mn_A
 ## 56             300 TAGCGCTC  0      0 15     25  1.0      100      25      GTACAG     Mg_I     Mn_A
@@ -4710,13 +4711,13 @@ plate7d %>% as.data.frame
 ## 34             300 TAGCGCTC  0      0  4     25  3.0      100      25      GTATCT     Mg_E     Mn_A
 ## 27             300 TAGCGCTC  0      0  3     25  2.0      100      25      ACAGCA     Mg_D     Mn_A
 ## 42             300 TAGCGCTC  0      0  6     25  5.0      100      25      ACACGT     Mg_F     Mn_A
-## 63             300 TAGCGCTC  0      0  0      0  0.0        0     150      CTGAGC     Mg_A     Mn_A
+## 63             300 TAGCGCTC  0      0  0      0  0.0        0     150      CTGACG     Mg_A     Mn_A
 ## 3              300 TAGCGCTC  0      0  0      0  2.0      100      50      GTAGAT     Mg_A     Mn_A
 ## 2              300 TAGCGCTC  0      0  0      0  1.0      100      50      ACACAG     Mg_A     Mn_A
-## 41             300 TAGCGCTC  0      0  6     25  4.0      100      25      ACAGTG     Mg_F     Mn_A
-## 9              300 TAGCGCTC  0      0  1     25  2.0      100      25      CACTAC     Mg_B     Mn_A
-## 53             300 TAGCGCTC  0      0 12     25  4.0      100      25      TATACG     Mg_H     Mn_A
-## 8              300 TAGCGCTC  0      0  1     25  1.0      100      25      ATCGAT     Mg_B     Mn_A
+## 41             300 TAGCGCTC  0      0  6     25  4.0      100      25      CTGCTC     Mg_F     Mn_A
+## 9              300 TAGCGCTC  0      0  1     25  2.0      100      25      GAGCTC     Mg_B     Mn_A
+## 53             300 TAGCGCTC  0      0 12     25  4.0      100      25      TATAGC     Mg_H     Mn_A
+## 8              300 TAGCGCTC  0      0  1     25  1.0      100      25      ATCGCA     Mg_B     Mn_A
 ## 62             300 TAGCGCTC  0      0  3     25  0.0        0     125      CACTCT     Mg_D     Mn_A
 ## 55             300 TAGCGCTC  0      0 15     25  0.5      100      25      ACATGA     Mg_I     Mn_A
 ## 10             300 TAGCGCTC  0      0  1     25  3.0      100      25      CTGCAG     Mg_B     Mn_A
@@ -4730,13 +4731,13 @@ plate7d %>% as.data.frame
 ## 18             300 TAGCGCTC  0      0  2     25  5.0      100      25      CACATA     Mg_C     Mn_A
 ## 60             300 TAGCGCTC  0      0 15     25  5.0      100      25      AGTCGT     Mg_I     Mn_A
 ## 31             300 TAGCGCTC  0      0  4     25  0.5      100      25      AGTGCA     Mg_E     Mn_A
-## 12             300 TAGCGCTC  0      0  1     25  5.0      100      25      ATCGCA     Mg_B     Mn_A
+## 12             300 TAGCGCTC  0      0  1     25  5.0      100      25      ATCGAT     Mg_B     Mn_A
 ## 61             300 TAGCGCTC  0      0  3     25  0.0        0     125      CACTGA     Mg_D     Mn_A
 ## 64             300 TAGCGCTC  0      0  0      0  0.0        0     150      GAGCGT     Mg_A     Mn_A
 ## 39             300 TAGCGCTC  0      0  6     25  2.0      100      25      GAGTCT     Mg_F     Mn_A
 ## 57             300 TAGCGCTC  0      0 15     25  2.0      100      25      ACATCT     Mg_I     Mn_A
 ## 16             300 TAGCGCTC  0      0  2     25  3.0      100      25      GCTAGC     Mg_C     Mn_A
-## 29             300 TAGCGCTC  0      0  3     25  4.0      100      25      ATCAGC     Mg_D     Mn_A
+## 29             300 TAGCGCTC  0      0  3     25  4.0      100      25      TATCTC     Mg_D     Mn_A
 ## 26             300 TAGCGCTC  0      0  3     25  1.0      100      25      CACGAT     Mg_D     Mn_A
 ## 46             300 TAGCGCTC  0      0  9     25  3.0      100      25      ATCTAC     Mg_G     Mn_A
 ## 28             300 TAGCGCTC  0      0  3     25  3.0      100      25      ATCACG     Mg_D     Mn_A
@@ -4750,19 +4751,19 @@ plate7d %>% as.data.frame
 ## 33             300 TAGCGCTC  0      0  4     25  2.0      100      25      GTAGTG     Mg_E     Mn_A
 ## 24             300 TAGCGCTC  0      0  3     25  5.0      100      25      ATCGTG     Mg_D     Mn_A
 ## 22             300 TAGCGCTC  0      0  3     25  3.0      100      25      TCGAGC     Mg_D     Mn_A
-## 51             300 TAGCGCTC  0      0 12     25  2.0      100      25      CTGACG     Mg_H     Mn_A
+## 51             300 TAGCGCTC  0      0 12     25  2.0      100      25      CTGAGC     Mg_H     Mn_A
 ## 47             300 TAGCGCTC  0      0  9     25  4.0      100      25      GTATAC     Mg_G     Mn_A
 ## 19             300 TAGCGCTC  0      0  3     25  0.5      100      25      ATCATA     Mg_D     Mn_A
 ## 4              300 TAGCGCTC  0      0  0      0  3.0      100      50      GCTACG     Mg_A     Mn_A
 ## 641            300 ACTGAGCG  1     25  0      0  0.0        0     125      GTACAG     Mg_A     Mn_B
 ## 151            300 ACTGAGCG  1     25  2     25  2.0      100       0      CGAGAT     Mg_C     Mn_B
-## 181            300 ACTGAGCG  1     25  2     25  5.0      100       0      TATAGC     Mg_C     Mn_B
+## 181            300 ACTGAGCG  1     25  2     25  5.0      100       0      TATACG     Mg_C     Mn_B
 ## 431            300 ACTGAGCG  1     25  9     25  0.5      100       0      CGAGTG     Mg_G     Mn_B
 ## 511            300 ACTGAGCG  1     25 12     25  2.0      100       0      TCGACG     Mg_H     Mn_B
 ## 281            300 ACTGAGCG  1     25  3     25  3.0      100       0      ATCACG     Mg_D     Mn_B
 ## 231            300 ACTGAGCG  1     25  3     25  4.0      100       0      CACTGA     Mg_D     Mn_B
 ## 65             300 ACTGAGCG  1     25  0      0  5.0      100      25      CTGCGT     Mg_A     Mn_B
-## 611            300 ACTGAGCG  1     25  3     25  0.0        0     100      ACAGTG     Mg_D     Mn_B
+## 611            300 ACTGAGCG  1     25  3     25  0.0        0     100      CTGCTC     Mg_D     Mn_B
 ## 441            300 ACTGAGCG  1     25  9     25  1.0      100       0      GCTGAT     Mg_G     Mn_B
 ## 251            300 ACTGAGCG  1     25  3     25  0.5      100       0      GAGCGT     Mg_D     Mn_B
 ## 201            300 ACTGAGCG  1     25  3     25  1.0      100       0      ACATGA     Mg_D     Mn_B
@@ -4780,14 +4781,14 @@ plate7d %>% as.data.frame
 ## 311            300 ACTGAGCG  1     25  4     25  0.5      100       0      GTAGAT     Mg_E     Mn_B
 ## 571            300 ACTGAGCG  1     25 15     25  2.0      100       0      ACACGT     Mg_I     Mn_B
 ## 71             300 ACTGAGCG  1     25  1     25  0.5      100       0      CGATGA     Mg_B     Mn_B
-## 461            300 ACTGAGCG  1     25  9     25  3.0      100       0      CTGAGC     Mg_G     Mn_B
-## 481            300 ACTGAGCG  1     25  9     25  5.0      100       0      CACTAC     Mg_G     Mn_B
+## 461            300 ACTGAGCG  1     25  9     25  3.0      100       0      CTGACG     Mg_G     Mn_B
+## 481            300 ACTGAGCG  1     25  9     25  5.0      100       0      GAGCTC     Mg_G     Mn_B
 ## 491            300 ACTGAGCG  1     25 12     25  0.5      100       0      ACATAC     Mg_H     Mn_B
-## 501            300 ACTGAGCG  1     25 12     25  1.0      100       0      CTGACG     Mg_H     Mn_B
-## 271            300 ACTGAGCG  1     25  3     25  2.0      100       0      ATCGCA     Mg_D     Mn_B
+## 501            300 ACTGAGCG  1     25 12     25  1.0      100       0      CTGAGC     Mg_H     Mn_B
+## 271            300 ACTGAGCG  1     25  3     25  2.0      100       0      ATCGAT     Mg_D     Mn_B
 ## 101            300 ACTGAGCG  1     25  1     25  3.0      100       0      CACACG     Mg_B     Mn_B
-## 261            300 ACTGAGCG  1     25  3     25  1.0      100       0      TATACG     Mg_D     Mn_B
-## 171            300 ACTGAGCG  1     25  2     25  4.0      100       0      ATCTCT     Mg_C     Mn_B
+## 261            300 ACTGAGCG  1     25  3     25  1.0      100       0      TATAGC     Mg_D     Mn_B
+## 171            300 ACTGAGCG  1     25  2     25  4.0      100       0      CGACTC     Mg_C     Mn_B
 ## 521            300 ACTGAGCG  1     25 12     25  3.0      100       0      GTACGT     Mg_H     Mn_B
 ## 141            300 ACTGAGCG  1     25  2     25  1.0      100       0      CTGATA     Mg_C     Mn_B
 ## 131            300 ACTGAGCG  1     25  2     25  0.5      100       0      GCTATA     Mg_C     Mn_B
@@ -4796,7 +4797,7 @@ plate7d %>% as.data.frame
 ## 221            300 ACTGAGCG  1     25  3     25  3.0      100       0      ACAGCA     Mg_D     Mn_B
 ## 401            300 ACTGAGCG  1     25  6     25  3.0      100       0      CTGCAG     Mg_F     Mn_B
 ## 510            300 ACTGAGCG  1     25  0      0  4.0      100      25      AGTGCA     Mg_A     Mn_B
-## 391            300 ACTGAGCG  1     25  6     25  2.0      100       0      ATCGAT     Mg_F     Mn_B
+## 391            300 ACTGAGCG  1     25  6     25  2.0      100       0      ATCGCA     Mg_F     Mn_B
 ## 561            300 ACTGAGCG  1     25 15     25  1.0      100       0      GCTACG     Mg_I     Mn_B
 ## 531            300 ACTGAGCG  1     25 12     25  4.0      100       0      GCTCGT     Mg_H     Mn_B
 ## 351            300 ACTGAGCG  1     25  4     25  4.0      100       0      ACAGAT     Mg_E     Mn_B
@@ -4805,30 +4806,30 @@ plate7d %>% as.data.frame
 ## 81             300 ACTGAGCG  1     25  1     25  1.0      100       0      ATCGTG     Mg_B     Mn_B
 ## 361            300 ACTGAGCG  1     25  4     25  5.0      100       0      GTATAC     Mg_E     Mn_B
 ## 310            300 ACTGAGCG  1     25  0      0  2.0      100      25      TATGCA     Mg_A     Mn_B
-## 91             300 ACTGAGCG  1     25  1     25  2.0      100       0      ATCAGC     Mg_B     Mn_B
+## 91             300 ACTGAGCG  1     25  1     25  2.0      100       0      TATCTC     Mg_B     Mn_B
 ## 121            300 ACTGAGCG  1     25  1     25  5.0      100       0      ACACAG     Mg_B     Mn_B
 ## 110            300 ACTGAGCG  1     25  0      0  0.5      100      25      CGATAC     Mg_A     Mn_B
 ## 601            300 ACTGAGCG  1     25 15     25  5.0      100       0      CGATCT     Mg_I     Mn_B
 ## 371            300 ACTGAGCG  1     25  6     25  0.5      100       0      GCTCTC     Mg_F     Mn_B
-## 211            300 ACTGAGCG  1     25  3     25  2.0      100       0      AGTACG     Mg_D     Mn_B
+## 211            300 ACTGAGCG  1     25  3     25  2.0      100       0      GCTGCA     Mg_D     Mn_B
 ## 381            300 ACTGAGCG  1     25  6     25  1.0      100       0      ATCTAC     Mg_F     Mn_B
 ## 631            300 ACTGAGCG  1     25  0      0  0.0        0     125      CGAGCA     Mg_A     Mn_B
 ## 111            300 ACTGAGCG  1     25  1     25  4.0      100       0      GCTAGC     Mg_B     Mn_B
 ## 451            300 ACTGAGCG  1     25  9     25  2.0      100       0      GAGTAC     Mg_G     Mn_B
-## 161            300 ACTGAGCG  1     25  2     25  3.0      100       0      AGTAGC     Mg_C     Mn_B
+## 161            300 ACTGAGCG  1     25  2     25  3.0      100       0      GCTGTG     Mg_C     Mn_B
 ## 291            300 ACTGAGCG  1     25  3     25  4.0      100       0      AGTCGT     Mg_D     Mn_B
 ## 551            300 ACTGAGCG  1     25 15     25  0.5      100       0      GTATGA     Mg_I     Mn_B
-## 412            300 CCTAAGAC  2     25  6     25  4.0      100       0      ATCTCT     Mg_F     Mn_C
+## 412            300 CCTAAGAC  2     25  6     25  4.0      100       0      CGACTC     Mg_F     Mn_C
 ## 122            300 CCTAAGAC  2     25  1     25  5.0      100       0      GCTATA     Mg_B     Mn_C
 ## 432            300 CCTAAGAC  2     25  9     25  0.5      100       0      AGTGCA     Mg_G     Mn_C
 ## 212            300 CCTAAGAC  2     25  3     25  2.0      100       0      ATCTAC     Mg_D     Mn_C
 ## 112            300 CCTAAGAC  2     25  1     25  4.0      100       0      AGTCAG     Mg_B     Mn_C
 ## 532            300 CCTAAGAC  2     25 12     25  4.0      100       0      GAGTAC     Mg_H     Mn_C
-## 512            300 CCTAAGAC  2     25  0      0  4.0      100      25      AGTACG     Mg_A     Mn_C
+## 512            300 CCTAAGAC  2     25  0      0  4.0      100      25      GCTGCA     Mg_A     Mn_C
 ## 582            300 CCTAAGAC  2     25 15     25  3.0      100       0      AGTGAT     Mg_I     Mn_C
 ## 472            300 CCTAAGAC  2     25  9     25  4.0      100       0      GTAGCA     Mg_G     Mn_C
 ## 392            300 CCTAAGAC  2     25  6     25  2.0      100       0      TATGAT     Mg_F     Mn_C
-## 413            300 CCTAAGAC  2     25  0      0  3.0      100      25      CACTAC     Mg_A     Mn_C
+## 413            300 CCTAAGAC  2     25  0      0  3.0      100      25      GAGCTC     Mg_A     Mn_C
 ## 292            300 CCTAAGAC  2     25  3     25  4.0      100       0      AGTCGT     Mg_D     Mn_C
 ## 272            300 CCTAAGAC  2     25  3     25  2.0      100       0      GTAGTG     Mg_D     Mn_C
 ## 522            300 CCTAAGAC  2     25 12     25  3.0      100       0      CTGATA     Mg_H     Mn_C
@@ -4838,37 +4839,37 @@ plate7d %>% as.data.frame
 ## 442            300 CCTAAGAC  2     25  9     25  1.0      100       0      TCGAGC     Mg_G     Mn_C
 ## 192            300 CCTAAGAC  2     25  3     25  0.5      100       0      CGAGCA     Mg_D     Mn_C
 ## 502            300 CCTAAGAC  2     25 12     25  1.0      100       0      GCTAGC     Mg_H     Mn_C
-## 622            300 CCTAAGAC  2     25  3     25  0.0        0     100      ATCAGC     Mg_D     Mn_C
+## 622            300 CCTAAGAC  2     25  3     25  0.0        0     100      TATCTC     Mg_D     Mn_C
 ## 113            300 CCTAAGAC  2     25  0      0  0.5      100      25      GTAGAT     Mg_A     Mn_C
 ## 142            300 CCTAAGAC  2     25  2     25  1.0      100       0      CGATGA     Mg_C     Mn_C
 ## 66             300 CCTAAGAC  2     25  0      0  5.0      100      25      ACACGT     Mg_A     Mn_C
 ## 492            300 CCTAAGAC  2     25 12     25  0.5      100       0      CGAGTG     Mg_H     Mn_C
 ## 102            300 CCTAAGAC  2     25  1     25  3.0      100       0      GAGCGT     Mg_B     Mn_C
-## 562            300 CCTAAGAC  2     25 15     25  1.0      100       0      TATACG     Mg_I     Mn_C
+## 562            300 CCTAAGAC  2     25 15     25  1.0      100       0      TATAGC     Mg_I     Mn_C
 ## 482            300 CCTAAGAC  2     25  9     25  5.0      100       0      CACAGC     Mg_G     Mn_C
 ## 352            300 CCTAAGAC  2     25  4     25  4.0      100       0      CTGCGT     Mg_E     Mn_C
-## 213            300 CCTAAGAC  2     25  0      0  1.0      100      25      TATAGC     Mg_A     Mn_C
+## 213            300 CCTAAGAC  2     25  0      0  1.0      100      25      TATACG     Mg_A     Mn_C
 ## 182            300 CCTAAGAC  2     25  2     25  5.0      100       0      CACATA     Mg_C     Mn_C
-## 362            300 CCTAAGAC  2     25  4     25  5.0      100       0      AGTAGC     Mg_E     Mn_C
+## 362            300 CCTAAGAC  2     25  4     25  5.0      100       0      GCTGTG     Mg_E     Mn_C
 ## 452            300 CCTAAGAC  2     25  9     25  2.0      100       0      ACAGCA     Mg_G     Mn_C
 ## 172            300 CCTAAGAC  2     25  2     25  4.0      100       0      CGATAC     Mg_C     Mn_C
 ## 232            300 CCTAAGAC  2     25  3     25  4.0      100       0      ACATCT     Mg_D     Mn_C
 ## 462            300 CCTAAGAC  2     25  9     25  3.0      100       0      GTACGT     Mg_G     Mn_C
 ## 642            300 CCTAAGAC  2     25  0      0  0.0        0     125      GAGTCT     Mg_A     Mn_C
 ## 132            300 CCTAAGAC  2     25  2     25  0.5      100       0      CACACG     Mg_C     Mn_C
-## 542            300 CCTAAGAC  2     25 12     25  5.0      100       0      CTGAGC     Mg_H     Mn_C
+## 542            300 CCTAAGAC  2     25 12     25  5.0      100       0      CTGACG     Mg_H     Mn_C
 ## 92             300 CCTAAGAC  2     25  1     25  2.0      100       0      CGACGT     Mg_B     Mn_C
 ## 262            300 CCTAAGAC  2     25  3     25  1.0      100       0      GCTACG     Mg_D     Mn_C
 ## 72             300 CCTAAGAC  2     25  1     25  0.5      100       0      GTATCT     Mg_B     Mn_C
 ## 402            300 CCTAAGAC  2     25  6     25  3.0      100       0      CACTCT     Mg_F     Mn_C
 ## 252            300 CCTAAGAC  2     25  3     25  0.5      100       0      GCTCTC     Mg_D     Mn_C
 ## 513            300 CCTAAGAC  2     25 12     25  2.0      100       0      ATCATA     Mg_H     Mn_C
-## 82             300 CCTAAGAC  2     25  1     25  1.0      100       0      ATCGCA     Mg_B     Mn_C
+## 82             300 CCTAAGAC  2     25  1     25  1.0      100       0      ATCGAT     Mg_B     Mn_C
 ## 382            300 CCTAAGAC  2     25  6     25  1.0      100       0      ACAGAT     Mg_F     Mn_C
-## 342            300 CCTAAGAC  2     25  4     25  3.0      100       0      ATCGAT     Mg_E     Mn_C
+## 342            300 CCTAAGAC  2     25  4     25  3.0      100       0      ATCGCA     Mg_E     Mn_C
 ## 162            300 CCTAAGAC  2     25  2     25  3.0      100       0      CACGTG     Mg_C     Mn_C
 ## 572            300 CCTAAGAC  2     25 15     25  2.0      100       0      ACATGA     Mg_I     Mn_C
-## 242            300 CCTAAGAC  2     25  3     25  5.0      100       0      ACAGTG     Mg_D     Mn_C
+## 242            300 CCTAAGAC  2     25  3     25  5.0      100       0      CTGCTC     Mg_D     Mn_C
 ## 312            300 CCTAAGAC  2     25  0      0  2.0      100      25      ACACAG     Mg_A     Mn_C
 ## 592            300 CCTAAGAC  2     25 15     25  4.0      100       0      GTATGA     Mg_I     Mn_C
 ## 282            300 CCTAAGAC  2     25  3     25  3.0      100       0      GCTGAT     Mg_D     Mn_C
@@ -4901,9 +4902,9 @@ plate7d %>% as.data.frame
 ## 243            300 CGATCAGT  3     25  3     25  5.0      100       0      TCGACG     Mg_D     Mn_D
 ## 543            300 CGATCAGT  3     25 12     25  5.0      100       0      ATCTAC     Mg_H     Mn_D
 ## 343            300 CGATCAGT  3     25  4     25  3.0      100       0      ACAGCA     Mg_E     Mn_D
-## 373            300 CGATCAGT  3     25  6     25  0.5      100       0      ATCGCA     Mg_F     Mn_D
+## 373            300 CGATCAGT  3     25  6     25  0.5      100       0      ATCGAT     Mg_F     Mn_D
 ## 83             300 CGATCAGT  3     25  1     25  1.0      100       0      GTACAG     Mg_B     Mn_D
-## 303            300 CGATCAGT  3     25  3     25  5.0      100       0      ATCAGC     Mg_D     Mn_D
+## 303            300 CGATCAGT  3     25  3     25  5.0      100       0      TATCTC     Mg_D     Mn_D
 ## 163            300 CGATCAGT  3     25  2     25  3.0      100       0      ATCACG     Mg_C     Mn_D
 ## 443            300 CGATCAGT  3     25  9     25  1.0      100       0      AGTCGT     Mg_G     Mn_D
 ## 515            300 CGATCAGT  3     25 12     25  2.0      100       0      CACGCA     Mg_H     Mn_D
@@ -4925,29 +4926,29 @@ plate7d %>% as.data.frame
 ## 623            300 CGATCAGT  3     25  3     25  0.0        0     100      CACATA     Mg_D     Mn_D
 ## 115            300 CGATCAGT  3     25  0      0  0.5      100      25      ACATGA     Mg_A     Mn_D
 ## 403            300 CGATCAGT  3     25  6     25  3.0      100       0      GAGCGT     Mg_F     Mn_D
-## 314            300 CGATCAGT  3     25  4     25  0.5      100       0      ACAGTG     Mg_E     Mn_D
+## 314            300 CGATCAGT  3     25  4     25  0.5      100       0      CTGCTC     Mg_E     Mn_D
 ## 215            300 CGATCAGT  3     25  3     25  2.0      100       0      GTAGAT     Mg_D     Mn_D
 ## 473            300 CGATCAGT  3     25  9     25  4.0      100       0      CACGTG     Mg_G     Mn_D
 ## 613            300 CGATCAGT  3     25  3     25  0.0        0     100      CGATAC     Mg_D     Mn_D
-## 593            300 CGATCAGT  3     25 15     25  4.0      100       0      AGTACG     Mg_I     Mn_D
+## 593            300 CGATCAGT  3     25 15     25  4.0      100       0      GCTGCA     Mg_I     Mn_D
 ## 263            300 CGATCAGT  3     25  3     25  1.0      100       0      AGTCAG     Mg_D     Mn_D
 ## 193            300 CGATCAGT  3     25  3     25  0.5      100       0      CGACAG     Mg_D     Mn_D
-## 103            300 CGATCAGT  3     25  1     25  3.0      100       0      ATCGAT     Mg_B     Mn_D
+## 103            300 CGATCAGT  3     25  1     25  3.0      100       0      ATCGCA     Mg_B     Mn_D
 ## 353            300 CGATCAGT  3     25  4     25  4.0      100       0      TATGAT     Mg_E     Mn_D
 ## 393            300 CGATCAGT  3     25  6     25  2.0      100       0      GTAGTG     Mg_F     Mn_D
 ## 283            300 CGATCAGT  3     25  3     25  3.0      100       0      TATGCA     Mg_D     Mn_D
 ## 433            300 CGATCAGT  3     25  9     25  0.5      100       0      TATGTG     Mg_G     Mn_D
 ## 503            300 CGATCAGT  3     25 12     25  1.0      100       0      CACGAT     Mg_H     Mn_D
-## 173            300 CGATCAGT  3     25  2     25  4.0      100       0      CTGAGC     Mg_C     Mn_D
+## 173            300 CGATCAGT  3     25  2     25  4.0      100       0      CTGACG     Mg_C     Mn_D
 ## 423            300 CGATCAGT  3     25  6     25  5.0      100       0      GCTAGC     Mg_F     Mn_D
 ## 463            300 CGATCAGT  3     25  9     25  3.0      100       0      GCTCAG     Mg_G     Mn_D
-## 523            300 CGATCAGT  3     25 12     25  3.0      100       0      CACTAC     Mg_H     Mn_D
+## 523            300 CGATCAGT  3     25 12     25  3.0      100       0      GAGCTC     Mg_H     Mn_D
 ## 315            300 CGATCAGT  3     25  0      0  2.0      100      25      ACACGT     Mg_A     Mn_D
-## 483            300 CGATCAGT  3     25  9     25  5.0      100       0      ATCTCT     Mg_G     Mn_D
-## 123            300 CGATCAGT  3     25  1     25  5.0      100       0      AGTAGC     Mg_B     Mn_D
+## 483            300 CGATCAGT  3     25  9     25  5.0      100       0      CGACTC     Mg_G     Mn_D
+## 123            300 CGATCAGT  3     25  1     25  5.0      100       0      GCTGTG     Mg_B     Mn_D
 ## 415            300 CGATCAGT  3     25  0      0  3.0      100      25      GTATCT     Mg_A     Mn_D
 ## 364            300 TGCAGCTA  4     25  4     25  5.0      100       0      CACTCT     Mg_E     Mn_E
-## 216            300 TGCAGCTA  4     25  0      0  1.0      100      25      CACTAC     Mg_A     Mn_E
+## 216            300 TGCAGCTA  4     25  0      0  1.0      100      25      GAGCTC     Mg_A     Mn_E
 ## 474            300 TGCAGCTA  4     25  9     25  4.0      100       0      GCTCAG     Mg_G     Mn_E
 ## 494            300 TGCAGCTA  4     25 12     25  0.5      100       0      CTGATA     Mg_H     Mn_E
 ## 464            300 TGCAGCTA  4     25  9     25  3.0      100       0      AGTCAG     Mg_G     Mn_E
@@ -4964,12 +4965,12 @@ plate7d %>% as.data.frame
 ## 424            300 TGCAGCTA  4     25  6     25  5.0      100       0      GAGTCT     Mg_F     Mn_E
 ## 174            300 TGCAGCTA  4     25  2     25  4.0      100       0      CACGAT     Mg_C     Mn_E
 ## 194            300 TGCAGCTA  4     25  3     25  0.5      100       0      CACGTG     Mg_D     Mn_E
-## 116            300 TGCAGCTA  4     25  1     25  4.0      100       0      ATCGCA     Mg_B     Mn_E
+## 116            300 TGCAGCTA  4     25  1     25  4.0      100       0      ATCGAT     Mg_B     Mn_E
 ## 644            300 TGCAGCTA  4     25  0      0  0.0        0     125      GTATGA     Mg_A     Mn_E
-## 204            300 TGCAGCTA  4     25  3     25  1.0      100       0      TATACG     Mg_D     Mn_E
+## 204            300 TGCAGCTA  4     25  3     25  1.0      100       0      TATAGC     Mg_D     Mn_E
 ## 484            300 TGCAGCTA  4     25  9     25  5.0      100       0      CACATA     Mg_G     Mn_E
 ## 74             300 TGCAGCTA  4     25  1     25  0.5      100       0      GCTATA     Mg_B     Mn_E
-## 117            300 TGCAGCTA  4     25  0      0  0.5      100      25      ATCTCT     Mg_A     Mn_E
+## 117            300 TGCAGCTA  4     25  0      0  0.5      100      25      CGACTC     Mg_A     Mn_E
 ## 417            300 TGCAGCTA  4     25  6     25  4.0      100       0      TCGACG     Mg_F     Mn_E
 ## 294            300 TGCAGCTA  4     25  3     25  4.0      100       0      ACATAC     Mg_D     Mn_E
 ## 454            300 TGCAGCTA  4     25  9     25  2.0      100       0      ATCATA     Mg_G     Mn_E
@@ -4980,21 +4981,21 @@ plate7d %>% as.data.frame
 ## 404            300 TGCAGCTA  4     25  6     25  3.0      100       0      GTAGCA     Mg_F     Mn_E
 ## 84             300 TGCAGCTA  4     25  1     25  1.0      100       0      ACAGCA     Mg_B     Mn_E
 ## 94             300 TGCAGCTA  4     25  1     25  2.0      100       0      GTACAG     Mg_B     Mn_E
-## 184            300 TGCAGCTA  4     25  2     25  5.0      100       0      CTGACG     Mg_C     Mn_E
-## 604            300 TGCAGCTA  4     25 15     25  5.0      100       0      CTGAGC     Mg_I     Mn_E
+## 184            300 TGCAGCTA  4     25  2     25  5.0      100       0      CTGAGC     Mg_C     Mn_E
+## 604            300 TGCAGCTA  4     25 15     25  5.0      100       0      CTGACG     Mg_I     Mn_E
 ## 394            300 TGCAGCTA  4     25  6     25  2.0      100       0      ATCGTG     Mg_F     Mn_E
 ## 254            300 TGCAGCTA  4     25  3     25  0.5      100       0      ATCACG     Mg_D     Mn_E
 ## 154            300 TGCAGCTA  4     25  2     25  2.0      100       0      CACGCA     Mg_C     Mn_E
 ## 134            300 TGCAGCTA  4     25  2     25  0.5      100       0      CGATGA     Mg_C     Mn_E
 ## 594            300 TGCAGCTA  4     25 15     25  4.0      100       0      CGACGT     Mg_I     Mn_E
-## 374            300 TGCAGCTA  4     25  6     25  0.5      100       0      TATAGC     Mg_F     Mn_E
+## 374            300 TGCAGCTA  4     25  6     25  0.5      100       0      TATACG     Mg_F     Mn_E
 ## 544            300 TGCAGCTA  4     25 12     25  5.0      100       0      CGACAG     Mg_H     Mn_E
 ## 217            300 TGCAGCTA  4     25  3     25  2.0      100       0      GTAGAT     Mg_D     Mn_E
 ## 324            300 TGCAGCTA  4     25  4     25  1.0      100       0      CGATAC     Mg_E     Mn_E
 ## 274            300 TGCAGCTA  4     25  3     25  2.0      100       0      ACATGA     Mg_D     Mn_E
 ## 264            300 TGCAGCTA  4     25  3     25  1.0      100       0      AGTCGT     Mg_D     Mn_E
 ## 124            300 TGCAGCTA  4     25  1     25  5.0      100       0      ACACAG     Mg_B     Mn_E
-## 234            300 TGCAGCTA  4     25  3     25  4.0      100       0      AGTACG     Mg_D     Mn_E
+## 234            300 TGCAGCTA  4     25  3     25  4.0      100       0      GCTGCA     Mg_D     Mn_E
 ## 554            300 TGCAGCTA  4     25 15     25  0.5      100       0      GTAGTG     Mg_I     Mn_E
 ## 334            300 TGCAGCTA  4     25  4     25  2.0      100       0      AGTGAT     Mg_E     Mn_E
 ## 384            300 TGCAGCTA  4     25  6     25  1.0      100       0      ACATCT     Mg_F     Mn_E
@@ -5005,24 +5006,24 @@ plate7d %>% as.data.frame
 ## 534            300 TGCAGCTA  4     25 12     25  4.0      100       0      CACAGC     Mg_H     Mn_E
 ## 224            300 TGCAGCTA  4     25  3     25  3.0      100       0      GCTGAT     Mg_D     Mn_E
 ## 624            300 TGCAGCTA  4     25  3     25  0.0        0     100      CGAGTG     Mg_D     Mn_E
-## 634            300 TGCAGCTA  4     25  0      0  0.0        0     125      ATCGAT     Mg_A     Mn_E
+## 634            300 TGCAGCTA  4     25  0      0  0.0        0     125      ATCGCA     Mg_A     Mn_E
 ## 317            300 TGCAGCTA  4     25  4     25  0.5      100       0      GCTCGT     Mg_E     Mn_E
-## 564            300 TGCAGCTA  4     25 15     25  1.0      100       0      AGTAGC     Mg_I     Mn_E
-## 164            300 TGCAGCTA  4     25  2     25  3.0      100       0      ATCAGC     Mg_C     Mn_E
+## 564            300 TGCAGCTA  4     25 15     25  1.0      100       0      GCTGTG     Mg_I     Mn_E
+## 164            300 TGCAGCTA  4     25  2     25  3.0      100       0      TATCTC     Mg_C     Mn_E
 ## 444            300 TGCAGCTA  4     25  9     25  1.0      100       0      CTGCAG     Mg_G     Mn_E
 ## 435            300 TCGACGTC  5     25  9     25  0.5      100       0      CACTCT     Mg_G     Mn_F
 ## 645            300 TCGACGTC  5     25  0      0  0.0        0     125      CGATAC     Mg_A     Mn_F
-## 345            300 TCGACGTC  5     25  4     25  3.0      100       0      ATCGCA     Mg_E     Mn_F
+## 345            300 TCGACGTC  5     25  4     25  3.0      100       0      ATCGAT     Mg_E     Mn_F
 ## 565            300 TCGACGTC  5     25 15     25  1.0      100       0      TCGAGC     Mg_I     Mn_F
 ## 635            300 TCGACGTC  5     25  0      0  0.0        0     125      GAGTAC     Mg_A     Mn_F
 ## 485            300 TCGACGTC  5     25  9     25  5.0      100       0      ACACGT     Mg_G     Mn_F
-## 185            300 TCGACGTC  5     25  2     25  5.0      100       0      AGTAGC     Mg_C     Mn_F
+## 185            300 TCGACGTC  5     25  2     25  5.0      100       0      GCTGTG     Mg_C     Mn_F
 ## 105            300 TCGACGTC  5     25  1     25  3.0      100       0      CACGAT     Mg_B     Mn_F
 ## 318            300 TCGACGTC  5     25  4     25  0.5      100       0      ATCATA     Mg_E     Mn_F
 ## 175            300 TCGACGTC  5     25  2     25  4.0      100       0      GTAGAT     Mg_C     Mn_F
-## 465            300 TCGACGTC  5     25  9     25  3.0      100       0      AGTACG     Mg_G     Mn_F
+## 465            300 TCGACGTC  5     25  9     25  3.0      100       0      GCTGCA     Mg_G     Mn_F
 ## 295            300 TCGACGTC  5     25  3     25  4.0      100       0      ACAGAT     Mg_D     Mn_F
-## 455            300 TCGACGTC  5     25  9     25  2.0      100       0      TATAGC     Mg_G     Mn_F
+## 455            300 TCGACGTC  5     25  9     25  2.0      100       0      TATACG     Mg_G     Mn_F
 ## 325            300 TCGACGTC  5     25  4     25  1.0      100       0      TCGACG     Mg_E     Mn_F
 ## 555            300 TCGACGTC  5     25 15     25  0.5      100       0      GTATAC     Mg_I     Mn_F
 ## 418            300 TCGACGTC  5     25  0      0  3.0      100      25      TATGCA     Mg_A     Mn_F
@@ -5035,7 +5036,7 @@ plate7d %>% as.data.frame
 ## 505            300 TCGACGTC  5     25 12     25  1.0      100       0      CGAGAT     Mg_H     Mn_F
 ## 218            300 TCGACGTC  5     25  0      0  1.0      100      25      AGTCAG     Mg_A     Mn_F
 ## 419            300 TCGACGTC  5     25  6     25  4.0      100       0      ACAGCA     Mg_F     Mn_F
-## 519            300 TCGACGTC  5     25 12     25  2.0      100       0      ATCAGC     Mg_H     Mn_F
+## 519            300 TCGACGTC  5     25 12     25  2.0      100       0      TATCTC     Mg_H     Mn_F
 ## 205            300 TCGACGTC  5     25  3     25  1.0      100       0      TATGTG     Mg_D     Mn_F
 ## 275            300 TCGACGTC  5     25  3     25  2.0      100       0      GAGCGT     Mg_D     Mn_F
 ## 118            300 TCGACGTC  5     25  0      0  0.5      100      25      GCTCAG     Mg_A     Mn_F
@@ -5050,27 +5051,27 @@ plate7d %>% as.data.frame
 ## 219            300 TCGACGTC  5     25  3     25  2.0      100       0      ACATCT     Mg_D     Mn_F
 ## 119            300 TCGACGTC  5     25  1     25  4.0      100       0      CGATCT     Mg_B     Mn_F
 ## 165            300 TCGACGTC  5     25  2     25  3.0      100       0      ACATGA     Mg_C     Mn_F
-## 225            300 TCGACGTC  5     25  3     25  3.0      100       0      CTGACG     Mg_D     Mn_F
+## 225            300 TCGACGTC  5     25  3     25  3.0      100       0      CTGAGC     Mg_D     Mn_F
 ## 535            300 TCGACGTC  5     25 12     25  4.0      100       0      CACAGC     Mg_H     Mn_F
 ## 605            300 TCGACGTC  5     25 15     25  5.0      100       0      GCTGAT     Mg_I     Mn_F
 ## 305            300 TCGACGTC  5     25  3     25  5.0      100       0      GTACGT     Mg_D     Mn_F
 ## 235            300 TCGACGTC  5     25  3     25  4.0      100       0      GTATGA     Mg_D     Mn_F
 ## 155            300 TCGACGTC  5     25  2     25  2.0      100       0      AGTCGT     Mg_C     Mn_F
-## 319            300 TCGACGTC  5     25  0      0  2.0      100      25      ATCGAT     Mg_A     Mn_F
-## 125            300 TCGACGTC  5     25  1     25  5.0      100       0      CTGAGC     Mg_B     Mn_F
+## 319            300 TCGACGTC  5     25  0      0  2.0      100      25      ATCGCA     Mg_A     Mn_F
+## 125            300 TCGACGTC  5     25  1     25  5.0      100       0      CTGACG     Mg_B     Mn_F
 ## 265            300 TCGACGTC  5     25  3     25  1.0      100       0      AGTGCA     Mg_D     Mn_F
-## 69             300 TCGACGTC  5     25  0      0  5.0      100      25      TATACG     Mg_A     Mn_F
+## 69             300 TCGACGTC  5     25  0      0  5.0      100      25      TATAGC     Mg_A     Mn_F
 ## 525            300 TCGACGTC  5     25 12     25  3.0      100       0      AGTGAT     Mg_H     Mn_F
 ## 585            300 TCGACGTC  5     25 15     25  3.0      100       0      ACACAG     Mg_I     Mn_F
 ## 75             300 TCGACGTC  5     25  1     25  0.5      100       0      CGACGT     Mg_B     Mn_F
 ## 95             300 TCGACGTC  5     25  1     25  2.0      100       0      GTAGCA     Mg_B     Mn_F
-## 445            300 TCGACGTC  5     25  9     25  1.0      100       0      ACAGTG     Mg_G     Mn_F
+## 445            300 TCGACGTC  5     25  9     25  1.0      100       0      CTGCTC     Mg_G     Mn_F
 ## 575            300 TCGACGTC  5     25 15     25  2.0      100       0      CGAGTG     Mg_I     Mn_F
 ## 475            300 TCGACGTC  5     25  9     25  4.0      100       0      GTATCT     Mg_G     Mn_F
 ## 625            300 TCGACGTC  5     25  3     25  0.0        0     100      CGATGA     Mg_D     Mn_F
-## 425            300 TCGACGTC  5     25  6     25  5.0      100       0      CACTAC     Mg_F     Mn_F
+## 425            300 TCGACGTC  5     25  6     25  5.0      100       0      GAGCTC     Mg_F     Mn_F
 ## 595            300 TCGACGTC  5     25 15     25  4.0      100       0      GCTATA     Mg_I     Mn_F
-## 135            300 TCGACGTC  5     25  2     25  0.5      100       0      ATCTCT     Mg_C     Mn_F
+## 135            300 TCGACGTC  5     25  2     25  0.5      100       0      CGACTC     Mg_C     Mn_F
 ## 355            300 TCGACGTC  5     25  4     25  4.0      100       0      CTGCGT     Mg_E     Mn_F
 ## 255            300 TCGACGTC  5     25  3     25  0.5      100       0      ATCACG     Mg_D     Mn_F
 ## 285            300 TCGACGTC  5     25  3     25  3.0      100       0      GAGTCT     Mg_D     Mn_F
@@ -5514,12 +5515,12 @@ transfers7a
 ## 1799  B02 H19  25         AGTCGT
 ## 1800  B02 I08  25         AGTCGT
 ## 1801  B02 L07  25         AGTCGT
-## 1926  B03 A22  25         ATCTCT
-## 1927  B03 B07  25         ATCTCT
-## 1928  B03 G13  25         ATCTCT
-## 1929  B03 J19  25         ATCTCT
-## 1930  B03 N09  25         ATCTCT
-## 1931  B03 O07  25         ATCTCT
+## 1926  B03 A22  25         CGACTC
+## 1927  B03 B07  25         CGACTC
+## 1928  B03 G13  25         CGACTC
+## 1929  B03 J19  25         CGACTC
+## 1930  B03 N09  25         CGACTC
+## 1931  B03 O07  25         CGACTC
 ## 1830  B04 E22  25         CGACGT
 ## 1831  B04 K06  25         CGACGT
 ## 1832  B04 N10  25         CGACGT
@@ -5619,11 +5620,11 @@ transfers7a
 ## 1805  D07 J09  25         TATGCA
 ## 1806  D07 K01  25         TATGCA
 ## 1807  D07 L21  25         TATGCA
-## 1510  E01 C04  25         ACAGTG
-## 1511  E01 H22  25         ACAGTG
-## 1512  E01 J15  25         ACAGTG
-## 1513  E01 M12  25         ACAGTG
-## 1514  E01 N01  25         ACAGTG
+## 1510  E01 C04  25         CTGCTC
+## 1511  E01 H22  25         CTGCTC
+## 1512  E01 J15  25         CTGCTC
+## 1513  E01 M12  25         CTGCTC
+## 1514  E01 N01  25         CTGCTC
 ## 1842  E02 C23  25         AGTGTG
 ## 1843  E02 D19  25         AGTGTG
 ## 1844  E02 F12  25         AGTGTG
@@ -5697,12 +5698,12 @@ transfers7a
 ## 1923  G01 M15  25         ACATCT
 ## 1924  G01 N02  25         ACATCT
 ## 1925  G01 O06  25         ACATCT
-## 1650  G02 B12  25         ATCAGC
-## 1651  G02 D07  25         ATCAGC
-## 1652  G02 E04  25         ATCAGC
-## 1653  G02 F19  25         ATCAGC
-## 1654  G02 I12  25         ATCAGC
-## 1655  G02 K23  25         ATCAGC
+## 1650  G02 B12  25         TATCTC
+## 1651  G02 D07  25         TATCTC
+## 1652  G02 E04  25         TATCTC
+## 1653  G02 F19  25         TATCTC
+## 1654  G02 I12  25         TATCTC
+## 1655  G02 K23  25         TATCTC
 ## 1756  G03 F08  25         CACGCA
 ## 1757  G03 H12  25         CACGCA
 ## 1758  G03 I01  25         CACGCA
@@ -5768,83 +5769,83 @@ transfers7a
 ## 1178  H07 H02  25         ATCGTG
 ## 1179  H07 H17  25         ATCGTG
 ## 1180  H07 K19  25         ATCGTG
-## 1871  I01 A10  25         AGTACG
-## 1872  I01 B13  25         AGTACG
-## 1873  I01 B17  25         AGTACG
-## 1874  I01 H05  25         AGTACG
-## 1875  I01 K21  25         AGTACG
-## 1876  I01 M05  25         AGTACG
-## 1324  I02 A07  25         ATCGAT
-## 1325  I02 D13  25         ATCGAT
-## 1326  I02 G11  25         ATCGAT
-## 1327  I02 H08  25         ATCGAT
-## 1328  I02 H24  25         ATCGAT
-## 1329  I02 O23  25         ATCGAT
-## 1217  I03 A05  25         CACTAC
-## 1218  I03 A14  25         CACTAC
-## 1219  I03 B11  25         CACTAC
-## 1220  I03 J20  25         CACTAC
-## 1221  I03 L04  25         CACTAC
-## 1222  I03 O22  25         CACTAC
-## 1768  I04 B01  25         CTGACG
-## 1769  I04 B19  25         CTGACG
-## 1770  I04 I03  25         CTGACG
-## 1771  I04 I24  25         CTGACG
-## 1772  I04 L16  25         CTGACG
-## 1773  I04 M11  25         CTGACG
+## 1871  I01 A10  25         GCTGCA
+## 1872  I01 B13  25         GCTGCA
+## 1873  I01 B17  25         GCTGCA
+## 1874  I01 H05  25         GCTGCA
+## 1875  I01 K21  25         GCTGCA
+## 1876  I01 M05  25         GCTGCA
+## 1324  I02 A07  25         ATCGCA
+## 1325  I02 D13  25         ATCGCA
+## 1326  I02 G11  25         ATCGCA
+## 1327  I02 H08  25         ATCGCA
+## 1328  I02 H24  25         ATCGCA
+## 1329  I02 O23  25         ATCGCA
+## 1217  I03 A05  25         GAGCTC
+## 1218  I03 A14  25         GAGCTC
+## 1219  I03 B11  25         GAGCTC
+## 1220  I03 J20  25         GAGCTC
+## 1221  I03 L04  25         GAGCTC
+## 1222  I03 O22  25         GAGCTC
+## 1768  I04 B01  25         CTGAGC
+## 1769  I04 B19  25         CTGAGC
+## 1770  I04 I03  25         CTGAGC
+## 1771  I04 I24  25         CTGAGC
+## 1772  I04 L16  25         CTGAGC
+## 1773  I04 M11  25         CTGAGC
 ## 1899  I05 B05  25         GCTGAT
 ## 1900  I05 F20  25         GCTGAT
 ## 1901  I05 G17  25         GCTGAT
 ## 1902  I05 O02  25         GCTGAT
 ## 1903  I05 O11  25         GCTGAT
-## 1762  I06 C11  25         TATACG
-## 1763  I06 D09  25         TATACG
-## 1764  I06 I02  25         TATACG
-## 1765  I06 L05  25         TATACG
-## 1766  I06 L20  25         TATACG
-## 1767  I06 O17  25         TATACG
+## 1762  I06 C11  25         TATAGC
+## 1763  I06 D09  25         TATAGC
+## 1764  I06 I02  25         TATAGC
+## 1765  I06 L05  25         TATAGC
+## 1766  I06 L20  25         TATAGC
+## 1767  I06 O17  25         TATAGC
 ## 1396  I07 C01  25         CACTGA
 ## 1397  I07 C15  25         CACTGA
 ## 1398  I07 L13  25         CACTGA
 ## 1399  I07 M21  25         CACTGA
 ## 1400  I07 P03  25         CACTGA
 ## 1401  I07 P18  25         CACTGA
-## 1785  J01 A16  25         AGTAGC
-## 1786  J01 A17  25         AGTAGC
-## 1787  J01 B09  25         AGTAGC
-## 1788  J01 F17  25         AGTAGC
-## 1789  J01 H07  25         AGTAGC
-## 1790  J01 I06  25         AGTAGC
-## 1859  J02 B14  25         ATCGCA
-## 1860  J02 G15  25         ATCGCA
-## 1861  J02 G22  25         ATCGCA
-## 1862  J02 L06  25         ATCGCA
-## 1863  J02 M03  25         ATCGCA
-## 1864  J02 N23  25         ATCGCA
+## 1785  J01 A16  25         GCTGTG
+## 1786  J01 A17  25         GCTGTG
+## 1787  J01 B09  25         GCTGTG
+## 1788  J01 F17  25         GCTGTG
+## 1789  J01 H07  25         GCTGTG
+## 1790  J01 I06  25         GCTGTG
+## 1859  J02 B14  25         ATCGAT
+## 1860  J02 G15  25         ATCGAT
+## 1861  J02 G22  25         ATCGAT
+## 1862  J02 L06  25         ATCGAT
+## 1863  J02 M03  25         ATCGAT
+## 1864  J02 N23  25         ATCGAT
 ## 1085  J03 A03  25         CACTCT
 ## 1086  J03 B20  25         CACTCT
 ## 1087  J03 D10  25         CACTCT
 ## 1088  J03 E18  25         CACTCT
 ## 1089  J03 K10  25         CACTCT
 ## 1090  J03 N03  25         CACTCT
-## 1853  J04 D18  25         CTGAGC
-## 1854  J04 K17  25         CTGAGC
-## 1855  J04 M02  25         CTGAGC
-## 1856  J04 N15  25         CTGAGC
-## 1857  J04 O12  25         CTGAGC
-## 1858  J04 P05  25         CTGAGC
+## 1853  J04 D18  25         CTGACG
+## 1854  J04 K17  25         CTGACG
+## 1855  J04 M02  25         CTGACG
+## 1856  J04 N15  25         CTGACG
+## 1857  J04 O12  25         CTGACG
+## 1858  J04 P05  25         CTGACG
 ## 827   J05 A02  25         GAGCGT
 ## 828   J05 D02  25         GAGCGT
 ## 829   J05 E12  25         GAGCGT
 ## 830   J05 G21  25         GAGCGT
 ## 831   J05 L09  25         GAGCGT
 ## 832   J05 P20  25         GAGCGT
-## 1719  J06 B16  25         TATAGC
-## 1720  J06 G02  25         TATAGC
-## 1721  J06 H06  25         TATAGC
-## 1722  J06 I22  25         TATAGC
-## 1723  J06 L22  25         TATAGC
-## 1724  J06 O15  25         TATAGC
+## 1719  J06 B16  25         TATACG
+## 1720  J06 G02  25         TATACG
+## 1721  J06 H06  25         TATACG
+## 1722  J06 I22  25         TATACG
+## 1723  J06 L22  25         TATACG
+## 1724  J06 O15  25         TATACG
 ## 1932  J07 F07  25         CTGATA
 ## 1933  J07 G12  25         CTGATA
 ## 1934  J07 H18  25         CTGATA
@@ -7804,12 +7805,12 @@ transfers7b
 ## 1756  B02 J06  25         AGTCGT
 ## 1757  B02 O15  25         AGTCGT
 ## 1758  B02 O24  25         AGTCGT
-## 1727  B03 D19  25         ATCTCT
-## 1728  B03 G03  25         ATCTCT
-## 1729  B03 H15  25         ATCTCT
-## 1730  B03 I23  25         ATCTCT
-## 1731  B03 M15  25         ATCTCT
-## 1732  B03 N05  25         ATCTCT
+## 1727  B03 D19  25         CGACTC
+## 1728  B03 G03  25         CGACTC
+## 1729  B03 H15  25         CGACTC
+## 1730  B03 I23  25         CGACTC
+## 1731  B03 M15  25         CGACTC
+## 1732  B03 N05  25         CGACTC
 ## 1051  B04 A05  25         CGACGT
 ## 1052  B04 A13  25         CGACGT
 ## 1053  B04 B04  25         CGACGT
@@ -7909,12 +7910,12 @@ transfers7b
 ## 2024  D07 I22  25         TATGCA
 ## 2025  D07 L12  25         TATGCA
 ## 2026  D07 P05  25         TATGCA
-## 1664  E01 E06  25         ACAGTG
-## 1665  E01 E10  25         ACAGTG
-## 1666  E01 E18  25         ACAGTG
-## 1667  E01 F11  25         ACAGTG
-## 1668  E01 L04  25         ACAGTG
-## 1669  E01 L23  25         ACAGTG
+## 1664  E01 E06  25         CTGCTC
+## 1665  E01 E10  25         CTGCTC
+## 1666  E01 E18  25         CTGCTC
+## 1667  E01 F11  25         CTGCTC
+## 1668  E01 L04  25         CTGCTC
+## 1669  E01 L23  25         CTGCTC
 ## 1658  E02 D12  25         AGTGTG
 ## 1659  E02 E05  25         AGTGTG
 ## 1660  E02 H22  25         AGTGTG
@@ -7989,12 +7990,12 @@ transfers7b
 ## 1822  G01 D15  25         ACATCT
 ## 1823  G01 H24  25         ACATCT
 ## 1824  G01 K04  25         ACATCT
-## 1604  G02 C21  25         ATCAGC
-## 1605  G02 E02  25         ATCAGC
-## 1606  G02 J04  25         ATCAGC
-## 1607  G02 J11  25         ATCAGC
-## 1608  G02 L22  25         ATCAGC
-## 1609  G02 O14  25         ATCAGC
+## 1604  G02 C21  25         TATCTC
+## 1605  G02 E02  25         TATCTC
+## 1606  G02 J04  25         TATCTC
+## 1607  G02 J11  25         TATCTC
+## 1608  G02 L22  25         TATCTC
+## 1609  G02 O14  25         TATCTC
 ## 1774  G03 D22  25         CACGCA
 ## 1775  G03 E24  25         CACGCA
 ## 1776  G03 I04  25         CACGCA
@@ -8064,78 +8065,78 @@ transfers7b
 ## 2002  H07 G09  25         ATCGTG
 ## 2003  H07 J12  25         ATCGTG
 ## 2004  H07 P21  25         ATCGTG
-## 1592  I01 B07  25         AGTACG
-## 1593  I01 C08  25         AGTACG
-## 1594  I01 F19  25         AGTACG
-## 1595  I01 G20  25         AGTACG
-## 1596  I01 M12  25         AGTACG
-## 1597  I01 N11  25         AGTACG
-## 1759  I02 F05  25         ATCGAT
-## 1760  I02 I01  25         ATCGAT
-## 1761  I02 I24  25         ATCGAT
-## 1762  I02 M16  25         ATCGAT
-## 1747  I03 E17  25         CACTAC
-## 1748  I03 G07  25         CACTAC
-## 1749  I03 H08  25         CACTAC
-## 1750  I03 N12  25         CACTAC
-## 1751  I03 O11  25         CACTAC
-## 1752  I03 P17  25         CACTAC
-## 1586  I04 B03  25         CTGACG
-## 1587  I04 C07  25         CTGACG
-## 1588  I04 E16  25         CTGACG
-## 1589  I04 E20  25         CTGACG
-## 1590  I04 J09  25         CTGACG
-## 1591  I04 P19  25         CTGACG
+## 1592  I01 B07  25         GCTGCA
+## 1593  I01 C08  25         GCTGCA
+## 1594  I01 F19  25         GCTGCA
+## 1595  I01 G20  25         GCTGCA
+## 1596  I01 M12  25         GCTGCA
+## 1597  I01 N11  25         GCTGCA
+## 1759  I02 F05  25         ATCGCA
+## 1760  I02 I01  25         ATCGCA
+## 1761  I02 I24  25         ATCGCA
+## 1762  I02 M16  25         ATCGCA
+## 1747  I03 E17  25         GAGCTC
+## 1748  I03 G07  25         GAGCTC
+## 1749  I03 H08  25         GAGCTC
+## 1750  I03 N12  25         GAGCTC
+## 1751  I03 O11  25         GAGCTC
+## 1752  I03 P17  25         GAGCTC
+## 1586  I04 B03  25         CTGAGC
+## 1587  I04 C07  25         CTGAGC
+## 1588  I04 E16  25         CTGAGC
+## 1589  I04 E20  25         CTGAGC
+## 1590  I04 J09  25         CTGAGC
+## 1591  I04 P19  25         CTGAGC
 ## 1450  I05 C02  25         GCTGAT
 ## 1451  I05 H06  25         GCTGAT
 ## 1452  I05 M09  25         GCTGAT
 ## 1453  I05 M17  25         GCTGAT
 ## 1454  I05 N16  25         GCTGAT
 ## 1455  I05 N21  25         GCTGAT
-## 1780  I06 G14  25         TATACG
-## 1781  I06 G19  25         TATACG
-## 1782  I06 H16  25         TATACG
-## 1783  I06 I05  25         TATACG
-## 1784  I06 L07  25         TATACG
+## 1780  I06 G14  25         TATAGC
+## 1781  I06 G19  25         TATAGC
+## 1782  I06 H16  25         TATAGC
+## 1783  I06 I05  25         TATAGC
+## 1784  I06 L07  25         TATAGC
 ## 1910  I07 A17  25         CACTGA
 ## 1911  I07 F13  25         CACTGA
 ## 1912  I07 H05  25         CACTGA
 ## 1913  I07 H17  25         CACTGA
 ## 1914  I07 M11  25         CACTGA
 ## 1915  I07 O04  25         CACTGA
-## 1721  J01 B06  25         AGTAGC
-## 1722  J01 B10  25         AGTAGC
-## 1723  J01 E23  25         AGTAGC
-## 1724  J01 G02  25         AGTAGC
-## 1725  J01 N19  25         AGTAGC
-## 1726  J01 O10  25         AGTAGC
-## 1498  J02 C04  25         ATCGCA
-## 1499  J02 F15  25         ATCGCA
-## 1500  J02 F18  25         ATCGCA
-## 1501  J02 I13  25         ATCGCA
-## 1502  J02 L08  25         ATCGCA
-## 1503  J02 M23  25         ATCGCA
+## 1721  J01 B06  25         GCTGTG
+## 1722  J01 B10  25         GCTGTG
+## 1723  J01 E23  25         GCTGTG
+## 1724  J01 G02  25         GCTGTG
+## 1725  J01 N19  25         GCTGTG
+## 1726  J01 O10  25         GCTGTG
+## 1498  J02 C04  25         ATCGAT
+## 1499  J02 F15  25         ATCGAT
+## 1500  J02 F18  25         ATCGAT
+## 1501  J02 I13  25         ATCGAT
+## 1502  J02 L08  25         ATCGAT
+## 1503  J02 M23  25         ATCGAT
 ## 1598  J03 A16  25         CACTCT
 ## 1599  J03 A21  25         CACTCT
 ## 1600  J03 B11  25         CACTCT
 ## 1601  J03 E01  25         CACTCT
 ## 1602  J03 N18  25         CACTCT
 ## 1603  J03 P03  25         CACTCT
-## 1319  J04 A08  25         CTGAGC
-## 1320  J04 C17  25         CTGAGC
-## 1321  J04 D04  25         CTGAGC
-## 1322  J04 D24  25         CTGAGC
-## 1323  J04 L09  25         CTGAGC
+## 1319  J04 A08  25         CTGACG
+## 1320  J04 C17  25         CTGACG
+## 1321  J04 D04  25         CTGACG
+## 1322  J04 D24  25         CTGACG
+## 1323  J04 L09  25         CTGACG
 ## 2010  J05 A09  25         GAGCGT
 ## 2011  J05 F21  25         GAGCGT
 ## 2012  J05 J01  25         GAGCGT
 ## 2013  J05 J10  25         GAGCGT
 ## 2014  J05 K23  25         GAGCGT
-## 1814  J06 B05  25         TATAGC
-## 1815  J06 D17  25         TATAGC
-## 1816  J06 E19  25         TATAGC
-## 1817  J06 K03  25         TATAGC
-## 1818  J06 P10  25         TATAGC
+## 1814  J06 B05  25         TATACG
+## 1815  J06 D17  25         TATACG
+## 1816  J06 E19  25         TATACG
+## 1817  J06 K03  25         TATACG
+## 1818  J06 P10  25         TATACG
 ## 1670  J07 C16  25         CTGATA
 ## 1671  J07 E07  25         CTGATA
 ## 1672  J07 H09  25         CTGATA
@@ -10094,11 +10095,11 @@ transfers7c
 ## 1904  B02 I18  25         AGTCGT
 ## 1905  B02 M16  25         AGTCGT
 ## 1906  B02 O03  25         AGTCGT
-## 1745  B03 F04  25         ATCTCT
-## 1746  B03 G07  25         ATCTCT
-## 1747  B03 G19  25         ATCTCT
-## 1748  B03 J23  25         ATCTCT
-## 1749  B03 O11  25         ATCTCT
+## 1745  B03 F04  25         CGACTC
+## 1746  B03 G07  25         CGACTC
+## 1747  B03 G19  25         CGACTC
+## 1748  B03 J23  25         CGACTC
+## 1749  B03 O11  25         CGACTC
 ## 1891  B04 C17  25         CGACGT
 ## 1892  B04 D19  25         CGACGT
 ## 1893  B04 G11  25         CGACGT
@@ -10200,12 +10201,12 @@ transfers7c
 ## 1362  D07 L03  25         TATGCA
 ## 1363  D07 M23  25         TATGCA
 ## 1364  D07 O14  25         TATGCA
-## 1663  E01 C13  25         ACAGTG
-## 1664  E01 E21  25         ACAGTG
-## 1665  E01 F12  25         ACAGTG
-## 1666  E01 G03  25         ACAGTG
-## 1667  E01 L01  25         ACAGTG
-## 1668  E01 N24  25         ACAGTG
+## 1663  E01 C13  25         CTGCTC
+## 1664  E01 E21  25         CTGCTC
+## 1665  E01 F12  25         CTGCTC
+## 1666  E01 G03  25         CTGCTC
+## 1667  E01 L01  25         CTGCTC
+## 1668  E01 N24  25         CTGCTC
 ## 1913  E02 B01  25         AGTGTG
 ## 1914  E02 B16  25         AGTGTG
 ## 1915  E02 C11  25         AGTGTG
@@ -10283,12 +10284,12 @@ transfers7c
 ## 1356  G01 H11  25         ACATCT
 ## 1357  G01 N20  25         ACATCT
 ## 1358  G01 O10  25         ACATCT
-## 1679  G02 D10  25         ATCAGC
-## 1680  G02 E19  25         ATCAGC
-## 1681  G02 G06  25         ATCAGC
-## 1682  G02 I09  25         ATCAGC
-## 1683  G02 P02  25         ATCAGC
-## 1684  G02 P22  25         ATCAGC
+## 1679  G02 D10  25         TATCTC
+## 1680  G02 E19  25         TATCTC
+## 1681  G02 G06  25         TATCTC
+## 1682  G02 I09  25         TATCTC
+## 1683  G02 P02  25         TATCTC
+## 1684  G02 P22  25         TATCTC
 ## 1827  G03 C15  25         CACGCA
 ## 1828  G03 D11  25         CACGCA
 ## 1829  G03 D21  25         CACGCA
@@ -10353,78 +10354,78 @@ transfers7c
 ## 1824  H07 L18  25         ATCGTG
 ## 1825  H07 M14  25         ATCGTG
 ## 1826  H07 N15  25         ATCGTG
-## 2013  I01 B11  25         AGTACG
-## 2014  I01 D08  25         AGTACG
-## 2015  I01 F17  25         AGTACG
-## 2016  I01 I21  25         AGTACG
-## 1376  I02 C04  25         ATCGAT
-## 1377  I02 D04  25         ATCGAT
-## 1378  I02 D09  25         ATCGAT
-## 1379  I02 D24  25         ATCGAT
-## 1380  I02 E20  25         ATCGAT
-## 1381  I02 G16  25         ATCGAT
-## 1815  I03 C23  25         CACTAC
-## 1816  I03 D03  25         CACTAC
-## 1817  I03 H10  25         CACTAC
-## 1818  I03 K04  25         CACTAC
-## 1819  I03 N19  25         CACTAC
-## 1820  I03 O15  25         CACTAC
-## 1856  I04 B06  25         CTGACG
-## 1857  I04 E10  25         CTGACG
-## 1858  I04 H17  25         CTGACG
-## 1859  I04 L14  25         CTGACG
-## 1860  I04 M03  25         CTGACG
-## 1861  I04 O22  25         CTGACG
+## 2013  I01 B11  25         GCTGCA
+## 2014  I01 D08  25         GCTGCA
+## 2015  I01 F17  25         GCTGCA
+## 2016  I01 I21  25         GCTGCA
+## 1376  I02 C04  25         ATCGCA
+## 1377  I02 D04  25         ATCGCA
+## 1378  I02 D09  25         ATCGCA
+## 1379  I02 D24  25         ATCGCA
+## 1380  I02 E20  25         ATCGCA
+## 1381  I02 G16  25         ATCGCA
+## 1815  I03 C23  25         GAGCTC
+## 1816  I03 D03  25         GAGCTC
+## 1817  I03 H10  25         GAGCTC
+## 1818  I03 K04  25         GAGCTC
+## 1819  I03 N19  25         GAGCTC
+## 1820  I03 O15  25         GAGCTC
+## 1856  I04 B06  25         CTGAGC
+## 1857  I04 E10  25         CTGAGC
+## 1858  I04 H17  25         CTGAGC
+## 1859  I04 L14  25         CTGAGC
+## 1860  I04 M03  25         CTGAGC
+## 1861  I04 O22  25         CTGAGC
 ## 1771  I05 C21  25         GCTGAT
 ## 1772  I05 H06  25         GCTGAT
 ## 1773  I05 I04  25         GCTGAT
 ## 1774  I05 M09  25         GCTGAT
 ## 1775  I05 N12  25         GCTGAT
 ## 1776  I05 P23  25         GCTGAT
-## 1653  I06 G01  25         TATACG
-## 1654  I06 I24  25         TATACG
-## 1655  I06 J13  25         TATACG
-## 1656  I06 K16  25         TATACG
-## 1657  I06 N04  25         TATACG
-## 1658  I06 N17  25         TATACG
+## 1653  I06 G01  25         TATAGC
+## 1654  I06 I24  25         TATAGC
+## 1655  I06 J13  25         TATAGC
+## 1656  I06 K16  25         TATAGC
+## 1657  I06 N04  25         TATAGC
+## 1658  I06 N17  25         TATAGC
 ## 1850  I07 A24  25         CACTGA
 ## 1851  I07 J19  25         CACTGA
 ## 1852  I07 K09  25         CACTGA
 ## 1853  I07 M02  25         CACTGA
 ## 1854  I07 N03  25         CACTGA
 ## 1855  I07 P12  25         CACTGA
-## 2017  J01 E23  25         AGTAGC
-## 2018  J01 F07  25         AGTAGC
-## 2019  J01 F20  25         AGTAGC
-## 2020  J01 I15  25         AGTAGC
-## 2021  J01 N14  25         AGTAGC
-## 1371  J02 C03  25         ATCGCA
-## 1372  J02 I14  25         ATCGCA
-## 1373  J02 N05  25         ATCGCA
-## 1374  J02 N11  25         ATCGCA
-## 1375  J02 O17  25         ATCGCA
+## 2017  J01 E23  25         GCTGTG
+## 2018  J01 F07  25         GCTGTG
+## 2019  J01 F20  25         GCTGTG
+## 2020  J01 I15  25         GCTGTG
+## 2021  J01 N14  25         GCTGTG
+## 1371  J02 C03  25         ATCGAT
+## 1372  J02 I14  25         ATCGAT
+## 1373  J02 N05  25         ATCGAT
+## 1374  J02 N11  25         ATCGAT
+## 1375  J02 O17  25         ATCGAT
 ## 1342  J03 A06  25         CACTCT
 ## 1343  J03 A09  25         CACTCT
 ## 1344  J03 C19  25         CACTCT
 ## 1345  J03 F24  25         CACTCT
 ## 1346  J03 P08  25         CACTCT
 ## 1347  J03 P09  25         CACTCT
-## 1762  J04 A16  25         CTGAGC
-## 1763  J04 A18  25         CTGAGC
-## 1764  J04 H20  25         CTGAGC
-## 1765  J04 I02  25         CTGAGC
-## 1766  J04 P06  25         CTGAGC
+## 1762  J04 A16  25         CTGACG
+## 1763  J04 A18  25         CTGACG
+## 1764  J04 H20  25         CTGACG
+## 1765  J04 I02  25         CTGACG
+## 1766  J04 P06  25         CTGACG
 ## 1833  J05 F16  25         GAGCGT
 ## 1834  J05 J20  25         GAGCGT
 ## 1835  J05 K07  25         GAGCGT
 ## 1836  J05 M10  25         GAGCGT
 ## 1837  J05 O21  25         GAGCGT
 ## 1838  J05 P01  25         GAGCGT
-## 1810  J06 D22  25         TATAGC
-## 1811  J06 E13  25         TATAGC
-## 1812  J06 H02  25         TATAGC
-## 1813  J06 H13  25         TATAGC
-## 1814  J06 K03  25         TATAGC
+## 1810  J06 D22  25         TATACG
+## 1811  J06 E13  25         TATACG
+## 1812  J06 H02  25         TATACG
+## 1813  J06 H13  25         TATACG
+## 1814  J06 K03  25         TATACG
 ## 1647  J07 A22  25         CTGATA
 ## 1648  J07 B10  25         CTGATA
 ## 1649  J07 E08  25         CTGATA
@@ -12388,12 +12389,12 @@ transfers7d
 ## 1796  B02 K23  25         AGTCGT
 ## 1797  B02 L22  25         AGTCGT
 ## 1798  B02 P07  25         AGTCGT
-## 1151  B03 A04  25         ATCTCT
-## 1152  B03 A09  25         ATCTCT
-## 1153  B03 E24  25         ATCTCT
-## 1154  B03 J02  25         ATCTCT
-## 1155  B03 P14  25         ATCTCT
-## 1156  B03 P21  25         ATCTCT
+## 1151  B03 A04  25         CGACTC
+## 1152  B03 A09  25         CGACTC
+## 1153  B03 E24  25         CGACTC
+## 1154  B03 J02  25         CGACTC
+## 1155  B03 P14  25         CGACTC
+## 1156  B03 P21  25         CGACTC
 ## 1557  B04 C02  25         CGACGT
 ## 1558  B04 D11  25         CGACGT
 ## 1559  B04 F01  25         CGACGT
@@ -12490,11 +12491,11 @@ transfers7d
 ## 1255  D07 D24  25         TATGCA
 ## 1256  D07 N03  25         TATGCA
 ## 1257  D07 N14  25         TATGCA
-## 1711  E01 D01  25         ACAGTG
-## 1712  E01 E08  25         ACAGTG
-## 1713  E01 L12  25         ACAGTG
-## 1714  E01 M11  25         ACAGTG
-## 1715  E01 N23  25         ACAGTG
+## 1711  E01 D01  25         CTGCTC
+## 1712  E01 E08  25         CTGCTC
+## 1713  E01 L12  25         CTGCTC
+## 1714  E01 M11  25         CTGCTC
+## 1715  E01 N23  25         CTGCTC
 ## 1761  E02 C22  25         AGTGTG
 ## 1762  E02 D05  25         AGTGTG
 ## 1763  E02 F17  25         AGTGTG
@@ -12571,12 +12572,12 @@ transfers7d
 ## 1829  G01 J22  25         ACATCT
 ## 1830  G01 K05  25         ACATCT
 ## 1831  G01 M20  25         ACATCT
-## 1837  G02 E13  25         ATCAGC
-## 1838  G02 F14  25         ATCAGC
-## 1839  G02 H18  25         ATCAGC
-## 1840  G02 K07  25         ATCAGC
-## 1841  G02 N04  25         ATCAGC
-## 1842  G02 O23  25         ATCAGC
+## 1837  G02 E13  25         TATCTC
+## 1838  G02 F14  25         TATCTC
+## 1839  G02 H18  25         TATCTC
+## 1840  G02 K07  25         TATCTC
+## 1841  G02 N04  25         TATCTC
+## 1842  G02 O23  25         TATCTC
 ## 1486  G03 A08  25         CACGCA
 ## 1487  G03 E09  25         CACGCA
 ## 1488  G03 H09  25         CACGCA
@@ -12644,77 +12645,77 @@ transfers7d
 ## 1907  H07 J21  25         ATCGTG
 ## 1908  H07 N01  25         ATCGTG
 ## 1909  H07 O03  25         ATCGTG
-## 1354  I01 A06  25         AGTACG
-## 1355  I01 A15  25         AGTACG
-## 1356  I01 D19  25         AGTACG
-## 1357  I01 L16  25         AGTACG
-## 1358  I01 M17  25         AGTACG
-## 1359  I01 P01  25         AGTACG
-## 1727  I02 G03  25         ATCGAT
-## 1728  I02 K16  25         ATCGAT
-## 1729  I02 L03  25         ATCGAT
-## 1730  I02 L23  25         ATCGAT
-## 1731  I02 N11  25         ATCGAT
-## 1732  I02 O20  25         ATCGAT
-## 1716  I03 A18  25         CACTAC
-## 1717  I03 C11  25         CACTAC
-## 1718  I03 G01  25         CACTAC
-## 1719  I03 H04  25         CACTAC
-## 1720  I03 P12  25         CACTAC
-## 1721  I03 P19  25         CACTAC
-## 1916  I04 H06  25         CTGACG
-## 1917  I04 I19  25         CTGACG
-## 1918  I04 L17  25         CTGACG
-## 1919  I04 O05  25         CTGACG
+## 1354  I01 A06  25         GCTGCA
+## 1355  I01 A15  25         GCTGCA
+## 1356  I01 D19  25         GCTGCA
+## 1357  I01 L16  25         GCTGCA
+## 1358  I01 M17  25         GCTGCA
+## 1359  I01 P01  25         GCTGCA
+## 1727  I02 G03  25         ATCGCA
+## 1728  I02 K16  25         ATCGCA
+## 1729  I02 L03  25         ATCGCA
+## 1730  I02 L23  25         ATCGCA
+## 1731  I02 N11  25         ATCGCA
+## 1732  I02 O20  25         ATCGCA
+## 1716  I03 A18  25         GAGCTC
+## 1717  I03 C11  25         GAGCTC
+## 1718  I03 G01  25         GAGCTC
+## 1719  I03 H04  25         GAGCTC
+## 1720  I03 P12  25         GAGCTC
+## 1721  I03 P19  25         GAGCTC
+## 1916  I04 H06  25         CTGAGC
+## 1917  I04 I19  25         CTGAGC
+## 1918  I04 L17  25         CTGAGC
+## 1919  I04 O05  25         CTGAGC
 ## 1670  I05 B09  25         GCTGAT
 ## 1671  I05 D02  25         GCTGAT
 ## 1672  I05 E01  25         GCTGAT
 ## 1673  I05 L19  25         GCTGAT
 ## 1674  I05 M14  25         GCTGAT
 ## 1675  I05 O18  25         GCTGAT
-## 1722  I06 E21  25         TATACG
-## 1723  I06 G02  25         TATACG
-## 1724  I06 G11  25         TATACG
-## 1725  I06 J01  25         TATACG
-## 1726  I06 N18  25         TATACG
+## 1722  I06 E21  25         TATAGC
+## 1723  I06 G02  25         TATAGC
+## 1724  I06 G11  25         TATAGC
+## 1725  I06 J01  25         TATAGC
+## 1726  I06 N18  25         TATAGC
 ## 1810  I07 A22  25         CACTGA
 ## 1811  I07 B07  25         CACTGA
 ## 1812  I07 H13  25         CACTGA
 ## 1813  I07 K02  25         CACTGA
-## 1563  J01 B23  25         AGTAGC
-## 1564  J01 C03  25         AGTAGC
-## 1565  J01 G16  25         AGTAGC
-## 1566  J01 O22  25         AGTAGC
-## 1567  J01 P06  25         AGTAGC
-## 1568  J01 P15  25         AGTAGC
-## 1804  J02 B19  25         ATCGCA
-## 1805  J02 E19  25         ATCGCA
-## 1806  J02 F12  25         ATCGCA
-## 1807  J02 H07  25         ATCGCA
-## 1808  J02 K01  25         ATCGCA
-## 1809  J02 K14  25         ATCGCA
+## 1563  J01 B23  25         GCTGTG
+## 1564  J01 C03  25         GCTGTG
+## 1565  J01 G16  25         GCTGTG
+## 1566  J01 O22  25         GCTGTG
+## 1567  J01 P06  25         GCTGTG
+## 1568  J01 P15  25         GCTGTG
+## 1804  J02 B19  25         ATCGAT
+## 1805  J02 E19  25         ATCGAT
+## 1806  J02 F12  25         ATCGAT
+## 1807  J02 H07  25         ATCGAT
+## 1808  J02 K01  25         ATCGAT
+## 1809  J02 K14  25         ATCGAT
 ## 1733  J03 A17  25         CACTCT
 ## 1734  J03 B13  25         CACTCT
 ## 1735  J03 B17  25         CACTCT
 ## 1736  J03 G04  25         CACTCT
 ## 1737  J03 K11  25         CACTCT
-## 1693  J04 E05  25         CTGAGC
-## 1694  J04 H03  25         CTGAGC
-## 1695  J04 I15  25         CTGAGC
-## 1696  J04 I20  25         CTGAGC
-## 1697  J04 L24  25         CTGAGC
-## 1698  J04 P09  25         CTGAGC
+## 1693  J04 E05  25         CTGACG
+## 1694  J04 H03  25         CTGACG
+## 1695  J04 I15  25         CTGACG
+## 1696  J04 I20  25         CTGACG
+## 1697  J04 L24  25         CTGACG
+## 1698  J04 P09  25         CTGACG
 ## 1814  J05 D03  25         GAGCGT
 ## 1815  J05 G10  25         GAGCGT
 ## 1816  J05 G20  25         GAGCGT
 ## 1817  J05 H20  25         GAGCGT
 ## 1818  J05 K03  25         GAGCGT
 ## 1819  J05 L11  25         GAGCGT
-## 757   J06 A02  25         TATAGC
-## 758   J06 B03  25         TATAGC
-## 759   J06 D21  25         TATAGC
-## 760   J06 G14  25         TATAGC
-## 761   J06 K18  25         TATAGC
+## 757   J06 A02  25         TATACG
+## 758   J06 B03  25         TATACG
+## 759   J06 D21  25         TATACG
+## 760   J06 G14  25         TATACG
+## 761   J06 K18  25         TATACG
 ## 1893  J07 A20  25         CTGATA
 ## 1894  J07 C14  25         CTGATA
 ## 1895  J07 F20  25         CTGATA
