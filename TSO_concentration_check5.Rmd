@@ -80,6 +80,8 @@ conc <-    aggregate( conc[,c("A260", "A280")]
                     , list(Well = conc$Well, plate = conc$plate)
                     , mean)
 
+conc$CV <- conc.sd$A260 / conc$A260
+
 summary(conc)
 ```
 
@@ -186,9 +188,12 @@ conc$stock <-
 conc$exp_noncor <- conc$stock / 5 / 20 # 20 × dilution before measurement.
 conc$exp <- 200 / 20 # 20 × dilution before measurement.
 
-ggplot(conc, aes(obs, exp_noncor, colour = expected)) + 
+ggplot(conc, aes(obs, exp_noncor, colour = CV)) + 
   geom_text(aes(label=Well))
 ```
+
+The measurements with the highest noise (coefficient of variation, CV) are
+plotted in lighter tones of blue.
 
 What we see here is that for barcodes such as `D07`, `H07`, `G07`, etc, the
 concentration was quite efficiently corrected.

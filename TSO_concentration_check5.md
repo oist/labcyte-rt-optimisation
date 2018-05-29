@@ -82,17 +82,19 @@ conc <-    aggregate( conc[,c("A260", "A280")]
                     , list(Well = conc$Well, plate = conc$plate)
                     , mean)
 
+conc$CV <- conc.sd$A260 / conc$A260
+
 summary(conc)
 ```
 
 ```
-##      Well              plate                A260               A280        
-##  Length:70          Length:70          Min.   : 0.02633   Min.   :0.01767  
-##  Class :character   Class :character   1st Qu.: 6.07700   1st Qu.:3.50667  
-##  Mode  :character   Mode  :character   Median : 6.47817   Median :3.80050  
-##                                        Mean   : 6.88756   Mean   :3.99223  
-##                                        3rd Qu.: 7.52992   3rd Qu.:4.35267  
-##                                        Max.   :12.83600   Max.   :7.50067
+##      Well              plate                A260               A280               CV           
+##  Length:70          Length:70          Min.   : 0.02633   Min.   :0.01767   Min.   :0.0007188  
+##  Class :character   Class :character   1st Qu.: 6.07700   1st Qu.:3.50667   1st Qu.:0.0057552  
+##  Mode  :character   Mode  :character   Median : 6.47817   Median :3.80050   Median :0.0137396  
+##                                        Mean   : 6.88756   Mean   :3.99223   Mean   :0.0227364  
+##                                        3rd Qu.: 7.52992   3rd Qu.:4.35267   3rd Qu.:0.0259328  
+##                                        Max.   :12.83600   Max.   :7.50067   Max.   :0.1112838
 ```
 
 
@@ -225,11 +227,14 @@ conc$stock <-
 conc$exp_noncor <- conc$stock / 5 / 20 # 20 × dilution before measurement.
 conc$exp <- 200 / 20 # 20 × dilution before measurement.
 
-ggplot(conc, aes(obs, exp_noncor, colour = expected)) + 
+ggplot(conc, aes(obs, exp_noncor, colour = CV)) + 
   geom_text(aes(label=Well))
 ```
 
 ![](TSO_concentration_check5_files/figure-html/dil_factors-1.png)<!-- -->
+
+The measurements with the highest noise (coefficient of variation, CV) are
+plotted in lighter tones of blue.
 
 What we see here is that for barcodes such as `D07`, `H07`, `G07`, etc, the
 concentration was quite efficiently corrected.
