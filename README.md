@@ -36,7 +36,9 @@ Concentration checks
    [2](TSO_concentration_check2.md) showed that the real molarity was a bit lower.
    The measurements here show that this was reflected in the source plate,
    except for the highest concentrations.
-
+ - [5](TSO_concentration_check4.md): source plate for Experiment 7.  Confirms that
+   concentration corrections were effective, but that there is a systematic
+   shift (~15 µM instead of 10 as planned).
 
 
 Experiments

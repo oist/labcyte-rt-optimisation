@@ -1,0 +1,202 @@
+---
+title: "TSO concentration in exp. 8's source plate"
+subtitle: "RT optimisation with the Labcyte Echo 525. Source plate QC."
+output: 
+  html_document: 
+    fig_height: 5.25
+    fig_width: 5.25
+    keep_md: yes
+    toc: yes
+    pandoc_args:
+     - "--lua-filter=links-to-markdown.lua"
+---
+
+```{r set_options, echo=FALSE, cache=FALSE}
+options(width = 100)
+```
+
+Concentrations of the actual TSO solutions in source plates, measured with
+a NanoDrop 8000, that has a dynamic range of 2.5–3,700 ng/μL for dsDNA according
+to the manufacturer's [website](https://www.thermofisher.com/jp/en/home/industrial/spectroscopy-elemental-isotope-analysis/molecular-spectroscopy/ultraviolet-visible-visible-spectrophotometry-uv-vis-vis/uv-vis-vis-instruments/nanodrop-microvolume-spectrophotometers/nanodrop-products-guide.html).
+
+
+Load R packages
+===============
+
+```{r load_libraries}
+library("magrittr")
+library("ggplot2")
+```
+
+
+Load data
+=========
+
+Source plate
+------------
+
+Original file name `180528_kato.xlsx`.  This file is for the source plate used
+in [experiment 8](Labcyte-RT_Data_Analysis_8.md), which uses transfer [design 7](Labcyte-RT7.md).
+
+
+```{r concentration_QC_load_1}
+source <- gdata::read.xls( "Labcyte-Exp8.quantification.xlsx"
+                         , nrow = 210, sheet = 1, stringsAsFactors = FALSE)
+
+source$Plate.ID <- "exp8"
+source$col      <- source$Well. %>% sub(pat = ".", rep = "")
+source$row      <- source$Well. %>% substr(1,1)
+```
+
+TSOs were transferred from the source plate to a dillution plate, in new
+coordinates documented in sheet 2.  The command below reconstructs the well
+names.
+
+```{r concentration_QC_load_2}
+source$orig_well  <- apply( expand.grid( c("01", "03", "05", "07", "02", "04", "06")
+                                       , unlist( lapply( LETTERS[1:10]
+                                                       , rep
+                                                       , 3)))
+                          , MARGIN = 1
+                          , function(x) paste0(x[2], x[1]))
+```
+
+
+Average replicates
+------------------
+
+```{r concentration_average_replicates}
+conc <- data.frame( Well  = source$orig_well
+                  , plate = source$Plate.ID
+                  , A260  = source$A260.
+                  , A280  = source$A280.
+                  , stringsAsFactors = FALSE)
+
+conc.sd <- aggregate( conc[,c("A260", "A280")]
+                    , list(Well = conc$Well, plate = conc$plate)
+                    , sd)
+
+conc <-    aggregate( conc[,c("A260", "A280")]
+                    , list(Well = conc$Well, plate = conc$plate)
+                    , mean)
+
+summary(conc)
+```
+
+
+Barcode IDs
+-----------
+
+See [design 7](Labcyte-RT7.md) if you would like to double-check.
+
+```{r barcode_IDs}
+#               1   2   3   4   5   6   7
+conc$ID  <- c(  1, 13, 25, 37, 49, 61, 73  # A
+             ,  2, 14, 39, 38, 50, 62, 74  # B
+             ,  4, 16, 28, 40, 64, 76, 88  # C
+             ,  5, 17, 29, 41, 65, 77, 89  # D
+             , 51, 18, 30, 42, 66, 78, 90  # E
+             ,  7, 19, 31, 43, 67, 79, 91  # F
+             ,  8, 87, 32, 44, 68, 80, 92  # G
+             ,  9, 21, 33, 45, 69, 81, 24  # H 
+             , 71, 23, 60, 47, 70, 83, 36  # I
+             , 72, 22, 35, 46, 59, 82, 48) # J
+
+conc$stock_Well <- platetools::num_to_well(1:96)[conc$ID]
+```
+
+
+Load maker's information
+------------------------
+
+```{r idt_table}
+idt <- read.csv("TSO_master_plate_PO_8268526.csv")
+idt <- idt[,c("Well.Position", "Extinction.Coefficient.L..mole.cm.")]
+conc$ext <- idt[match(conc$stock_Well, idt$Well), "Extinction.Coefficient.L..mole.cm."]
+```
+
+
+Calculate concentrations (in micromolars)
+-----------------------------------------
+
+```{r calc_concentration}
+conc$obs <- conc$A260 / conc$ext * 1e6
+```
+
+
+Expected concentration
+----------------------
+
+In this experiment, all the TSOs were prepared at 200 µM and diluted 20 times
+before the measurement of concentration.
+
+```{r exp_conc}
+conc$expected <- "10 µM"
+```
+
+
+Histograms
+==========
+
+The outlier with absorbances and molarity close to zero is `I06/G11`
+(source/stock coordinates).  Conversely, `D06/G05`, `F07/H07` and `H06/G09`
+have the highest values.
+
+```{r concentration_QC_histograms}
+hist_obs  <- ggplot(conc, aes(obs,  fill = expected)) +
+  geom_histogram(bins=30) + ggtitle("Observed concentrations (µM)")
+hist_a260 <- ggplot(conc, aes(A260, fill = expected)) +
+  geom_histogram(bins=30) + ggtitle("Absorbance at 260 nm")
+hist_a280 <- ggplot(conc, aes(A280, fill = expected)) +
+  geom_histogram(bins=30) + ggtitle("Absorbance at 280 nm")
+
+ggpubr::ggarrange(ncol = 1, nrow = 3, hist_obs, hist_a260, hist_a280)
+```
+
+
+A260 vs A280
+============
+
+```{r concentration_QC_abs_ratio, fig.height=3, fig.width=4, paged.print=TRUE}
+ggplot(conc, aes(A280, A260, colour = expected)) + geom_point() +
+  ggtitle("Relation between absorbances at 260 and 280 nm")
+```
+
+
+Comparison between source and stock
+===================================
+
+The source plate was prepared with correction of the concentrations of the stock
+primers (see [TSO_concentration_check2](TSO_concentration_check2.md) for details).
+
+Still, the observed molarity (15.5 µM ± 3.8) is significantly different from the expectation (10 µM).
+
+To see the effectiveness of the correction, we plot the observed molarities
+against the expected molarities if the concentrations were not corrected
+(that is transfer 4 µL TSO in 16 µL H2O for all TSOs).
+
+```{r dil_factors, fig.height=4, fig.width=5}
+t.test(conc$obs, mu=10)
+
+conc$stock <-
+  read.table( "dilution_table.txt"
+            , sep = "\t"
+            , header = TRUE)[,"source_obs_molarity", drop = T][conc$ID]
+
+conc$exp_noncor <- conc$stock / 5 / 20 # 20 × dilution before measurement.
+conc$exp <- 200 / 20 # 20 × dilution before measurement.
+
+ggplot(conc, aes(obs, exp_noncor, colour = expected)) + 
+  geom_text(aes(label=Well))
+```
+
+What we see here is that for barcodes such as `D07`, `H07`, `G07`, etc, the
+concentration was quite efficiently corrected.
+
+
+Session information
+===================
+
+```{r sesion_info}
+sessionInfo()
+```
