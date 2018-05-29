@@ -141,8 +141,7 @@ Histograms
 ==========
 
 The outlier with absorbances and molarity close to zero is `I06/G11`
-(source/stock coordinates).  Conversely, `D06/G05`, `F07/H07` and `H06/G09`
-have the highest values.
+(source/stock coordinates).  This was confirmed in a separate measurement.
 
 ```{r concentration_QC_histograms}
 hist_obs  <- ggplot(conc, aes(obs,  fill = expected)) +

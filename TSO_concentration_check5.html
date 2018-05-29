@@ -412,7 +412,7 @@ conc$ext &lt;- idt[match(conc$stock_Well, idt$Well), &quot;Extinction.Coefficien
 </div>
 <div id="histograms" class="section level1">
 <h1>Histograms</h1>
-<p>The outlier with absorbances and molarity close to zero is <code>I06/G11</code> (source/stock coordinates). Conversely, <code>D06/G05</code>, <code>F07/H07</code> and <code>H06/G09</code> have the highest values.</p>
+<p>The outlier with absorbances and molarity close to zero is <code>I06/G11</code> (source/stock coordinates). This was confirmed in a separate measurement.</p>
 <pre class="r"><code>hist_obs  &lt;- ggplot(conc, aes(obs,  fill = expected)) +
   geom_histogram(bins=30) + ggtitle(&quot;Observed concentrations (µM)&quot;)
 hist_a260 &lt;- ggplot(conc, aes(A260, fill = expected)) +
