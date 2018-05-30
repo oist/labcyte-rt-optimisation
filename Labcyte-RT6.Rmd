@@ -133,6 +133,9 @@ plate$BARCODE_SEQ <- nanoCAGE2017barcodes[plate$BARCODE_ID, "barcodes"]
 
 plate$RNA_level <- plate$RNA %>% factor(labels = paste0("RNA_", LETTERS[1:6]))
 plate$RTP_level <- plate$RT_PRIMERS %>% factor(labels = paste0("RTP_", LETTERS[1:7]))
+
+plate$RNA[plate$RNA_vol == 0] <- 0
+plate$plateID <- plateID
 ```
 
 Summary

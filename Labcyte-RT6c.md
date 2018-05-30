@@ -16,6 +16,7 @@ output:
 variant <- "c"
 newseed <- 3
 indexes <- c("ACTCGCTA", "GGAGCTAC", "GCGTAGTA", "CGGAGCCT", "TACGCTGC", "ATGCGCAG")
+plateID <- "S"
 ```
 
 
@@ -179,6 +180,9 @@ plate$BARCODE_SEQ <- nanoCAGE2017barcodes[plate$BARCODE_ID, "barcodes"]
 
 plate$RNA_level <- plate$RNA %>% factor(labels = paste0("RNA_", LETTERS[1:6]))
 plate$RTP_level <- plate$RT_PRIMERS %>% factor(labels = paste0("RTP_", LETTERS[1:7]))
+
+plate$RNA[plate$RNA_vol == 0] <- 0
+plate$plateID <- plateID
 ```
 
 Summary
@@ -190,7 +194,7 @@ plate
 ```
 
 ```
-## # A tibble: 384 x 18
+## # A tibble: 384 x 19
 ##    well  row   col   sxt   BARCODE_ID TSO_source TSO_vol    TSO RT_PRIMERS RT_PRIMERS_vol
 ##  * <chr> <fct> <fct> <fct>      <dbl>      <dbl>   <dbl>  <dbl>      <dbl>          <dbl>
 ##  1 A01   A     1     A1           78.       12.5     50.   1.25         0.             0.
@@ -203,8 +207,9 @@ plate
 ##  8 A08   A     8     A1           65.       12.5    100.   2.50         1.            25.
 ##  9 C01   C     1     A1           28.       12.5     50.   1.25         1.            25.
 ## 10 C02   C     2     A1           41.       12.5     50.   1.25         8.            25.
-## # ... with 374 more rows, and 8 more variables: MASTER_MIX_vol <dbl>, INDEX <fct>, RNA <dbl>,
-## #   RNA_vol <dbl>, H2O_vol <dbl>, BARCODE_SEQ <chr>, RNA_level <fct>, RTP_level <fct>
+## # ... with 374 more rows, and 9 more variables: MASTER_MIX_vol <dbl>, INDEX <fct>, RNA <dbl>,
+## #   RNA_vol <dbl>, H2O_vol <dbl>, BARCODE_SEQ <chr>, RNA_level <fct>, RTP_level <fct>,
+## #   plateID <chr>
 ```
 
 ```r
@@ -229,13 +234,21 @@ summary(plate)
 ##  Max.   :100.00   Max.   :160.000   Max.   :24.00   Max.   :25.00   Max.   :350    TACGCTGC:64  
 ##                                                                                                 
 ##       RNA            RNA_vol         H2O_vol       BARCODE_SEQ        RNA_level  RTP_level 
-##  Min.   :     1   Min.   : 0.00   Min.   :  0.00   Length:384         RNA_A:64   RTP_A:54  
+##  Min.   :     0   Min.   : 0.00   Min.   :  0.00   Length:384         RNA_A:64   RTP_A:54  
 ##  1st Qu.:    10   1st Qu.:25.00   1st Qu.:  0.00   Class :character   RNA_B:64   RTP_B:60  
-##  Median :   550   Median :25.00   Median : 50.00   Mode  :character   RNA_C:64   RTP_C:54  
-##  Mean   : 18518   Mean   :24.61   Mean   : 46.09                      RNA_D:64   RTP_D:54  
+##  Median :   100   Median :25.00   Median : 50.00   Mode  :character   RNA_C:64   RTP_C:54  
+##  Mean   : 18229   Mean   :24.61   Mean   : 46.09                      RNA_D:64   RTP_D:54  
 ##  3rd Qu.: 10000   3rd Qu.:25.00   3rd Qu.: 75.00                      RNA_E:64   RTP_E:54  
 ##  Max.   :100000   Max.   :25.00   Max.   :100.00                      RNA_F:64   RTP_F:54  
-##                                                                                  RTP_G:54
+##                                                                                  RTP_G:54  
+##    plateID         
+##  Length:384        
+##  Class :character  
+##  Mode  :character  
+##                    
+##                    
+##                    
+## 
 ```
 
 ```r
@@ -335,6 +348,10 @@ RNA mass
 (plot_RNA <- plateMapLog("RNA", "RNA mass (ng)"))
 ```
 
+```
+## Warning: Transformation introduced infinite values in discrete y-axis
+```
+
 ![](Labcyte-RT6c_files/figure-html/plot_RNA_mass-1.png)<!-- -->
 
 
@@ -387,7 +404,7 @@ levels(plate$RNA %>% factor)
 ```
 
 ```
-## [1] "1"     "10"    "100"   "1000"  "10000" "1e+05"
+## [1] "0"     "1"     "10"    "100"   "1000"  "10000" "1e+05"
 ```
 
 ```r

@@ -17,6 +17,7 @@ options(width = 100)
 variant <- "b"
 newseed <- 2
 indexes <- c("CTCTCTAC", "CGAGGCTG", "AAGAGGCA", "GTAGAGGA", "GCTCATGA", "ATCTCAGG")
+plateID <- "R"
 ```
 
 ```{r child = "Labcyte-RT6.Rmd"}
