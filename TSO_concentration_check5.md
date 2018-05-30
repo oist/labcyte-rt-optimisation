@@ -194,9 +194,8 @@ primers (see [TSO_concentration_check2](TSO_concentration_check2.md) for details
 
 Still, the observed molarity (15.5 µM ± 3.8) is significantly different from the expectation (10 µM).
 
-To see the effectiveness of the correction, we plot the observed molarities
-against the expected molarities if the concentrations were not corrected
-(that is transfer 4 µL TSO in 16 µL H2O for all TSOs).
+To see the effectiveness of the correction, we plot the observed dilution
+factors against the expected ones.
 
 
 ```r
@@ -217,17 +216,23 @@ t.test(conc$obs, mu=10)
 ##   15.4874
 ```
 
+To see the effectiveness of the correction, we plot the observed dilution
+factors against the expected ones.
+
+
 ```r
-conc$stock <-
+stock <- 
   read.table( "dilution_table.txt"
             , sep = "\t"
-            , header = TRUE)[,"source_obs_molarity", drop = T][conc$ID]
+            , header = TRUE)[conc$ID, ]
+conc$dil_exp <- stock$dilution_factor_for_100uM / 10
+conc$dil_obs <- stock$source_obs_molarity / 200 / conc$obs
 
-conc$exp_noncor <- conc$stock / 5 / 20 # 20 × dilution before measurement.
-conc$exp <- 200 / 20 # 20 × dilution before measurement.
-
-ggplot(conc, aes(obs, exp_noncor, colour = CV)) + 
-  geom_text(aes(label=Well))
+ggplot(conc, aes(dil_obs, dil_exp, colour = CV)) + 
+  geom_text(aes(label=Well)) +
+  scale_x_log10("Observed dilution") +
+  scale_y_log10("Expected dilution", breaks = c(0.5, 1, 2)) +
+  ggtitle("Samples were more diluted than expected, but by a constant factor.")
 ```
 
 ![](TSO_concentration_check5_files/figure-html/dil_factors-1.png)<!-- -->
@@ -235,8 +240,10 @@ ggplot(conc, aes(obs, exp_noncor, colour = CV)) +
 The measurements with the highest noise (coefficient of variation, CV) are
 plotted in lighter tones of blue.
 
-What we see here is that for barcodes such as `D07`, `H07`, `G07`, etc, the
-concentration was quite efficiently corrected.
+What we see here is that for the most highly concentrated TSOs, the
+concentration was still quite well corrected.  TSOs that have an aberrant
+observed dilution factor also have a high CV of their absorbance, so it may be
+just a measurement error.
 
 
 Session information
