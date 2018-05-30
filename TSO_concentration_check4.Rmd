@@ -1,5 +1,6 @@
 ---
 title: "TSO concentration in exp. 7's source plate"
+subtitle: "RT optimisation with the Labcyte Echo 525. Source plate QC."
 output: 
   html_document: 
     fig_height: 5.25
@@ -78,6 +79,8 @@ conc <-    aggregate( conc[,c("A260", "A280")]
                     , list(Well = conc$Well, plate = conc$plate)
                     , mean)
 
+conc$CV <- conc.sd$A260 / conc$A260
+
 summary(conc)
 ```
 
@@ -122,7 +125,6 @@ conc$obs <- conc$A260 / conc$ext * 1e6
 ```
 
 
-
 Expected concentrations
 -----------------------
 
@@ -151,24 +153,14 @@ ggpubr::ggarrange( ncol = 1, nrow = 3, hist_obs, hist_a260, hist_a280)
 ```
 
 
-Absorbances and concentration
-=============================
+A260 vs A280
+============
 
-## A260 vs A280
-
-```{r concentration_QC_abs_ratio}
+```{r concentration_QC_abs_ratio, fig.height=3, fig.width=4}
 ggplot(conc, aes(A280, A260, colour = expected)) + geom_point() +
     scale_x_log10() + scale_y_log10() +
   ggtitle("Relation between absorbances at 260 and 280 nm")
 ```
-
-## concentration vs A260
-
-```{r concentration_QC_conc_a260}
-ggplot(conc, aes(obs, A260, colour = expected)) + geom_point() +
-  ggtitle("Relation between concentration and abs. at 260 nm")
-```
-
 
 
 Comparison between source and stock
@@ -188,8 +180,15 @@ conc$stock <-
 
 conc$exp <- conc$stock / conc$dil
 
-ggplot(conc, aes(obs, exp, colour = expected)) + geom_point() +
+ggplot(conc, aes(obs, exp, colour = CV)) +
+  geom_text(aes(label=Well)) +
   facet_wrap(~expected, scale = "free")
+```
+
+## Save concentration values.
+
+```{r}
+dput(data.frame(ID = conc$ID, ratio = conc$obs / conc$exp))
 ```
 
 
