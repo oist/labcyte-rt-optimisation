@@ -1,5 +1,5 @@
 ---
-title: "Labcyte-RT Data Analysis (6th experiment)"
+title: "Labcyte-RT Data Analysis (7th experiment)"
 subtitle: "RT optimisation with the Labcyte Echo 525: TSO, RT primer and RNA amounts"
 output:
   html_document:
@@ -32,7 +32,15 @@ library("ggplot2")
 library("magrittr")
 library("MultiAssayExperiment")
 library("SummarizedExperiment")
+library("viridis")
 ```
+
+
+Load CAGE libraries
+===================
+
+Load summary statistics from MOIRAI
+-----------------------------------
 
 MOIRAI shortcuts
 
@@ -47,12 +55,6 @@ BASEDIR        <- "/osc-fs_home/scratch/moirai"
 MOIRAI_BASE    <- file.path(BASEDIR, MOIRAI_USER)
 MOIRAI_RESULTS <- file.path(MOIRAI_BASE, MOIRAI_PROJ, paste(MISEQ_RUN, WORKFLOW, MOIRAI_STAMP, sep = "."))
 ```
-
-Load CAGE libraries
-===================
-
-Load summary statistics from MOIRAI and polish the names
---------------------------------------------------------
 
 ```{r MOIRAI, dependson = "moirai_shortcuts"}
 ce <- smallCAGEqc::loadMoiraiStats(
@@ -112,8 +114,12 @@ ce <- CAGEexp( colData    = ce
 ```
 
 ```{r get_CTSS_data, dependson = "new_CAGEexp"}
-getCTSS(ce, useMulticore = TRUE)
-removeStrandInvaders(ce)
+if(file.exists(paste0("Labcyte-RT_Data_Analysis_", expNumber, ".Rds"))) {
+  ce <- readRDS(paste0("Labcyte-RT_Data_Analysis_", expNumber, ".Rds"))
+} else {
+  getCTSS(ce, useMulticore = TRUE)
+  removeStrandInvaders(ce)
+}
 ```
 
 
@@ -124,7 +130,11 @@ Collect annotations and gene symbols via a local GENCODE file
 (mm9 GENCODE not available in AnnotationHub)
 
 ```{r annotate_CTSS, dependson = "get_CTSS_data"}
-annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
+if(file.exists(paste0("Labcyte-RT_Data_Analysis_", expNumber, ".Rds"))) {
+  print("Annotated data loaded from file")
+  } else {
+  annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
+  }
 ```
 
 
@@ -164,7 +174,7 @@ was chosen for negative controls, therefore they are either missed or correct.
 Actually, a lot are missed.  However, this is not entirely surprising since
 only weak signal is expected.
 
-```{r neg_ctls_qc, fig.height=12, dependson="annotate_CTSS"}
+```{r neg_ctls_qc, fig.height=15, dependson="annotate_CTSS", warning=FALSE}
 ce$NC <- ce$RNA_vol == 0
 
 ggpubr::ggarrange( legend = "right", common.legend = TRUE,
@@ -184,7 +194,7 @@ The negative controls of `TCCTGAGC`, `GGACTCCT`, `AAGAGGCA`, `GCTCATGA`,
 promoter rate thatn the other samples; this is strange.  It was not the
 case in experiment 6.
 
-```{r neg_ctls_annot, fig.height=12, dependson="annotate_CTSS"}
+```{r neg_ctls_annot, fig.height=15, dependson="annotate_CTSS", warning=FALSE}
 ggpubr::ggarrange( legend = "right", common.legend = TRUE,
   plotAnnot( ce, scope = msScope_counts, group = "NC"
            , title = NULL, facet = "index", normalise = FALSE) +
@@ -198,7 +208,7 @@ ggpubr::ggarrange( legend = "right", common.legend = TRUE,
 ```
 
 
-### Removal of the negative controls
+### Removal of the RNA-negative controls
 
 To ease data handling, the negative controls with no RNA are removed.  By design
 all of these negative controls had 10 μM TSO.
@@ -215,11 +225,11 @@ By replicate
 
 Discrepancy between replicates:
 
- - CGAGGCTG has an excess artefacts (tag dust) compared to same libraries from
+ - `CGAGGCTG` has an excess artefacts (tag dust) compared to same libraries from
    other plates.
- - TAGGCATG has a different profile compared to other plates, but its amount
+ - `TAGGCATG` has a different profile compared to other plates, but its amount
    of tag dust clearly indicates that it is correctly identified as a "1 pg"
-   library.  Same for GCTCATGA in the 10 pg libraries.
+   library.  Same for `GCTCATGA` in the 10 pg libraries.
 
 The following barcodes were found in libraries where they were not supposed
 to be used:
@@ -229,9 +239,10 @@ to be used:
  - `ACATCT` in `TAGGCATG`.
  - `GTATCT` in `CGAGGCTG`.
 
-In experiment 4, swapped indexes were "CGTACTAG", "AGGCAGAA" and  "TAGGCATG", "CTCTCTAC".
+In experiment 4, swapped indexes were `CGTACTAG`, `AGGCAGAA` and `TAGGCATG`, 
+`CTCTCTAC`.
 
-```{r qc_plots_by_replicate}
+```{r qc_plots_by_replicate, fig.height=8, fig.width=8}
 plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
            , title = NULL, facet = "index") + ylab("Number of read pairs") +
   xlab(NULL) + facet_wrap(~facet, ncol = 6, scale = "free")
@@ -243,30 +254,12 @@ plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = TRUE
 plotAnnot( ce, scope = msScope_qcSI, group = "TSO", normalise = FALSE
            , title = NULL, facet = "index") + ylab("Number of read pairs") +
   xlab(NULL) + facet_wrap(~facet, ncol = 6, scale = "free")
+```
 
+```{r qc_plots_by_plate, fig.height=4, fig.width=8}
 plotAnnot( ce, scope = msScope_qcSI, group = "index", normalise = FALSE
            , title = NULL, facet = "plateID") + ylab("Number of read pairs") +
   xlab(NULL) + facet_wrap(~facet, ncol = 4, scale = "free")
-```
-
-
-```{r qc_RNA_quantity, dependson = "get_CTSS_data"}
-ggpubr::ggarrange( legend = "right", common.legend = TRUE,
-  plotAnnot( ce, scope = msScope_qcSI, group = "index", normalise = FALSE, title = NULL) +
-    ylab("sequence counts") + xlab("Replicate number"),
-  plotAnnot( ce, scope = msScope_qcSI, group = "index", normalise = TRUE,  title = NULL) +
-    ylab("Normalised to 100%") + xlab("Replicate number")
-) %>% ggpubr::annotate_figure(top="QC of processing, by indexed library")
-```
-
-
-```{r CTSS_annotation_plot_per_replicate, dependson = "annotate_CTSS"}
-ggpubr::ggarrange( legend = "right", common.legend = TRUE,
-  plotAnnot( ce, scope = msScope_counts, group = "index", normalise = FALSE, title = NULL) +
-    ylab("sequence counts") + xlab("Replicate number"),
-  plotAnnot( ce, scope = msScope_counts, group = "index", normalise = TRUE,  title = NULL) +
-    ylab("Normalised to 100%") + xlab("Replicate number")
-) %>% ggpubr::annotate_figure(top="QC annotation, by indexed library")
 ```
 
 
@@ -276,7 +269,7 @@ By barcode
 Barcodes 34 and 7 gave more sequences than average, but their normalised QC
 profile or their annotation profile does not stand out
 
-```{r plot_by_barcode}
+```{r plot_by_barcode, fig.height=8, fig.width=8}
 Tier_A <- c(  3, 15, 27, 39, 51, 63, 75
            , 10, 22, 34, 46, 58, 70, 82
            , 11, 23, 35, 47, 59, 71, 83)
@@ -299,12 +292,12 @@ plotAnnot( ce, scope = msScope_qcSI, group = "repl"
   facet_wrap(~facet, ncol=7)
 
 plotAnnot( ce, scope = msScope_qcSI, group = "repl"
-           , title = "Sequence counts"
+           , title = "Sequence counts (normalised)"
            , facet = "BN", normalise = TRUE) +
   facet_wrap(~facet, ncol=7)
 
 plotAnnot( ce, scope = msScope_counts, group = "repl"
-           , title = "Sequence counts"
+           , title = "Annotation counts"
            , facet = "BN", normalise = FALSE) +
   facet_wrap(~facet, ncol=7)
 ```
@@ -355,7 +348,7 @@ ce <- ce[,ce$RT_PRIMERS != 0]
 ```
 
 
-### By TSO concentration
+## By TSO concentration
 
  - Highest TSO concentrations give largest molecule counts, except at the
    highest RNA concentration (200 ng / µL)
@@ -389,7 +382,7 @@ ggpubr::ggarrange(legend = "right",
   ggpubr::annotate_figure(top="QC control, by TSO concentration and amount of RNA (ng)")
 ```
 
-### By RTP concentration
+## By RTP concentration
 
  - At high RNA concentrations, rRNA rate increases with RT primer concentration.
  - At low RNA concentrations, rRNA rate decreases with RT primer concentration...
@@ -416,76 +409,287 @@ ggpubr::ggarrange(legend = "right",
 Analysis
 ========
 
+## Tag dust
 
-### TSO-RT ratios
+If not removed during library preparation, oligonucleotide artifacts strongly
+dominate libraries prepared with 1 pg RNA.  In general, the amount of artefacts
+increases when starting RNA amounts decrease.  Here, adding RT primers increases
+artefacts.  In contrary, and somewhat surprisingly, adding TSOs seem to reduce
+artefacts.
 
-```{r tso_rt_ratios}
-ce$rtp_rna <- paste0("RTP: ", ce$RT_PRIMERS, ", RNA: ", ce$RNA)
-plotAnnot( ce, scope = msScope_counts, group = "TSO", normalise = F
-           , title = NULL, facet = "rtp_rna") + ylab("Number of read pairs") +
-  xlab(NULL) + facet_wrap(~facet, ncol = 6, scale = "free")
+Sub panel at 10,000 pg is noisy because replicate `CGAGGCTG` is an outlier with
+a large amount of artefacts.
 
-ce$tso_rna <- paste(ce$TSO, ce$RNA)
-plotAnnot( ce, scope = msScope_counts, group = "RT_PRIMERS", normalise = F
-           , title = NULL, facet = "tso_rna") + ylab("Number of read pairs") +
-  xlab(NULL) + facet_wrap(~facet, ncol = 6, scale = "free")
+```{r TSO_vs_tagDust_by_RTP_facet_RNA, fig.height=7, fig.width=10}
+ggplot(colData(ce) %>% data.frame, aes(TSO, tagdust / extracted * 100, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth() +
+  facet_wrap(~RNA, scales = "fixed") +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = ce$TSO %>% unique %>% sort) +
+  scale_y_continuous("Tag dust (% of extracted reads)") +
+  ggtitle("Increasing TSO molarity stronlgy reduces artifact amounts.")
+```
+
+Plot where all RT primer concentrations are pooled, showing influence of RNA
+mass and TSO concentration:
+
+```{r TSO_vs_tagDust_facet_RNA, fig.height=4, fig.width=15}
+ggplot(colData(ce) %>% data.frame, aes(TSO, tagdust / extracted * 100, color=RNA %>% factor)) +
+  geom_point() +
+  geom_smooth() +
+  facet_wrap(~RNA, scales = "fixed", nrow = 1) +
+  scale_color_viridis(discrete = TRUE, name = "RNA (pg)", option = "magma") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.625, 2.500, 10.000, 40.000, 160.000)) +
+  scale_y_continuous("Tag dust (% of extracted reads)") +
+  ggtitle("Increasing TSO molarity stronlgy reduces artifact amounts.")
+```
+
+Same with all RNA amount overlayed in a single plot.
+
+```{r TSO_vs_tagDust_by_RNA, fig.height=4, fig.width=4}
+ggplot(colData(ce) %>% data.frame, aes(TSO, tagdust / extracted * 100, color=RNA %>% factor)) +
+  geom_point() +
+  geom_smooth() +
+  scale_color_viridis(discrete = TRUE, name = "RNA (pg)", option = "magma") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks =  c(0.625, 2.500, 10.000, 40.000, 160.000)) +
+  scale_y_continuous("Tag dust (% of extracted reads)") +
+  ggtitle("TSO molarity stronlgy influences artifact amounts.")
 ```
 
 
-NEED TO NORMALISE COUNTS PER BLOCK since each index had different total amount
-of sequences.
+## Ribosomal RNA
 
-```{r}
-ce$ratios <- ce$BARCODE_ID
-ce$ratios <- ratios[match(ce$ratios, ratios$ID), "ratio"]
-ce$TSO_corrected <- ce$TSO * ce$ratios
+ - Too much RT primers increase rRNA rate.
+ - rRNA rate is maximal at mild amounts of RNA (~1 ng).
+ - Within the high TSO concentration, an minimum is reach between 20 and 40 µM,
+   depending on the quantity RNA and RT primers.
 
-ggplot(colData(ce) %>% data.frame, aes(TSO, counts, color=RT_PRIMERS %>% factor)) +
-  geom_point() + facet_wrap(~RNA, scales = "free") + geom_smooth(se=FALSE) +
-  scale_x_log10() + scale_y_log10()
-
-ggplot(colData(ce) %>% data.frame, aes(TSO_corrected, counts, color=RT_PRIMERS %>% factor)) +
-  geom_point() + facet_wrap(~RNA, scales = "free") + geom_smooth(se=FALSE) +
-  scale_x_log10() + scale_y_log10()
-
-ggplot(colData(ce) %>% data.frame, aes(RT_PRIMERS, counts, color=TSO %>% factor)) +
-  geom_point() + facet_wrap(~RNA, scales = "free") + geom_smooth(se=FALSE) +
-  scale_x_log10() + scale_y_log10()
+```{r rRNA_rate_definition}
+ce$rRNA_rate <- ce$rdna / (ce$extracted - ce$tagdust)
 ```
 
-
-```{r}
-ce$rRNA_rate <- ce$rdna / (ce$extracted - ce$tagdust) * 100
-
+```{r TSO_vs_rRNA_by_RTP_facet_RNA, fig.height=7, fig.width=10}
 ggplot(colData(ce) %>% data.frame, aes(TSO, rRNA_rate, color=RT_PRIMERS %>% factor)) +
-  geom_point() + facet_wrap(~RNA, scales = "free") + geom_smooth(se=FALSE) +
-  scale_x_log10() 
-
-ggplot(colData(ce) %>% data.frame, aes(TSO_corrected, rRNA_rate, color=RT_PRIMERS %>% factor)) +
-  geom_point() + facet_wrap(~RNA, scales = "free") + geom_smooth(se=FALSE) +
-  scale_x_log10()
-
-ggplot(colData(ce) %>% data.frame, aes(RT_PRIMERS, rRNA_rate, color=TSO %>% factor)) +
-  geom_point() + facet_wrap(~RNA, scales = "free") + geom_smooth(se=FALSE) +
-  scale_x_log10() 
+  geom_point() +
+  geom_smooth() +
+  facet_wrap(~RNA, scales = "fixed") +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10, 40, 160)) +
+  scale_y_continuous("rRNA (% of non-tagdust extracted reads)") +
+  ggtitle("TSO molarity stronlgy modulates rRNA amounts.")
 ```
 
 
+## Yield
 
-```{r}
-ce$promoter_rate <- ce$promoter / ce$counts * 100
+Because we multiplexed reactions together, the ones with the highest yield
+will give the largest amount of reads.  Higher yield gives the possibility
+of reducing the number of PCR cycles.
 
+Since multiplexing is not perfect, each library had a different number
+of reads.  Therefore, to compare yields in terms of number of aligned reads,
+etc, one needs to normalise per indexed library.
+
+```{r calc_normalised_values, dependson = "get_CTSS_data"}
+tapply(ce$librarySizes, ce$index, sum)
+indexMean <- tapply(ce$librarySizes, ce$index, mean)
+
+ce$libSizeNormByIndex <-
+  mapply( FUN   = function(n, index) n / indexMean[index]
+        , n     = ce$librarySizes
+        , index = ce$index)
+```
+
+RT primer molarity mildly influences yield.  Higher molarities are
+needed when TSO molarity is increased.  Conversely, high molarities are
+detrimental for low TSO amounts.  In brief, the RT primer concentration must
+be adjusted to the TSO concentration.
+
+```{r RTP_vs_norm_counts_by_TSO_facet_RNA, fig.height=7, fig.width=10}
+ggplot(colData(ce) %>% data.frame, aes(RT_PRIMERS, libSizeNormByIndex, color=TSO %>% factor)) +
+  geom_point() +
+  geom_smooth() +
+  facet_wrap(~RNA, scales = "fixed") +
+  scale_color_viridis(discrete = TRUE, name = "[TSO] (µM)", option = "magma") +
+  scale_x_log10( "RT primer molarity (µM)"
+               , breaks = ce$RT_PRIMERS %>% unique %>% sort) +
+  scale_y_log10( "Normalised counts (arbitrary scale)"
+               , breaks = c(0.01, 0.1, 1, 10)) +
+  ggtitle("RT primer concentration mildly influences yield.")
+```
+
+Since the trend appears true for all RNA concentrations, the following figure
+pools all data.
+
+```{r RTP_vs_norm_counts_by_TSO, fig.height=4, fig.width=4}
+ggplot(colData(ce) %>% data.frame, aes(RT_PRIMERS, libSizeNormByIndex, color=TSO %>% factor)) +
+  geom_point() +
+  geom_smooth() +
+#  facet_wrap(~RNA, scales = "fixed") +
+  scale_color_viridis(discrete = TRUE, name = "[TSO] (µM)", option = "magma") +
+  scale_x_log10( "RT primer molarity (µM)"
+               , breaks = ce$RT_PRIMERS %>% unique %>% sort) +
+  scale_y_log10( "Normalised counts (arbitrary scale)"
+               , breaks = c(0.01, 0.1, 1, 10)) +
+  ggtitle("RT primer concentration mildly influences yield.")
+```
+
+
+## Mapping rate
+
+The percent of proper pairs aligned indicate the amount of data that goes in
+the analysis.  The rest is basically discarded.  Here, we do not take tag dust
+artefact into account, assuming that they can be removed before sequencing.
+
+The results are somewhat symmetric with the rRNA rate, since rRNA reads are
+a large proportion of the discarded data.
+
+```{r mapping_rate_definition}
+ce$mapping_rate <- ce$properpairs / (ce$extracted - ce$tagdust) * 100
+```
+
+```{r TSO_vs_mapping_rate_by_RTP_facet_RNA, fig.height=7, fig.width=10}
+ggplot(colData(ce) %>% data.frame, aes(TSO, mapping_rate, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth() +
+  facet_wrap(~RNA, scales = "fixed") +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10, 40, 160)) +
+  scale_y_continuous("Mapping rate (% of extracted reads)") +
+  ggtitle("TSO molarity stronlgy influences mapping rate.")
+```
+
+
+## Strand invasion
+
+Strand invasion artefacts are also discarded, but at a later step.  In this
+experiment, their amount was reasonably low.
+
+Interestingly, the amount of strand invaders was minimised by high amounts
+of TSOs and RT primers.  Does that mean that strand invasion happen first,
+and then template-switching happens if primers remain ?
+
+```{r SI_rate_definition}
+ce$strand_invasion_rate <- ce$strandInvaders / (ce$counts + ce$strandInvaders) * 100
+```
+
+```{r TSO_vs_SI_rate_by_RTP_facet_RNA, fig.height=7, fig.width=10}
+ggplot(colData(ce) %>% data.frame, aes(TSO, strand_invasion_rate, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth() +
+  facet_wrap(~RNA, scales = "fixed") +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10, 40, 160)) +
+  scale_y_continuous("Strand invasion rate (% of molecule counts)") +
+  ggtitle("Oligonucleotide molarity stronlgy influences strand invasion rate.")
+```
+
+
+## Promoter rate
+
+High promoter rate is THE goal of a CAGE experiment.  The molarity of RT
+primer does not seem to matter much.  Promoter rate reaches optimum at TSO
+molarities higher than 10 µM.
+
+```{r promoter_rate_definition}
+ce$promoter_rate <- ce$promoter / (ce$counts) * 100
+```
+
+```{r TSO_vs_promoter_rate_by_RTP_facet_RNA, fig.height=7, fig.width=10}
 ggplot(colData(ce) %>% data.frame, aes(TSO, promoter_rate, color=RT_PRIMERS %>% factor)) +
-  geom_point() + facet_wrap(~RNA, scales = "free") + geom_smooth(se=FALSE) +
-  scale_x_log10() 
+  geom_point() +
+  geom_smooth() +
+  facet_wrap(~RNA, scales = "fixed") +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10, 40, 160)) +
+  scale_y_continuous("Promoter rate (% of molecule counts after SI removal)") +
+  ggtitle("Promoter rate reaches optimum at high TSO molarity.")
+```
 
-ggplot(colData(ce) %>% data.frame, aes(TSO_corrected, promoter_rate, color=RT_PRIMERS %>% factor)) +
-  geom_point() + facet_wrap(~RNA, scales = "free") + geom_smooth(se=FALSE) +
-  scale_x_log10()
+Low TSO molarities are much more detrimental for promoter rate at high RNA concentrations.
 
-ggplot(colData(ce) %>% data.frame, aes(RT_PRIMERS, promoter_rate, color=TSO %>% factor)) +
-  geom_point() + facet_wrap(~RNA, scales = "free") + geom_smooth(se=FALSE) +
-  scale_x_log10()
+```{r TSO_vs_promoter_rate_by_RNA, fig.height=4, fig.width=4}
+ggplot(colData(ce) %>% data.frame, aes(TSO, promoter_rate, color=RNA %>% factor)) +
+  geom_point() +
+  geom_smooth() +
+#  facet_wrap(~RNA, scales = "fixed") +
+  scale_color_viridis(discrete = TRUE, name = "RNA (pg)", option = "magma") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10, 40, 160)) +
+  scale_y_continuous("Promoter rate (% of molecule counts after SI removal)") +
+  ggtitle("Promoter rate reaches optimum at high TSO molarity.")
+```
+
+
+## Richness (on genes)
+
+Using a free plotting scale as richness reaches extremely low values at 1 pg RNA.
+
+### Richness scale of 10
+
+Many libraries were too shallowly sequenced to allow to calculate richness
+on a scale of 100.
+
+Richness is higher when RT primer molarity is higher.
+
+```{r TSO_vs_richness10_by_RTP_facet_RNA, fig.height=7, fig.width=10}
+CTSStoGenes(ce)
+ce$r10g <- vegan::rarefy(t(assay(ce[["geneExpMatrix"]])),10)
+ce$r10g[ce$counts < 10] <- NA
+ 
+ggplot(colData(ce) %>% data.frame, aes(TSO, r10g, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth() +
+  facet_wrap(~RNA, scales = "free") +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10, 40, 160)) +
+  scale_y_continuous("Gene richness (on a scale of 10)") +
+  ggtitle("Higher RT primer concentration give higher richness.")
+```
+
+### Richness scale of 100
+
+On a scale of 100, we see that TSO concentration needs to be matched with
+RNA amounts.
+
+```{r TSO_vs_richness100_by_RTP_facet_RNA, fig.height=7, fig.width=10, warning=FALSE}
+CTSStoGenes(ce)
+ce$r100g <- vegan::rarefy(t(assay(ce[["geneExpMatrix"]])),100)
+ce$r100g[ce$counts < 100] <- NA
+ 
+ggplot(colData(ce) %>% data.frame, aes(TSO, r100g, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth() +
+  facet_wrap(~RNA, scales = "free") +
+  scale_color_viridis(discrete = TRUE, name = "[TSO] (µM)") +
+  scale_x_log10( "TSO molarity (µM)"
+               , breaks = c(0.6, 2.5, 10, 40, 160)) +
+  scale_y_continuous("Gene richness (on a scale of 100)") +
+  ggtitle("Higher RT primer concentration give higher richness.")
+```
+
+```{r RTP_vs_richness100_by_RNA, fig.height=7, fig.width=10}
+CTSStoGenes(ce)
+ce$r100g <- vegan::rarefy(t(assay(ce[["geneExpMatrix"]])),100)
+ce$r100g[ce$counts < 100] <- NA
+ 
+ggplot(colData(ce) %>% data.frame, aes(RT_PRIMERS, r100g, color=RNA %>% factor)) +
+  geom_point() +
+  geom_smooth() +
+  scale_color_viridis(discrete = TRUE, name = "RNA (pg)", option = "magma") +
+  scale_x_log10( "RT primer molarity (µM)"
+               , breaks = ce$RT_PRIMERS %>% unique %>% sort) +
+  scale_y_continuous("Gene richness (on a scale of 100)") +
+  ggtitle("Higher RT primer concentration give higher richness.")
 ```
 
 
