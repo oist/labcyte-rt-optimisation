@@ -148,7 +148,9 @@ was the quality of the TSOs used in the previous experiments.
 
 ### Experiment 7
 
-[Experiment seven](Labcyte-RT_Data_Analysis_7.md): plates `Q`, `R`, `S` and `T`.
+Experiment seven
+  ([Analysis](Labcyte-RT_Data_Analysis_7.md)) /
+  ([QC](Labcyte-RT_Data_Analysis_7_QC.md)): plates `Q`, `R`, `S` and `T`.
 MiSeq ID `180517_M00528_0364_000000000-BRGK6` (good quality).
 MOIRAI
   [QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180517_M00528_0364_000000000-BRGK6.paired_raw_quality_control2.20180518043259/180517_M00528_0364_000000000-BRGK6.paired_raw_quality_control2.20180518043259.html),

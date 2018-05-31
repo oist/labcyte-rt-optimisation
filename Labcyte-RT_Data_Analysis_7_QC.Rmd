@@ -1,0 +1,418 @@
+---
+title: "Labcyte-RT Data QC (7th experiment)"
+subtitle: "RT optimisation with the Labcyte Echo 525: TSO, RT primer and RNA amounts"
+output:
+  html_document:
+    keep_md: yes
+    number_sections: yes
+    toc: yes
+    pandoc_args:
+     - "--lua-filter=links-to-markdown.lua"
+---
+
+```{r echo = FALSE}
+knitr::opts_chunk$set(cache  = TRUE)
+knitr::opts_knit$set(verbose = TRUE)
+ggplot2::theme_set(ggplot2::theme_bw())
+expNumber <- 7
+```
+
+Here, we assessed again multiple combinations of TSO, RT primer and RNA amounts,
+using a different stock of TSOs (PO_8268526), purchased earlier but apparently
+of better quality (see [experiment 6](Labcyte-RT_Data_Analysis_6.md)), and
+with a more extensive randomisation of TSO barcodes and well coordinates
+(see designs [6a](Labcyte-RT6a.md), [6b](Labcyte-RT6b.md), [6c](Labcyte-RT6c.md) and [6d](Labcyte-RT6d.md)).
+
+Load R packages
+===============
+
+```{r load_R_libraries, message = FALSE}
+library("CAGEr")
+library("ggplot2")
+library("magrittr")
+library("MultiAssayExperiment")
+library("SummarizedExperiment")
+library("viridis")
+```
+
+
+Load CAGE libraries
+===================
+
+Load summary statistics from MOIRAI
+-----------------------------------
+
+MOIRAI shortcuts
+
+```{r moirai_shortcuts, dependson = "load_R_libraries"}
+MISEQ_RUN      <- "180517_M00528_0364_000000000-BRGK6"
+WORKFLOW       <- "OP-WORKFLOW-CAGEscan-short-reads-v2.1.2"
+MOIRAI_STAMP   <- "20180521173736"
+MOIRAI_PROJ    <- "project/Labcyte_test_decoy" 
+MOIRAI_USER    <- "nanoCAGE2" 
+ASSEMBLY       <- "mm9"
+BASEDIR        <- "/osc-fs_home/scratch/moirai"
+MOIRAI_BASE    <- file.path(BASEDIR, MOIRAI_USER)
+MOIRAI_RESULTS <- file.path(MOIRAI_BASE, MOIRAI_PROJ, paste(MISEQ_RUN, WORKFLOW, MOIRAI_STAMP, sep = "."))
+```
+
+```{r MOIRAI, dependson = "moirai_shortcuts"}
+ce <- smallCAGEqc::loadMoiraiStats(
+  pipeline  = WORKFLOW,
+  multiplex = file.path( MOIRAI_BASE, "input", paste0(MISEQ_RUN, ".multiplex.txt")),
+  summary   = file.path( MOIRAI_RESULTS, "text", "summary.txt")) %>% DataFrame
+
+ce$inputFiles <- paste0(MOIRAI_RESULTS, "/CAGEscan_fragments/", ce$samplename, ".bed")
+
+# Discard lines for which input files do not exist.
+ce <- ce[sapply(ce$inputFiles, file.exists),]
+
+# Discard lines for which input files are empty.
+ce <- ce[file.info(ce$inputFiles)$size != 0,]
+
+ce$inputFilesType <- c("bed")
+ce$sampleLabels <- as.character(ce$samplename)
+
+ce <- ce[ce$group != "decoy",]  # Temporary fix
+
+ce
+```
+
+
+Load plate design
+-----------------
+
+Using transfer designs [6a](Labcyte-RT6a.md), [6b](Labcyte-RT6b.md), [6c](Labcyte-RT6c.md) and [6d](Labcyte-RT6d.md).
+
+```{r PLATE, dependson = "MOIRAI"}
+plate <- rbind(
+  cbind(read.table("plate6a.txt", sep = "\t", header=TRUE, stringsAsFactors=FALSE), repl="Q")
+, cbind(read.table("plate6b.txt", sep = "\t", header=TRUE, stringsAsFactors=FALSE), repl="R")
+, cbind(read.table("plate6c.txt", sep = "\t", header=TRUE, stringsAsFactors=FALSE), repl="S")
+, cbind(read.table("plate6d.txt", sep = "\t", header=TRUE, stringsAsFactors=FALSE), repl="T"))
+
+stopifnot(identical(plate, plate[!duplicated(plate),]))
+
+ce %<>% cbind(plate[match( paste(ce$barcode, ce$index)
+                         , paste(plate$BARCODE_SEQ, plate$INDEX)), ])
+
+ce$index %<>% factor(levels = unique(plate$INDEX))  # Keep original order of indexes.
+ce$plateID <- ce$repl # Define plate IDs
+
+rownames(ce) %<>% paste(ce$plateID, sep = "_")
+ce$sampleLabels <- rownames(ce)
+
+ce$RNA_factor <- ce$RNA %>%
+  factor(labels = c("no RNA", "1 pg RNA", "10 pg RNA", "100 pg RNA", "1 ng RNA", "10 ng RNA", "100 ng RNA"))
+
+rm(plate)
+```
+
+
+Create a CAGEexp object and load expression data
+------------------------------------------------
+
+```{r new_CAGEexp, message = F, echo = FALSE, dependson = "PLATE"}
+ce <- CAGEexp( colData    = ce
+             , genomeName = "BSgenome.Mmusculus.UCSC.mm9")
+```
+
+```{r get_CTSS_data, dependson = "new_CAGEexp"}
+if(file.exists(paste0("Labcyte-RT_Data_Analysis_", expNumber, ".Rds"))) {
+  ce <- readRDS(paste0("Labcyte-RT_Data_Analysis_", expNumber, ".Rds"))
+} else {
+  getCTSS(ce, useMulticore = TRUE)
+  removeStrandInvaders(ce)
+}
+```
+
+
+Annotation with GENCODE
+-----------------------
+
+Collect annotations and gene symbols via a local GENCODE file
+(mm9 GENCODE not available in AnnotationHub)
+
+```{r annotate_CTSS, dependson = "get_CTSS_data"}
+if(file.exists(paste0("Labcyte-RT_Data_Analysis_", expNumber, ".Rds"))) {
+  print("Annotated data loaded from file")
+  } else {
+  annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
+  }
+```
+
+
+Save the CAGEexp file
+---------------------
+
+```{r save_myCAGEexp_object, dependson = "annotate_CTSS"}
+saveRDS(ce, paste0("Labcyte-RT_Data_Analysis_", expNumber, ".Rds"))
+```
+
+
+Quality controls
+================
+
+Custom _scopes_ displaying _strand invasion_ artefacts.
+
+```{r custom_plotAnnot_scopes}
+source("customScopes.R", echo = TRUE)
+```
+
+
+Negative controls
+-----------------
+
+Some negative controls did not give any sequence and therefore are not in the
+CAGEr object at all.
+
+```{r count_neg_ctls, fig.height=8, dependson="annotate_CTSS"}
+summary(ce$RNA_vol == 0)
+```
+
+The signal in negative controls is higher than before in
+[experiment 5](Labcyte-RT_Data_Analysis_5.md) and
+[experiment 6](Labcyte-RT_Data_Analysis_6.md).  Could that suggest index
+swapping?  Not really because in this experiment, a specific set of barcodes
+was chosen for negative controls, therefore they are either missed or correct.
+Actually, a lot are missed.  However, this is not entirely surprising since
+only weak signal is expected.
+
+```{r neg_ctls_qc, fig.height=15, dependson="annotate_CTSS", warning=FALSE}
+ce$NC <- ce$RNA_vol == 0
+
+ggpubr::ggarrange( legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = msScope_qcSI, group = "NC"
+           , title = NULL, facet = "index", normalise = FALSE) +
+    facet_wrap("facet", ncol = 1) +
+    ylab("sequence counts") + xlab("Negative control ?"),
+  plotAnnot( ce, scope = msScope_qcSI, group = "NC"
+           , title = NULL, facet = "index", normalise = TRUE) +
+    facet_wrap("facet", ncol = 1) +
+    ylab("Normalised to 100%") + xlab("Negative control ?")
+)  %>% ggpubr::annotate_figure(top="QC report, by replicate set")
+```
+
+The negative controls of `TCCTGAGC`, `GGACTCCT`, `AAGAGGCA`, `GCTCATGA`,
+`CGGAGCCT`, `TACGCTGC`m, `ACTGAGCG`, `CCTAAGAC` and `CGATCAGT` have a higher
+promoter rate thatn the other samples; this is strange.  It was not the
+case in experiment 6.
+
+```{r neg_ctls_annot, fig.height=15, dependson="annotate_CTSS", warning=FALSE}
+ggpubr::ggarrange( legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = msScope_counts, group = "NC"
+           , title = NULL, facet = "index", normalise = FALSE) +
+    facet_wrap("facet", ncol = 1) +
+    ylab("sequence counts") + xlab("Negative control ?"),
+  plotAnnot( ce, scope = msScope_counts, group = "NC"
+           , title = NULL, facet = "index", normalise = TRUE) +
+    facet_wrap("facet", ncol = 1) +
+    ylab("Normalised to 100%") + xlab("Negative control ?")
+)  %>% ggpubr::annotate_figure(top="QC annotation, by replicate set")
+```
+
+
+### Removal of the RNA-negative controls
+
+To ease data handling, the negative controls with no RNA are removed.  By design
+all of these negative controls had 10 μM TSO.
+
+```{r}
+colData(ce[,ce$NC]) %>% data.frame %>% summary
+ce.bak <- ce
+ce     <- ce[, ! ce$NC]
+```
+
+
+By replicate
+------------
+
+Discrepancy between replicates:
+
+ - `CGAGGCTG` has an excess artefacts (tag dust) compared to same libraries from
+   other plates.
+ - `TAGGCATG` has a different profile compared to other plates, but its amount
+   of tag dust clearly indicates that it is correctly identified as a "1 pg"
+   library.  Same for `GCTCATGA` in the 10 pg libraries.
+
+The following barcodes were found in libraries where they were not supposed
+to be used:
+
+ - `ATCAGC` in `ACTCGCTA`, `GCGTAGTA`, `TAGCGCTC`, `AGGCAGAA`,
+`GGAGCTAC`, `GTAGAGGA`, `CGTACTAG` and `TAAGGCGA`.
+ - `ACATCT` in `TAGGCATG`.
+ - `GTATCT` in `CGAGGCTG`.
+
+In experiment 4, swapped indexes were `CGTACTAG`, `AGGCAGAA` and `TAGGCATG`, 
+`CTCTCTAC`.
+
+```{r qc_plots_by_replicate, fig.height=8, fig.width=8}
+plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
+           , title = NULL, facet = "index") + ylab("Number of read pairs") +
+  xlab(NULL) + facet_wrap(~facet, ncol = 6, scale = "free")
+
+plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = TRUE
+           , title = NULL, facet = "index") + ylab("Number of read pairs") +
+  xlab(NULL) + facet_wrap(~facet, ncol = 6, scale = "fixed")
+
+plotAnnot( ce, scope = msScope_qcSI, group = "TSO", normalise = FALSE
+           , title = NULL, facet = "index") + ylab("Number of read pairs") +
+  xlab(NULL) + facet_wrap(~facet, ncol = 6, scale = "free")
+```
+
+```{r qc_plots_by_plate, fig.height=4, fig.width=8}
+plotAnnot( ce, scope = msScope_qcSI, group = "index", normalise = FALSE
+           , title = NULL, facet = "plateID") + ylab("Number of read pairs") +
+  xlab(NULL) + facet_wrap(~facet, ncol = 4, scale = "free")
+```
+
+
+By barcode
+----------
+
+Barcodes 34 and 7 gave more sequences than average, but their normalised QC
+profile or their annotation profile does not stand out
+
+```{r plot_by_barcode, fig.height=8, fig.width=8}
+Tier_A <- c(  3, 15, 27, 39, 51, 63, 75
+           , 10, 22, 34, 46, 58, 70, 82
+           , 11, 23, 35, 47, 59, 71, 83)
+
+Tier_B <- c(  1, 13, 25, 37, 49, 61, 73
+           ,  2, 14, 26, 38, 50, 62, 74
+           ,  7, 19, 31, 43, 55, 67, 79)
+
+Tier_C <- c(  4, 16, 28, 40, 52, 64, 76
+           ,  5, 17, 29, 41, 65, 77, 89
+           ,  6, 18, 30, 42, 66, 78, 90)
+
+Tier_N <- c(  8, 20, 32, 44, 68, 80, 92)
+
+ce$BN <- factor(ce$BARCODE_ID, levels = c(Tier_A, Tier_B, Tier_C, Tier_N))
+
+plotAnnot( ce, scope = msScope_qcSI, group = "repl"
+           , title = "Sequence counts"
+           , facet = "BN", normalise = FALSE) +
+  facet_wrap(~facet, ncol=7)
+
+plotAnnot( ce, scope = msScope_qcSI, group = "repl"
+           , title = "Sequence counts (normalised)"
+           , facet = "BN", normalise = TRUE) +
+  facet_wrap(~facet, ncol=7)
+
+plotAnnot( ce, scope = msScope_counts, group = "repl"
+           , title = "Annotation counts"
+           , facet = "BN", normalise = FALSE) +
+  facet_wrap(~facet, ncol=7)
+```
+
+
+By RT primer quantity
+---------------------
+
+Strangely, libraries made with no RT primers have a QC profile that is not
+dramatically different from other libraries.  This might again be explained
+by contaminations, although the amount of sequences in the "no RT primer"
+samples is a bit high for such an explanation.
+
+
+```{r qc_rt_primer_quantity}
+ggpubr::ggarrange(legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
+           , title = NULL) + ylab("Number of read pairs") + xlab(NULL),
+  plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", normalise = TRUE
+         , title = NULL) + ylab("Normalised to 100 %") + xlab(NULL)) %>%
+  ggpubr::annotate_figure(top="QC control, by amount of RT primers (in μM)")
+```
+
+```{r promrate_rt_primer_quantity}
+ggpubr::ggarrange(legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = msScope_counts, group = "RT_PRIMERS", normalise = FALSE
+           , title = NULL) + ylab("Number of read pairs") + xlab(NULL),
+  plotAnnot( ce, scope = msScope_counts, group = "RT_PRIMERS", normalise = TRUE
+         , title = NULL) + ylab("Normalised to 100 %") + xlab(NULL)) %>%
+  ggpubr::annotate_figure(top="QC annotation, by amount of RT primers (in μM)")
+```
+
+Consistency of RTP-negative controls (still looking for index swap)
+
+```{r}
+plotAnnot( ce[,ce$TSO == 10], scope = msScope_qcSI, group = "RT_PRIMERS", normalise = FALSE
+           , title = NULL, facet = "index") + ylab("Number of read pairs") +
+  xlab(NULL) + facet_wrap(~facet, ncol = 6, scale = "fixed")
+```
+
+### Removal of the primer-negative controls
+
+To ease data handling (for instance when working with primer ratios), the
+negative controls with no primers are removed.
+
+```{r}
+ce <- ce[,ce$RT_PRIMERS != 0]
+```
+
+
+## By TSO concentration
+
+ - Highest TSO concentrations give largest molecule counts, except at the
+   highest RNA concentration (200 ng / µL)
+   
+ - Large number of tag artefacts are produced at lowest RNA concentrations
+   (20 or 1 pg / µL).  Note that the libraries have not been size-selected
+   on purpose, to estimate the amount of artefacts.
+   
+ - rRNA rate peaks at the highest TSO concentrations, and has another peak
+   at intermediate concentrations (~2.5 µM)
+
+ - Strand invation seems to depend more on RNA quantity than on TSO concentration.
+ 
+ -> let's do the next experiment at 10 µM final (200 µM stock), like in the
+    nanoCAGE 2017 protocol.  Slightly higher concentrations may have been
+    better but we need to consider that our stock plate is soon running out.
+    In addition, the actual TSO concentrations in this experiment are lower
+    than the expected value, according to the survey of the
+    [concentrations of the stock plate PO_8268526](TSO_concentration_check2.md).
+
+```{r qc_TSO_quantity, fig.height=10, fig.width=10}
+ggpubr::ggarrange(legend = "right",
+  plotAnnot( ce, scope = msScope_qcSI, group = "TSO", facet="RNA"
+           , normalise = FALSE, title = "Yield") +
+    ylab("Number of read pairs") + xlab("TSO") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_qcSI, group = "TSO", facet="RNA"
+           , normalise = TRUE, title = "QC report") +
+    ylab("Normalised to 100 %") + xlab(NULL) +
+    facet_wrap(~facet, ncol = 1)) %>%
+  ggpubr::annotate_figure(top="QC control, by TSO concentration and amount of RNA (ng)")
+```
+
+## By RTP concentration
+
+ - At high RNA concentrations, rRNA rate increases with RT primer concentration.
+ - At low RNA concentrations, rRNA rate decreases with RT primer concentration...
+ 
+ - at high RNA concentrations, molecule counts only increase marginally with RT
+   primer concentration.
+   
+   -> Let's do the next experiment at 2 µM.
+
+```{r qc_norm_TSO_quantity, fig.height=10, fig.width=10}
+ggpubr::ggarrange(legend = "right",
+    plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", facet="RNA"
+           , normalise = FALSE, title = "Yield") +
+    ylab("Number of read pairs") + xlab("TSO") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_qcSI, group = "RT_PRIMERS", facet="RNA"
+           , normalise = TRUE, title = "QC report") +
+    ylab("Normalised to 100 %") + xlab(NULL) +
+    facet_wrap(~facet, ncol = 1)) %>%
+  ggpubr::annotate_figure(top="QC control, by RTP concentration and amount of RNA (ng)")
+```
+
+
+Session information
+===================
+
+```{r}
+sessionInfo()
+```
