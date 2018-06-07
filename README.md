@@ -157,6 +157,17 @@ MOIRAI
   [Workflow]().
 
 
+### Experiment 8
+
+Experiment eight, using the same design as exp. 7 but with SuperScript IV.
+  ([Analysis](Labcyte-RT_Data_Analysis_8.md)) /
+  ([QC](Labcyte-RT_Data_Analysis_8_QC.md)): plates `Q2`, `R2`, `S2` and `T2`.
+MiSeq ID `180606_M00528_0367_000000000-BN3FG` (good quality).
+MOIRAI
+  [QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180606_M00528_0367_000000000-BN3FG.paired_raw_quality_control2.20180607095712/180606_M00528_0367_000000000-BN3FG.paired_raw_quality_control2.20180607095712.html),
+  [Workflow]().
+
+
 Xmas project
 ------------
 
