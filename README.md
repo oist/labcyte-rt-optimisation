@@ -167,6 +167,17 @@ MOIRAI
   [QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180606_M00528_0367_000000000-BN3FG.paired_raw_quality_control2.20180607095712/180606_M00528_0367_000000000-BN3FG.paired_raw_quality_control2.20180607095712.html),
   [Workflow]().
 
+### Experiment 8
+
+Experiment nine, testing dNTP and divalent ion concentration using [transfer
+design 7](Labcyte-RT7.md).
+  ([Analysis](Labcyte-RT_Data_Analysis_9.md)) /
+  ([QC](Labcyte-RT_Data_Analysis_9_QC.md)): plates `U`, `V`, `W` and `X`.
+MiSeq ID `180607_M00528_0368_000000000-BN9KM` (good sequence quality, but few reads).
+MOIRAI
+  [QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180607_M00528_0368_000000000-BN9KM.paired_raw_quality_control2.20180608154048/180607_M00528_0368_000000000-BN9KM.paired_raw_quality_control2.20180608154048.html),
+  [Workflow]().
+
 
 Xmas project
 ------------
