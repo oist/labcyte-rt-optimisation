@@ -1,0 +1,44 @@
+[Header]
+IEMFileVersion,4
+Investigator Name,Sachi KATO
+Experiment Name,Labcyte_180521
+Date,6/6/2018
+Workflow,GenerateFASTQ
+Application,FASTQ Only
+Assay,TruSeq LT
+Description,
+Chemistry,Default
+
+[Reads]
+46
+21
+
+[Settings]
+ReverseComplement,0
+
+[Data]
+Sample_ID,Sample_Name,Sample_Plate,Sample_Well,I7_Index_ID,index,Sample_Project,Description
+1,,,,N701,TAAGGCGA,,library_01
+2,,,,N702,CGTACTAG,,library_02
+3,,,,N703,AGGCAGAA,,library_03
+4,,,,N704,TCCTGAGC,,library_04
+5,,,,N705,GGACTCCT,,library_05
+6,,,,N706,TAGGCATG,,library_06
+7,,,,N707,CTCTCTAC,,library_07
+8,,,,N710,CGAGGCTG,,library_08
+9,,,,N711,AAGAGGCA,,library_09
+10,,,,N712,GTAGAGGA,,library_10
+11,,,,N714,GCTCATGA,,library_11
+12,,,,N715,ATCTCAGG,,library_12
+13,,,,N716,ACTCGCTA,,library_13
+14,,,,N718,GGAGCTAC,,library_14
+15,,,,N719,GCGTAGTA,,library_15
+16,,,,N720,CGGAGCCT,,library_16
+17,,,,N721,TACGCTGC,,library_17
+18,,,,N722,ATGCGCAG,,library_18
+19,,,,N723,TAGCGCTC,,library_19
+20,,,,N724,ACTGAGCG,,library_20
+21,,,,N726,CCTAAGAC,,library_21
+22,,,,N727,CGATCAGT,,library_22
+23,,,,N728,TGCAGCTA,,library_23
+24,,,,N729,TCGACGTC,,library_24
