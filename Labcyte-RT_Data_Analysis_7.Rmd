@@ -369,7 +369,6 @@ On a scale of 100, we see that TSO concentration needs to be matched with
 RNA amounts.
 
 ```{r TSO_vs_richness100_by_RTP_facet_RNA, fig.height=7, fig.width=10, warning=FALSE}
-CTSStoGenes(ce)
 ce$r100g <- vegan::rarefy(t(assay(ce[["geneExpMatrix"]])),100)
 ce$r100g[ce$counts < 100] <- NA
  
@@ -386,10 +385,6 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, r100g, color=RT_PRIMERS %>% factor))
 ```
 
 ```{r RTP_vs_richness100_by_RNA, fig.height=4, fig.width=4}
-CTSStoGenes(ce)
-ce$r100g <- vegan::rarefy(t(assay(ce[["geneExpMatrix"]])),100)
-ce$r100g[ce$counts < 100] <- NA
- 
 ggplot(colData(ce) %>% data.frame, aes(RT_PRIMERS, r100g, color=RNA %>% factor)) +
   geom_point() +
   geom_smooth() +
