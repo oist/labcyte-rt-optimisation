@@ -1,0 +1,358 @@
+---
+title: "Labcyte-RT Data QC (9th experiment)"
+subtitle: "RT optimisation with the Labcyte Echo 525: dNTP and divalent cations"
+output:
+  html_document:
+    keep_md: yes
+    number_sections: yes
+    toc: yes
+    pandoc_args:
+     - "--lua-filter=links-to-markdown.lua"
+---
+
+```{r echo = FALSE}
+knitr::opts_chunk$set(cache  = TRUE)
+knitr::opts_knit$set(verbose = TRUE)
+ggplot2::theme_set(ggplot2::theme_bw())
+expNumber <- 9
+```
+
+Here we assessed multiple combinations of dNTP and divalent cation concentrations,
+using the stock of TSOs `PO_8268526` (see
+[experiment 6](Labcyte-RT_Data_Analysis_6.md)), following design7 (plates
+[7a](Labcyte-RT7a.md), [7b](Labcyte-RT7b.md), [7c](Labcyte-RT7c.md) and 
+[7d](Labcyte-RT7d.md)).
+
+
+Load R packages
+===============
+
+```{r load_R_libraries, message = FALSE}
+library("CAGEr")
+library("ggplot2")
+library("magrittr")
+library("MultiAssayExperiment")
+library("SummarizedExperiment")
+library("viridis")
+```
+
+
+Load CAGE libraries
+===================
+
+Load summary statistics from MOIRAI
+-----------------------------------
+
+MOIRAI shortcuts
+
+```{r moirai_shortcuts, dependson = "load_R_libraries"}
+MISEQ_RUN      <- "180607_M00528_0368_000000000-BN9KM"
+WORKFLOW       <- "OP-WORKFLOW-CAGEscan-short-reads-v2.1.2"
+MOIRAI_STAMP   <- "20180611064626"
+MOIRAI_PROJ    <- "project/Labcyte_test_decoy" 
+MOIRAI_USER    <- "nanoCAGE2" 
+ASSEMBLY       <- "mm9"
+BASEDIR        <- "/osc-fs_home/scratch/moirai"
+MOIRAI_BASE    <- file.path(BASEDIR, MOIRAI_USER)
+MOIRAI_RESULTS <- file.path(MOIRAI_BASE, MOIRAI_PROJ, paste(MISEQ_RUN, WORKFLOW, MOIRAI_STAMP, sep = "."))
+```
+
+```{r MOIRAI, dependson = "moirai_shortcuts"}
+ce <- smallCAGEqc::loadMoiraiStats(
+  pipeline  = WORKFLOW,
+  multiplex = file.path( MOIRAI_BASE, "input", paste0(MISEQ_RUN, ".multiplex.txt")),
+  summary   = file.path( MOIRAI_RESULTS, "text", "summary.txt")) %>% DataFrame
+
+ce$inputFiles <- paste0(MOIRAI_RESULTS, "/CAGEscan_fragments/", ce$samplename, ".bed")
+
+# Discard lines for which input files do not exist.
+ce <- ce[sapply(ce$inputFiles, file.exists),]
+
+# Discard lines for which input files are empty.
+ce <- ce[file.info(ce$inputFiles)$size != 0,]
+
+ce$inputFilesType <- c("bed")
+ce$sampleLabels <- as.character(ce$samplename)
+
+ce <- ce[ce$group != "decoy",]  # Temporary fix
+
+ce
+```
+
+
+Load plate design
+-----------------
+
+Using transfer designs [6a](Labcyte-RT6a.md), [6b](Labcyte-RT6b.md), [6c](Labcyte-RT6c.md) and [6d](Labcyte-RT6d.md).
+
+```{r PLATE, dependson = "MOIRAI"}
+plate <- rbind(
+  cbind(read.table("plate7a.txt", sep = "\t", header=TRUE, stringsAsFactors=FALSE), repl="Q2")
+, cbind(read.table("plate7b.txt", sep = "\t", header=TRUE, stringsAsFactors=FALSE), repl="R2")
+, cbind(read.table("plate7c.txt", sep = "\t", header=TRUE, stringsAsFactors=FALSE), repl="S2")
+, cbind(read.table("plate7d.txt", sep = "\t", header=TRUE, stringsAsFactors=FALSE), repl="T2"))
+
+stopifnot(identical(plate, plate[!duplicated(plate),]))
+
+ce %<>% cbind(plate[match( paste(ce$barcode, ce$index)
+                         , paste(plate$BARCODE_SEQ, plate$INDEX)), ])
+
+ce$index %<>% factor(levels = unique(plate$INDEX))  # Keep original order of indexes.
+ce$plateID <- ce$repl # Define plate IDs
+
+rownames(ce) %<>% paste(ce$plateID, sep = "_")
+ce$sampleLabels <- rownames(ce)
+
+rm(plate)
+```
+
+
+Create a CAGEexp object and load expression data
+------------------------------------------------
+
+```{r new_CAGEexp, message = F, echo = FALSE, dependson = "PLATE"}
+ce <- CAGEexp( colData    = ce
+             , genomeName = "BSgenome.Mmusculus.UCSC.mm9")
+```
+
+```{r get_CTSS_data, dependson = "new_CAGEexp"}
+if(file.exists(paste0("Labcyte-RT_Data_Analysis_", expNumber, ".Rds"))) {
+  ce <- readRDS(paste0("Labcyte-RT_Data_Analysis_", expNumber, ".Rds"))
+} else {
+  getCTSS(ce, useMulticore = TRUE)
+  removeStrandInvaders(ce)
+}
+```
+
+
+Annotation with GENCODE
+-----------------------
+
+Collect annotations and gene symbols via a local GENCODE file
+(mm9 GENCODE not available in AnnotationHub)
+
+```{r annotate_CTSS, dependson = "get_CTSS_data"}
+if(file.exists(paste0("Labcyte-RT_Data_Analysis_", expNumber, ".Rds"))) {
+  print("Annotated data loaded from file")
+  } else {
+  annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
+  }
+```
+
+
+Save the CAGEexp file
+---------------------
+
+```{r save_myCAGEexp_object, dependson = "annotate_CTSS"}
+if(!file.exists(paste0("Labcyte-RT_Data_Analysis_", expNumber, ".Rds")))
+  saveRDS(ce, paste0("Labcyte-RT_Data_Analysis_", expNumber, ".Rds"))
+```
+
+
+Quality controls
+================
+
+Custom _scopes_ displaying _strand invasion_ artefacts.
+
+```{r custom_plotAnnot_scopes}
+source("customScopes.R", echo = TRUE)
+```
+
+
+Negative controls
+-----------------
+
+```{r count_neg_ctls, fig.height=8, dependson="annotate_CTSS"}
+summary(ce$dNTP_vol == 0)
+```
+
+```{r neg_ctls_qc, fig.height=15, dependson="annotate_CTSS", warning=FALSE}
+ce$NC <- ce$dNTP_vol == 0
+
+ggpubr::ggarrange( legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = msScope_qcSI, group = "NC"
+           , title = NULL, facet = "index", normalise = FALSE) +
+    facet_wrap("facet", ncol = 1) +
+    ylab("sequence counts") + xlab("Negative control ?"),
+  plotAnnot( ce, scope = msScope_qcSI, group = "NC"
+           , title = NULL, facet = "index", normalise = TRUE) +
+    facet_wrap("facet", ncol = 1) +
+    ylab("Normalised to 100%") + xlab("Negative control ?")
+)  %>% ggpubr::annotate_figure(top="QC report, by replicate set")
+```
+
+This looks good, but unfortunately it is misleading: only 0.5 [dTNP] produced
+a large amount of reads.
+
+```{r qc_dNTP_quantity}
+ggpubr::ggarrange(legend = "right", common.legend = TRUE,
+  plotAnnot( ce, scope = msScope_qcSI, group = "dNTP", normalise = FALSE
+           , title = NULL) + ylab("Number of read pairs") + xlab("dNTP (µM)"),
+  plotAnnot( ce, scope = msScope_qcSI, group = "dNTP", normalise = TRUE
+         , title = NULL) + ylab("Normalised to 100 %") + xlab(NULL)) %>%
+  ggpubr::annotate_figure(top="QC control, by amount of dNTPs (in μM)")
+```
+
+Once we remove the points at dNTP = 0.5, there is no difference between
+controls and other data.
+
+```{r qc_dNTP_quantity2}
+ggpubr::ggarrange(legend = "right", common.legend = TRUE,
+  plotAnnot( ce[,ce$dNTP !=0.5], scope = msScope_qcSI, group = "dNTP", normalise = FALSE
+           , title = NULL) + ylab("Number of read pairs") + xlab("dNTP (µM)"),
+  plotAnnot( ce[,ce$dNTP !=0.5], scope = msScope_qcSI, group = "dNTP", normalise = TRUE
+         , title = NULL) + ylab("Normalised to 100 %") + xlab(NULL)) %>%
+  ggpubr::annotate_figure(top="QC control, by amount of dNTPs (in μM)")
+```
+
+
+### Removal of the RNA-negative controls
+
+To ease data handling, the negative controls with no RNA are removed.
+
+```{r}
+colData(ce[,ce$NC]) %>% data.frame %>% summary
+ce.bak <- ce
+ce     <- ce[, ! ce$NC]
+```
+
+
+By replicate
+------------
+
+The multiplexing of the libraries is well balanced.
+
+```{r qc_plots_by_plate, fig.height=4, fig.width=8}
+plotAnnot( ce, scope = msScope_qcSI, group = "index", normalise = FALSE
+           , title = NULL, facet = "plateID") + ylab("Number of read pairs") +
+  xlab(NULL) + facet_wrap(~facet, ncol = 4, scale = "free")
+```
+
+Replicates are consistent with each other.
+
+```{r qc_plots_by_replicate, fig.height=8, fig.width=8}
+plotAnnot( ce, scope = msScope_qcSI, group = "dNTP", normalise = FALSE
+         , title = NULL, facet = "index") + ylab("Number of read pairs") +
+  xlab("dNTP") + facet_wrap(~facet, ncol = 6, scale = "free")
+
+plotAnnot( ce, scope = msScope_qcSI, group = "Mg", normalise = FALSE
+         , title = NULL, facet = "index") + ylab("Number of read pairs") +
+  xlab("Mg2+") + facet_wrap(~facet, ncol = 6, scale = "fixed")
+
+plotAnnot( ce, scope = msScope_qcSI, group = "MMix", normalise = FALSE
+         , title = NULL, facet = "index") + ylab("Number of read pairs") +
+  xlab("Mastermix") + facet_wrap(~facet, ncol = 6, scale = "fixed")
+```
+
+
+By barcode
+----------
+
+Barcodes are fully randomised, so the pattern below is expected.
+
+```{r plot_by_barcode, fig.height=8, fig.width=8}
+#           1   2   3   4   5   6   7
+TSOs <- c(  1, 13, 25, 37, 49, 61, 73  # A
+         ,  2, 14, 39, 38, 50, 62, 74  # B
+         ,  4, 16, 28, 40, 64, 76, 88  # C
+         ,  5, 17, 29, 41, 65, 77, 89  # D
+         , 51, 18, 30, 42, 66, 78, 90  # E
+         ,  7, 19, 31, 43, 67, 79, 91  # F
+         ,  8, 87, 32, 44, 68, 80, 92  # G
+         ,  9, 21, 33, 45, 69, 81, 24  # H 
+         , 71, 23, 60, 47, 70, 83, 36  # I
+         , 72, 22, 35, 46, 59, 82, 48) # J
+
+plotAnnot( ce, scope = msScope_qcSI, group = "repl"
+           , title = "Sequence counts"
+           , facet = "BARCODE_SEQ", normalise = FALSE) +
+  facet_wrap(~facet, ncol=8)
+```
+
+
+Focus on [dNTP] == 0.5 µM and SSIII mastermix 
+---------------------------------------------
+
+```{r}
+ce <- ce[, ce$dNTP == 0.5 & ce$MMix == "SSIII"]
+```
+
+### By Mg concentration
+
+```{r qc_Mg_Mn, fig.height=10, fig.width=10}
+ggpubr::ggarrange(legend = "right",
+  plotAnnot( ce, scope = msScope_qcSI, group = "Mg", facet="Mn"
+           , normalise = FALSE, title = NULL) +
+    ylab("Number of read pairs") + xlab("Mg2+") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_qcSI, group = "Mg", facet="Mn"
+           , normalise = TRUE, title = NULL) +
+    ylab("Normalised to 100 %") + xlab(NULL) +
+    facet_wrap(~facet, ncol = 1)) %>%
+  ggpubr::annotate_figure(top="QC control, by Mg and Mn concentrations (µM)")
+```
+
+```{r qc_Mg_Mn_annot, fig.height=10, fig.width=10}
+ggpubr::ggarrange(legend = "right",
+  plotAnnot( ce, scope = msScope_counts, group = "Mg", facet="Mn"
+           , normalise = FALSE, title = "Yield") +
+    ylab("Number of read pairs") + xlab("Mg2+") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_counts, group = "Mg", facet="Mn"
+           , normalise = TRUE, title = "QC report") +
+    ylab("Normalised to 100 %") + xlab(NULL) +
+    facet_wrap(~facet, ncol = 1)) %>%
+  ggpubr::annotate_figure(top="QC control, by Mg and Mn concentrations (µM)")
+```
+
+
+### By Mn concentration
+
+```{r qc_Mn_Mg, fig.height=10, fig.width=10}
+ggpubr::ggarrange(legend = "right",
+  plotAnnot( ce, scope = msScope_qcSI, group = "Mg", facet="Mn"
+           , normalise = FALSE, title = NULL) +
+    ylab("Number of read pairs") + xlab("Mn2+") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_qcSI, group = "Mg", facet="Mn"
+           , normalise = TRUE, title = NULL) +
+    ylab("Normalised to 100 %") + xlab(NULL) +
+    facet_wrap(~facet, ncol = 1)) %>%
+  ggpubr::annotate_figure(top="QC control, by Mn and Mg concentrations (µM)")
+```
+
+```{r qc_Mn_Mg_annot, fig.height=10, fig.width=10}
+ggpubr::ggarrange(legend = "right",
+  plotAnnot( ce, scope = msScope_counts, group = "Mn", facet="Mg"
+           , normalise = FALSE, title = NULL) +
+    ylab("Number of read pairs") + xlab("Mn2+") +
+    facet_wrap(~facet, ncol = 1),
+  plotAnnot( ce, scope = msScope_counts, group = "Mn", facet="Mg"
+           , normalise = TRUE, title = NULL) +
+    ylab("Normalised to 100 %") + xlab(NULL) +
+    facet_wrap(~facet, ncol = 1)) %>%
+  ggpubr::annotate_figure(top="QC control, by Mn and Mg concentrations (µM)")
+```
+
+### Interaction between Mg and dNTP at Mn == 0 & ce$MMix == "SSIII"
+
+I can not make sense of the data.
+
+```{r qc_Mg_dNTP, fig.height=10, fig.width=5}
+plotAnnot( ce.bak[,ce.bak$Mn == 0 & ce.bak$MMix == "SSIII"], scope = msScope_counts, group = "Mg", facet="dNTP"
+           , normalise = TRUE, title = "QC (processing)") +
+    ylab("Number of read pairs") + xlab("Mg2+") +
+    facet_wrap(~facet, ncol = 1, scales = "fixed")
+
+plotAnnot( ce.bak[,ce.bak$Mn == 0 & ce.bak$MMix == "SSIII"], scope = msScope_counts, group = "Mg", facet="dNTP"
+           , normalise = FALSE, title = "QC (annotation)") +
+    ylab("Number of read pairs") + xlab("Mg2+") +
+    facet_wrap(~facet, ncol = 1, scales = "free")
+```
+
+Session information
+===================
+
+```{r}
+sessionInfo()
+```
