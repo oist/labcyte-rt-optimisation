@@ -60,6 +60,12 @@ if(file.exists("Labcyte-RT_Data_Analysis_7+8.Rds")) {
      ,  "10 ng RNA, SS III",  "10 ng RNA, SS IV"
      , "100 ng RNA, SS III", "100 ng RNA, SS IV"
      ))
+  ce$group_horiz <- paste0(ce$RNA_factor, ", ", ce$enzyme) %>% factor(
+    c(   "1 pg RNA, SS III",  "10 pg RNA, SS III" , "100 pg RNA, SS III"
+     ,   "1 ng RNA, SS III",  "10 ng RNA, SS III" , "100 ng RNA, SS III"
+     ,   "1 pg RNA, SS IV" ,  "10 pg RNA, SS IV"  , "100 pg RNA, SS IV"
+     ,   "1 ng RNA, SS IV" ,  "10 ng RNA, SS IV"  , "100 ng RNA, SS IV"
+     ))
   annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
   saveRDS(ce, "Labcyte-RT_Data_Analysis_7+8.Rds")
 }
@@ -470,12 +476,12 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, promoter_rate, color=RNA %>% factor)
   geom_point() +
   geom_smooth(method = "loess") +
   facet_wrap(~enzyme, scales = "fixed", ncol = 2) +
-  scale_color_viridis(discrete = TRUE, name = "RNA (pg)", option = "magma") +
+  scale_color_brewer(name = "RNA (pg)", palette = "YlGnBu") +
   scale_x_log10( "TS oligonucleotide molarity (µM)"
                , breaks = c(0.6, 2.5, 10, 40, 160)) +
   scale_y_continuous("Promoter % after SI removal)") +
   labs(title = "Promoter rate") +
-  theme_TSO_by_RTP_facet_RNA()
+  theme_TSO_by_RNA_facet_RNA()
 ```
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_promoter_rate_by_RNA-1.png)<!-- -->
@@ -588,6 +594,89 @@ ggplot(colData(ce) %>% data.frame, aes(RT_PRIMERS, r100g, color=RNA %>% factor))
 ```
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/RTP_vs_richness100_by_RNA-1.png)<!-- -->
+
+Horizontal version of some plots
+--------------------------------
+
+### TagDust
+
+
+```r
+ggplot(colData(ce) %>% data.frame, aes(TSO, tagdust / extracted * 100, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth(method = "loess") +
+  facet_wrap(~group_horiz, scales = "fixed", nrow = 2) +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(1.3, 5, 20, 80)) +
+  scale_y_continuous("Tag dust (%)") +
+  labs( title = "Amount of oligonucleotide artefacts (% of extracted reads)") +
+  theme_TSO_by_RTP_facet_RNA()
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_tagDust_by_RTP_facet_RNA_horiz-1.png)<!-- -->
+
+### rRNA
+
+
+```r
+ggplot(colData(ce) %>% data.frame, aes(TSO, rRNA_rate, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth(method = "loess") +
+  facet_wrap(~group_horiz, scales = "fixed", nrow = 2) +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(1.3, 5, 20, 80)) +
+  scale_y_continuous("% rRNA") +
+  labs( title = "Fraction of reads aligning to rRNA sequences (% of non-tagdust extracted reads)") +
+  theme_TSO_by_RTP_facet_RNA()
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_rRNA_by_RTP_facet_RNA_horiz-1.png)<!-- -->
+
+### Strand invasion
+
+
+```r
+ggplot(colData(ce[, ce$strand_invasion_rate < 30]) %>% data.frame, aes(TSO, strand_invasion_rate, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth(method = "loess") +
+  facet_wrap(~group_horiz, scales = "fixed", nrow = 2) +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(1.3, 5, 20, 80)) +
+  scale_y_continuous("Strand invasion rate") +
+  labs( title = "Strand invasion (% of molecule counts)"
+      , subtitle = "One outlier removed (1 pg RNA, SSIII, 1 µM RTP, > 30% strand invasion).") +
+  theme_TSO_by_RTP_facet_RNA()
+```
+
+```
+## harmonizing input:
+##   removing 2 sampleMap rows with 'colname' not in colnames of experiments
+##   removing 1 colData rownames not in sampleMap 'primary'
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_SI_rate_by_RTP_facet_RNA_no_outlier_horiz-1.png)<!-- -->
+
+### Promoter rate
+
+
+```r
+ggplot(colData(ce) %>% data.frame, aes(TSO, promoter_rate, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth(method = "loess") +
+  facet_wrap(~group_horiz, scales = "fixed", nrow = 2) +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(1.3, 5, 20, 80)) +
+  scale_y_continuous("Promoter rate (%)") +
+  labs( title = "Promoter rate"
+      , subtitle = "(% of molecule counts after SI removal)") +
+  theme_TSO_by_RTP_facet_RNA()
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_promoter_rate_by_RTP_facet_RNA_horiz-1.png)<!-- -->
 
 
 Session information
