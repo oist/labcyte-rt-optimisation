@@ -9,9 +9,9 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="210mm"
-   height="297mm"
-   viewBox="0 0 210 297"
+   width="841mm"
+   height="1189mm"
+   viewBox="0 0 841 1189"
    version="1.1"
    id="svg8"
    inkscape:version="0.92.1 r15371"
@@ -26,8 +26,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.35"
-     inkscape:cx="-101.42857"
-     inkscape:cy="548.57143"
+     inkscape:cx="1308.2546"
+     inkscape:cy="3517.9699"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -35,7 +35,20 @@
      inkscape:window-height="1016"
      inkscape:window-x="0"
      inkscape:window-y="27"
-     inkscape:window-maximized="1" />
+     inkscape:window-maximized="1"
+     showguides="true"
+     inkscape:guide-bbox="true">
+    <sodipodi:guide
+       position="250.16427,1193.0911"
+       orientation="1,0"
+       id="guide29"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="-545.22982,1000.6571"
+       orientation="0,1"
+       id="guide31"
+       inkscape:locked="false" />
+  </sodipodi:namedview>
   <metadata
      id="metadata5">
     <rdf:RDF>
@@ -51,5 +64,112 @@
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
-     id="layer1" />
+     id="layer1"
+     transform="translate(0,892)">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:11.58140373px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.28953508"
+       x="251.13048"
+       y="-851.47516"
+       id="text35"><tspan
+         sodipodi:role="line"
+         id="tspan33"
+         x="251.13048"
+         y="-851.47516"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:27.7953701px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';stroke-width:0.28953508">Machine-driven parameter-space</tspan><tspan
+         sodipodi:role="line"
+         x="251.13048"
+         y="-816.73096"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:27.7953701px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';stroke-width:0.28953508"
+         id="tspan37">exploration of biochemical reactions</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.04329872px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.25108245"
+       x="251.27377"
+       y="-787.96448"
+       id="text41"><tspan
+         sodipodi:role="line"
+         id="tspan39"
+         x="251.27377"
+         y="-787.96448"
+         style="font-size:13.39106464px;stroke-width:0.25108245">Charles Plessy<tspan
+   style="font-size:8.0346384px;baseline-shift:super;stroke-width:0.25108245"
+   id="tspan47">1,2,3,4</tspan>, Stéphane Poulain<tspan
+   style="font-size:8.0346384px;baseline-shift:super;stroke-width:0.25108245"
+   id="tspan65">1,2</tspan>, Sachi Kato<tspan
+   style="font-size:8.0346384px;baseline-shift:super;stroke-width:0.25108245"
+   id="tspan61">1,2</tspan>, Ophélie Arnaud<tspan
+   style="font-size:8.0346384px;baseline-shift:super;stroke-width:0.25108245"
+   id="tspan57">2</tspan>, Piero Carninci<tspan
+   style="font-size:8.0346384px;baseline-shift:super;stroke-width:0.25108245"
+   id="tspan55">1,2</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="257.64783"
+       y="-762.45636"
+       id="text71"><tspan
+         sodipodi:role="line"
+         id="tspan69"
+         x="257.64783"
+         y="-762.45636"
+         style="stroke-width:0.26458332">1: RIKEN Center for Integrative Medical Sciences, Division of Genomic Medicine</tspan><tspan
+         sodipodi:role="line"
+         x="257.64783"
+         y="-749.22717"
+         style="stroke-width:0.26458332"
+         id="tspan73">2: RIKEN Center for Life Science Technologies, Division of Genomic Technologies</tspan><tspan
+         sodipodi:role="line"
+         x="257.64783"
+         y="-735.99805"
+         style="stroke-width:0.26458332"
+         id="tspan75">3: Present address: Okinawa Institute of Science and Technology Graduate University,</tspan><tspan
+         sodipodi:role="line"
+         x="257.64783"
+         y="-722.76886"
+         style="stroke-width:0.26458332"
+         id="tspan77">                               Genomics and Regulatory Systems Unit.</tspan><tspan
+         sodipodi:role="line"
+         x="257.64783"
+         y="-709.53967"
+         style="stroke-width:0.26458332"
+         id="tspan79">4: For correspondence: charles.plessy@oist.jp</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:9.14338875px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.22858471"
+       x="9.7338781"
+       y="-687.69519"
+       id="text83"><tspan
+         sodipodi:role="line"
+         id="tspan81"
+         x="9.7338781"
+         y="-687.69519"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Italic';stroke-width:0.22858471"><tspan
+   style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold Italic';stroke-width:0.22858471"
+   id="tspan89">Acknowledgements</tspan>: we would like to thank Mark Lasinski, Iris Chen and Hiro Ishida from Labcyte, and Hisakazu Komine from Kiko-tech for making these experiments possible.</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="307.67258"
+       y="197.21425"
+       id="text87"><tspan
+         sodipodi:role="line"
+         id="tspan85"
+         x="307.67258"
+         y="206.57802"
+         style="stroke-width:0.26458332" /></text>
+    <text
+       id="text95"
+       y="-675.9353"
+       x="9.7338781"
+       style="font-style:normal;font-weight:normal;font-size:9.14338875px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.22858471"
+       xml:space="preserve"><tspan
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Italic';stroke-width:0.22858471"
+         y="-675.9353"
+         x="9.7338781"
+         id="tspan93"
+         sodipodi:role="line"><tspan
+   style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold Italic'"
+   id="tspan97">Funding</tspan>: MEXT grant to RIKEN CLST, JSPS Grand-in-Aid for Scientific Research S </tspan></text>
+  </g>
 </svg>
