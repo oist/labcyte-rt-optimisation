@@ -1,0 +1,25 @@
+---
+title: "6th plate design, not randomised"
+subtitle: "RT optimisation with the Labcyte Echo 525: TSO, RT primer and RNA amounts"
+output: 
+  html_document: 
+    fig_height: 5.25
+    fig_width: 5.25
+    keep_md: yes
+    toc: yes
+---
+
+```{r set-options, echo=FALSE, cache=FALSE}
+options(width = 100)
+knitr::opts_chunk$set(dev  = c("png", "svg"))
+```
+
+```{r}
+variant <- "a"
+newseed <- "n"
+indexes <- c("TAAGGCGA", "CGTACTAG", "AGGCAGAA", "TCCTGAGC", "GGACTCCT", "TAGGCATG")
+plateID <- "Q"
+```
+
+```{r child = "Labcyte-RT6.Rmd"}
+```
