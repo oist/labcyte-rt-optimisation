@@ -61,7 +61,7 @@ Set Random seed
 ===============
 
 ```{r setRandomSeed}
-set.seed(newseed)
+if (is.numeric(newseed)) set.seed(newseed)
 ```
 
 Creation of sextants
@@ -69,10 +69,17 @@ Creation of sextants
 
 ```{r sextants, dependson=c("tiers", "setRandomSeed")}
 createRandomisedSextant <- function(index, rna) {
-  df <- data.frame ( BARCODE_ID = c( sample(Tier_A, 21)
-                                   , sample(Tier_B, 21)
-                                   , sample(Tier_C, 21)
-                                   , sample(Tier_N,  1)))
+  if (is.numeric(newseed)) {
+    df <- data.frame ( BARCODE_ID = c( sample(Tier_A, 21)
+                                     , sample(Tier_B, 21)
+                                     , sample(Tier_C, 21)
+                                     , sample(Tier_N,  1)))
+  } else {
+    df <- data.frame ( BARCODE_ID = c( Tier_A[1:21]
+                                     , Tier_B[1:21]
+                                     , Tier_C[1:21]
+                                     , Tier_N[1]))
+  }
   tsoMaxConc <- 800
   df$TSO_source <- c( rep(tsoMaxConc /  1, 21)
                     , rep(tsoMaxConc /  8, 21)
@@ -89,7 +96,8 @@ createRandomisedSextant <- function(index, rna) {
   df$RNA_vol <- 25
   df[64, "RNA_vol"] <- 0
   df$H2O_vol <- 500 - df$RNA_vol - df$RT_PRIMERS_vol - df$TSO_vol - df$MASTER_MIX_vol
-  df[sample(nrow(df)),]
+  if (is.numeric(newseed)) df <- df[sample(nrow(df)),]
+  df
 }
 ```
 
