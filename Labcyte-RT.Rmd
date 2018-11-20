@@ -10,6 +10,7 @@ output:
 
 ```{r set-options, echo=FALSE, cache=FALSE}
 options(width = 100)
+knitr::opts_chunk$set(dev  = c("png", "svg"))
 ```
 
 Load scripts and libraries.
