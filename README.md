@@ -40,6 +40,11 @@ Concentration checks
    concentration corrections were effective, but that there is a systematic
    shift (~15 µM instead of 10 as planned).
 
+Data
+----
+
+MiSeq runs DOI: 10.5281/zenodo.1680999
+
 
 Experiments
 -----------
