@@ -1,0 +1,184 @@
+---
+title: "Dummy version to make an explanatory figure"
+output: 
+  html_document: 
+    fig_height: 5.25
+    fig_width: 5.25
+    keep_md: yes
+    toc: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r set-options, echo=FALSE, cache=FALSE}
+options(width = 100)
+knitr::opts_chunk$set(dev  = c("png", "svg"))
+```
+
+```{r}
+variant <- "a"
+newseed <- 1
+indexes <- c("TAAGGCGA", "CGTACTAG", "AGGCAGAA", "TCCTGAGC", "GGACTCCT", "TAGGCATG")
+plateID <- "Q"
+```
+
+
+Dummy version to make an explanatory figure
+=================================================
+
+This file starts as a copy of Labcyte-RT6.Rmd and may still
+contain commands that are not really needed to make the figure panel,
+but that I do not have time to remove.
+
+## Load scripts and libraries.
+
+```{r}
+library("magrittr")   # For its diamond pipe operators
+library("ggplot2")    # For plotting
+library("platetools") # For defining and manipulating 384-well plates
+library("plyr")
+library("tibble")     # For comfortable command-line operations
+
+# The set_block function that will become part of platetools
+source("https://raw.githubusercontent.com/charles-plessy/platetools/76213accb1704d11a2d96fb1f6284d0b46117778/R/set_block.R")
+
+# Do not load the whole smallCAGEqc package, just get the barcode data.
+data("nanoCAGE2017barcodes", package = "smallCAGEqc")
+```
+
+
+Selected TSOs
+=============
+
+```{r tiers}
+Tier_N <- 1:64
+```
+
+Creation of sextants
+====================
+
+```{r sextants, dependson=c("tiers", "setRandomSeed")}
+createRandomisedSextant <- function(index, rna) {
+    df <- data.frame ( BARCODE_ID =  Tier_N)
+  tsoMaxConc <- 800
+  df$TSO_source <- c( rep(tsoMaxConc /  1, 21)
+                    , rep(tsoMaxConc /  8, 21)
+                    , rep(tsoMaxConc /  64, 21)
+                    , tsoMaxConc / 32)
+  df$TSO_vol <- c(rep(c(rep(100,7), rep(50,7), rep(25,7)),3), 25)
+  df$TSO <- df$TSO_source * df$TSO_vol / 500
+  df$RT_PRIMERS <- c(rep(c(0, 1, 2, 4, 8, 16, 24), 9), 1)
+  df$RT_PRIMERS_vol <- 25
+  df[df$RT_PRIMERS == 0, "RT_PRIMERS_vol"] <- 0
+  df$MASTER_MIX_vol <- 350
+  df$INDEX <- index
+  df$RNA <- rna
+  df$RNA_vol <- 25
+  df[64, "RNA_vol"] <- 0
+  df$H2O_vol <- 500 - df$RNA_vol - df$RT_PRIMERS_vol - df$TSO_vol - df$MASTER_MIX_vol
+  df
+}
+```
+
+
+Sextants
+========
+
+Plate layout
+------------
+
+Create a data frame representing the contents of each well.
+
+```{r make_plate_df}
+plate           <- tibble(well = platetools::num_to_well(1:384, plate = "384"))
+plate$row       <- sub("..$", "", plate$well) %>% factor
+plate$col       <- sub("^.",  "", plate$well) %>% as.numeric %>% factor
+```
+
+Fill sextants
+-------------
+
+```{r fill_sextants, dependson=c("sextants", "make_plate_df")}
+indexes <- c("TAAGGCGA", "CGTACTAG", "AGGCAGAA", "TCCTGAGC", "GGACTCCT", "TAGGCATG")
+
+plate$sxt <- paste0 (
+  c(rep("A", 8), rep("B", 8), rep("C", 8)),
+  ifelse (plate$row %in% LETTERS[1:8 * 2], 2, 1)
+) %>% factor
+
+plate %<>% arrange(sxt)
+
+plate %<>% cbind( rbind( createRandomisedSextant(indexes[1], 1e5)
+                       , createRandomisedSextant(indexes[2], 1e4)
+                       , createRandomisedSextant(indexes[3], 1e3)
+                       , createRandomisedSextant(indexes[4], 1e2)
+                       , createRandomisedSextant(indexes[5], 1e1)
+                       , createRandomisedSextant(indexes[6], 1e0))
+      ) %>% as.tibble()
+
+plate$BARCODE_ID
+plate$INDEX %<>% factor
+plate$BARCODE_SEQ <- nanoCAGE2017barcodes[plate$BARCODE_ID, "barcodes"]
+
+plate$RNA_level <- plate$RNA %>% factor(labels = paste0("RNA_", LETTERS[1:6]))
+plate$RTP_level <- plate$RT_PRIMERS %>% factor(labels = paste0("RTP_", LETTERS[1:7]))
+
+plate$RNA[plate$RNA_vol == 0] <- 0
+plate$plateID <- "Z"
+```
+
+
+Plate maps
+==========
+
+```{r}
+plateMap <- function(x, title) {
+  platetools::raw_map(plate[[x]], well=plate$well, plate="384") +
+  ggtitle(title) +
+  viridis::scale_fill_viridis(breaks = unique(plate[[x]]))
+}
+
+plateMapLog <- function(x, title) {
+  platetools::raw_map(plate[[x]], well=plate$well, plate="384") +
+  ggtitle(title) +
+  viridis::scale_fill_viridis(breaks = unique(plate[[x]]), trans = "log")
+}
+```
+
+TSO
+---
+
+### Without legend, to better scale with the index plot.
+
+```{r plot_barcode_IDs, fig.height=3}
+platetools::raw_map(plate[["BARCODE_ID"]], well=plate$well, plate="384") +
+  ggtitle("Barcode ID") + theme(legend.position="none") + viridis::scale_fill_viridis()
+```
+
+### With legend
+
+```{r plot_barcode_IDs_legend, fig.height=3}
+platetools::raw_map(plate[["BARCODE_ID"]], well=plate$well, plate="384") +
+  ggtitle("Barcode ID") + viridis::scale_fill_viridis(breaks = c(1, 64))
+```
+
+Indexes
+-------
+
+### Without legend, to better scale with the barcode plot.
+
+```{r plot_Indexes, fig.height=3}
+platetools::raw_map(plate[["INDEX"]], well=plate$well, plate="384") + ggtitle("INDEXes") + theme(legend.position="none")
+```
+
+### With legend
+
+```{r plot_Indexes_legend, fig.height=3}
+platetools::raw_map(plate[["INDEX"]], well=plate$well, plate="384") + ggtitle("INDEXes")
+```
+
+## Session information
+
+```{r sessionInfo}
+sessionInfo()
+```
