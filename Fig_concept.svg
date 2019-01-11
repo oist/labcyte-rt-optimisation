@@ -17,7 +17,7 @@
    id="svg97439"
    sodipodi:docname="Fig_concept.svg"
    inkscape:version="0.92.1 r15371"
-   inkscape:export-filename="/home/charles/bitmap.png"
+   inkscape:export-filename="/home/charles/projects/labcyte-rt-optimisation/Fig_concept.png"
    inkscape:export-xdpi="96.725258"
    inkscape:export-ydpi="96.725258">
   <defs
@@ -3446,8 +3446,8 @@
      inkscape:pageopacity="1"
      inkscape:pageshadow="2"
      inkscape:zoom="0.72296875"
-     inkscape:cx="428.16996"
-     inkscape:cy="442.17338"
+     inkscape:cx="151.53283"
+     inkscape:cy="436.64064"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -3467,7 +3467,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
