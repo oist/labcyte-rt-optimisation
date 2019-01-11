@@ -8,6 +8,8 @@ output:
     toc: yes
     pandoc_args:
      - "--lua-filter=links-to-markdown.lua"
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r echo = FALSE}
@@ -324,6 +326,20 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, mapping_rate, color=RT_PRIMERS %>% f
   theme_TSO_by_RTP_facet_RNA()
 ```
 
+Mapping rate at 100 ng RNA, SSIII, for figure panel
+
+```{r TSO_vs_mapping_rate_by_RTP_facet_RNA_singlePanel, fig.height=3, fig.width=4}
+ggplot(subset(colData(ce), group == "100 ng RNA, SS III") %>% data.frame, aes(TSO, mapping_rate, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth(method = "loess") +
+  facet_wrap(~group, scales = "fixed", ncol = 2) +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10, 40, 160)) +
+  scale_y_continuous("Mapping rate (% reads)") +
+  theme_TSO_by_RTP_facet_RNA()
+```
+
 
 ## Strand invasion
 
@@ -370,6 +386,22 @@ ggplot(colData(ce[, ce$strand_invasion_rate < 30]) %>% data.frame, aes(TSO, stra
   theme_TSO_by_RTP_facet_RNA()
 ```
 
+Strand invasion at 100 ng RNA, SS III, for figure panel
+
+Because of 1 outlier, the scale is a bit compressed.  Here is the same plot with
+the outlier removed.
+
+```{r TSO_vs_SI_rate_by_RTP_facet_RNA_no_outlier_singlePanel, fig.height=3, fig.width=4}
+ggplot(subset(colData(ce), group == "100 ng RNA, SS III") %>% data.frame, aes(TSO, strand_invasion_rate, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth(method = "loess") +
+  facet_wrap(~group, scales = "fixed", ncol = 2) +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10, 40, 160)) +
+  scale_y_continuous("strand invasion (% molecules)") +
+  theme_TSO_by_RTP_facet_RNA()
+```
 
 ## Promoter rate
 

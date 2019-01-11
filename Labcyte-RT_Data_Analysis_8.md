@@ -8,6 +8,8 @@ output:
     toc: yes
     pandoc_args:
      - "--lua-filter=links-to-markdown.lua"
+editor_options: 
+  chunk_output_type: console
 ---
 
 
@@ -180,12 +182,6 @@ ggplot(colData(ce[, ! (ce$index == "CGAGGCTG" & ce$plateID == "R")]) %>% data.fr
       , subtitle = '(outlier library "CGAGGCTG" of plate "R" removed)'
       , caption = stringr::str_wrap(width = 50, "The amount of artefacts detected by TagDust is increased by RT primers and decreased by RNA and TSOs.  SuperScript IV generated less artefacts than SS III.")) +
   theme_TSO_by_RTP_facet_RNA()
-```
-
-```
-## harmonizing input:
-##   removing 54 sampleMap rows with 'colname' not in colnames of experiments
-##   removing 54 colData rownames not in sampleMap 'primary'
 ```
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_tagDust_by_RTP_facet_RNA_no_outlier-1.png)<!-- -->
@@ -377,6 +373,23 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, mapping_rate, color=RT_PRIMERS %>% f
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_mapping_rate_by_RTP_facet_RNA-1.png)<!-- -->
 
+Mapping rate at 100 ng RNA, SSIII, for figure panel
+
+
+```r
+ggplot(subset(colData(ce), group == "100 ng RNA, SS III") %>% data.frame, aes(TSO, mapping_rate, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth(method = "loess") +
+  facet_wrap(~group, scales = "fixed", ncol = 2) +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10, 40, 160)) +
+  scale_y_continuous("Mapping rate (% reads)") +
+  theme_TSO_by_RTP_facet_RNA()
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_mapping_rate_by_RTP_facet_RNA_singlePanel-1.png)<!-- -->
+
 
 ## Strand invasion
 
@@ -428,14 +441,27 @@ ggplot(colData(ce[, ce$strand_invasion_rate < 30]) %>% data.frame, aes(TSO, stra
   theme_TSO_by_RTP_facet_RNA()
 ```
 
-```
-## harmonizing input:
-##   removing 1 sampleMap rows with 'colname' not in colnames of experiments
-##   removing 1 colData rownames not in sampleMap 'primary'
-```
-
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_SI_rate_by_RTP_facet_RNA_no_outlier-1.png)<!-- -->
 
+Strand invasion at 100 ng RNA, SS III, for figure panel
+
+Because of 1 outlier, the scale is a bit compressed.  Here is the same plot with
+the outlier removed.
+
+
+```r
+ggplot(subset(colData(ce), group == "100 ng RNA, SS III") %>% data.frame, aes(TSO, strand_invasion_rate, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth(method = "loess") +
+  facet_wrap(~group, scales = "fixed", ncol = 2) +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10, 40, 160)) +
+  scale_y_continuous("strand invasion (% molecules)") +
+  theme_TSO_by_RTP_facet_RNA()
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_SI_rate_by_RTP_facet_RNA_no_outlier_singlePanel-1.png)<!-- -->
 
 ## Promoter rate
 
@@ -500,53 +526,27 @@ Richness is higher when RT primer molarity is higher.
 
 
 ```r
-CTSStoGenes(ce)
-ce$r10g <- vegan::rarefy(t(assay(ce[["geneExpMatrix"]])),10)
-```
-
-```
-## Warning in vegan::rarefy(t(assay(ce[["geneExpMatrix"]])), 10): Requested
-## 'sample' was larger than smallest site maximum (0)
-```
-
-```r
-ce$r10g[ce$counts < 10] <- NA
-ce$r100g <- vegan::rarefy(t(assay(ce[["geneExpMatrix"]])),100)
-```
-
-```
-## Warning in vegan::rarefy(t(assay(ce[["geneExpMatrix"]])), 100): Requested
-## 'sample' was larger than smallest site maximum (0)
-```
-
-```r
-ce$r100g[ce$counts < 100] <- NA 
+# CTSStoGenes(ce)
+# ce$r10g <- vegan::rarefy(t(assay(ce[["geneExpMatrix"]])),10)
+# ce$r10g[ce$counts < 10] <- NA
+# ce$r100g <- vegan::rarefy(t(assay(ce[["geneExpMatrix"]])),100)
+# ce$r100g[ce$counts < 100] <- NA 
 ```
 
 
 ```r
-ggplot(colData(ce) %>% data.frame, aes(TSO, r10g, color=RT_PRIMERS %>% factor)) +
-  geom_point() +
-  geom_smooth(method = "loess") +
-  facet_wrap(~group, scales = "free", ncol = 2) +
-  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
-  scale_x_log10( "TS oligonucleotide molarity (µM)"
-               , breaks = c(0.6, 2.5, 10, 40, 160)) +
-  scale_y_continuous("Gene richness (on a scale of 10)") +
-  labs( title = "Richness on a scale of 10"
-      , caption = stringr::str_wrap("Higher RT primer concentration give higher richness.")) +
-  theme_TSO_by_RTP_facet_RNA()
+# ggplot(colData(ce) %>% data.frame, aes(TSO, r10g, color=RT_PRIMERS %>% factor)) +
+#   geom_point() +
+#   geom_smooth(method = "loess") +
+#   facet_wrap(~group, scales = "free", ncol = 2) +
+#   scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+#   scale_x_log10( "TS oligonucleotide molarity (µM)"
+#                , breaks = c(0.6, 2.5, 10, 40, 160)) +
+#   scale_y_continuous("Gene richness (on a scale of 10)") +
+#   labs( title = "Richness on a scale of 10"
+#       , caption = stringr::str_wrap("Higher RT primer concentration give higher richness.")) +
+#   theme_TSO_by_RTP_facet_RNA()
 ```
-
-```
-## Warning: Removed 62 rows containing non-finite values (stat_smooth).
-```
-
-```
-## Warning: Removed 62 rows containing missing values (geom_point).
-```
-
-![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_richness10_by_RTP_facet_RNA-1.png)<!-- -->
 
 
 ### Richness scale of 100
@@ -556,44 +556,32 @@ RNA amounts.
 
 
 ```r
-ggplot(colData(ce) %>% data.frame, aes(TSO, r100g, color=RT_PRIMERS %>% factor)) +
-  geom_point() +
-  geom_smooth(method = "loess") +
-  facet_wrap(~group, scales = "free", ncol = 2) +
-  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
-  scale_x_log10( "TSO molarity (µM)"
-               , breaks = c(0.6, 2.5, 10, 40, 160)) +
-  scale_y_continuous("Gene richness (on a scale of 100)") +
-  labs( title = "Richness on a scale of 100"
-      , caption = stringr::str_wrap("Higher RT primer concentration give higher richness.")) +
-  theme_TSO_by_RTP_facet_RNA()
+# ggplot(colData(ce) %>% data.frame, aes(TSO, r100g, color=RT_PRIMERS %>% factor)) +
+#   geom_point() +
+#   geom_smooth(method = "loess") +
+#   facet_wrap(~group, scales = "free", ncol = 2) +
+#   scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+#   scale_x_log10( "TSO molarity (µM)"
+#                , breaks = c(0.6, 2.5, 10, 40, 160)) +
+#   scale_y_continuous("Gene richness (on a scale of 100)") +
+#   labs( title = "Richness on a scale of 100"
+#       , caption = stringr::str_wrap("Higher RT primer concentration give higher richness.")) +
+#   theme_TSO_by_RTP_facet_RNA()
 ```
-
-![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_richness100_by_RTP_facet_RNA-1.png)<!-- -->
 
 
 ```r
-ggplot(colData(ce) %>% data.frame, aes(RT_PRIMERS, r100g, color=RNA %>% factor)) +
-  geom_point() +
-  geom_smooth(method = "loess") +
-  facet_wrap(~enzyme, scales = "fixed", ncol = 2) +
-  scale_color_brewer(name = "RNA (pg)", palette = "YlGnBu") +
-  scale_x_log10( "RT primer molarity (µM)"
-               , breaks = ce$RT_PRIMERS %>% unique %>% sort) +
-  scale_y_continuous("Gene richness (on a scale of 100)") +
-  ggtitle("Higher [RTP] give higher richness.") +
-  theme_RTP_by_RNA_facet_RNA()
+# ggplot(colData(ce) %>% data.frame, aes(RT_PRIMERS, r100g, color=RNA %>% factor)) +
+#   geom_point() +
+#   geom_smooth(method = "loess") +
+#   facet_wrap(~enzyme, scales = "fixed", ncol = 2) +
+#   scale_color_brewer(name = "RNA (pg)", palette = "YlGnBu") +
+#   scale_x_log10( "RT primer molarity (µM)"
+#                , breaks = ce$RT_PRIMERS %>% unique %>% sort) +
+#   scale_y_continuous("Gene richness (on a scale of 100)") +
+#   ggtitle("Higher [RTP] give higher richness.") +
+#   theme_RTP_by_RNA_facet_RNA()
 ```
-
-```
-## Warning: Removed 421 rows containing non-finite values (stat_smooth).
-```
-
-```
-## Warning: Removed 421 rows containing missing values (geom_point).
-```
-
-![](Labcyte-RT_Data_Analysis_8_files/figure-html/RTP_vs_richness100_by_RNA-1.png)<!-- -->
 
 Horizontal version of some plots
 --------------------------------
@@ -651,12 +639,6 @@ ggplot(colData(ce[, ce$strand_invasion_rate < 30]) %>% data.frame, aes(TSO, stra
   theme_TSO_by_RTP_facet_RNA()
 ```
 
-```
-## harmonizing input:
-##   removing 2 sampleMap rows with 'colname' not in colnames of experiments
-##   removing 1 colData rownames not in sampleMap 'primary'
-```
-
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_SI_rate_by_RTP_facet_RNA_no_outlier_horiz-1.png)<!-- -->
 
 ### Promoter rate
@@ -688,13 +670,13 @@ sessionInfo()
 ```
 
 ```
-## R version 3.4.3 (2017-11-30)
+## R version 3.5.1 (2018-07-02)
 ## Platform: x86_64-pc-linux-gnu (64-bit)
-## Running under: Debian GNU/Linux 9 (stretch)
+## Running under: Debian GNU/Linux buster/sid
 ## 
 ## Matrix products: default
-## BLAS: /usr/lib/libblas/libblas.so.3.7.0
-## LAPACK: /usr/lib/lapack/liblapack.so.3.7.0
+## BLAS: /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.8.0
+## LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.8.0
 ## 
 ## locale:
 ##  [1] LC_CTYPE=en_GB.UTF-8       LC_NUMERIC=C              
@@ -709,45 +691,49 @@ sessionInfo()
 ## [8] methods   base     
 ## 
 ## other attached packages:
-##  [1] viridis_0.4.0               viridisLite_0.2.0          
-##  [3] SummarizedExperiment_1.9.14 DelayedArray_0.4.1         
-##  [5] matrixStats_0.52.2          Biobase_2.38.0             
-##  [7] GenomicRanges_1.31.19       GenomeInfoDb_1.15.5        
-##  [9] IRanges_2.13.26             S4Vectors_0.17.32          
-## [11] BiocGenerics_0.25.3         MultiAssayExperiment_1.5.41
-## [13] magrittr_1.5                ggplot2_2.2.1              
-## [15] CAGEr_1.23.1               
+##  [1] viridis_0.5.1               viridisLite_0.3.0          
+##  [3] MultiAssayExperiment_1.7.16 SummarizedExperiment_1.11.6
+##  [5] DelayedArray_0.7.34         BiocParallel_1.15.9        
+##  [7] matrixStats_0.54.0          Biobase_2.41.2             
+##  [9] GenomicRanges_1.33.13       GenomeInfoDb_1.17.1        
+## [11] IRanges_2.15.17             S4Vectors_0.19.19          
+## [13] BiocGenerics_0.27.1         magrittr_1.5               
+## [15] ggplot2_3.0.0               CAGEr_1.23.2               
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] tidyr_0.7.2               VGAM_1.0-4               
-##  [3] splines_3.4.3             gtools_3.5.0             
-##  [5] BSgenome_1.47.5           GenomeInfoDbData_0.99.1  
-##  [7] Rsamtools_1.31.3          yaml_2.1.18              
-##  [9] pillar_1.2.1              backports_1.1.2          
-## [11] lattice_0.20-35           glue_1.2.0               
-## [13] digest_0.6.15             RColorBrewer_1.1-2       
-## [15] XVector_0.19.8            colorspace_1.3-2         
-## [17] htmltools_0.3.6           Matrix_1.2-12            
-## [19] plyr_1.8.4                XML_3.98-1.9             
-## [21] zlibbioc_1.24.0           purrr_0.2.4              
-## [23] scales_0.5.0              stringdist_0.9.4.6       
-## [25] BiocParallel_1.12.0       tibble_1.4.2             
-## [27] beanplot_1.2              mgcv_1.8-22              
-## [29] lazyeval_0.2.1            memoise_1.1.0            
-## [31] evaluate_0.10.1           nlme_3.1-131             
-## [33] MASS_7.3-47               vegan_2.4-5              
-## [35] tools_3.4.3               data.table_1.10.4-3      
-## [37] stringr_1.3.0             munsell_0.4.3            
-## [39] cluster_2.0.6             Biostrings_2.47.9        
-## [41] som_0.3-5.1               compiler_3.4.3           
-## [43] rlang_0.2.0               grid_3.4.3               
-## [45] RCurl_1.95-4.10           bitops_1.0-6             
-## [47] labeling_0.3              rmarkdown_1.9            
-## [49] gtable_0.2.0              codetools_0.2-15         
-## [51] reshape_0.8.7             reshape2_1.4.2           
-## [53] GenomicAlignments_1.15.12 gridExtra_2.3            
-## [55] knitr_1.20                rtracklayer_1.39.9       
-## [57] rprojroot_1.3-2           KernSmooth_2.23-15       
-## [59] permute_0.9-4             stringi_1.1.7            
-## [61] Rcpp_0.12.16
+##  [1] VGAM_1.0-6               splines_3.5.1           
+##  [3] gtools_3.8.1             assertthat_0.2.0        
+##  [5] BSgenome_1.49.3          GenomeInfoDbData_1.1.0  
+##  [7] Rsamtools_1.33.4         yaml_2.2.0              
+##  [9] pillar_1.3.0             backports_1.1.2         
+## [11] lattice_0.20-35          glue_1.3.0              
+## [13] digest_0.6.18            RColorBrewer_1.1-2      
+## [15] XVector_0.21.3           colorspace_1.3-2        
+## [17] htmltools_0.3.6          Matrix_1.2-14           
+## [19] plyr_1.8.4               XML_3.98-1.16           
+## [21] pkgconfig_2.0.2          zlibbioc_1.27.0         
+## [23] purrr_0.2.5              scales_1.0.0            
+## [25] stringdist_0.9.5.1       tibble_1.4.2            
+## [27] mgcv_1.8-24              beanplot_1.2            
+## [29] withr_2.1.2              lazyeval_0.2.1          
+## [31] formula.tools_1.7.1      crayon_1.3.4            
+## [33] memoise_1.1.0            evaluate_0.11           
+## [35] nlme_3.1-137             MASS_7.3-50             
+## [37] operator.tools_1.6.3     vegan_2.5-2             
+## [39] tools_3.5.1              data.table_1.11.4       
+## [41] stringr_1.3.1            munsell_0.5.0           
+## [43] cluster_2.0.7-1          bindrcpp_0.2.2          
+## [45] Biostrings_2.49.1        som_0.3-5.1             
+## [47] compiler_3.5.1           rlang_0.2.2             
+## [49] grid_3.5.1               RCurl_1.95-4.11         
+## [51] labeling_0.3             bitops_1.0-6            
+## [53] rmarkdown_1.10           codetools_0.2-15        
+## [55] gtable_0.2.0             reshape_0.8.7           
+## [57] R6_2.2.2                 gridExtra_2.3           
+## [59] GenomicAlignments_1.17.3 knitr_1.20              
+## [61] dplyr_0.7.6              rtracklayer_1.41.4      
+## [63] bindr_0.1.1              rprojroot_1.3-2         
+## [65] KernSmooth_2.23-15       permute_0.9-4           
+## [67] stringi_1.2.4            Rcpp_0.12.18            
+## [69] tidyselect_0.2.4
 ```
