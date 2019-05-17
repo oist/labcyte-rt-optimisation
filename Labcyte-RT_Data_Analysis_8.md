@@ -24,7 +24,7 @@ of better quality (see [experiment 6](Labcyte-RT_Data_Analysis_6.md)), and
 with a more extensive randomisation of TSO barcodes and well coordinates
 (see designs [6a](Labcyte-RT6a.md), [6b](Labcyte-RT6b.md), [6c](Labcyte-RT6c.md) and [6d](Labcyte-RT6d.md)).
 
-This file presents the results for SS III and SS IV in parallel.
+This file presents the results for SSIII and SSIV in parallel.
 
 
 Load R packages
@@ -53,22 +53,22 @@ if(file.exists("Labcyte-RT_Data_Analysis_7+8.Rds")) {
   ce8 <- readRDS(paste0("Labcyte-RT_Data_Analysis_", expNumber, ".Rds"))
   ce <- mergeCAGEsets(ce7, ce8)
   ce$enzyme <- ce$plateID
-  levels(ce$enzyme) <- c(rep("SS III", 4), rep("SS IV", 4))
+  levels(ce$enzyme) <- c(rep("SSIII", 4), rep("SSIV", 4))
   ce$group <- paste0(ce$RNA_factor, ", ", ce$enzyme) %>% factor(
-    c(   "1 pg RNA, SS III",   "1 pg RNA, SS IV"
-     ,  "10 pg RNA, SS III",  "10 pg RNA, SS IV"
-     , "100 pg RNA, SS III", "100 pg RNA, SS IV"
-     ,   "1 ng RNA, SS III",   "1 ng RNA, SS IV"
-     ,  "10 ng RNA, SS III",  "10 ng RNA, SS IV"
-     , "100 ng RNA, SS III", "100 ng RNA, SS IV"
+    c(   "1 pg RNA, SSIII",   "1 pg RNA, SSIV"
+     ,  "10 pg RNA, SSIII",  "10 pg RNA, SSIV"
+     , "100 pg RNA, SSIII", "100 pg RNA, SSIV"
+     ,   "1 ng RNA, SSIII",   "1 ng RNA, SSIV"
+     ,  "10 ng RNA, SSIII",  "10 ng RNA, SSIV"
+     , "100 ng RNA, SSIII", "100 ng RNA, SSIV"
      ))
   ce$group_horiz <- paste0(ce$RNA_factor, ", ", ce$enzyme) %>% factor(
-    c(   "1 pg RNA, SS III",  "10 pg RNA, SS III" , "100 pg RNA, SS III"
-     ,   "1 ng RNA, SS III",  "10 ng RNA, SS III" , "100 ng RNA, SS III"
-     ,   "1 pg RNA, SS IV" ,  "10 pg RNA, SS IV"  , "100 pg RNA, SS IV"
-     ,   "1 ng RNA, SS IV" ,  "10 ng RNA, SS IV"  , "100 ng RNA, SS IV"
+    c(   "1 pg RNA, SSIII",  "10 pg RNA, SSIII" , "100 pg RNA, SSIII"
+     ,   "1 ng RNA, SSIII",  "10 ng RNA, SSIII" , "100 ng RNA, SSIII"
+     ,   "1 pg RNA, SSIV" ,  "10 pg RNA, SSIV"  , "100 pg RNA, SSIV"
+     ,   "1 ng RNA, SSIV" ,  "10 ng RNA, SSIV"  , "100 ng RNA, SSIV"
      ))
-  annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
+  annotateCTSS(ce, rtracklayer::import.gff("gencode.vM1.annotation.gtf.gz"))
   saveRDS(ce, "Labcyte-RT_Data_Analysis_7+8.Rds")
 }
 ```
@@ -136,125 +136,18 @@ theme_RTP_by_RNA_facet_RNA <- function() {
 }
 ```
 
-
-## Tag dust
-
-If not removed during library preparation, oligonucleotide artifacts strongly
-dominate libraries prepared with 1 pg RNA.  In general, the amount of artefacts
-increases when starting RNA amounts decrease.  Here, increasing RT primer
-molaritys increase artefacts.  In contrary, and somewhat surprisingly,
-increasing TSO molarity seems to reduce artefacts.
-
-Sub panel at 10,000 pg is noisy because replicate `CGAGGCTG` is an outlier with
-a large amount of artefacts.
+### QC indicators
 
 
 ```r
-ggplot(colData(ce) %>% data.frame, aes(TSO, tagdust / extracted * 100, color=RT_PRIMERS %>% factor)) +
-  geom_point() +
-  geom_smooth(method = "loess") +
-  facet_wrap(~group, scales = "fixed", ncol = 2) +
-  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
-  scale_x_log10( "TS oligonucleotide molarity (µM)"
-               , breaks = c(0.6, 2.5, 10.0, 40.0, 160.0)) +
-  scale_y_continuous("Tag dust (% of extracted reads)") +
-  labs( title = "Amount of oligonucleotide artefacts"
-      , caption = stringr::str_wrap(width = 50, "The amount of artefacts detected by TagDust is increased by RT primers and decreased by RNA and TSOs.  SuperScript IV generated less artefacts than SS III.")) +
-  theme_TSO_by_RTP_facet_RNA()
+ce$TD_rate <- ce$tagdust / ce$extracted * 100
+ce$rRNA_rate <- ce$rdna / (ce$extracted - ce$tagdust) * 100
+ce$mapping_rate <- ce$properpairs / (ce$extracted - ce$tagdust) * 100
+ce$strand_invasion_rate <- ce$strandInvaders / (ce$counts + ce$strandInvaders) * 100
+ce$promoter_rate <- ce$promoter / (ce$counts) * 100
 ```
 
-![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_tagDust_by_RTP_facet_RNA-1.png)<!-- -->
-
-Sub panel at 10,000 pg is noisy because replicate `CGAGGCTG` is an outlier with
-a large amount of artefacts.  Here is the same figure with that library removed.
-
-
-```r
-ggplot(colData(ce[, ! (ce$index == "CGAGGCTG" & ce$plateID == "R")]) %>% data.frame, aes(TSO, tagdust / extracted * 100, color=RT_PRIMERS %>% factor)) +
-  geom_point() +
-  geom_smooth(method = "loess") +
-  facet_wrap(~group, scales = "fixed", ncol = 2) +
-  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
-  scale_x_log10( "TS oligonucleotide molarity (µM)"
-               , breaks = c(0.6, 2.5, 10.0, 40.0, 160.0)) +
-  scale_y_continuous("Tag dust (% of extracted reads)") +
-  labs( title = "Amount of oligonucleotide artefacts"
-      , subtitle = '(outlier library "CGAGGCTG" of plate "R" removed)'
-      , caption = stringr::str_wrap(width = 50, "The amount of artefacts detected by TagDust is increased by RT primers and decreased by RNA and TSOs.  SuperScript IV generated less artefacts than SS III.")) +
-  theme_TSO_by_RTP_facet_RNA()
-```
-
-![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_tagDust_by_RTP_facet_RNA_no_outlier-1.png)<!-- -->
-
-Plot where all RT primer concentrations are pooled, showing influence of RNA
-mass and TSO concentration:
-
-
-```r
-ggplot(colData(ce) %>% data.frame, aes(TSO, tagdust / extracted * 100, color=RNA %>% factor)) +
-  geom_point() +
-  geom_smooth(method = "loess") +
-  facet_wrap(~group, scales = "fixed", ncol = 2) +
-  scale_color_brewer(name = "RNA (pg)", palette = "YlGnBu") +
-  scale_x_log10( "TS oligonucleotide molarity (µM)"
-               , breaks = c(0.6, 2.5, 10.0, 40.0, 160.0)) +
-  scale_y_continuous("Tag dust (% of extracted reads)") +
-  ggtitle("Amount of oligonucleotide artefacts") +
-  theme_TSO_by_RNA_facet_RNA()
-```
-
-![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_tagDust_facet_RNA-1.png)<!-- -->
-
-Same with all RNA amount overlayed in a single plot.
-
-
-```r
-ggplot(colData(ce) %>% data.frame, aes(TSO, tagdust / extracted * 100, color=RNA %>% factor)) +
-  geom_point() +
-  geom_smooth(method = "loess") +
-  facet_wrap(~enzyme, ncol = 2) +
-  scale_color_brewer(name = "RNA (pg)", palette = "YlGnBu") +
-  scale_x_log10( "TS oligonucleotide molarity (µM)"
-               , breaks = c(0.6, 2.5, 10.0, 40.0, 160.0)) +
-  scale_y_continuous("Tag dust (% of extracted reads)") +
-  ggtitle("Amount of oligonucleotide artefacts") +
-  theme_TSO_by_RNA_facet_RNA()
-```
-
-![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_tagDust_by_RNA-1.png)<!-- -->
-
-
-## Ribosomal RNA
-
- - RT primers molarity increases rRNA rate.
- - With SS III, rRNA rate is maximal at mild amounts of RNA (~1 ng) and at
-   high TSO concentration, a minimum is reached between 20 and 40 µM,
-   depending on the quantity RNA and RT primers.
-
-
-```r
-ce$rRNA_rate <- ce$rdna / (ce$extracted - ce$tagdust)
-```
-
-
-```r
-ggplot(colData(ce) %>% data.frame, aes(TSO, rRNA_rate, color=RT_PRIMERS %>% factor)) +
-  geom_point() +
-  geom_smooth(method = "loess") +
-  facet_wrap(~group, scales = "fixed", ncol = 2) +
-  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
-  scale_x_log10( "TS oligonucleotide molarity (µM)"
-               , breaks = c(0.6, 2.5, 10, 40, 160)) +
-  scale_y_continuous("rRNA (% of non-tagdust extracted reads)") +
-  labs( title = "Fraction of reads aligning to rRNA sequences."
-      , caption = stringr::str_wrap(width = 50, "The fraction of reads aligning to ribosomal RNA (rRNA) sequences (after removing oligonucleotide artefacts) is increased by RT primers.  It varies with TSO and RNA amounts.  Overall, SuperScript IV gives more rRNA reads than SS III.")) +
-  theme_TSO_by_RTP_facet_RNA()
-```
-
-![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_rRNA_by_RTP_facet_RNA-1.png)<!-- -->
-
-
-## Yield
+#### Yield
 
 Because we multiplexed reactions together, the ones with the highest yield
 will give the largest amount of reads.  Higher yield gives the possibility
@@ -299,6 +192,176 @@ ce$libSizeNormBylib <-
         , plateID = ce$plateID)
 ```
 
+#### Aggregated table for contour plots
+
+
+```r
+z <- aggregate(colData(ce)[,c("TD_rate", "rRNA_rate", "libSizeNormBylib", "mapping_rate", "strand_invasion_rate", "promoter_rate")], by=list(TSO=ce$TSO, RTP=ce$RT_PRIMERS, group=ce$group), median) %>% as.data.frame()
+
+asp <- diff(range(log(z$RTP))) / diff(range(log(z$TSO))) # for lattice::contourplot
+```
+
+#### Lattice helper functions
+
+
+```r
+lowerIsBetter <- function(data, zvalue, main, cuts = 10) {
+  lattice::contourplot(
+     data = data,
+     zvalue ~ TSO * RTP | group,
+     cuts = cuts,
+     scales=list(x=list(at= c(0.6, 2.5, 10, 40, 160), log=10),
+                 y=list(at=c(1, 4, 16), log=10)),
+     aspect = asp,
+     main = main,
+     xlab = "Template-switching oligonucleotides (μM)",
+     ylab = "Reverse transcription primers (μM)",
+     region = TRUE,
+     col.regions = colorRampPalette(c("cyan", "white", "pink"))(100))
+}
+
+higherIsBetter <- function(data, zvalue, main, cuts = 10) {
+  lattice::contourplot(
+     data = data,
+     zvalue ~ TSO * RTP | group,
+     cuts = cuts,
+     scales=list(x=list(at= c(0.6, 2.5, 10, 40, 160), log=10),
+                 y=list(at=c(1, 4, 16), log=10)),
+     aspect = asp,
+     main = main,
+     xlab = "Template-switching oligonucleotides (μM)",
+     ylab = "Reverse transcription primers (μM)",
+     region = TRUE,
+     col.regions = colorRampPalette(c("pink", "white", "cyan"))(100))
+}
+```
+
+## Tag dust
+
+If not removed during library preparation, oligonucleotide artifacts strongly
+dominate libraries prepared with 1 pg RNA.  In general, the amount of artefacts
+increases when starting RNA amounts decrease.  Here, increasing RT primer
+molaritys increase artefacts.  In contrary, and somewhat surprisingly,
+increasing TSO molarity seems to reduce artefacts.
+
+Sub panel at 10,000 pg is noisy because replicate `CGAGGCTG` is an outlier with
+a large amount of artefacts.
+
+
+```r
+ggplot(colData(ce) %>% data.frame, aes(TSO, TD_rate, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth(method = "loess") +
+  facet_wrap(~group, scales = "fixed", ncol = 2) +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10.0, 40.0, 160.0)) +
+  scale_y_continuous("Tag dust (% of extracted reads)") +
+  labs( title = "Amount of oligonucleotide artefacts"
+      , caption = stringr::str_wrap(width = 50, "The amount of artefacts detected by TagDust is increased by RT primers and decreased by RNA and TSOs.  SuperScript IV generated less artefacts than SSIII.")) +
+  theme_TSO_by_RTP_facet_RNA()
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_tagDust_by_RTP_facet_RNA-1.png)<!-- -->
+
+Sub panel at 10,000 pg is noisy because replicate `CGAGGCTG` is an outlier with
+a large amount of artefacts.  Here is the same figure with that library removed.
+
+
+```r
+ggplot(colData(ce[, ! (ce$index == "CGAGGCTG" & ce$plateID == "R")]) %>% data.frame, aes(TSO, TD_rate, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth(method = "loess") +
+  facet_wrap(~group, scales = "fixed", ncol = 2) +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10.0, 40.0, 160.0)) +
+  scale_y_continuous("Tag dust (% of extracted reads)") +
+  labs( title = "Amount of oligonucleotide artefacts"
+      , subtitle = '(outlier library "CGAGGCTG" of plate "R" removed)'
+      , caption = stringr::str_wrap(width = 50, "The amount of artefacts detected by TagDust is increased by RT primers and decreased by RNA and TSOs.  SuperScript IV generated less artefacts than SSIII.")) +
+  theme_TSO_by_RTP_facet_RNA()
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_tagDust_by_RTP_facet_RNA_no_outlier-1.png)<!-- -->
+
+### Contour plots
+
+
+```r
+ggplot(z, aes(TSO, RTP, z=TD_rate)) +
+  scale_x_log10() +
+  scale_y_log10() +
+  facet_wrap(~group, ncol=2) +
+  scale_colour_viridis("%tagdust") +
+  geom_contour(aes(colour=stat(level)), binwidth = 5)
+```
+
+```
+## Warning: Not possible to generate contour data
+
+## Warning: Not possible to generate contour data
+
+## Warning: Not possible to generate contour data
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/TagDust_contour-1.png)<!-- -->
+
+
+```r
+lowerIsBetter(z, z$TD_rate, "Amount of oligonucleotide artefacts (%)")
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/TagDust_countour_lattice-1.png)<!-- -->
+
+## Ribosomal RNA
+
+ - RT primers molarity increases rRNA rate.
+ - With SSIII, rRNA rate is maximal at mild amounts of RNA (~1 ng) and at
+   high TSO concentration, a minimum is reached between 20 and 40 µM,
+   depending on the quantity RNA and RT primers.
+
+
+```r
+ggplot(colData(ce) %>% data.frame, aes(TSO, rRNA_rate, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth(method = "loess") +
+  facet_wrap(~group, scales = "fixed", ncol = 2) +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10, 40, 160)) +
+  scale_y_continuous("rRNA (% of non-tagdust extracted reads)") +
+  labs( title = "Fraction of reads aligning to rRNA sequences."
+      , caption = stringr::str_wrap(width = 50, "The fraction of reads aligning to ribosomal RNA (rRNA) sequences (after removing oligonucleotide artefacts) is increased by RT primers.  It varies with TSO and RNA amounts.  Overall, SuperScript IV gives more rRNA reads than SSIII.")) +
+  theme_TSO_by_RTP_facet_RNA()
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_rRNA_by_RTP_facet_RNA-1.png)<!-- -->
+
+### Contour plots
+
+
+```r
+ggplot(z, aes(TSO, RTP, z=rRNA_rate)) +
+  scale_x_log10() +
+  scale_y_log10() +
+  facet_wrap(~group, ncol=2) +
+  scale_colour_viridis("%rRNA") +
+  geom_contour(aes(colour=stat(level)), binwidth = 5)
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/rRNA_contour-1.png)<!-- -->
+
+
+```r
+lowerIsBetter(z, z$rRNA_rate, "Amount of ribosomal RNA sequences (%)")
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/rRNA_countour_lattice-1.png)<!-- -->
+
+
+## Yield
+
 RT primer molarity mildly influences yield.  Higher molarities are
 needed when TSO molarity is increased.  Conversely, high molarities are
 detrimental for low TSO amounts.  In brief, the RT primer concentration must
@@ -342,6 +405,15 @@ ggplot(colData(ce) %>% data.frame, aes(RT_PRIMERS, libSizeNormBylib, color=TSO %
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/RTP_vs_norm_counts_by_TSO-1.png)<!-- -->
 
+### Contour plot
+
+
+```r
+higherIsBetter(z, log(z$libSizeNormBylib), "Relative yield (arbitrary unit on log scale)")
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/yield_countour-1.png)<!-- -->
+
 
 ## Mapping rate
 
@@ -351,11 +423,6 @@ artefact into account, assuming that they can be removed before sequencing.
 
 The results are somewhat symmetric with the rRNA rate, since rRNA reads are
 a large proportion of the discarded data.
-
-
-```r
-ce$mapping_rate <- ce$properpairs / (ce$extracted - ce$tagdust) * 100
-```
 
 
 ```r
@@ -377,7 +444,7 @@ Mapping rate at 100 ng RNA, SSIII, for figure panel
 
 
 ```r
-ggplot(subset(colData(ce), group == "100 ng RNA, SS III") %>% data.frame, aes(TSO, mapping_rate, color=RT_PRIMERS %>% factor)) +
+ggplot(subset(colData(ce), group == "100 ng RNA, SSIII") %>% data.frame, aes(TSO, mapping_rate, color=RT_PRIMERS %>% factor)) +
   geom_point() +
   geom_smooth(method = "loess") +
   facet_wrap(~group, scales = "fixed", ncol = 2) +
@@ -390,6 +457,15 @@ ggplot(subset(colData(ce), group == "100 ng RNA, SS III") %>% data.frame, aes(TS
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_mapping_rate_by_RTP_facet_RNA_singlePanel-1.png)<!-- -->
 
+### Contour plot
+
+
+```r
+higherIsBetter(z, z$mapping_rate, "Mapping rate (%)")
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/mapRate_countour-1.png)<!-- -->
+
 
 ## Strand invasion
 
@@ -399,11 +475,6 @@ experiment, their amount was reasonably low.
 Interestingly, the amount of strand invaders was minimised by high amounts
 of TSOs and RT primers.  Does that mean that strand invasion happen first,
 and then template-switching happens if primers remain ?
-
-
-```r
-ce$strand_invasion_rate <- ce$strandInvaders / (ce$counts + ce$strandInvaders) * 100
-```
 
 
 ```r
@@ -443,14 +514,14 @@ ggplot(colData(ce[, ce$strand_invasion_rate < 30]) %>% data.frame, aes(TSO, stra
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_SI_rate_by_RTP_facet_RNA_no_outlier-1.png)<!-- -->
 
-Strand invasion at 100 ng RNA, SS III, for figure panel
+Strand invasion at 100 ng RNA, SSIII, for figure panel
 
 Because of 1 outlier, the scale is a bit compressed.  Here is the same plot with
 the outlier removed.
 
 
 ```r
-ggplot(subset(colData(ce), group == "100 ng RNA, SS III") %>% data.frame, aes(TSO, strand_invasion_rate, color=RT_PRIMERS %>% factor)) +
+ggplot(subset(colData(ce), group == "100 ng RNA, SSIII") %>% data.frame, aes(TSO, strand_invasion_rate, color=RT_PRIMERS %>% factor)) +
   geom_point() +
   geom_smooth(method = "loess") +
   facet_wrap(~group, scales = "fixed", ncol = 2) +
@@ -463,6 +534,16 @@ ggplot(subset(colData(ce), group == "100 ng RNA, SS III") %>% data.frame, aes(TS
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_SI_rate_by_RTP_facet_RNA_no_outlier_singlePanel-1.png)<!-- -->
 
+### Contour plot
+
+
+```r
+lowerIsBetter(z, z$strand_invasion_rate, "Strand invasion rate (%)")
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/SI_countour-1.png)<!-- -->
+
+
 ## Promoter rate
 
 High promoter rate is THE goal of a CAGE experiment.  The molarity of RT
@@ -472,10 +553,6 @@ molarities higher than 10 µM.
 This metric mirrors the strand invasion rate, which suggests that in some
 libraries, many strand invaders might be left undetected.
 
-
-```r
-ce$promoter_rate <- ce$promoter / (ce$counts) * 100
-```
 
 
 ```r
@@ -488,7 +565,7 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, promoter_rate, color=RT_PRIMERS %>% 
                , breaks = c(0.6, 2.5, 10, 40, 160)) +
   scale_y_continuous("Promoter rate (% of molecule counts after SI removal)") +
   labs( title = "Promoter rate"
-      , caption = stringr::str_wrap(width = 50, "Promoter rates increases with TSO and RT primer molarity.  It is higher with SuperScript III than with SS IV.")) +
+      , caption = stringr::str_wrap(width = 50, "Promoter rates increases with TSO and RT primer molarity.  It is higher with SuperScript III than with SSIV.")) +
   theme_TSO_by_RTP_facet_RNA()
 ```
 
@@ -512,6 +589,14 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, promoter_rate, color=RNA %>% factor)
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_promoter_rate_by_RNA-1.png)<!-- -->
 
+### Contour plots
+
+
+```r
+higherIsBetter(z, z$promoter_rate, "Promoter rate (%)")
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/promRate_countour-1.png)<!-- -->
 
 ## Richness (on genes)
 
@@ -660,6 +745,35 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, promoter_rate, color=RT_PRIMERS %>% 
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_promoter_rate_by_RTP_facet_RNA_horiz-1.png)<!-- -->
 
+Focus on 100 ng RNA, SSIII
+==========================
+
+
+```r
+summaryPlot <- function(group) {
+  p1 <- lowerIsBetter(z[z$group == group,], z$TD_rate[z$group == group], "TagDust rate (%)", cuts = 5)
+    
+  p2 <- lowerIsBetter(z[z$group == group,], z$rRNA_rate[z$group == group], "rRNA rate (%)", cuts = 5)
+  
+  p3 <- higherIsBetter(z[z$group == group,], log(z$libSizeNormBylib[z$group == group]), "Normalised library size (log)", cuts = 5)
+   
+  p4 <- higherIsBetter(z[z$group == group,], z$mapping_rate[z$group == group], "Mapping rate (%)", cuts = 5)
+    
+  p5 <- higherIsBetter(z[z$group == group,], z$promoter_rate[z$group == group], "Promoter rate (%)", cuts = 5)
+    
+  gridExtra::grid.arrange(p1, p2, p3, p4, p5, ncol = 2)
+}
+summaryPlot("100 ng RNA, SSIII")
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/mapRate_contour_lattice-1.png)<!-- -->
+
+```r
+summaryPlot("10 pg RNA, SSIV")
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/mapRate_contour_lattice-2.png)<!-- -->
+
 
 Session information
 ===================
@@ -670,7 +784,7 @@ sessionInfo()
 ```
 
 ```
-## R version 3.5.1 (2018-07-02)
+## R version 3.5.2 (2018-12-20)
 ## Platform: x86_64-pc-linux-gnu (64-bit)
 ## Running under: Debian GNU/Linux buster/sid
 ## 
@@ -692,48 +806,47 @@ sessionInfo()
 ## 
 ## other attached packages:
 ##  [1] viridis_0.5.1               viridisLite_0.3.0          
-##  [3] MultiAssayExperiment_1.7.16 SummarizedExperiment_1.11.6
-##  [5] DelayedArray_0.7.34         BiocParallel_1.15.9        
-##  [7] matrixStats_0.54.0          Biobase_2.41.2             
-##  [9] GenomicRanges_1.33.13       GenomeInfoDb_1.17.1        
-## [11] IRanges_2.15.17             S4Vectors_0.19.19          
-## [13] BiocGenerics_0.27.1         magrittr_1.5               
-## [15] ggplot2_3.0.0               CAGEr_1.23.2               
+##  [3] MultiAssayExperiment_1.8.3  SummarizedExperiment_1.12.0
+##  [5] DelayedArray_0.8.0          BiocParallel_1.16.6        
+##  [7] matrixStats_0.54.0          Biobase_2.42.0             
+##  [9] GenomicRanges_1.34.0        GenomeInfoDb_1.18.2        
+## [11] IRanges_2.16.0              S4Vectors_0.20.1           
+## [13] BiocGenerics_0.28.0         magrittr_1.5               
+## [15] ggplot2_3.0.0               CAGEr_1.24.0               
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] VGAM_1.0-6               splines_3.5.1           
+##  [1] VGAM_1.1-1               splines_3.5.2           
 ##  [3] gtools_3.8.1             assertthat_0.2.0        
-##  [5] BSgenome_1.49.3          GenomeInfoDbData_1.1.0  
-##  [7] Rsamtools_1.33.4         yaml_2.2.0              
-##  [9] pillar_1.3.0             backports_1.1.2         
-## [11] lattice_0.20-35          glue_1.3.0              
-## [13] digest_0.6.18            RColorBrewer_1.1-2      
-## [15] XVector_0.21.3           colorspace_1.3-2        
-## [17] htmltools_0.3.6          Matrix_1.2-14           
-## [19] plyr_1.8.4               XML_3.98-1.16           
-## [21] pkgconfig_2.0.2          zlibbioc_1.27.0         
-## [23] purrr_0.2.5              scales_1.0.0            
-## [25] stringdist_0.9.5.1       tibble_1.4.2            
-## [27] mgcv_1.8-24              beanplot_1.2            
-## [29] withr_2.1.2              lazyeval_0.2.1          
-## [31] formula.tools_1.7.1      crayon_1.3.4            
-## [33] memoise_1.1.0            evaluate_0.11           
-## [35] nlme_3.1-137             MASS_7.3-50             
-## [37] operator.tools_1.6.3     vegan_2.5-2             
-## [39] tools_3.5.1              data.table_1.11.4       
-## [41] stringr_1.3.1            munsell_0.5.0           
-## [43] cluster_2.0.7-1          bindrcpp_0.2.2          
-## [45] Biostrings_2.49.1        som_0.3-5.1             
-## [47] compiler_3.5.1           rlang_0.2.2             
-## [49] grid_3.5.1               RCurl_1.95-4.11         
-## [51] labeling_0.3             bitops_1.0-6            
-## [53] rmarkdown_1.10           codetools_0.2-15        
-## [55] gtable_0.2.0             reshape_0.8.7           
-## [57] R6_2.2.2                 gridExtra_2.3           
-## [59] GenomicAlignments_1.17.3 knitr_1.20              
-## [61] dplyr_0.7.6              rtracklayer_1.41.4      
-## [63] bindr_0.1.1              rprojroot_1.3-2         
-## [65] KernSmooth_2.23-15       permute_0.9-4           
-## [67] stringi_1.2.4            Rcpp_0.12.18            
-## [69] tidyselect_0.2.4
+##  [5] BSgenome_1.50.0          GenomeInfoDbData_1.1.0  
+##  [7] Rsamtools_1.34.1         yaml_2.2.0              
+##  [9] pillar_1.3.0             lattice_0.20-35         
+## [11] glue_1.3.1               digest_0.6.18           
+## [13] RColorBrewer_1.1-2       XVector_0.22.0          
+## [15] colorspace_1.3-2         htmltools_0.3.6         
+## [17] Matrix_1.2-14            plyr_1.8.4              
+## [19] XML_3.98-1.16            pkgconfig_2.0.2         
+## [21] zlibbioc_1.28.0          purrr_0.2.5             
+## [23] scales_1.0.0             stringdist_0.9.5.1      
+## [25] tibble_1.4.2             mgcv_1.8-24             
+## [27] beanplot_1.2             withr_2.1.2             
+## [29] lazyeval_0.2.1           formula.tools_1.7.1     
+## [31] crayon_1.3.4             memoise_1.1.0           
+## [33] evaluate_0.13            nlme_3.1-137            
+## [35] MASS_7.3-50              operator.tools_1.6.3    
+## [37] vegan_2.5-4              tools_3.5.2             
+## [39] data.table_1.11.4        stringr_1.3.1           
+## [41] munsell_0.5.0            cluster_2.0.7-1         
+## [43] bindrcpp_0.2.2           Biostrings_2.50.2       
+## [45] som_0.3-5.1              compiler_3.5.2          
+## [47] rlang_0.3.3              grid_3.5.2              
+## [49] RCurl_1.95-4.11          labeling_0.3            
+## [51] bitops_1.0-6             rmarkdown_1.12          
+## [53] codetools_0.2-15         gtable_0.2.0            
+## [55] reshape_0.8.8            R6_2.2.2                
+## [57] gridExtra_2.3            GenomicAlignments_1.18.1
+## [59] knitr_1.22               dplyr_0.7.6             
+## [61] rtracklayer_1.42.2       bindr_0.1.1             
+## [63] KernSmooth_2.23-15       permute_0.9-5           
+## [65] stringi_1.2.4            Rcpp_0.12.18            
+## [67] tidyselect_0.2.4         xfun_0.6
 ```
