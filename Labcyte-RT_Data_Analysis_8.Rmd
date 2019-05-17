@@ -30,7 +30,7 @@ of better quality (see [experiment 6](Labcyte-RT_Data_Analysis_6.md)), and
 with a more extensive randomisation of TSO barcodes and well coordinates
 (see designs [6a](Labcyte-RT6a.md), [6b](Labcyte-RT6b.md), [6c](Labcyte-RT6c.md) and [6d](Labcyte-RT6d.md)).
 
-This file presents the results for SS III and SS IV in parallel.
+This file presents the results for SSIII and SSIV in parallel.
 
 
 Load R packages
@@ -57,22 +57,22 @@ if(file.exists("Labcyte-RT_Data_Analysis_7+8.Rds")) {
   ce8 <- readRDS(paste0("Labcyte-RT_Data_Analysis_", expNumber, ".Rds"))
   ce <- mergeCAGEsets(ce7, ce8)
   ce$enzyme <- ce$plateID
-  levels(ce$enzyme) <- c(rep("SS III", 4), rep("SS IV", 4))
+  levels(ce$enzyme) <- c(rep("SSIII", 4), rep("SSIV", 4))
   ce$group <- paste0(ce$RNA_factor, ", ", ce$enzyme) %>% factor(
-    c(   "1 pg RNA, SS III",   "1 pg RNA, SS IV"
-     ,  "10 pg RNA, SS III",  "10 pg RNA, SS IV"
-     , "100 pg RNA, SS III", "100 pg RNA, SS IV"
-     ,   "1 ng RNA, SS III",   "1 ng RNA, SS IV"
-     ,  "10 ng RNA, SS III",  "10 ng RNA, SS IV"
-     , "100 ng RNA, SS III", "100 ng RNA, SS IV"
+    c(   "1 pg RNA, SSIII",   "1 pg RNA, SSIV"
+     ,  "10 pg RNA, SSIII",  "10 pg RNA, SSIV"
+     , "100 pg RNA, SSIII", "100 pg RNA, SSIV"
+     ,   "1 ng RNA, SSIII",   "1 ng RNA, SSIV"
+     ,  "10 ng RNA, SSIII",  "10 ng RNA, SSIV"
+     , "100 ng RNA, SSIII", "100 ng RNA, SSIV"
      ))
   ce$group_horiz <- paste0(ce$RNA_factor, ", ", ce$enzyme) %>% factor(
-    c(   "1 pg RNA, SS III",  "10 pg RNA, SS III" , "100 pg RNA, SS III"
-     ,   "1 ng RNA, SS III",  "10 ng RNA, SS III" , "100 ng RNA, SS III"
-     ,   "1 pg RNA, SS IV" ,  "10 pg RNA, SS IV"  , "100 pg RNA, SS IV"
-     ,   "1 ng RNA, SS IV" ,  "10 ng RNA, SS IV"  , "100 ng RNA, SS IV"
+    c(   "1 pg RNA, SSIII",  "10 pg RNA, SSIII" , "100 pg RNA, SSIII"
+     ,   "1 ng RNA, SSIII",  "10 ng RNA, SSIII" , "100 ng RNA, SSIII"
+     ,   "1 pg RNA, SSIV" ,  "10 pg RNA, SSIV"  , "100 pg RNA, SSIV"
+     ,   "1 ng RNA, SSIV" ,  "10 ng RNA, SSIV"  , "100 ng RNA, SSIV"
      ))
-  annotateCTSS(ce, rtracklayer::import.gff("/osc-fs_home/scratch/gmtu/annotation/mus_musculus/gencode-M1/gencode.vM1.annotation.gtf.gz"))
+  annotateCTSS(ce, rtracklayer::import.gff("gencode.vM1.annotation.gtf.gz"))
   saveRDS(ce, "Labcyte-RT_Data_Analysis_7+8.Rds")
 }
 ```
@@ -138,109 +138,17 @@ theme_RTP_by_RNA_facet_RNA <- function() {
 }
 ```
 
+### QC indicators
 
-## Tag dust
-
-If not removed during library preparation, oligonucleotide artifacts strongly
-dominate libraries prepared with 1 pg RNA.  In general, the amount of artefacts
-increases when starting RNA amounts decrease.  Here, increasing RT primer
-molaritys increase artefacts.  In contrary, and somewhat surprisingly,
-increasing TSO molarity seems to reduce artefacts.
-
-Sub panel at 10,000 pg is noisy because replicate `CGAGGCTG` is an outlier with
-a large amount of artefacts.
-
-```{r TSO_vs_tagDust_by_RTP_facet_RNA, fig.height=8, fig.width=5}
-ggplot(colData(ce) %>% data.frame, aes(TSO, tagdust / extracted * 100, color=RT_PRIMERS %>% factor)) +
-  geom_point() +
-  geom_smooth(method = "loess") +
-  facet_wrap(~group, scales = "fixed", ncol = 2) +
-  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
-  scale_x_log10( "TS oligonucleotide molarity (µM)"
-               , breaks = c(0.6, 2.5, 10.0, 40.0, 160.0)) +
-  scale_y_continuous("Tag dust (% of extracted reads)") +
-  labs( title = "Amount of oligonucleotide artefacts"
-      , caption = stringr::str_wrap(width = 50, "The amount of artefacts detected by TagDust is increased by RT primers and decreased by RNA and TSOs.  SuperScript IV generated less artefacts than SS III.")) +
-  theme_TSO_by_RTP_facet_RNA()
+```{r QC_rate_definitions}
+ce$TD_rate <- ce$tagdust / ce$extracted * 100
+ce$rRNA_rate <- ce$rdna / (ce$extracted - ce$tagdust) * 100
+ce$mapping_rate <- ce$properpairs / (ce$extracted - ce$tagdust) * 100
+ce$strand_invasion_rate <- ce$strandInvaders / (ce$counts + ce$strandInvaders) * 100
+ce$promoter_rate <- ce$promoter / (ce$counts) * 100
 ```
 
-Sub panel at 10,000 pg is noisy because replicate `CGAGGCTG` is an outlier with
-a large amount of artefacts.  Here is the same figure with that library removed.
-
-```{r TSO_vs_tagDust_by_RTP_facet_RNA_no_outlier, fig.height=8, fig.width=5}
-ggplot(colData(ce[, ! (ce$index == "CGAGGCTG" & ce$plateID == "R")]) %>% data.frame, aes(TSO, tagdust / extracted * 100, color=RT_PRIMERS %>% factor)) +
-  geom_point() +
-  geom_smooth(method = "loess") +
-  facet_wrap(~group, scales = "fixed", ncol = 2) +
-  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
-  scale_x_log10( "TS oligonucleotide molarity (µM)"
-               , breaks = c(0.6, 2.5, 10.0, 40.0, 160.0)) +
-  scale_y_continuous("Tag dust (% of extracted reads)") +
-  labs( title = "Amount of oligonucleotide artefacts"
-      , subtitle = '(outlier library "CGAGGCTG" of plate "R" removed)'
-      , caption = stringr::str_wrap(width = 50, "The amount of artefacts detected by TagDust is increased by RT primers and decreased by RNA and TSOs.  SuperScript IV generated less artefacts than SS III.")) +
-  theme_TSO_by_RTP_facet_RNA()
-```
-
-Plot where all RT primer concentrations are pooled, showing influence of RNA
-mass and TSO concentration:
-
-```{r TSO_vs_tagDust_facet_RNA, fig.height=8, fig.width=5}
-ggplot(colData(ce) %>% data.frame, aes(TSO, tagdust / extracted * 100, color=RNA %>% factor)) +
-  geom_point() +
-  geom_smooth(method = "loess") +
-  facet_wrap(~group, scales = "fixed", ncol = 2) +
-  scale_color_brewer(name = "RNA (pg)", palette = "YlGnBu") +
-  scale_x_log10( "TS oligonucleotide molarity (µM)"
-               , breaks = c(0.6, 2.5, 10.0, 40.0, 160.0)) +
-  scale_y_continuous("Tag dust (% of extracted reads)") +
-  ggtitle("Amount of oligonucleotide artefacts") +
-  theme_TSO_by_RNA_facet_RNA()
-```
-
-Same with all RNA amount overlayed in a single plot.
-
-```{r TSO_vs_tagDust_by_RNA, fig.height=4, fig.width=5}
-ggplot(colData(ce) %>% data.frame, aes(TSO, tagdust / extracted * 100, color=RNA %>% factor)) +
-  geom_point() +
-  geom_smooth(method = "loess") +
-  facet_wrap(~enzyme, ncol = 2) +
-  scale_color_brewer(name = "RNA (pg)", palette = "YlGnBu") +
-  scale_x_log10( "TS oligonucleotide molarity (µM)"
-               , breaks = c(0.6, 2.5, 10.0, 40.0, 160.0)) +
-  scale_y_continuous("Tag dust (% of extracted reads)") +
-  ggtitle("Amount of oligonucleotide artefacts") +
-  theme_TSO_by_RNA_facet_RNA()
-```
-
-
-## Ribosomal RNA
-
- - RT primers molarity increases rRNA rate.
- - With SS III, rRNA rate is maximal at mild amounts of RNA (~1 ng) and at
-   high TSO concentration, a minimum is reached between 20 and 40 µM,
-   depending on the quantity RNA and RT primers.
-
-```{r rRNA_rate_definition}
-ce$rRNA_rate <- ce$rdna / (ce$extracted - ce$tagdust)
-```
-
-```{r TSO_vs_rRNA_by_RTP_facet_RNA, fig.height=8, fig.width=5}
-ggplot(colData(ce) %>% data.frame, aes(TSO, rRNA_rate, color=RT_PRIMERS %>% factor)) +
-  geom_point() +
-  geom_smooth(method = "loess") +
-  facet_wrap(~group, scales = "fixed", ncol = 2) +
-  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
-  scale_x_log10( "TS oligonucleotide molarity (µM)"
-               , breaks = c(0.6, 2.5, 10, 40, 160)) +
-  scale_y_continuous("rRNA (% of non-tagdust extracted reads)") +
-  labs( title = "Fraction of reads aligning to rRNA sequences."
-      , caption = stringr::str_wrap(width = 50, "The fraction of reads aligning to ribosomal RNA (rRNA) sequences (after removing oligonucleotide artefacts) is increased by RT primers.  It varies with TSO and RNA amounts.  Overall, SuperScript IV gives more rRNA reads than SS III.")) +
-  theme_TSO_by_RTP_facet_RNA()
-```
-
-
-## Yield
+#### Yield
 
 Because we multiplexed reactions together, the ones with the highest yield
 will give the largest amount of reads.  Higher yield gives the possibility
@@ -261,6 +169,145 @@ ce$libSizeNormBylib <-
         , index = ce$index
         , plateID = ce$plateID)
 ```
+
+#### Aggregated table for contour plots
+
+```{r aggregateTable}
+z <- aggregate(colData(ce)[,c("TD_rate", "rRNA_rate", "libSizeNormBylib", "mapping_rate", "strand_invasion_rate", "promoter_rate")], by=list(TSO=ce$TSO, RTP=ce$RT_PRIMERS, group=ce$group), median) %>% as.data.frame()
+
+asp <- diff(range(log(z$RTP))) / diff(range(log(z$TSO))) # for lattice::contourplot
+```
+
+#### Lattice helper functions
+
+```{r latticeHelperFuncs}
+lowerIsBetter <- function(data, zvalue, main, cuts = 10) {
+  lattice::contourplot(
+     data = data,
+     zvalue ~ TSO * RTP | group,
+     cuts = cuts,
+     scales=list(x=list(at= c(0.6, 2.5, 10, 40, 160), log=10),
+                 y=list(at=c(1, 4, 16), log=10)),
+     aspect = asp,
+     main = main,
+     xlab = "Template-switching oligonucleotides (μM)",
+     ylab = "Reverse transcription primers (μM)",
+     region = TRUE,
+     col.regions = colorRampPalette(c("cyan", "white", "pink"))(100))
+}
+
+higherIsBetter <- function(data, zvalue, main, cuts = 10) {
+  lattice::contourplot(
+     data = data,
+     zvalue ~ TSO * RTP | group,
+     cuts = cuts,
+     scales=list(x=list(at= c(0.6, 2.5, 10, 40, 160), log=10),
+                 y=list(at=c(1, 4, 16), log=10)),
+     aspect = asp,
+     main = main,
+     xlab = "Template-switching oligonucleotides (μM)",
+     ylab = "Reverse transcription primers (μM)",
+     region = TRUE,
+     col.regions = colorRampPalette(c("pink", "white", "cyan"))(100))
+}
+```
+
+## Tag dust
+
+If not removed during library preparation, oligonucleotide artifacts strongly
+dominate libraries prepared with 1 pg RNA.  In general, the amount of artefacts
+increases when starting RNA amounts decrease.  Here, increasing RT primer
+molaritys increase artefacts.  In contrary, and somewhat surprisingly,
+increasing TSO molarity seems to reduce artefacts.
+
+Sub panel at 10,000 pg is noisy because replicate `CGAGGCTG` is an outlier with
+a large amount of artefacts.
+
+```{r TSO_vs_tagDust_by_RTP_facet_RNA, fig.height=8, fig.width=5}
+ggplot(colData(ce) %>% data.frame, aes(TSO, TD_rate, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth(method = "loess") +
+  facet_wrap(~group, scales = "fixed", ncol = 2) +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10.0, 40.0, 160.0)) +
+  scale_y_continuous("Tag dust (% of extracted reads)") +
+  labs( title = "Amount of oligonucleotide artefacts"
+      , caption = stringr::str_wrap(width = 50, "The amount of artefacts detected by TagDust is increased by RT primers and decreased by RNA and TSOs.  SuperScript IV generated less artefacts than SSIII.")) +
+  theme_TSO_by_RTP_facet_RNA()
+```
+
+Sub panel at 10,000 pg is noisy because replicate `CGAGGCTG` is an outlier with
+a large amount of artefacts.  Here is the same figure with that library removed.
+
+```{r TSO_vs_tagDust_by_RTP_facet_RNA_no_outlier, fig.height=8, fig.width=5}
+ggplot(colData(ce[, ! (ce$index == "CGAGGCTG" & ce$plateID == "R")]) %>% data.frame, aes(TSO, TD_rate, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth(method = "loess") +
+  facet_wrap(~group, scales = "fixed", ncol = 2) +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10.0, 40.0, 160.0)) +
+  scale_y_continuous("Tag dust (% of extracted reads)") +
+  labs( title = "Amount of oligonucleotide artefacts"
+      , subtitle = '(outlier library "CGAGGCTG" of plate "R" removed)'
+      , caption = stringr::str_wrap(width = 50, "The amount of artefacts detected by TagDust is increased by RT primers and decreased by RNA and TSOs.  SuperScript IV generated less artefacts than SSIII.")) +
+  theme_TSO_by_RTP_facet_RNA()
+```
+
+### Contour plots
+
+```{r TagDust_contour, fig.height=7, fig.width=4.6}
+ggplot(z, aes(TSO, RTP, z=TD_rate)) +
+  scale_x_log10() +
+  scale_y_log10() +
+  facet_wrap(~group, ncol=2) +
+  scale_colour_viridis("%tagdust") +
+  geom_contour(aes(colour=stat(level)), binwidth = 5)
+```
+
+```{r TagDust_countour_lattice, fig.width=6, fig.height=10, warning=FALSE}
+lowerIsBetter(z, z$TD_rate, "Amount of oligonucleotide artefacts (%)")
+```
+
+## Ribosomal RNA
+
+ - RT primers molarity increases rRNA rate.
+ - With SSIII, rRNA rate is maximal at mild amounts of RNA (~1 ng) and at
+   high TSO concentration, a minimum is reached between 20 and 40 µM,
+   depending on the quantity RNA and RT primers.
+
+```{r TSO_vs_rRNA_by_RTP_facet_RNA, fig.height=8, fig.width=5}
+ggplot(colData(ce) %>% data.frame, aes(TSO, rRNA_rate, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth(method = "loess") +
+  facet_wrap(~group, scales = "fixed", ncol = 2) +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10, 40, 160)) +
+  scale_y_continuous("rRNA (% of non-tagdust extracted reads)") +
+  labs( title = "Fraction of reads aligning to rRNA sequences."
+      , caption = stringr::str_wrap(width = 50, "The fraction of reads aligning to ribosomal RNA (rRNA) sequences (after removing oligonucleotide artefacts) is increased by RT primers.  It varies with TSO and RNA amounts.  Overall, SuperScript IV gives more rRNA reads than SSIII.")) +
+  theme_TSO_by_RTP_facet_RNA()
+```
+
+### Contour plots
+
+```{r rRNA_contour, fig.height=7, fig.width=4.6}
+ggplot(z, aes(TSO, RTP, z=rRNA_rate)) +
+  scale_x_log10() +
+  scale_y_log10() +
+  facet_wrap(~group, ncol=2) +
+  scale_colour_viridis("%rRNA") +
+  geom_contour(aes(colour=stat(level)), binwidth = 5)
+```
+
+```{r rRNA_countour_lattice, fig.width=6, fig.height=10, warning=FALSE}
+lowerIsBetter(z, z$rRNA_rate, "Amount of ribosomal RNA sequences (%)")
+```
+
+
+## Yield
 
 RT primer molarity mildly influences yield.  Higher molarities are
 needed when TSO molarity is increased.  Conversely, high molarities are
@@ -299,6 +346,12 @@ ggplot(colData(ce) %>% data.frame, aes(RT_PRIMERS, libSizeNormBylib, color=TSO %
   theme_RTP_by_TSO_facet_RNA()
 ```
 
+### Contour plot
+
+```{r yield_countour, fig.width=6, fig.height=10, warning=FALSE}
+higherIsBetter(z, log(z$libSizeNormBylib), "Relative yield (arbitrary unit on log scale)")
+```
+
 
 ## Mapping rate
 
@@ -308,10 +361,6 @@ artefact into account, assuming that they can be removed before sequencing.
 
 The results are somewhat symmetric with the rRNA rate, since rRNA reads are
 a large proportion of the discarded data.
-
-```{r mapping_rate_definition}
-ce$mapping_rate <- ce$properpairs / (ce$extracted - ce$tagdust) * 100
-```
 
 ```{r TSO_vs_mapping_rate_by_RTP_facet_RNA, fig.height=8, fig.width=5}
 ggplot(colData(ce) %>% data.frame, aes(TSO, mapping_rate, color=RT_PRIMERS %>% factor)) +
@@ -329,7 +378,7 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, mapping_rate, color=RT_PRIMERS %>% f
 Mapping rate at 100 ng RNA, SSIII, for figure panel
 
 ```{r TSO_vs_mapping_rate_by_RTP_facet_RNA_singlePanel, fig.height=3, fig.width=4}
-ggplot(subset(colData(ce), group == "100 ng RNA, SS III") %>% data.frame, aes(TSO, mapping_rate, color=RT_PRIMERS %>% factor)) +
+ggplot(subset(colData(ce), group == "100 ng RNA, SSIII") %>% data.frame, aes(TSO, mapping_rate, color=RT_PRIMERS %>% factor)) +
   geom_point() +
   geom_smooth(method = "loess") +
   facet_wrap(~group, scales = "fixed", ncol = 2) +
@@ -338,6 +387,12 @@ ggplot(subset(colData(ce), group == "100 ng RNA, SS III") %>% data.frame, aes(TS
                , breaks = c(0.6, 2.5, 10, 40, 160)) +
   scale_y_continuous("Mapping rate (% reads)") +
   theme_TSO_by_RTP_facet_RNA()
+```
+
+### Contour plot
+
+```{r mapRate_countour, fig.width=6, fig.height=10, warning=FALSE}
+higherIsBetter(z, z$mapping_rate, "Mapping rate (%)")
 ```
 
 
@@ -349,10 +404,6 @@ experiment, their amount was reasonably low.
 Interestingly, the amount of strand invaders was minimised by high amounts
 of TSOs and RT primers.  Does that mean that strand invasion happen first,
 and then template-switching happens if primers remain ?
-
-```{r SI_rate_definition}
-ce$strand_invasion_rate <- ce$strandInvaders / (ce$counts + ce$strandInvaders) * 100
-```
 
 ```{r TSO_vs_SI_rate_by_RTP_facet_RNA, fig.height=8, fig.width=5}
 ggplot(colData(ce) %>% data.frame, aes(TSO, strand_invasion_rate, color=RT_PRIMERS %>% factor)) +
@@ -386,13 +437,13 @@ ggplot(colData(ce[, ce$strand_invasion_rate < 30]) %>% data.frame, aes(TSO, stra
   theme_TSO_by_RTP_facet_RNA()
 ```
 
-Strand invasion at 100 ng RNA, SS III, for figure panel
+Strand invasion at 100 ng RNA, SSIII, for figure panel
 
 Because of 1 outlier, the scale is a bit compressed.  Here is the same plot with
 the outlier removed.
 
 ```{r TSO_vs_SI_rate_by_RTP_facet_RNA_no_outlier_singlePanel, fig.height=3, fig.width=4}
-ggplot(subset(colData(ce), group == "100 ng RNA, SS III") %>% data.frame, aes(TSO, strand_invasion_rate, color=RT_PRIMERS %>% factor)) +
+ggplot(subset(colData(ce), group == "100 ng RNA, SSIII") %>% data.frame, aes(TSO, strand_invasion_rate, color=RT_PRIMERS %>% factor)) +
   geom_point() +
   geom_smooth(method = "loess") +
   facet_wrap(~group, scales = "fixed", ncol = 2) +
@@ -403,6 +454,13 @@ ggplot(subset(colData(ce), group == "100 ng RNA, SS III") %>% data.frame, aes(TS
   theme_TSO_by_RTP_facet_RNA()
 ```
 
+### Contour plot
+
+```{r SI_countour, fig.width=6, fig.height=10, warning=FALSE}
+lowerIsBetter(z, z$strand_invasion_rate, "Strand invasion rate (%)")
+```
+
+
 ## Promoter rate
 
 High promoter rate is THE goal of a CAGE experiment.  The molarity of RT
@@ -412,9 +470,6 @@ molarities higher than 10 µM.
 This metric mirrors the strand invasion rate, which suggests that in some
 libraries, many strand invaders might be left undetected.
 
-```{r promoter_rate_definition}
-ce$promoter_rate <- ce$promoter / (ce$counts) * 100
-```
 
 ```{r TSO_vs_promoter_rate_by_RTP_facet_RNA, fig.height=8, fig.width=5}
 ggplot(colData(ce) %>% data.frame, aes(TSO, promoter_rate, color=RT_PRIMERS %>% factor)) +
@@ -426,7 +481,7 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, promoter_rate, color=RT_PRIMERS %>% 
                , breaks = c(0.6, 2.5, 10, 40, 160)) +
   scale_y_continuous("Promoter rate (% of molecule counts after SI removal)") +
   labs( title = "Promoter rate"
-      , caption = stringr::str_wrap(width = 50, "Promoter rates increases with TSO and RT primer molarity.  It is higher with SuperScript III than with SS IV.")) +
+      , caption = stringr::str_wrap(width = 50, "Promoter rates increases with TSO and RT primer molarity.  It is higher with SuperScript III than with SSIV.")) +
   theme_TSO_by_RTP_facet_RNA()
 ```
 
@@ -445,6 +500,11 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, promoter_rate, color=RNA %>% factor)
   theme_TSO_by_RNA_facet_RNA()
 ```
 
+### Contour plots
+
+```{r promRate_countour, fig.width=6, fig.height=10, warning=FALSE}
+higherIsBetter(z, z$promoter_rate, "Promoter rate (%)")
+```
 
 ## Richness (on genes)
 
@@ -575,6 +635,27 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, promoter_rate, color=RT_PRIMERS %>% 
   labs( title = "Promoter rate"
       , subtitle = "(% of molecule counts after SI removal)") +
   theme_TSO_by_RTP_facet_RNA()
+```
+
+Focus on 100 ng RNA, SSIII
+==========================
+
+```{r mapRate_contour_lattice, fig.height=15, fig.width=15, warning=FALSE}
+summaryPlot <- function(group) {
+  p1 <- lowerIsBetter(z[z$group == group,], z$TD_rate[z$group == group], "TagDust rate (%)", cuts = 5)
+    
+  p2 <- lowerIsBetter(z[z$group == group,], z$rRNA_rate[z$group == group], "rRNA rate (%)", cuts = 5)
+  
+  p3 <- higherIsBetter(z[z$group == group,], log(z$libSizeNormBylib[z$group == group]), "Normalised library size (log)", cuts = 5)
+   
+  p4 <- higherIsBetter(z[z$group == group,], z$mapping_rate[z$group == group], "Mapping rate (%)", cuts = 5)
+    
+  p5 <- higherIsBetter(z[z$group == group,], z$promoter_rate[z$group == group], "Promoter rate (%)", cuts = 5)
+    
+  gridExtra::grid.arrange(p1, p2, p3, p4, p5, ncol = 2)
+}
+summaryPlot("100 ng RNA, SSIII")
+summaryPlot("10 pg RNA, SSIV")
 ```
 
 
