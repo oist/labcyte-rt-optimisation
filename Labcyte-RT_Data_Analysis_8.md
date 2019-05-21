@@ -14,17 +14,17 @@ editor_options:
 
 
 
-This experiment follows exactly the same design as for
+Experiment 8 follows exactly the same design as for
 [experiment 7](Labcyte-RT_Data_Analysis_7.md), except that we are using
 SuperScript IV and its buffer.
+
+In this file, we analyse the results for SSIII and SSIV in parallel.
 
 Here, we assessed again multiple combinations of TSO, RT primer and RNA amounts,
 using a different stock of TSOs (PO_8268526), purchased earlier but apparently
 of better quality (see [experiment 6](Labcyte-RT_Data_Analysis_6.md)), and
 with a more extensive randomisation of TSO barcodes and well coordinates
 (see designs [6a](Labcyte-RT6a.md), [6b](Labcyte-RT6b.md), [6c](Labcyte-RT6c.md) and [6d](Labcyte-RT6d.md)).
-
-This file presents the results for SSIII and SSIV in parallel.
 
 
 Load R packages
@@ -55,13 +55,21 @@ if(file.exists("Labcyte-RT_Data_Analysis_7+8.Rds")) {
   ce$enzyme <- ce$plateID
   levels(ce$enzyme) <- c(rep("SSIII", 4), rep("SSIV", 4))
   ce$group <- paste0(ce$RNA_factor, ", ", ce$enzyme) %>% factor(
+    c( "100 ng RNA, SSIII", "100 ng RNA, SSIV"
+     ,  "10 ng RNA, SSIII",  "10 ng RNA, SSIV"
+     ,   "1 ng RNA, SSIII",   "1 ng RNA, SSIV"
+     , "100 pg RNA, SSIII", "100 pg RNA, SSIV"
+     ,  "10 pg RNA, SSIII",  "10 pg RNA, SSIV"
+     ,   "1 pg RNA, SSIII",   "1 pg RNA, SSIV"
+     ))
+  ce$group.lattice <- paste0(ce$RNA_factor, ", ", ce$enzyme) %>% factor(
     c(   "1 pg RNA, SSIII",   "1 pg RNA, SSIV"
      ,  "10 pg RNA, SSIII",  "10 pg RNA, SSIV"
      , "100 pg RNA, SSIII", "100 pg RNA, SSIV"
      ,   "1 ng RNA, SSIII",   "1 ng RNA, SSIV"
      ,  "10 ng RNA, SSIII",  "10 ng RNA, SSIV"
      , "100 ng RNA, SSIII", "100 ng RNA, SSIV"
-     ))
+     )) # ggplot2 and lattice use a different order...
   ce$group_horiz <- paste0(ce$RNA_factor, ", ", ce$enzyme) %>% factor(
     c(   "1 pg RNA, SSIII",  "10 pg RNA, SSIII" , "100 pg RNA, SSIII"
      ,   "1 ng RNA, SSIII",  "10 ng RNA, SSIII" , "100 ng RNA, SSIII"
@@ -71,6 +79,11 @@ if(file.exists("Labcyte-RT_Data_Analysis_7+8.Rds")) {
   annotateCTSS(ce, rtracklayer::import.gff("gencode.vM1.annotation.gtf.gz"))
   saveRDS(ce, "Labcyte-RT_Data_Analysis_7+8.Rds")
 }
+```
+
+```
+## Warning in S4Vectors:::set_unlisted_names(unlisted_x, x): failed to set
+## names on the unlisted CompressedGRangesList object
 ```
 
 
@@ -197,6 +210,7 @@ ce$libSizeNormBylib <-
 
 ```r
 z <- aggregate(colData(ce)[,c("TD_rate", "rRNA_rate", "libSizeNormBylib", "mapping_rate", "strand_invasion_rate", "promoter_rate")], by=list(TSO=ce$TSO, RTP=ce$RT_PRIMERS, group=ce$group), median) %>% as.data.frame()
+z$group.lattice <- factor(z$group, levels=levels(ce$group.lattice))
 
 asp <- diff(range(log(z$RTP))) / diff(range(log(z$TSO))) # for lattice::contourplot
 ```
@@ -208,7 +222,7 @@ asp <- diff(range(log(z$RTP))) / diff(range(log(z$TSO))) # for lattice::contourp
 lowerIsBetter <- function(data, zvalue, main, cuts = 10) {
   lattice::contourplot(
      data = data,
-     zvalue ~ TSO * RTP | group,
+     zvalue ~ TSO * RTP | group.lattice,
      cuts = cuts,
      scales=list(x=list(at= c(0.6, 2.5, 10, 40, 160), log=10),
                  y=list(at=c(1, 4, 16), log=10)),
@@ -223,7 +237,7 @@ lowerIsBetter <- function(data, zvalue, main, cuts = 10) {
 higherIsBetter <- function(data, zvalue, main, cuts = 10) {
   lattice::contourplot(
      data = data,
-     zvalue ~ TSO * RTP | group,
+     zvalue ~ TSO * RTP | group.lattice,
      cuts = cuts,
      scales=list(x=list(at= c(0.6, 2.5, 10, 40, 160), log=10),
                  y=list(at=c(1, 4, 16), log=10)),
@@ -285,34 +299,14 @@ ggplot(colData(ce[, ! (ce$index == "CGAGGCTG" & ce$plateID == "R")]) %>% data.fr
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_tagDust_by_RTP_facet_RNA_no_outlier-1.png)<!-- -->
 
-### Contour plots
-
-
-```r
-ggplot(z, aes(TSO, RTP, z=TD_rate)) +
-  scale_x_log10() +
-  scale_y_log10() +
-  facet_wrap(~group, ncol=2) +
-  scale_colour_viridis("%tagdust") +
-  geom_contour(aes(colour=stat(level)), binwidth = 5)
-```
-
-```
-## Warning: Not possible to generate contour data
-
-## Warning: Not possible to generate contour data
-
-## Warning: Not possible to generate contour data
-```
-
-![](Labcyte-RT_Data_Analysis_8_files/figure-html/TagDust_contour-1.png)<!-- -->
+### Contour plot
 
 
 ```r
 lowerIsBetter(z, z$TD_rate, "Amount of oligonucleotide artefacts (%)")
 ```
 
-![](Labcyte-RT_Data_Analysis_8_files/figure-html/TagDust_countour_lattice-1.png)<!-- -->
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/TagDust_countour-1.png)<!-- -->
 
 ## Ribosomal RNA
 
@@ -338,26 +332,14 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, rRNA_rate, color=RT_PRIMERS %>% fact
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_rRNA_by_RTP_facet_RNA-1.png)<!-- -->
 
-### Contour plots
-
-
-```r
-ggplot(z, aes(TSO, RTP, z=rRNA_rate)) +
-  scale_x_log10() +
-  scale_y_log10() +
-  facet_wrap(~group, ncol=2) +
-  scale_colour_viridis("%rRNA") +
-  geom_contour(aes(colour=stat(level)), binwidth = 5)
-```
-
-![](Labcyte-RT_Data_Analysis_8_files/figure-html/rRNA_contour-1.png)<!-- -->
+### Contour plot
 
 
 ```r
 lowerIsBetter(z, z$rRNA_rate, "Amount of ribosomal RNA sequences (%)")
 ```
 
-![](Labcyte-RT_Data_Analysis_8_files/figure-html/rRNA_countour_lattice-1.png)<!-- -->
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/rRNA_countour-1.png)<!-- -->
 
 
 ## Yield
@@ -369,41 +351,39 @@ be adjusted to the TSO concentration.
 
 
 ```r
-ggplot(colData(ce) %>% data.frame, aes(RT_PRIMERS, libSizeNormBylib, color=TSO %>% factor)) +
+ggplot(colData(ce)[ce$group == "100 pg RNA, SSIII",] %>% data.frame, aes(TSO, libSizeNormBylib, color=RT_PRIMERS %>% factor)) +
   geom_point() +
   geom_smooth(method = "loess") +
-  facet_wrap(~group, scales = "fixed", ncol = 2) +
-  scale_color_viridis(discrete = TRUE, name = "[TSO] (µM)", option = "magma") +
-  scale_x_log10( "RT primer molarity (µM)"
-               , breaks = ce$RT_PRIMERS %>% unique %>% sort) +
+  facet_wrap(~RT_PRIMERS, scales = "fixed", ncol = 2) +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10, 40, 160)) +
   scale_y_log10( "Normalised counts (arbitrary scale)"
                , breaks = c(0.01, 0.1, 1, 10)) +
-  labs( title = "Sequence yield"
-      , caption = stringr::str_wrap(width = 50, "Within a library, the reactions are multiplexed by simple pooling without normalisation.  Therefore, reactions that produced more cDNAs will give more sequence reads compared to the others.  Yield increases with TSO amounts, and does not vary much with RT primer amounts, although there may be a trend showing the need to match the RT primer molarity with the TSO molarity.  Effect of RNA amounts and enzyme can not be measured because of the per-library normalisation approach, which confounds with the RNA levels.")) +
-  theme_RTP_by_TSO_facet_RNA()
+  labs( title = "Yield (100 pg RNA, SSIII)") +
+  theme_TSO_by_RTP_facet_RNA()
 ```
 
-![](Labcyte-RT_Data_Analysis_8_files/figure-html/RTP_vs_norm_counts_by_TSO_facet_RNA-1.png)<!-- -->
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_norm_counts_fixed_RNA_facet_RTP-1.png)<!-- -->
 
-Since the trend appears true for all RNA concentrations, the following figure
-pools all data.
+Within a library, the reactions are multiplexed by simple pooling without normalisation.  Therefore, reactions that produced more cDNAs will give more sequence reads compared to the others.  Yield increases with TSO amounts, and does not vary much with RT primer amounts, although there may be a trend showing the need to match the RT primer molarity with the TSO molarity.  Effect of RNA amounts and enzyme can not be measured because of the per-library normalisation approach, which confounds with the RNA levels.
 
 
 ```r
-ggplot(colData(ce) %>% data.frame, aes(RT_PRIMERS, libSizeNormBylib, color=TSO %>% factor)) +
+ggplot(colData(ce) %>% data.frame, aes(TSO, libSizeNormBylib, color=RT_PRIMERS %>% factor)) +
   geom_point() +
   geom_smooth(method = "loess") +
-  facet_wrap(~enzyme, scales = "fixed", nrow = 1) +
-  scale_color_viridis(discrete = TRUE, name = "[TSO] (µM)", option = "magma") +
-  scale_x_log10( "RT primer molarity (µM)"
-               , breaks = ce$RT_PRIMERS %>% unique %>% sort) +
+  facet_wrap(~group, scales = "fixed", ncol = 2) +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10, 40, 160)) +
   scale_y_log10( "Normalised counts (arbitrary scale)"
                , breaks = c(0.01, 0.1, 1, 10)) +
   labs( title = "Sequence yield") +
-  theme_RTP_by_TSO_facet_RNA()
+  theme_TSO_by_RTP_facet_RNA()
 ```
 
-![](Labcyte-RT_Data_Analysis_8_files/figure-html/RTP_vs_norm_counts_by_TSO-1.png)<!-- -->
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_norm_counts_by_RTP_facet_RNA-1.png)<!-- -->
 
 ### Contour plot
 
@@ -439,23 +419,6 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, mapping_rate, color=RT_PRIMERS %>% f
 ```
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_mapping_rate_by_RTP_facet_RNA-1.png)<!-- -->
-
-Mapping rate at 100 ng RNA, SSIII, for figure panel
-
-
-```r
-ggplot(subset(colData(ce), group == "100 ng RNA, SSIII") %>% data.frame, aes(TSO, mapping_rate, color=RT_PRIMERS %>% factor)) +
-  geom_point() +
-  geom_smooth(method = "loess") +
-  facet_wrap(~group, scales = "fixed", ncol = 2) +
-  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
-  scale_x_log10( "TS oligonucleotide molarity (µM)"
-               , breaks = c(0.6, 2.5, 10, 40, 160)) +
-  scale_y_continuous("Mapping rate (% reads)") +
-  theme_TSO_by_RTP_facet_RNA()
-```
-
-![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_mapping_rate_by_RTP_facet_RNA_singlePanel-1.png)<!-- -->
 
 ### Contour plot
 
@@ -668,82 +631,6 @@ RNA amounts.
 #   theme_RTP_by_RNA_facet_RNA()
 ```
 
-Horizontal version of some plots
---------------------------------
-
-### TagDust
-
-
-```r
-ggplot(colData(ce) %>% data.frame, aes(TSO, tagdust / extracted * 100, color=RT_PRIMERS %>% factor)) +
-  geom_point() +
-  geom_smooth(method = "loess") +
-  facet_wrap(~group_horiz, scales = "fixed", nrow = 2) +
-  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
-  scale_x_log10( "TS oligonucleotide molarity (µM)"
-               , breaks = c(1.3, 5, 20, 80)) +
-  scale_y_continuous("Tag dust (%)") +
-  labs( title = "Amount of oligonucleotide artefacts (% of extracted reads)") +
-  theme_TSO_by_RTP_facet_RNA()
-```
-
-![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_tagDust_by_RTP_facet_RNA_horiz-1.png)<!-- -->
-
-### rRNA
-
-
-```r
-ggplot(colData(ce) %>% data.frame, aes(TSO, rRNA_rate, color=RT_PRIMERS %>% factor)) +
-  geom_point() +
-  geom_smooth(method = "loess") +
-  facet_wrap(~group_horiz, scales = "fixed", nrow = 2) +
-  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
-  scale_x_log10( "TS oligonucleotide molarity (µM)"
-               , breaks = c(1.3, 5, 20, 80)) +
-  scale_y_continuous("% rRNA") +
-  labs( title = "Fraction of reads aligning to rRNA sequences (% of non-tagdust extracted reads)") +
-  theme_TSO_by_RTP_facet_RNA()
-```
-
-![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_rRNA_by_RTP_facet_RNA_horiz-1.png)<!-- -->
-
-### Strand invasion
-
-
-```r
-ggplot(colData(ce[, ce$strand_invasion_rate < 30]) %>% data.frame, aes(TSO, strand_invasion_rate, color=RT_PRIMERS %>% factor)) +
-  geom_point() +
-  geom_smooth(method = "loess") +
-  facet_wrap(~group_horiz, scales = "fixed", nrow = 2) +
-  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
-  scale_x_log10( "TS oligonucleotide molarity (µM)"
-               , breaks = c(1.3, 5, 20, 80)) +
-  scale_y_continuous("Strand invasion rate") +
-  labs( title = "Strand invasion (% of molecule counts)"
-      , subtitle = "One outlier removed (1 pg RNA, SSIII, 1 µM RTP, > 30% strand invasion).") +
-  theme_TSO_by_RTP_facet_RNA()
-```
-
-![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_SI_rate_by_RTP_facet_RNA_no_outlier_horiz-1.png)<!-- -->
-
-### Promoter rate
-
-
-```r
-ggplot(colData(ce) %>% data.frame, aes(TSO, promoter_rate, color=RT_PRIMERS %>% factor)) +
-  geom_point() +
-  geom_smooth(method = "loess") +
-  facet_wrap(~group_horiz, scales = "fixed", nrow = 2) +
-  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
-  scale_x_log10( "TS oligonucleotide molarity (µM)"
-               , breaks = c(1.3, 5, 20, 80)) +
-  scale_y_continuous("Promoter rate (%)") +
-  labs( title = "Promoter rate"
-      , subtitle = "(% of molecule counts after SI removal)") +
-  theme_TSO_by_RTP_facet_RNA()
-```
-
-![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_promoter_rate_by_RTP_facet_RNA_horiz-1.png)<!-- -->
 
 Focus on 100 ng RNA, SSIII
 ==========================
@@ -801,7 +688,7 @@ sessionInfo()
 ## [11] LC_MEASUREMENT=en_GB.UTF-8 LC_IDENTIFICATION=C       
 ## 
 ## attached base packages:
-## [1] parallel  stats4    stats     graphics  grDevices utils     datasets 
+## [1] stats4    parallel  stats     graphics  grDevices utils     datasets 
 ## [8] methods   base     
 ## 
 ## other attached packages:
