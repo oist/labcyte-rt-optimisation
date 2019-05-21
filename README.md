@@ -49,7 +49,7 @@ MiSeq runs DOI: 10.5281/zenodo.1680999
 Experiments
 -----------
  
-### Experiment 1
+### Experiment 1 (pilot) and 2 (replicate)
  
 [Experiment one](Labcyte-RT_Data_Analysis.md): plate `A`.
 MiSeq ID: `171227_M00528_0321_000000000-B4GLP` (moderate quality, especially on read 1).
@@ -72,8 +72,6 @@ Explanation for the artefact was found later, but this experiment was not re-ana
 (superseded by Experiemnt 2 anyway).
 
 
-### Experiment 2
-
 [Experiment two](Labcyte-RT_Data_Analysis_2.md): plates: `B`, `C`, and `D`.
 MiSeq ID: `180123_M00528_0325_000000000-B4PCK` (bad quality, especially on read 1, leading to large numbers of unmapped reads). 
 MOIRAI
@@ -89,7 +87,7 @@ that highest TSO concentrations give the highest yields and lowest amounts
 of rDNA and high promoter rates.
 
 
-### Experiment 3
+### Experiment 3 and 4 (different layouts of the source plate)
 
 [Experiment three](Labcyte-RT_Data_Analysis_3merge.md)
    ([SSIII QC](Labcyte-RT_Data_Analysis_3a.md): plates `E`, `F` and `G`,
@@ -106,8 +104,6 @@ shown to be related to TSOs in source plate row B, and not related to the
 actual concentration.
 
 
-### Experiment 4
-
 [Experiment four](Labcyte-RT_Data_Analysis_4.md): plates `K` and `L`.
 MiSeq ID: `180326_M00528_0346_000000000-B4GJR`.
 MOIRAI
@@ -119,7 +115,7 @@ or contents of "row B" TSOs.  The conclusion was that the artefact was related
 to the TSO quality or barcode sequence.
 
 
-### Experiment 5
+### Experiment 5 and 6 (showing batch bias of the TSOs)
      
 [Experiment five](Labcyte-RT_Data_Analysis_5.md): plates `M` and `N`.
 MiSeq ID: `180411_M00528_0351_000000000-BN3BL`.
@@ -127,7 +123,7 @@ MOIRAI
   [QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.paired_raw_quality_control2.20180412055341/180411_M00528_0351_000000000-BN3BL.paired_raw_quality_control2.20180412055341.html),
   [Workflow](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412203518/180411_M00528_0351_000000000-BN3BL.OP-WORKFLOW-CAGEscan-short-reads-v2.1.1.20180412203518.html).
 
-A new transfer design with randomised TSO positions ([4](Labcyte-RT5.md) and
+A new transfer design with randomised TSO positions ([4](Labcyte-RT4.md) and
 [5](Labcyte-RT5.md) for two independant randomisations) showed a dramatic
 variation of reaction efficiencies, even when the only degree of freedom is the
 TSO.  Thus, the origin of the artefact is either the barcode sequence or the
@@ -137,21 +133,19 @@ From these results, normalisation factors were calculated, to correct for
 TSO-specific variations of reaction efficiency.
 
 
-### Experiment 6
-
 [Experiment six](Labcyte-RT_Data_Analysis_6.md): plates `O` and `P`.
 MiSeq ID: `180501_M00528_0359_000000000-B4PJY`.
 MOIRAI
   [QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180501_M00528_0359_000000000-B4PJY.paired_raw_quality_control2.20180502080443/180501_M00528_0359_000000000-B4PJY.paired_raw_quality_control2.20180502080443.html),
   [Workflow](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180501_M00528_0359_000000000-B4PJY.OP-WORKFLOW-CAGEscan-short-reads-v2.1.2.20180502081812/180501_M00528_0359_000000000-B4PJY.OP-WORKFLOW-CAGEscan-short-reads-v2.1.2.20180502081812.html).
 
-Same randomised transfer designs ([4](Labcyte-RT5.md) and
+Same randomised transfer designs ([4](Labcyte-RT4.md) and
 [5](Labcyte-RT5.md)), but a different batch of TSOs.  In this experiment, the
 variation of reaction efficiency is much milder, demonstrating that the problem
 was the quality of the TSOs used in the previous experiments.
 
 
-### Experiment 7
+### Experiment 7 (SSIII) and 8 (SSIV)
 
 Experiment seven
   ([Analysis](Labcyte-RT_Data_Analysis_7.md)) /
@@ -161,9 +155,6 @@ MOIRAI
   [QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180517_M00528_0364_000000000-BRGK6.paired_raw_quality_control2.20180518043259/180517_M00528_0364_000000000-BRGK6.paired_raw_quality_control2.20180518043259.html),
   [Workflow]().
 
-
-### Experiment 8
-
 Experiment eight, using the same design as exp. 7 but with SuperScript IV.
   ([Analysis](Labcyte-RT_Data_Analysis_8.md)) /
   ([QC](Labcyte-RT_Data_Analysis_8_QC.md)): plates `Q2`, `R2`, `S2` and `T2`.
@@ -172,7 +163,8 @@ MOIRAI
   [QC](http://moirai.gsc.riken.jp/osc-fs_home/scratch/moirai/nanoCAGE2/project/Labcyte/180606_M00528_0367_000000000-BN3FG.paired_raw_quality_control2.20180607095712/180606_M00528_0367_000000000-BN3FG.paired_raw_quality_control2.20180607095712.html),
   [Workflow]().
 
-### Experiment 8
+
+### Experiment 9 (failed)
 
 Experiment nine, testing dNTP and divalent ion concentration using [transfer
 design 7](Labcyte-RT7.md).
