@@ -43,7 +43,8 @@ Concentration checks
 Data
 ----
 
-MiSeq runs DOI: 10.5281/zenodo.1680999
+ - nanoCAGE sequence data: [Zenodo 1680999](https://doi.org/10.5281/zenodo.1680999)
+ - nanoCAGE sequence alignments: [Zenodo 1683162](https://doi.org/10.5281/zenodo.1683162)
 
 
 Experiments
