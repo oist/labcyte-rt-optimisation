@@ -1,0 +1,49 @@
+Delivered-To: koishikawa@riken.jp
+Return-Path: plessy@riken.jp
+Received: from postman.riken.jp (localhost.localdomain [127.0.0.1])
+	by postman.riken.jp (Postfix) with SMTP id B649B3BC2C0;
+	Fri, 18 May 2018 14:14:14 +0900 (JST)
+Received: from [10.64.132.191] (ipm03.gsc.riken.go.jp [134.160.83.73])
+	by postman.riken.jp (Postfix) with ESMTPA id 3CB3A3BC2BD;
+	Fri, 18 May 2018 14:14:14 +0900 (JST)
+To: Sachi Kato <koishikawa@riken.jp>,
+ =?UTF-8?Q?St=c3=a9phane_Poulain?= <stephane.poulain@riken.jp>
+From: Charles Plessy <plessy@riken.jp>
+Subject: Labcyte plan change: SSIV on Monday, dNTPs on Thusday.
+Message-ID: <9c2fe64e-1ca4-3b91-e3ff-2f3f4945a223@riken.jp>
+Date: Fri, 18 May 2018 14:14:14 +0900
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.4.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-PMX-Version: 6.3.3.2656215, Antispam-Engine: 2.7.2.2107409, Antispam-Data: 2018.5.18.50316, AntiVirus-Engine: 5.49.1, AntiVirus-Data: 2018.4.16.5491003
+Content-Transfer-Encoding: quoted-printable
+
+Dear Kato-san and St=C3=A9phane,
+
+thank you for your feedback yesterday.
+
+As you know, the processing of the current experiment will not be=20
+finished today, since we have more reads (9 millions) and more libraries=20
+(1,536).
+
+Also, for the study of dNTP and Mg concentration, we need to prepare a=20
+buffer without magnesium, and I also would like to add Mn2+.
+
+Therefore, it is hard to finish the planning of this experiment by Monday=
+.
+
+I propose that next Monday we do the TSO/RT check with SuperScript IV=20
+following exactly the same plan as for SSIII, and then on Thursday we=20
+will do the dNTP/Mg/Mn experiment.
+
+Other tests of trehalose and betain concentration, temperature checks,=20
+etc are not essential.  Either we will not do them, or if you like we=20
+can try to squeeze them on Friday (and freeze the RT products; I think=20
+that it would not be a problem).
+
+Cheers,
+
+--=20
+Charles
