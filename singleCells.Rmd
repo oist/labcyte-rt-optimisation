@@ -1,0 +1,354 @@
+---
+title: "Comparison of SuperScript III and IV"
+output: 
+  html_document: 
+    keep_md: yes
+    number_sections: yes
+    toc: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r echo=FALSE}
+knitr::opts_chunk$set(cache  = TRUE)
+knitr::opts_knit$set(verbose = TRUE)
+ggplot2::theme_set(ggplot2::theme_bw())
+```
+
+Data load and QC in R
+=====================
+
+```{r load_R_libraries, message=F}
+library(AnnotationHub)
+BS_GENOME    <- "BSgenome.Hsapiens.plusHPV.hg38" 
+library(BS_GENOME, character.only = T)
+library(CAGEr)
+library(data.table)
+library(ggplot2)
+library(magrittr)
+library(plyr)
+library(MultiAssayExperiment)
+library(SummarizedExperiment)
+library(reshape)
+library(vegan)
+```
+
+MOIRAI shortcuts
+
+```{r moirai_shortcuts}
+MOIRAI_BASE    <- file.path("..")
+MOIRAI_RESULTS <- file.path(MOIRAI_BASE, "NC33.OP-WORKFLOW-CAGEscan-short-reads-v2.0.20170119161243")
+```
+
+Load CAGE libraries
+===================
+
+Load summary statistics from MOIRAI and polish the names.
+---------------------------------------------------------
+
+### NC 33
+
+```{r NC33_MOIRAI}
+libs_NC33 <- smallCAGEqc::loadMoiraiStats(
+  pipeline  = "OP-WORKFLOW-CAGEscan-short-reads-v2.0",
+  multiplex = file.path( "../multiplex_files/NC33.multiplex.txt"),
+  summary   = file.path( "../NC33.OP-WORKFLOW-CAGEscan-short-reads-v2.0.20170119161243/text/summary.txt"))
+
+libs_NC33$group  <- sub("SSC3",     "SSC III", libs_NC33$group)
+libs_NC33$group  <- sub("cont3", "NC SSC III", libs_NC33$group)
+libs_NC33$group  <- sub("SSC4",      "SSC IV", libs_NC33$group)
+libs_NC33$group  <- sub("cont4",  "NC SSC IV", libs_NC33$group)
+libs_NC33$group2 <- libs_NC33$group
+libs_NC33$group  <- paste(libs_NC33$group, "rep1")
+```
+
+Discard samples that did not yield molecules, and add file paths and sample labels
+
+```{r NC33_CAGEscan_fragments}
+MOIRAI_FRAGS_NC33 <-
+ file.path( "../NC33.OP-WORKFLOW-CAGEscan-short-reads-v2.0.20170119161243/CAGEscan_fragments") %>%
+    list.files(full.names = TRUE)
+
+names(MOIRAI_FRAGS_NC33) <- sub(".bed", "", basename(MOIRAI_FRAGS_NC33))
+
+libs_NC33 <- libs_NC33[names(MOIRAI_FRAGS_NC33), ]
+libs_NC33$sampleLabels   <- names(MOIRAI_FRAGS_NC33)
+libs_NC33$inputFiles     <- MOIRAI_FRAGS_NC33
+libs_NC33$inputFilesType <- "bed"
+
+rm(MOIRAI_FRAGS_NC33)
+```
+
+### NC37
+
+```{r NC37_MOIRAI}
+libs_NC37 <- smallCAGEqc::loadMoiraiStats(
+  pipeline  = "OP-WORKFLOW-CAGEscan-short-reads-v2.0",
+  multiplex = file.path( "../multiplex_files/NC37.multiplex.txt"),
+  summary   = file.path( "../NC37.OP-WORKFLOW-CAGEscan-short-reads-v2.0.20170119161306/text/summary.txt"))
+
+libs_NC37$group  <- sub("SSC3",     "SSC III", libs_NC37$group)
+libs_NC37$group  <- sub("cont3", "NC SSC III", libs_NC37$group)
+libs_NC37$group  <- sub("SSC4",      "SSC IV", libs_NC37$group)
+libs_NC37$group  <- sub("cont4",  "NC SSC IV", libs_NC37$group)
+libs_NC37$group2 <- libs_NC37$group
+libs_NC37$group  <- paste(libs_NC37$group, "rep2")
+```
+
+Discard samples that did not yield molecules, and add file paths and sample labels
+
+```{r NC37_CAGEscan_fragments}
+MOIRAI_FRAGS_NC37 <-
+ file.path( "../NC37.OP-WORKFLOW-CAGEscan-short-reads-v2.0.20170119161306/CAGEscan_fragments") %>%
+    list.files(full.names = TRUE)
+
+names(MOIRAI_FRAGS_NC37) <- sub(".bed", "", basename(MOIRAI_FRAGS_NC37))
+
+libs_NC37 <- libs_NC37[names(MOIRAI_FRAGS_NC37), ]
+libs_NC37$sampleLabels   <- names(MOIRAI_FRAGS_NC37)
+libs_NC37$inputFiles     <- MOIRAI_FRAGS_NC37
+libs_NC37$inputFilesType <- "bed"
+
+rm(MOIRAI_FRAGS_NC37)
+```
+
+### Merge
+
+```{r merge_libs_tables}
+libs <- rbind(libs_NC33, libs_NC37)
+rm(libs_NC33, libs_NC37)
+```
+
+### Remove empty files
+
+```{r removeEmptyFiles}
+libs <- libs[file.info(libs$inputFiles)$size > 0,]
+```
+
+### Create a CAGEexp object and load expression data.
+
+```{r new_CAGEexp, message = FALSE}
+myCAGEexp <- new( "CAGEexp"
+                , colData = DataFrame(libs)
+                , metadata = list( genomeName = BS_GENOME
+                                 , inputFilesType = "bed"))
+
+myCAGEexp$group <- factor(myCAGEexp$group, levels=c("NC SSC III rep1",
+  "NC SSC IV rep1", "NC SSC III rep2", "NC SSC IV rep2", 
+  "SSC III rep1", "SSC IV rep1",  "SSC III rep2", "SSC IV rep2"))
+
+rm(libs)
+getCTSS(myCAGEexp)
+```
+
+CTSS analysis
+=============
+
+```{r save-ctss}
+# Delete me later ?
+ctss <- CTSStagCount(myCAGEexp)
+write.table(ctss, 'ctss.txt', sep="\t", quote=FALSE)
+rm(ctss)
+```
+
+```{r ctss-analysis}
+myCAGEexp$counts <- myCAGEexp$librarySizes  # Needed for backward compatibility with smallCAGEqc.
+myCAGEexp$l1     <- colSums(CTSStagCountDf(myCAGEexp) > 0)
+```
+
+Annotation with GENCODE
+-----------------------
+
+```{r get-annotation}
+# ah <- AnnotationHub()
+# query(ah, c("Gencode", "gff", "human"))
+# gff <- ah[["AH49556"]]
+# EBI's FTP server borken today
+gff <- rtracklayer::import.gff("Homo_sapiens.GRCh38.97.gtf.gz")
+seqlevels(gff) <- paste0("chr", seqlevels(gff))
+```
+
+Annotate the genomic ranges of the `tagCountMatrix` SummarizedExperiment.
+
+```{r annotate-CAGEexp}
+annotateCTSS(myCAGEexp, gff)
+CTSStoGenes(myCAGEexp)
+```
+
+
+Create of a SummarizedExperiemnt for gene expression level.
+
+```{r}
+myCAGEexp$genes <- colSums(assay(GeneExpSE(myCAGEexp)) %>% as.data.frame > 0)
+#myCAGEexp$geneSymbols <- countSymbols(assay(GeneExpSE(myCAGEexp)) %>% as.data.frame)
+```
+
+Richness
+--------
+
+```{r calculate-richness}
+myCAGEexp$r100l1 <- rarefy(t(CTSStagCountDf(myCAGEexp) %>% as.matrix),100)
+myCAGEexp$r100l1[myCAGEexp$counts < 100] <- NA
+```
+
+
+Analysis
+=========
+
+## Gene counts and TSS discovery
+
+
+```{r}
+write.table(colData(myCAGEexp) %>% as.data.frame, 'libs.txt', sep="\t", quote=FALSE)
+write.table(assay(GeneExpSE(myCAGEexp)), 'genes.txt', sep="\t", quote=FALSE)
+```
+
+### Removing cells with less than 100 counts
+
+```{r}
+myCAGEexp$QCed <- myCAGEexp$counts >= 100
+```
+
+### Number of reads/single cells
+
+```{r}
+with(colData(myCAGEexp)[myCAGEexp$QCed,],
+  data.frame( mean = tapply(extracted, group, mean)
+            ,   sd = tapply(extracted, group, sd)
+            ,    n = tapply(extracted, group, length)))
+```
+
+Produce libs table without negative controls to draw cleaner hanabiPlot
+
+```{r}
+myCAGEexp$keep <- (! grepl("^NC", myCAGEexp$group)) & myCAGEexp$QCed
+CE <- myCAGEexp[, myCAGEexp$keep]
+CD <- droplevels(colData(CE))
+colData(CE) <- CD
+```
+
+```{r extracted, dev=c('png', 'svg')}
+boxplot(extracted ~ group2, ylab = "Extracted reads", data = CD)
+```
+
+```{r extracted_byrep, dev=c('png', 'svg')}
+boxplot(extracted ~ group, ylab = "Extracted reads", data = CD)
+```
+
+
+### Graph
+
+```{r, message = FALSE}
+library(ggplot2)
+```
+
+#### Gene count
+
+```{r gene-count2, dev=c('png', 'svg'), fig.height=2.5}
+dotsize <- 30
+ggplot(CD %>% data.frame, aes(x=group2, y=genes)) +
+  stat_summary(fun.y=mean, fun.ymin=mean, fun.ymax=mean, geom="crossbar", color="gray") +
+  geom_dotplot(aes(fill=group), binaxis='y', binwidth=1, dotsize=dotsize, stackdir='center') + theme_bw() +
+  xlab("Enzyme") +
+  coord_flip()
+```
+
+```{r gene-count, dev=c('png', 'svg'), fig.height=2.5}
+dotsize <- 30
+ggplot(CD %>% data.frame, aes(x=group, y=genes)) +
+  stat_summary(fun.y=mean, fun.ymin=mean, fun.ymax=mean, geom="crossbar", color="gray") +
+  geom_dotplot(aes(fill=group), binaxis='y', binwidth=1, dotsize=dotsize, stackdir='center') + theme_bw() +
+  coord_flip()
+```
+
+#### Transcripts counts
+
+```{r transcripts-count2, dev=c('png', 'svg'), fig.height=2.5}
+dotsize <- 120
+ggplot(CD %>% data.frame, aes(x=group2, y=counts)) +
+  stat_summary(fun.y=mean, fun.ymin=mean, fun.ymax=mean, geom="crossbar", color="gray") +
+  geom_dotplot(aes(fill=group), binaxis='y', binwidth=1, dotsize=dotsize, stackdir='center') + theme_bw() +
+  xlab("Enzyme") +
+  coord_flip()
+```
+
+```{r transcripts-count, dev=c('png', 'svg'), fig.height=2.5}
+dotsize <- 120
+ggplot(CD %>% data.frame, aes(x=group, y=counts)) +
+  stat_summary(fun.y=mean, fun.ymin=mean, fun.ymax=mean, geom="crossbar", color="gray") +
+  geom_dotplot(aes(fill=group), binaxis='y', binwidth=1, dotsize=dotsize, stackdir='center') + theme_bw() +
+  xlab("Enzyme") +
+  coord_flip()
+```
+
+### PlotAnnot
+
+```{r plotAnnot, dev=c('png', 'svg'), fig.height=2.5}
+plotAnnot(CE, scope="counts", group="group")
+plotAnnot(CE, scope="counts", group="group2")
+plotAnnot(CE, scope="qc", group="group")
+plotAnnot(CE, scope="qc", group="group2")
+```
+
+### Rarefaction
+
+Raw reads per molecule (BED12 data)
+-----------------------------------
+
+```{r load_fragments}
+bed <- sapply(inputFiles(myCAGEexp), rtracklayer::import.bed)
+names(bed) <- sampleLabels(myCAGEexp)
+bed <- bed[myCAGEexp$keep]
+```
+
+```{r, message=FALSE}
+library(vegan)
+# If applicable, restore the previous computation with the command below:
+# load("rar.Rda")
+
+# Rarefy at with enough sampling points to give a smooth appearance to
+# the curves.  It can take time !
+
+rar1 <- hanabi(CTSStagCountDF(CE), from = 0)
+rarg <- hanabi(assay(GeneExpSE(CE)) %>% as.data.frame, from = 0)
+rarU <- hanabi(bed, from = 0)
+
+# Save the result on the hard drive.  This way, if the commands have
+#been run
+# through knitr, the long computations here can be skipped if needed
+#again in
+# an interactive session.
+save(rar1, rarg, rarU, file="rar.Rda") 
+```
+
+### Graphs
+
+#### Plot TSS discovery
+
+```{r hanabi-TSS, dev=c('png', 'svg')}
+hanabiPlot(rar1, ylab='number of TSS detected', xlab='number of unique molecule counts', main=paste("TSS discovery"), group=CD$group2)
+```
+
+```{r hanabi-TSS_byrep, dev=c('png', 'svg')}
+hanabiPlot(rar1, ylab='number of TSS detected', xlab='number of unique molecule counts', main=paste("TSS discovery"), group=CD$group)
+```
+
+#### Plot Gene discovery
+
+```{r hanabi-gene, dev=c('png', 'svg')}
+hanabiPlot(rarg, ylab='number of genes detected', xlab='number of unique molecule counts', main=paste("Gene discovery"), group=CD$group2)
+```
+
+```{r hanabi-gene_byrep, dev=c('png', 'svg')}
+hanabiPlot(rarg, ylab='number of genes detected', xlab='number of unique molecule counts', main=paste("Gene discovery"), group=CD$group)
+```
+
+#### Plot Molecule discovery (with raw reads)
+
+````{r hanabi-UMI, dev=c('png', 'svg')}
+hanabiPlot(rarU, ylab='number of molecules detected', xlab='number of properly mapped reads', main=paste("Transcript discovery "), group=CD$group2)
+```
+
+````{r hanabi-UMI2, dev=c('png', 'svg')}
+hanabiPlot(rarU, ylab='number of molecules detected', xlab='number of properly mapped reads', main=paste("Transcript discovery"), group=CD$group, legend.pos = "topright")
+```
