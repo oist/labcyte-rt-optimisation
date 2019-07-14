@@ -300,8 +300,8 @@ ggplot(CD %>% data.frame, aes(x=group, y=counts)) +
 ```{r plotAnnot, dev=c('png', 'svg'), fig.height=2.5}
 plotAnnot(CE, scope="counts", group="group")
 plotAnnot(CE, scope="counts", group="group2")
-plotAnnot(CE, scope="qc", group="group")
-plotAnnot(CE, scope="qc", group="group2")
+plotAnnot(CE, scope="qc", group="group") + scale_fill_brewer(palette = "Set2")
+plotAnnot(CE, scope="qc", group="group2")+ scale_fill_brewer(palette = "Set2")
 ```
 
 ### Rarefaction
