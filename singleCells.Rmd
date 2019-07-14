@@ -134,7 +134,7 @@ libs_all <- rbind(libs_all, libs)
 
 ### NC39
 
-```{r NC38_MOIRAI}
+```{r NC39_MOIRAI}
 libs <- smallCAGEqc::loadMoiraiStats(
   pipeline  = "OP-WORKFLOW-CAGEscan-short-reads-v2.0",
   multiplex = file.path( "multiplex_files/NC39.multiplex.txt"),
