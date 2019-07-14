@@ -176,11 +176,6 @@ myCAGEexp <- new( "CAGEexp"
                 , colData = DataFrame(libs)
                 , metadata = list( genomeName = BS_GENOME
                                  , inputFilesType = "bed"))
-
-myCAGEexp$group <- factor(myCAGEexp$group, levels=c("NC SSC III rep1",
-  "NC SSC IV rep1", "NC SSC III rep2", "NC SSC IV rep2", 
-  "SSC III rep1", "SSC IV rep1",  "SSC III rep2", "SSC IV rep2"))
-
 rm(libs)
 getCTSS(myCAGEexp)
 ```
@@ -188,15 +183,7 @@ getCTSS(myCAGEexp)
 CTSS analysis
 =============
 
-```{r save-ctss}
-# Delete me later ?
-ctss <- CTSStagCount(myCAGEexp)
-write.table(ctss, 'ctss.txt', sep="\t", quote=FALSE)
-rm(ctss)
-```
-
 ```{r ctss-analysis}
-myCAGEexp$counts <- myCAGEexp$librarySizes  # Needed for backward compatibility with smallCAGEqc.
 myCAGEexp$l1     <- colSums(CTSStagCountDf(myCAGEexp) > 0)
 ```
 
@@ -207,7 +194,8 @@ Annotation with GENCODE
 # ah <- AnnotationHub()
 # query(ah, c("Gencode", "gff", "human"))
 # gff <- ah[["AH49556"]]
-# EBI's FTP server borken today
+# EBI's FTP server borken today, let's use ENSEMBL instead
+# ftp://ftp.ensembl.org/pub/release-97/gtf/homo_sapiens/Homo_sapiens.GRCh38.97.gtf.gz
 gff <- rtracklayer::import.gff("Homo_sapiens.GRCh38.97.gtf.gz")
 seqlevels(gff) <- paste0("chr", seqlevels(gff))
 ```
@@ -239,14 +227,6 @@ myCAGEexp$r100l1[myCAGEexp$counts < 100] <- NA
 Analysis
 =========
 
-## Gene counts and TSS discovery
-
-
-```{r}
-write.table(colData(myCAGEexp) %>% as.data.frame, 'libs.txt', sep="\t", quote=FALSE)
-write.table(assay(GeneExpSE(myCAGEexp)), 'genes.txt', sep="\t", quote=FALSE)
-```
-
 ### Removing cells with less than 100 counts
 
 ```{r}
@@ -262,29 +242,19 @@ with(colData(myCAGEexp)[myCAGEexp$QCed,],
             ,    n = tapply(extracted, group, length)))
 ```
 
-Produce libs table without negative controls to draw cleaner hanabiPlot
+Produce libs table without negative controls to draw cleaner hanabiPlot.
+
+Also removed fixed cells as they are not relevant in this analysis.
 
 ```{r}
-myCAGEexp$keep <- (! grepl("^NC", myCAGEexp$group)) & myCAGEexp$QCed
+myCAGEexp$keep <- (! grepl("^NC", myCAGEexp$group)) & (! grepl("fixed", myCAGEexp$group)) & myCAGEexp$QCed
 CE <- myCAGEexp[, myCAGEexp$keep]
 CD <- droplevels(colData(CE))
 colData(CE) <- CD
 ```
 
-```{r extracted, dev=c('png', 'svg')}
-boxplot(extracted ~ group2, ylab = "Extracted reads", data = CD)
-```
-
-```{r extracted_byrep, dev=c('png', 'svg')}
-boxplot(extracted ~ group, ylab = "Extracted reads", data = CD)
-```
-
 
 ### Graph
-
-```{r, message = FALSE}
-library(ggplot2)
-```
 
 #### Gene count
 
@@ -389,10 +359,17 @@ hanabiPlot(rarg, ylab='number of genes detected', xlab='number of unique molecul
 
 #### Plot Molecule discovery (with raw reads)
 
-````{r hanabi-UMI, dev=c('png', 'svg')}
+```{r hanabi-UMI, dev=c('png', 'svg')}
 hanabiPlot(rarU, ylab='number of molecules detected', xlab='number of properly mapped reads', main=paste("Transcript discovery "), group=CD$group2)
 ```
 
-````{r hanabi-UMI2, dev=c('png', 'svg')}
+```{r hanabi-UMI2, dev=c('png', 'svg')}
 hanabiPlot(rarU, ylab='number of molecules detected', xlab='number of properly mapped reads', main=paste("Transcript discovery"), group=CD$group, legend.pos = "topright")
+```
+
+#### Richness
+
+```{r richness, dev=c('png', 'svg')}
+qplot(data = CD %>% as.data.frame, group, r100l1, geom = c("boxplot", "jitter"))
+qplot(data = CD %>% as.data.frame, group2, r100l1, geom = c("boxplot", "jitter"))
 ```
