@@ -177,6 +177,14 @@ MOIRAI
   [Workflow]().
 
 
+### Single cells
+
+Our results match well with a collection of [experiments on single
+cells](singleCells.md) that we performed earlier.  The raw data is available on
+Zenodo (<http://doi.org/10.5281/zenodo.250156>).  The alignments will be
+uploaded soon.
+
+
 Xmas project
 ------------
 
