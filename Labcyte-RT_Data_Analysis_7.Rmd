@@ -8,6 +8,8 @@ output:
     toc: yes
     pandoc_args:
      - "--lua-filter=links-to-markdown.lua"
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r echo = FALSE}
@@ -183,6 +185,23 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, rRNA_rate, color=RT_PRIMERS %>% fact
   scale_y_continuous("rRNA (% of non-tagdust extracted reads)") +
   ggtitle("TSO molarity stronlgy modulates rRNA amounts.") +
   theme_TSO_by_RTP_facet_RNA()
+```
+
+
+```{r rRNA_contour, fig.height=7, fig.width=7}
+y <- colData(ce)[,c("TSO","RT_PRIMERS", "rRNA_rate")]
+z <- aggregate(y$rRNA_rate, by=list(TSO=y$TSO, RTP=y$RT_PRIMERS), median)
+ggplot(z, aes(TSO, RTP, z=x)) + geom_contour(aes(colour=stat(level))) + scale_x_log10() + scale_y_log10() + geom_point(aes(colour=stat(z)))
+
+ggplot(z, aes(TSO, RTP, z=x)) + geom_contour(aes(colour=stat(level))) + scale_x_log10() + scale_y_log10()
+
+y <- colData(ce)[,c("TSO","RT_PRIMERS", "rRNA_rate", "RNA_factor")]
+z <- aggregate(y$rRNA_rate, by=list(TSO=y$TSO, RTP=y$RT_PRIMERS, RNA=y$RNA_factor), median)
+
+ggplot(z, aes(TSO, RTP, z=x)) + geom_contour(aes(colour=stat(level))) + scale_x_log10() + scale_y_log10() + geom_point(aes(colour=stat(z))) + facet_wrap(~RNA)
+
+
+ggplot(colData(ce) %>% data.frame, aes(TSO, RT_PRIMERS, z=rRNA_rate))  + geom_point(aes(colour=stat(z))) + scale_x_log10() + scale_y_log10() + facet_wrap(~RNA) + geom_contour(aes(colour=stat(level)))
 ```
 
 
