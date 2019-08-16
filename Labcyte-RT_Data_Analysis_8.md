@@ -81,11 +81,6 @@ if(file.exists("Labcyte-RT_Data_Analysis_7+8.Rds")) {
 }
 ```
 
-```
-## Warning in S4Vectors:::set_unlisted_names(unlisted_x, x): failed to set
-## names on the unlisted CompressedGRangesList object
-```
-
 
 Remove negative controls
 ========================
@@ -160,6 +155,33 @@ ce$strand_invasion_rate <- ce$strandInvaders / (ce$counts + ce$strandInvaders) *
 ce$promoter_rate <- ce$promoter / (ce$counts) * 100
 ```
 
+#### Richness
+
+
+```r
+CTSStoGenes(ce)
+ce$r10g <- vegan::rarefy(t(assay(GeneExpSE(ce))), 10)
+```
+
+```
+## Warning in vegan::rarefy(t(assay(GeneExpSE(ce))), 10): requested 'sample'
+## was larger than smallest site maximum (0)
+```
+
+```r
+ce$r10g[ce$counts < 10] <- NA
+ce$r100g <- vegan::rarefy(t(assay(ce[["geneExpMatrix"]])),100)
+```
+
+```
+## Warning in vegan::rarefy(t(assay(ce[["geneExpMatrix"]])), 100): requested
+## 'sample' was larger than smallest site maximum (0)
+```
+
+```r
+ce$r100g[ce$counts < 100] <- NA 
+```
+
 #### Yield
 
 Because we multiplexed reactions together, the ones with the highest yield
@@ -209,8 +231,15 @@ ce$libSizeNormBylib <-
 
 
 ```r
-z <- aggregate(colData(ce)[,c("TD_rate", "rRNA_rate", "libSizeNormBylib", "mapping_rate", "strand_invasion_rate", "promoter_rate")], by=list(TSO=ce$TSO, RTP=ce$RT_PRIMERS, group=ce$group), median) %>% as.data.frame()
+z <- aggregate(colData(ce)[,c("TD_rate", "rRNA_rate", "libSizeNormBylib", "mapping_rate", "strand_invasion_rate", "promoter_rate", "r10g", "r100g")], by=list(TSO=ce$TSO, RTP=ce$RT_PRIMERS, group=ce$group), median) %>% as.data.frame()
 z$group.lattice <- factor(z$group, levels=levels(ce$group.lattice))
+
+zm <- aggregate(colData(ce)[,c("TD_rate", "rRNA_rate", "libSizeNormBylib", "mapping_rate", "strand_invasion_rate", "promoter_rate", "r10g", "r100g")], by=list(TSO=ce$TSO, RTP=ce$RT_PRIMERS, group=ce$group), function(x) mad(x) / median(x)) %>% as.data.frame()
+zm$group.lattice <- factor(z$group, levels=levels(ce$group.lattice))
+
+zm$avg <- rowMeans(cbind(zm$TD_rate, zm$rRNA_rate, zm$mapping_rate, zm$strand_invasion_rate, zm$promoter_rate))
+
+# Calculated mads to survey variability but the plots are uninspiring.
 
 asp <- diff(range(log(z$RTP))) / diff(range(log(z$TSO))) # for lattice::contourplot
 ```
@@ -561,6 +590,14 @@ higherIsBetter(z, z$promoter_rate, "Promoter rate (%)")
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/promRate_countour-1.png)<!-- -->
 
+
+```r
+zz <- z[z$group.lattice == "10 ng RNA, SSIII",]
+higherIsBetter(zz, zz$promoter_rate, "Promoter rate (%)")
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/promRate_countour_just1panel-1.png)<!-- -->
+
 ## Richness (on genes)
 
 Using a free plotting scale as richness reaches extremely low values at 1 pg RNA.
@@ -574,28 +611,43 @@ Richness is higher when RT primer molarity is higher.
 
 
 ```r
-# CTSStoGenes(ce)
-# ce$r10g <- vegan::rarefy(t(assay(ce[["geneExpMatrix"]])),10)
-# ce$r10g[ce$counts < 10] <- NA
-# ce$r100g <- vegan::rarefy(t(assay(ce[["geneExpMatrix"]])),100)
-# ce$r100g[ce$counts < 100] <- NA 
+ggplot(colData(ce) %>% data.frame, aes(TSO, r10g, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth(method = "loess") +
+  facet_wrap(~group, scales = "free", ncol = 2) +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10, 40, 160)) +
+  scale_y_continuous("Gene richness (on a scale of 10)") +
+  labs( title = "Richness on a scale of 10"
+      , caption = stringr::str_wrap("Higher RT primer concentration give higher richness.")) +
+  theme_TSO_by_RTP_facet_RNA()
 ```
+
+```
+## Warning: Removed 62 rows containing non-finite values (stat_smooth).
+```
+
+```
+## Warning: Removed 62 rows containing missing values (geom_point).
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_richness10_by_RTP_facet_RNA-1.png)<!-- -->
 
 
 ```r
-# ggplot(colData(ce) %>% data.frame, aes(TSO, r10g, color=RT_PRIMERS %>% factor)) +
-#   geom_point() +
-#   geom_smooth(method = "loess") +
-#   facet_wrap(~group, scales = "free", ncol = 2) +
-#   scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
-#   scale_x_log10( "TS oligonucleotide molarity (µM)"
-#                , breaks = c(0.6, 2.5, 10, 40, 160)) +
-#   scale_y_continuous("Gene richness (on a scale of 10)") +
-#   labs( title = "Richness on a scale of 10"
-#       , caption = stringr::str_wrap("Higher RT primer concentration give higher richness.")) +
-#   theme_TSO_by_RTP_facet_RNA()
+higherIsBetter(z, z$r10g, "Richness (on a scale of 10)")
 ```
 
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/richness10_contour-1.png)<!-- -->
+
+```r
+z2 <- z
+z2[z2$TSO == 5 & z2$RTP == 4 & z2$group == "1 pg RNA, SSIII", "r10g"] <- NA
+higherIsBetter(z2, z2$r10g, "Richness (on a scale of 10)")
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/richness10_contour-2.png)<!-- -->
 
 ### Richness scale of 100
 
@@ -604,32 +656,27 @@ RNA amounts.
 
 
 ```r
-# ggplot(colData(ce) %>% data.frame, aes(TSO, r100g, color=RT_PRIMERS %>% factor)) +
-#   geom_point() +
-#   geom_smooth(method = "loess") +
-#   facet_wrap(~group, scales = "free", ncol = 2) +
-#   scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
-#   scale_x_log10( "TSO molarity (µM)"
-#                , breaks = c(0.6, 2.5, 10, 40, 160)) +
-#   scale_y_continuous("Gene richness (on a scale of 100)") +
-#   labs( title = "Richness on a scale of 100"
-#       , caption = stringr::str_wrap("Higher RT primer concentration give higher richness.")) +
-#   theme_TSO_by_RTP_facet_RNA()
+ggplot(colData(ce) %>% data.frame, aes(TSO, r100g, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth(method = "loess") +
+  facet_wrap(~group, scales = "free", ncol = 2) +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TSO molarity (µM)"
+               , breaks = c(0.6, 2.5, 10, 40, 160)) +
+  scale_y_continuous("Gene richness (on a scale of 100)") +
+  labs( title = "Richness on a scale of 100"
+      , caption = stringr::str_wrap("Higher RT primer concentration give higher richness.")) +
+  theme_TSO_by_RTP_facet_RNA()
 ```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_richness100_by_RTP_facet_RNA-1.png)<!-- -->
 
 
 ```r
-# ggplot(colData(ce) %>% data.frame, aes(RT_PRIMERS, r100g, color=RNA %>% factor)) +
-#   geom_point() +
-#   geom_smooth(method = "loess") +
-#   facet_wrap(~enzyme, scales = "fixed", ncol = 2) +
-#   scale_color_brewer(name = "RNA (pg)", palette = "YlGnBu") +
-#   scale_x_log10( "RT primer molarity (µM)"
-#                , breaks = ce$RT_PRIMERS %>% unique %>% sort) +
-#   scale_y_continuous("Gene richness (on a scale of 100)") +
-#   ggtitle("Higher [RTP] give higher richness.") +
-#   theme_RTP_by_RNA_facet_RNA()
+higherIsBetter(z, z$r100g, "Richness (on a scale of 100)")
 ```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/richness100_contour-1.png)<!-- -->
 
 
 Focus on 100 ng RNA, SSIII
@@ -647,8 +694,10 @@ summaryPlot <- function(group) {
   p4 <- higherIsBetter(z[z$group == group,], z$mapping_rate[z$group == group], "Mapping rate (%)", cuts = 5)
     
   p5 <- higherIsBetter(z[z$group == group,], z$promoter_rate[z$group == group], "Promoter rate (%)", cuts = 5)
+  
+  p6 <- higherIsBetter(z[z$group == group,], z$r100g[z$group == group], "Richness (scale 100)", cuts = 5)
     
-  gridExtra::grid.arrange(p1, p2, p3, p4, p5, ncol = 2)
+  gridExtra::grid.arrange(p1, p2, p3, p4, p5, p6, ncol = 2)
 }
 summaryPlot("100 ng RNA, SSIII")
 ```
@@ -688,7 +737,7 @@ sessionInfo()
 ## [11] LC_MEASUREMENT=en_GB.UTF-8 LC_IDENTIFICATION=C       
 ## 
 ## attached base packages:
-## [1] stats4    parallel  stats     graphics  grDevices utils     datasets 
+## [1] parallel  stats4    stats     graphics  grDevices utils     datasets 
 ## [8] methods   base     
 ## 
 ## other attached packages:
