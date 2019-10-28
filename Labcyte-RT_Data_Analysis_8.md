@@ -239,6 +239,29 @@ zm$group.lattice <- factor(z$group, levels=levels(ce$group.lattice))
 
 zm$avg <- rowMeans(cbind(zm$TD_rate, zm$rRNA_rate, zm$mapping_rate, zm$strand_invasion_rate, zm$promoter_rate))
 
+all_MAD_over_mean <- c(zm$TD_rate, zm$rRNA_rate, zm$libSizeNormBylib, zm$mapping_rate, zm$strand_invasion_rate, zm$promoter_rate, zm$r10g)
+mean(all_MAD_over_mean, na.rm=TRUE)
+```
+
+```
+## [1] 0.180389
+```
+
+```r
+median(all_MAD_over_mean, na.rm=TRUE)
+```
+
+```
+## [1] 0.1144263
+```
+
+```r
+hist(all_MAD_over_mean)
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/aggregateTable-1.png)<!-- -->
+
+```r
 # Calculated mads to survey variability but the plots are uninspiring.
 
 asp <- diff(range(log(z$RTP))) / diff(range(log(z$TSO))) # for lattice::contourplot
@@ -307,6 +330,22 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, TD_rate, color=RT_PRIMERS %>% factor
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_tagDust_by_RTP_facet_RNA-1.png)<!-- -->
 
+
+```r
+ggplot(colData(ce) %>% data.frame, aes(TSO, TD_rate, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth(method = "loess") +
+  facet_wrap(~group+RT_PRIMERS, scales = "fixed", ncol = 6) +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10.0, 40.0, 160.0)) +
+  scale_y_continuous("Tag dust (MAD/median of extracted reads)") +
+  labs( title = "Amount of oligonucleotide artefacts") +
+  theme_TSO_by_RTP_facet_RNA()
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_tagDust_by_RTP_facet_RNA_var-1.png)<!-- -->
+
 Sub panel at 10,000 pg is noisy because replicate `CGAGGCTG` is an outlier with
 a large amount of artefacts.  Here is the same figure with that library removed.
 
@@ -337,6 +376,13 @@ lowerIsBetter(z, z$TD_rate, "Amount of oligonucleotide artefacts (%)")
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/TagDust_countour-1.png)<!-- -->
 
+
+```r
+lowerIsBetter(zm, zm$TD_rate, "Amount of oligonucleotide artefacts (MAD/median)")
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/TagDust_countour_var-1.png)<!-- -->
+
 ## Ribosomal RNA
 
  - RT primers molarity increases rRNA rate.
@@ -361,6 +407,22 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, rRNA_rate, color=RT_PRIMERS %>% fact
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_rRNA_by_RTP_facet_RNA-1.png)<!-- -->
 
+
+```r
+ggplot(colData(ce) %>% data.frame, aes(TSO, rRNA_rate, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth(method = "loess") +
+  facet_wrap(~group+RT_PRIMERS, scales = "fixed", ncol = 6) +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10, 40, 160)) +
+  scale_y_continuous("rRNA (% of non-tagdust extracted reads)") +
+  labs( title = "Fraction of reads aligning to rRNA sequences.") +
+  theme_TSO_by_RTP_facet_RNA()
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_rRNA_by_RTP_facet_RNA_var-1.png)<!-- -->
+
 ### Contour plot
 
 
@@ -369,6 +431,13 @@ lowerIsBetter(z, z$rRNA_rate, "Amount of ribosomal RNA sequences (%)")
 ```
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/rRNA_countour-1.png)<!-- -->
+
+
+```r
+lowerIsBetter(zm, zm$rRNA_rate, "Amount of ribosomal RNA sequences (MAD/median)")
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/rRNA_countour_var-1.png)<!-- -->
 
 
 ## Yield
@@ -395,6 +464,7 @@ ggplot(colData(ce)[ce$group == "100 pg RNA, SSIII",] %>% data.frame, aes(TSO, li
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_norm_counts_fixed_RNA_facet_RTP-1.png)<!-- -->
 
+
 Within a library, the reactions are multiplexed by simple pooling without normalisation.  Therefore, reactions that produced more cDNAs will give more sequence reads compared to the others.  Yield increases with TSO amounts, and does not vary much with RT primer amounts, although there may be a trend showing the need to match the RT primer molarity with the TSO molarity.  Effect of RNA amounts and enzyme can not be measured because of the per-library normalisation approach, which confounds with the RNA levels.
 
 
@@ -414,6 +484,24 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, libSizeNormBylib, color=RT_PRIMERS %
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_norm_counts_by_RTP_facet_RNA-1.png)<!-- -->
 
+
+
+```r
+ggplot(colData(ce) %>% data.frame, aes(TSO, libSizeNormBylib, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth(method = "loess") +
+  facet_wrap(~group+RT_PRIMERS, scales = "fixed", ncol = 6) +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10, 40, 160)) +
+  scale_y_log10( "Normalised counts (arbitrary scale)"
+               , breaks = c(0.01, 0.1, 1, 10)) +
+  labs( title = "Sequence yield") +
+  theme_TSO_by_RTP_facet_RNA()
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_norm_counts_by_RTP_facet_RNA_var-1.png)<!-- -->
+
 ### Contour plot
 
 
@@ -422,6 +510,13 @@ higherIsBetter(z, log(z$libSizeNormBylib), "Relative yield (arbitrary unit on lo
 ```
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/yield_countour-1.png)<!-- -->
+
+
+```r
+lowerIsBetter(zm, zm$libSizeNormBylib, "Relative yield (MAD/median)")
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/yield_countour_var-1.png)<!-- -->
 
 
 ## Mapping rate
@@ -449,6 +544,23 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, mapping_rate, color=RT_PRIMERS %>% f
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_mapping_rate_by_RTP_facet_RNA-1.png)<!-- -->
 
+
+
+```r
+ggplot(colData(ce) %>% data.frame, aes(TSO, mapping_rate, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth(method = "loess") +
+  facet_wrap(~group+RT_PRIMERS, scales = "fixed", ncol = 6) +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10, 40, 160)) +
+  scale_y_continuous("Mapping rate (MAD/median)") +
+  ggtitle("Mapping rate")  +
+  theme_TSO_by_RTP_facet_RNA()
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_mapping_rate_by_RTP_facet_RNA_var-1.png)<!-- -->
+
 ### Contour plot
 
 
@@ -458,6 +570,12 @@ higherIsBetter(z, z$mapping_rate, "Mapping rate (%)")
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/mapRate_countour-1.png)<!-- -->
 
+
+```r
+lowerIsBetter(zm, zm$mapping_rate, "Mapping rate (MAD/median)")
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/mapRate_countour_var-1.png)<!-- -->
 
 ## Strand invasion
 
@@ -484,6 +602,22 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, strand_invasion_rate, color=RT_PRIME
 ```
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_SI_rate_by_RTP_facet_RNA-1.png)<!-- -->
+
+
+```r
+ggplot(colData(ce) %>% data.frame, aes(TSO, strand_invasion_rate, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth(method = "loess") +
+  facet_wrap(~group+RT_PRIMERS, scales = "fixed", ncol = 6) +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10, 40, 160)) +
+  scale_y_continuous("Strand invasion rate (MAD/median)") +
+  labs( title = "Strand invasion") +
+  theme_TSO_by_RTP_facet_RNA()
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_SI_rate_by_RTP_facet_RNA_var-1.png)<!-- -->
 
 Because of 1 outlier, the scale is a bit compressed.  Here is the same plot with
 the outlier removed.
@@ -536,6 +670,12 @@ lowerIsBetter(z, z$strand_invasion_rate, "Strand invasion rate (%)")
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/SI_countour-1.png)<!-- -->
 
 
+```r
+lowerIsBetter(zm, zm$strand_invasion_rate, "Strand invasion rate (MAD/median)")
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/SI_countour_var-1.png)<!-- -->
+
 ## Promoter rate
 
 High promoter rate is THE goal of a CAGE experiment.  The molarity of RT
@@ -562,6 +702,24 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, promoter_rate, color=RT_PRIMERS %>% 
 ```
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_promoter_rate_by_RTP_facet_RNA-1.png)<!-- -->
+
+
+
+```r
+ggplot(colData(ce) %>% data.frame, aes(TSO, promoter_rate, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth(method = "loess") +
+  facet_wrap(~group+RT_PRIMERS, scales = "fixed", ncol = 6) +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10, 40, 160)) +
+  scale_y_continuous("Promoter rate (% of molecule counts after SI removal)") +
+  labs( title = "Promoter rate") +
+  theme_TSO_by_RTP_facet_RNA()
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_promoter_rate_by_RTP_facet_RNA_var-1.png)<!-- -->
+
 
 Low TSO molarities are much more detrimental for promoter rate at high RNA concentrations.
 
@@ -597,6 +755,15 @@ higherIsBetter(zz, zz$promoter_rate, "Promoter rate (%)")
 ```
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/promRate_countour_just1panel-1.png)<!-- -->
+
+
+
+```r
+lowerIsBetter(zm, zm$promoter_rate, "Promoter rate (MAD/median)")
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/promRate_countour_var-1.png)<!-- -->
+
 
 ## Richness (on genes)
 
@@ -636,6 +803,30 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, r10g, color=RT_PRIMERS %>% factor)) 
 
 
 ```r
+ggplot(colData(ce) %>% data.frame, aes(TSO, r10g, color=RT_PRIMERS %>% factor)) +
+  geom_point() +
+  geom_smooth(method = "loess") +
+  facet_wrap(~group+RT_PRIMERS, scales = "free", ncol = 6) +
+  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
+  scale_x_log10( "TS oligonucleotide molarity (µM)"
+               , breaks = c(0.6, 2.5, 10, 40, 160)) +
+  scale_y_continuous("Gene richness (on a scale of 10)") +
+  labs( title = "Richness on a scale of 10") +
+  theme_TSO_by_RTP_facet_RNA()
+```
+
+```
+## Warning: Removed 62 rows containing non-finite values (stat_smooth).
+```
+
+```
+## Warning: Removed 62 rows containing missing values (geom_point).
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/TSO_vs_richness10_by_RTP_facet_RNA_var-1.png)<!-- -->
+
+
+```r
 higherIsBetter(z, z$r10g, "Richness (on a scale of 10)")
 ```
 
@@ -648,6 +839,14 @@ higherIsBetter(z2, z2$r10g, "Richness (on a scale of 10)")
 ```
 
 ![](Labcyte-RT_Data_Analysis_8_files/figure-html/richness10_contour-2.png)<!-- -->
+
+
+
+```r
+lowerIsBetter(zm, zm$r10g, "Richness (MAD/median)")
+```
+
+![](Labcyte-RT_Data_Analysis_8_files/figure-html/richness10_contour_var-1.png)<!-- -->
 
 ### Richness scale of 100
 
