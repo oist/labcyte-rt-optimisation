@@ -199,11 +199,6 @@ zm$group.lattice <- factor(z$group, levels=levels(ce$group.lattice))
 
 zm$avg <- rowMeans(cbind(zm$TD_rate, zm$rRNA_rate, zm$mapping_rate, zm$strand_invasion_rate, zm$promoter_rate))
 
-all_MAD_over_mean <- c(zm$TD_rate, zm$rRNA_rate, zm$libSizeNormBylib, zm$mapping_rate, zm$strand_invasion_rate, zm$promoter_rate, zm$r10g)
-mean(all_MAD_over_mean, na.rm=TRUE)
-median(all_MAD_over_mean, na.rm=TRUE)
-hist(all_MAD_over_mean)
-
 # Calculated mads to survey variability but the plots are uninspiring.
 
 asp <- diff(range(log(z$RTP))) / diff(range(log(z$TSO))) # for lattice::contourplot
@@ -268,19 +263,6 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, TD_rate, color=RT_PRIMERS %>% factor
   theme_TSO_by_RTP_facet_RNA()
 ```
 
-```{r TSO_vs_tagDust_by_RTP_facet_RNA_var, fig.height=20, fig.width=10}
-ggplot(colData(ce) %>% data.frame, aes(TSO, TD_rate, color=RT_PRIMERS %>% factor)) +
-  geom_point() +
-  geom_smooth(method = "loess") +
-  facet_wrap(~group+RT_PRIMERS, scales = "fixed", ncol = 6) +
-  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
-  scale_x_log10( "TS oligonucleotide molarity (µM)"
-               , breaks = c(0.6, 2.5, 10.0, 40.0, 160.0)) +
-  scale_y_continuous("Tag dust (MAD/median of extracted reads)") +
-  labs( title = "Amount of oligonucleotide artefacts") +
-  theme_TSO_by_RTP_facet_RNA()
-```
-
 Sub panel at 10,000 pg is noisy because replicate `CGAGGCTG` is an outlier with
 a large amount of artefacts.  Here is the same figure with that library removed.
 
@@ -305,10 +287,6 @@ ggplot(colData(ce[, ! (ce$index == "CGAGGCTG" & ce$plateID == "R")]) %>% data.fr
 lowerIsBetter(z, z$TD_rate, "Amount of oligonucleotide artefacts (%)")
 ```
 
-```{r TagDust_countour_var, fig.width=6, fig.height=10, warning=FALSE}
-lowerIsBetter(zm, zm$TD_rate, "Amount of oligonucleotide artefacts (MAD/median)")
-```
-
 ## Ribosomal RNA
 
  - RT primers molarity increases rRNA rate.
@@ -330,27 +308,10 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, rRNA_rate, color=RT_PRIMERS %>% fact
   theme_TSO_by_RTP_facet_RNA()
 ```
 
-```{r TSO_vs_rRNA_by_RTP_facet_RNA_var, fig.height=20, fig.width=10}
-ggplot(colData(ce) %>% data.frame, aes(TSO, rRNA_rate, color=RT_PRIMERS %>% factor)) +
-  geom_point() +
-  geom_smooth(method = "loess") +
-  facet_wrap(~group+RT_PRIMERS, scales = "fixed", ncol = 6) +
-  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
-  scale_x_log10( "TS oligonucleotide molarity (µM)"
-               , breaks = c(0.6, 2.5, 10, 40, 160)) +
-  scale_y_continuous("rRNA (% of non-tagdust extracted reads)") +
-  labs( title = "Fraction of reads aligning to rRNA sequences.") +
-  theme_TSO_by_RTP_facet_RNA()
-```
-
 ### Contour plot
 
 ```{r rRNA_countour, fig.width=6, fig.height=10, warning=FALSE}
 lowerIsBetter(z, z$rRNA_rate, "Amount of ribosomal RNA sequences (%)")
-```
-
-```{r rRNA_countour_var, fig.width=6, fig.height=10, warning=FALSE}
-lowerIsBetter(zm, zm$rRNA_rate, "Amount of ribosomal RNA sequences (MAD/median)")
 ```
 
 
@@ -375,7 +336,6 @@ ggplot(colData(ce)[ce$group == "100 pg RNA, SSIII",] %>% data.frame, aes(TSO, li
   theme_TSO_by_RTP_facet_RNA()
 ```
 
-
 Within a library, the reactions are multiplexed by simple pooling without normalisation.  Therefore, reactions that produced more cDNAs will give more sequence reads compared to the others.  Yield increases with TSO amounts, and does not vary much with RT primer amounts, although there may be a trend showing the need to match the RT primer molarity with the TSO molarity.  Effect of RNA amounts and enzyme can not be measured because of the per-library normalisation approach, which confounds with the RNA levels.
 
 ```{r TSO_vs_norm_counts_by_RTP_facet_RNA, fig.height=8, fig.width=5}
@@ -392,29 +352,10 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, libSizeNormBylib, color=RT_PRIMERS %
   theme_TSO_by_RTP_facet_RNA()
 ```
 
-
-```{r TSO_vs_norm_counts_by_RTP_facet_RNA_var, fig.height=20, fig.width=10}
-ggplot(colData(ce) %>% data.frame, aes(TSO, libSizeNormBylib, color=RT_PRIMERS %>% factor)) +
-  geom_point() +
-  geom_smooth(method = "loess") +
-  facet_wrap(~group+RT_PRIMERS, scales = "fixed", ncol = 6) +
-  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
-  scale_x_log10( "TS oligonucleotide molarity (µM)"
-               , breaks = c(0.6, 2.5, 10, 40, 160)) +
-  scale_y_log10( "Normalised counts (arbitrary scale)"
-               , breaks = c(0.01, 0.1, 1, 10)) +
-  labs( title = "Sequence yield") +
-  theme_TSO_by_RTP_facet_RNA()
-```
-
 ### Contour plot
 
 ```{r yield_countour, fig.width=6, fig.height=10, warning=FALSE}
 higherIsBetter(z, log(z$libSizeNormBylib), "Relative yield (arbitrary unit on log scale)")
-```
-
-```{r yield_countour_var, fig.width=6, fig.height=10, warning=FALSE}
-lowerIsBetter(zm, zm$libSizeNormBylib, "Relative yield (MAD/median)")
 ```
 
 
@@ -440,29 +381,12 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, mapping_rate, color=RT_PRIMERS %>% f
   theme_TSO_by_RTP_facet_RNA()
 ```
 
-
-```{r TSO_vs_mapping_rate_by_RTP_facet_RNA_var, fig.height=20, fig.width=10}
-ggplot(colData(ce) %>% data.frame, aes(TSO, mapping_rate, color=RT_PRIMERS %>% factor)) +
-  geom_point() +
-  geom_smooth(method = "loess") +
-  facet_wrap(~group+RT_PRIMERS, scales = "fixed", ncol = 6) +
-  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
-  scale_x_log10( "TS oligonucleotide molarity (µM)"
-               , breaks = c(0.6, 2.5, 10, 40, 160)) +
-  scale_y_continuous("Mapping rate (MAD/median)") +
-  ggtitle("Mapping rate")  +
-  theme_TSO_by_RTP_facet_RNA()
-```
-
 ### Contour plot
 
 ```{r mapRate_countour, fig.width=6, fig.height=10, warning=FALSE}
 higherIsBetter(z, z$mapping_rate, "Mapping rate (%)")
 ```
 
-```{r mapRate_countour_var, fig.width=6, fig.height=10, warning=FALSE}
-lowerIsBetter(zm, zm$mapping_rate, "Mapping rate (MAD/median)")
-```
 
 ## Strand invasion
 
@@ -484,19 +408,6 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, strand_invasion_rate, color=RT_PRIME
   scale_y_continuous("Strand invasion rate (% of molecule counts)") +
   labs( title = "Strand invasion"
       , caption = stringr::str_wrap(width = 50, "Strand invasion artefacts are reduced by adding more RT primers.  With SuperScript III, the molarity of TSOs has to be increased at high RNA concentrations.  This does not seem to be teh case with SuperScript IV.")) +
-  theme_TSO_by_RTP_facet_RNA()
-```
-
-```{r TSO_vs_SI_rate_by_RTP_facet_RNA_var, fig.height=20, fig.width=10}
-ggplot(colData(ce) %>% data.frame, aes(TSO, strand_invasion_rate, color=RT_PRIMERS %>% factor)) +
-  geom_point() +
-  geom_smooth(method = "loess") +
-  facet_wrap(~group+RT_PRIMERS, scales = "fixed", ncol = 6) +
-  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
-  scale_x_log10( "TS oligonucleotide molarity (µM)"
-               , breaks = c(0.6, 2.5, 10, 40, 160)) +
-  scale_y_continuous("Strand invasion rate (MAD/median)") +
-  labs( title = "Strand invasion") +
   theme_TSO_by_RTP_facet_RNA()
 ```
 
@@ -541,9 +452,6 @@ ggplot(subset(colData(ce), group == "100 ng RNA, SSIII") %>% data.frame, aes(TSO
 lowerIsBetter(z, z$strand_invasion_rate, "Strand invasion rate (%)")
 ```
 
-```{r SI_countour_var, fig.width=6, fig.height=10, warning=FALSE}
-lowerIsBetter(zm, zm$strand_invasion_rate, "Strand invasion rate (MAD/median)")
-```
 
 ## Promoter rate
 
@@ -568,21 +476,6 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, promoter_rate, color=RT_PRIMERS %>% 
       , caption = stringr::str_wrap(width = 50, "Promoter rates increases with TSO and RT primer molarity.  It is higher with SuperScript III than with SSIV.")) +
   theme_TSO_by_RTP_facet_RNA()
 ```
-
-
-```{r TSO_vs_promoter_rate_by_RTP_facet_RNA_var, fig.height=20, fig.width=10}
-ggplot(colData(ce) %>% data.frame, aes(TSO, promoter_rate, color=RT_PRIMERS %>% factor)) +
-  geom_point() +
-  geom_smooth(method = "loess") +
-  facet_wrap(~group+RT_PRIMERS, scales = "fixed", ncol = 6) +
-  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
-  scale_x_log10( "TS oligonucleotide molarity (µM)"
-               , breaks = c(0.6, 2.5, 10, 40, 160)) +
-  scale_y_continuous("Promoter rate (% of molecule counts after SI removal)") +
-  labs( title = "Promoter rate") +
-  theme_TSO_by_RTP_facet_RNA()
-```
-
 
 Low TSO molarities are much more detrimental for promoter rate at high RNA concentrations.
 
@@ -610,12 +503,6 @@ zz <- z[z$group.lattice == "10 ng RNA, SSIII",]
 higherIsBetter(zz, zz$promoter_rate, "Promoter rate (%)")
 ```
 
-
-```{r promRate_countour_var, fig.width=6, fig.height=10, warning=FALSE}
-lowerIsBetter(zm, zm$promoter_rate, "Promoter rate (MAD/median)")
-```
-
-
 ## Richness (on genes)
 
 Using a free plotting scale as richness reaches extremely low values at 1 pg RNA.
@@ -641,29 +528,11 @@ ggplot(colData(ce) %>% data.frame, aes(TSO, r10g, color=RT_PRIMERS %>% factor)) 
   theme_TSO_by_RTP_facet_RNA()
 ```
 
-```{r TSO_vs_richness10_by_RTP_facet_RNA_var, fig.height=20, fig.width=10}
-ggplot(colData(ce) %>% data.frame, aes(TSO, r10g, color=RT_PRIMERS %>% factor)) +
-  geom_point() +
-  geom_smooth(method = "loess") +
-  facet_wrap(~group+RT_PRIMERS, scales = "free", ncol = 6) +
-  scale_color_viridis(discrete = TRUE, name = "[RTP] (µM)") +
-  scale_x_log10( "TS oligonucleotide molarity (µM)"
-               , breaks = c(0.6, 2.5, 10, 40, 160)) +
-  scale_y_continuous("Gene richness (on a scale of 10)") +
-  labs( title = "Richness on a scale of 10") +
-  theme_TSO_by_RTP_facet_RNA()
-```
-
 ```{r richness10_contour, fig.width=6, fig.height=10, warning=FALSE}
 higherIsBetter(z, z$r10g, "Richness (on a scale of 10)")
 z2 <- z
 z2[z2$TSO == 5 & z2$RTP == 4 & z2$group == "1 pg RNA, SSIII", "r10g"] <- NA
 higherIsBetter(z2, z2$r10g, "Richness (on a scale of 10)")
-```
-
-
-```{r richness10_contour_var, fig.width=6, fig.height=10, warning=FALSE}
-lowerIsBetter(zm, zm$r10g, "Richness (MAD/median)")
 ```
 
 ### Richness scale of 100
@@ -711,6 +580,19 @@ summaryPlot <- function(group) {
 }
 summaryPlot("100 ng RNA, SSIII")
 summaryPlot("10 pg RNA, SSIV")
+```
+
+Pareto
+======
+
+```{r pareto}
+library("rPref")
+library("ggplot2")
+res <- psel(z,high(z$promoter_rate) * low(z$TD_rate))
+ggplot(res, aes(x=promoter_rate, y=TD_rate)) + geom_point(aes(size=5, col=group)) + geom_step()
+res <- psel(z,high(z$a) * low(z$b))
+ggplot(res, aes(x=a, y=b)) + geom_point(aes(size=5, col=group)) + geom_step()
+
 ```
 
 
