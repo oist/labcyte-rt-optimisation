@@ -1,4 +1,0 @@
-serve_html:
-  script:
-    - mkdir -p /osc-fs_home/plessy/public_html/Labcyte-RT-optimisation
-    - cp *html /osc-fs_home/plessy/public_html/Labcyte-RT-optimisation/
