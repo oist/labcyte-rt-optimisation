@@ -180,8 +180,8 @@ MOIRAI
 
 Our results match well with a collection of [experiments on single
 cells](singleCells.md) that we performed earlier.  The raw data is available on
-Zenodo (<http://doi.org/10.5281/zenodo.250156>).  The alignments will be
-uploaded soon.
+Zenodo (<http://doi.org/10.5281/zenodo.250156>) and the alignment files at
+<https://doi.org/10.5281/zenodo.3340196>.
 
 
 Xmas project
